@@ -1,13 +1,16 @@
+import { type  MoneyValue } from "./MoneyValue";
+
 export interface ProjectionYear {
+     yearIndex: number;
   age: number;
 
-  openingBalance: number;
+  openingBalance: MoneyValue;
 
-  contributions: number;
+  contributions: MoneyValue;
 
-  investmentGrowth: number;
+  investmentGrowth: MoneyValue;
 
-  fees: number;
+  fees: MoneyValue;
 
-  closingBalance: number;
+  closingBalance: MoneyValue;
 }
