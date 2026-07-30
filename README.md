@@ -1,29 +1,35 @@
-# Compact Drawdown Dashboard
+# Retirement comparison dashboard patch
 
-Copy the included `src` folder over the project `src` folder.
+This patch replaces the compact retirement planner's original side-by-side comparison results with a decision-focused comparison dashboard.
 
-## What changes
+## Included changes
 
-- Sticky compact assumptions sidebar on desktop
-- Compact outcome cards across the top
-- Balance and income charts combined into a tabbed chart area
-- New key-insights panel
-- Projection table collapsed by default
-- Calculation assumptions collapsed by default
-- Responsive tablet and mobile layouts
-- Existing financial engine, tax calculations and inflation display logic remain unchanged
+- Plain-English outcome banner
+- Difference-first metric cards
+- Existing overlaid balance chart retained
+- Benefits and trade-offs panel
+- Assumptions table showing changed values first
+- Optional display of unchanged assumptions
+- Retirement timeline
+- Collapsible year-by-year comparison table
+- Collapsible side-by-side scenario editors
+- Swap plans and copy current plan actions
+- Responsive desktop, tablet, and mobile styling
+
+## Installation
+
+Copy the included `src` folder over the existing project `src` folder.
+
+This patch assumes the earlier compact retirement dashboard patch is already installed.
 
 ## Validation
 
-Run:
+TypeScript compilation passed with:
 
 ```powershell
-npm run test:run
-npm run build
+node node_modules/typescript/bin/tsc -b
 ```
 
-The patch was TypeScript-checked with:
+The Vite production build could not run in the Linux validation container because the existing project dependency tree is missing the optional native package `@rolldown/binding-linux-x64-gnu`. This is the same environment-specific Rolldown issue encountered with earlier patches.
 
-```powershell
-npx tsc --noEmit -p tsconfig.app.json
-```
+No pension projection calculations were changed.
