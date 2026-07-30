@@ -1,19 +1,29 @@
-# Inflation display mode
+# Compact Drawdown Dashboard
 
-Copy the included `src` folder over the project source folder.
+Copy the included `src` folder over the project `src` folder.
 
-This update adds a presentation-only selector for:
+## What changes
 
-- Future money (nominal projected pounds)
-- Today's money (inflation-discounted values)
+- Sticky compact assumptions sidebar on desktop
+- Compact outcome cards across the top
+- Balance and income charts combined into a tabbed chart area
+- New key-insights panel
+- Projection table collapsed by default
+- Calculation assumptions collapsed by default
+- Responsive tablet and mobile layouts
+- Existing financial engine, tax calculations and inflation display logic remain unchanged
 
-The drawdown and tax engines remain unchanged and continue to calculate in nominal pounds. The first modelled drawdown year is the base year for the real-value conversion because the drawdown planner starts at retirement.
+## Validation
 
 Run:
 
 ```powershell
-npm run test:run -- src/utils/drawdownDisplayValues.test.ts src/engine/drawdown/__tests__
+npm run test:run
 npm run build
 ```
 
-TypeScript compilation was verified in the build workspace. Vitest could not start there because the uploaded Windows dependency tree does not contain the Linux Rolldown native binding.
+The patch was TypeScript-checked with:
+
+```powershell
+npx tsc --noEmit -p tsconfig.app.json
+```
