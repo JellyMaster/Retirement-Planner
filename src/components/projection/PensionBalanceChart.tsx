@@ -12,6 +12,12 @@ import {
 
 import type { ProjectionYear } from "../../engine/models/ProjectionYear";
 
+import {
+  formatCompactCurrency,
+  formatCurrency,
+} from "../../utils/formatters";
+
+
 interface PensionBalanceChartProps {
   years: ProjectionYear[];
 }
@@ -85,7 +91,7 @@ export function PensionBalanceChart({
               tickLine={false}
               axisLine={false}
               width={85}
-              tickFormatter={formatAxisCurrency}
+              tickFormatter={formatCompactCurrency}
             />
 
             <Tooltip
@@ -99,7 +105,7 @@ export function PensionBalanceChart({
                   Number(rawValue ?? 0);
 
                 return [
-                  formatFullCurrency(
+                  formatCurrency(
                     Number.isFinite(
                       numericValue
                     )
@@ -143,31 +149,5 @@ export function PensionBalanceChart({
   );
 }
 
-function formatAxisCurrency(
-  value: number
-): string {
-  if (Math.abs(value) >= 1_000_000) {
-    return `£${(
-      value / 1_000_000
-    ).toFixed(1)}m`;
-  }
 
-  if (Math.abs(value) >= 1_000) {
-    return `£${Math.round(
-      value / 1_000
-    )}k`;
-  }
-
-  return `£${Math.round(value)}`;
-}
-
-function formatFullCurrency(
-  value: number
-): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 

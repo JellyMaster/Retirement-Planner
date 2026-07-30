@@ -705,3 +705,83 @@ input {
     height: 340px;
   }
 }
+
+html {
+  background: var(--colour-background);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+
+  background: var(--colour-background);
+  color: var(--colour-text);
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  background: var(--colour-input-background);
+  color: var(--colour-text);
+  border: 1px solid var(--colour-border);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--colour-text-muted);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  padding: 0.55rem 0.8rem;
+
+  background: var(--colour-surface);
+  color: var(--colour-text);
+
+  border: 1px solid var(--colour-border);
+  border-radius: 0.5rem;
+
+  cursor: pointer;
+
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.theme-toggle:hover {
+  background: var(--colour-surface-secondary);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid
+    color-mix(
+      in srgb,
+      var(--colour-primary) 40%,
+      transparent
+    );
+  outline-offset: 2px;
+}
+
+.theme-toggle__icon {
+  line-height: 1;
+}
+
+.theme-toggle__label {
+  white-space: nowrap;
+}

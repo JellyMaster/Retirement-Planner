@@ -7,6 +7,7 @@ import type { PensionInputs } from "../../engine/models/PensionInputs";
 import type { PensionInputErrors } from "../../validation/validatePensionInputs";
 
 interface PensionInputsFormProps {
+    idPrefix?: string;
   value: PensionInputs;
   errors: PensionInputErrors;
 
@@ -26,11 +27,18 @@ type OptionalNumericField =
   | "extraMonthlyContribution";
 
 export function PensionInputsForm({
+  idPrefix = "pension",
   value,
   errors,
   onChange,
   onReset,
 }: PensionInputsFormProps) {
+ function createFieldId(
+    fieldName: string
+  ): string {
+    return `${idPrefix}-${fieldName}`;
+  }
+
   function updateRequiredNumber(
     field: RequiredNumericField,
     event: ChangeEvent<HTMLInputElement>
@@ -83,7 +91,7 @@ export function PensionInputsForm({
           description="Your current age and planned retirement age."
         >
           <NumberField
-            id="currentAge"
+            id={createFieldId("currentAge")}
             label="Current age"
             value={value.currentAge}
             min={18}
@@ -98,7 +106,7 @@ export function PensionInputsForm({
           />
 
           <NumberField
-            id="retirementAge"
+            id={createFieldId("retirementAge")}
             label="Retirement age"
             value={value.retirementAge}
             min={18}
@@ -118,7 +126,7 @@ export function PensionInputsForm({
           description="Your pension balance and regular monthly contributions."
         >
           <NumberField
-            id="currentPot"
+            id={createFieldId("currentPot")}
             label="Current pension pot"
             prefix="£"
             value={value.currentPot}
@@ -134,7 +142,9 @@ export function PensionInputsForm({
           />
 
           <NumberField
-            id="employeeContribution"
+           id={createFieldId(
+  "employeeContribution"
+)}
             label="Your monthly contribution"
             prefix="£"
             value={
@@ -154,7 +164,9 @@ export function PensionInputsForm({
           />
 
           <NumberField
-            id="employerContribution"
+           id={createFieldId(
+  "employerContribution"
+)}
             label="Employer monthly contribution"
             prefix="£"
             value={
@@ -179,7 +191,7 @@ export function PensionInputsForm({
           description="Expected return, pension fees and inflation."
         >
           <PercentageField
-            id="annualReturn"
+            id={createFieldId("annualReturn")}
             label="Expected annual return"
             value={value.annualReturn}
             max={20}
@@ -193,7 +205,7 @@ export function PensionInputsForm({
           />
 
           <PercentageField
-            id="annualFee"
+            id={createFieldId("annualFee")}
             label="Annual pension fee"
             value={value.annualFee}
             max={5}
@@ -208,7 +220,7 @@ export function PensionInputsForm({
           />
 
           <PercentageField
-            id="inflation"
+           id={createFieldId("inflation")}
             label="Expected inflation"
             value={value.inflation}
             max={15}
@@ -227,7 +239,9 @@ export function PensionInputsForm({
           description="Model annual increases or additional monthly payments."
         >
           <PercentageField
-            id="contributionIncrease"
+          id={createFieldId(
+  "contributionIncrease"
+)}
             label="Annual contribution increase"
             value={
               value.annualContributionIncrease
@@ -247,7 +261,9 @@ export function PensionInputsForm({
           />
 
           <NumberField
-            id="extraContributionAge"
+            id={createFieldId(
+  "extraContributionAge"
+)}
             label="Extra contribution starts at age"
             value={
               value.extraContributionAge ?? ""
@@ -264,7 +280,9 @@ export function PensionInputsForm({
           />
 
           <NumberField
-            id="extraMonthlyContribution"
+           id={createFieldId(
+  "extraMonthlyContribution"
+)}
             label="Extra monthly contribution"
             prefix="£"
             value={

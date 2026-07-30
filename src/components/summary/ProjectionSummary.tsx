@@ -1,8 +1,10 @@
 import type { ProjectionResult } from "../../engine/models/ProjectionResult";
+import { formatCurrency } from "../../utils/formatters";
 
 interface ProjectionSummaryProps {
   result: ProjectionResult;
 }
+
 
 export function ProjectionSummary({
   result,
@@ -89,10 +91,3 @@ function SummaryCard({
   );
 }
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}

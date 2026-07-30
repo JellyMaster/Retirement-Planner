@@ -9,6 +9,8 @@ interface ScenarioSummaryCardProps {
   difference?: number;
 }
 
+import { formatCurrency } from "../../utils/formatters";
+
 export function ScenarioSummaryCard({
   title,
   result,
@@ -122,13 +124,4 @@ function DifferenceBadge({
   );
 }
 
-function formatCurrency(
-  value: number
-): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 

@@ -6,6 +6,10 @@ import {
   getProjectionMilestones,
   type ProjectionMilestone,
 } from "../../engine/utils/getProjectionMilestones";
+import {
+  formatCompactCurrency,
+  formatCurrency,
+} from "../../utils/formatters";
 
 interface ProjectionMilestonesProps {
   years: ProjectionYear[];
@@ -113,32 +117,5 @@ function MilestoneCard({
   );
 }
 
-function formatCompactCurrency(
-  value: number
-): string {
-  if (value >= 1_000_000) {
-    const millions = value / 1_000_000;
 
-    return `£${millions.toFixed(
-      Number.isInteger(millions) ? 0 : 1
-    )}m`;
-  }
 
-  if (value >= 1_000) {
-    return `£${Math.round(
-      value / 1_000
-    )}k`;
-  }
-
-  return formatCurrency(value);
-}
-
-function formatCurrency(
-  value: number
-): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}

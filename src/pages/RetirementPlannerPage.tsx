@@ -1,4 +1,3 @@
-
 import {
   useMemo,
   useState,
@@ -16,14 +15,16 @@ import { ProjectionSummary } from "../components/summary/ProjectionSummary";
 
 import { defaultPensionInputs } from "../config/defaultPensionInputs";
 
-import { ProjectionResultFactory } from "../engine/factories/ProjectionResultFactory";
 import type { PensionInputs } from "../engine/models/PensionInputs";
-import { RetirementProjectionEngine } from "../engine/services/RetirementProjectionEngine";
 
+import { usePensionProjection } from "../hooks/usePensionProjection";
+
+import { ThemeToggle } from "../components/theme/ThemeToggle";
 import {
-  hasPensionInputErrors,
-  validatePensionInputs,
-} from "../validation/validatePensionInputs";
+  formatCurrency,
+  formatPercentage,
+} from "../utils/formatters";
+
 
 export function RetirementPlannerPage() {
   const [inputs, setInputs] =
@@ -43,58 +44,11 @@ export function RetirementPlannerPage() {
     setComparisonEnabled,
   ] = useState(false);
 
-  const errors = useMemo(
-    () => validatePensionInputs(inputs),
-    [inputs]
-  );
+  const currentScenario =
+    usePensionProjection(inputs);
 
-  const comparisonErrors = useMemo(
-    () =>
-      validatePensionInputs(
-        comparisonInputs
-      ),
-    [comparisonInputs]
-  );
-
-  const hasErrors =
-    hasPensionInputErrors(errors);
-
-  const comparisonHasErrors =
-    hasPensionInputErrors(
-      comparisonErrors
-    );
-
-  const projection = useMemo(() => {
-    if (hasErrors) {
-      return ProjectionResultFactory.create(
-        []
-      );
-    }
-
-    return RetirementProjectionEngine.calculate(
-      inputs
-    );
-  }, [inputs, hasErrors]);
-
-  const comparisonProjection =
-    useMemo(() => {
-      if (
-        !comparisonEnabled ||
-        comparisonHasErrors
-      ) {
-        return ProjectionResultFactory.create(
-          []
-        );
-      }
-
-      return RetirementProjectionEngine.calculate(
-        comparisonInputs
-      );
-    }, [
-      comparisonInputs,
-      comparisonEnabled,
-      comparisonHasErrors,
-    ]);
+  const comparisonScenario =
+    usePensionProjection(comparisonInputs);
 
   const assumptions = useMemo(
     () => [
@@ -117,7 +71,8 @@ export function RetirementPlannerPage() {
       {
         label: "Monthly contribution",
         value: formatCurrency(
-          inputs.monthlyEmployeeContribution + inputs.monthlyEmployerContribution
+          inputs.monthlyEmployeeContribution +
+            inputs.monthlyEmployerContribution
         ),
       },
       {
@@ -149,8 +104,10 @@ export function RetirementPlannerPage() {
   );
 
   const finalBalanceDifference =
-    comparisonProjection.finalBalance.nominal -
-    projection.finalBalance.nominal;
+    comparisonScenario.projection.finalBalance
+      .nominal -
+    currentScenario.projection.finalBalance
+      .nominal;
 
   function resetInputs() {
     setInputs({
@@ -189,6 +146,8 @@ export function RetirementPlannerPage() {
           Adjust your assumptions to see how
           your pension could grow over time.
         </p>
+
+         <ThemeToggle />
       </header>
 
       <div className="comparison-toggle-row">
@@ -236,8 +195,9 @@ export function RetirementPlannerPage() {
           )}
 
           <PensionInputsForm
+            idPrefix="current"
             value={inputs}
-            errors={errors}
+            errors={currentScenario.errors}
             onChange={setInputs}
             onReset={resetInputs}
           />
@@ -251,8 +211,11 @@ export function RetirementPlannerPage() {
             </div>
 
             <PensionInputsForm
+              idPrefix="comparison"
               value={comparisonInputs}
-              errors={comparisonErrors}
+              errors={
+                comparisonScenario.errors
+              }
               onChange={
                 setComparisonInputs
               }
@@ -261,7 +224,7 @@ export function RetirementPlannerPage() {
               }
             />
           </div>
-        ) : hasErrors ? (
+        ) : currentScenario.hasErrors ? (
           <section className="panel">
             <div className="panel-heading">
               <h2>Your projection</h2>
@@ -274,16 +237,21 @@ export function RetirementPlannerPage() {
           </section>
         ) : (
           <ProjectionSummary
-            result={projection}
+            result={
+              currentScenario.projection
+            }
           />
         )}
       </section>
 
       {comparisonEnabled ? (
         <>
-          {hasErrors ||
-          comparisonHasErrors ? (
-            <section className="validation-notice">
+          {currentScenario.hasErrors ||
+          comparisonScenario.hasErrors ? (
+            <section
+              className="validation-notice"
+              role="alert"
+            >
               Correct the highlighted fields
               in both scenarios to view the
               comparison.
@@ -303,25 +271,29 @@ export function RetirementPlannerPage() {
                 <div className="scenario-results-grid">
                   <ScenarioSummaryCard
                     title="Current plan"
-                    result={projection}
+                    result={
+                      currentScenario.projection
+                    }
                     retirementAge={
                       inputs.retirementAge
                     }
                     monthlyContribution={
-                      inputs.monthlyEmployeeContribution + inputs.monthlyEmployerContribution
+                      inputs.monthlyEmployeeContribution +
+                      inputs.monthlyEmployerContribution
                     }
                   />
 
                   <ScenarioSummaryCard
                     title="Comparison plan"
                     result={
-                      comparisonProjection
+                      comparisonScenario.projection
                     }
                     retirementAge={
                       comparisonInputs.retirementAge
                     }
                     monthlyContribution={
-                      comparisonInputs.monthlyEmployeeContribution + comparisonInputs.monthlyEmployerContribution
+                      comparisonInputs.monthlyEmployeeContribution +
+                      comparisonInputs.monthlyEmployerContribution
                     }
                     difference={
                       finalBalanceDifference
@@ -332,17 +304,22 @@ export function RetirementPlannerPage() {
 
               <ScenarioComparisonChart
                 baseYears={
-                  projection.years
+                  currentScenario.projection
+                    .years
                 }
                 comparisonYears={
-                  comparisonProjection.years
+                  comparisonScenario.projection
+                    .years
                 }
               />
             </>
           )}
         </>
-      ) : hasErrors ? (
-        <section className="validation-notice">
+      ) : currentScenario.hasErrors ? (
+        <section
+          className="validation-notice"
+          role="alert"
+        >
           Correct the highlighted fields to
           view your projection.
         </section>
@@ -353,43 +330,31 @@ export function RetirementPlannerPage() {
           />
 
           <ProjectionMilestones
-            years={projection.years}
+            years={
+              currentScenario.projection.years
+            }
           />
 
           <PensionBalanceChart
-            years={projection.years}
+            years={
+              currentScenario.projection.years
+            }
           />
 
           <ContributionGrowthChart
-            years={projection.years}
+            years={
+              currentScenario.projection.years
+            }
           />
 
           <ProjectionTable
-            years={projection.years}
+            years={
+              currentScenario.projection.years
+            }
           />
         </>
       )}
     </main>
   );
-}
-
-function formatCurrency(
-  value: number
-): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function formatPercentage(
-  value: number
-): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "percent",
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 2,
-  }).format(value);
 }
 

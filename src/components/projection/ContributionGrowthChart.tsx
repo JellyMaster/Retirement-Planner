@@ -12,6 +12,11 @@ import {
 
 import type { ProjectionYear } from "../../engine/models/ProjectionYear";
 
+import {
+  formatCompactCurrency,
+  formatCurrency,
+} from "../../utils/formatters";
+
 interface ContributionGrowthChartProps {
   years: ProjectionYear[];
 }
@@ -89,7 +94,7 @@ export function ContributionGrowthChart({
               tickLine={false}
               axisLine={false}
               width={85}
-              tickFormatter={formatAxisCurrency}
+              tickFormatter={formatCompactCurrency}
             />
 
             <Tooltip
@@ -104,7 +109,7 @@ export function ContributionGrowthChart({
                 );
 
                 return [
-                  formatFullCurrency(
+                  formatCurrency(
                     Math.abs(
                       Number.isFinite(numericValue)
                         ? numericValue
@@ -147,36 +152,5 @@ export function ContributionGrowthChart({
   );
 }
 
-function formatAxisCurrency(
-  value: number
-): string {
-  const absoluteValue = Math.abs(value);
-  const prefix = value < 0 ? "-£" : "£";
 
-  if (absoluteValue >= 1_000_000) {
-    return `${prefix}${(
-      absoluteValue / 1_000_000
-    ).toFixed(1)}m`;
-  }
-
-  if (absoluteValue >= 1_000) {
-    return `${prefix}${Math.round(
-      absoluteValue / 1_000
-    )}k`;
-  }
-
-  return `${prefix}${Math.round(
-    absoluteValue
-  )}`;
-}
-
-function formatFullCurrency(
-  value: number
-): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 

@@ -12,6 +12,11 @@ import {
 
 import type { ProjectionYear } from "../../engine/models/ProjectionYear";
 
+import {
+  formatCompactCurrency,
+  formatCurrency,
+} from "../../utils/formatters";
+
 interface ScenarioComparisonChartProps {
   baseYears: ProjectionYear[];
   comparisonYears: ProjectionYear[];
@@ -84,7 +89,7 @@ export function ScenarioComparisonChart({
               tickLine={false}
               axisLine={false}
               width={85}
-              tickFormatter={formatAxisCurrency}
+              tickFormatter={formatCompactCurrency}
             />
 
             <Tooltip
@@ -180,35 +185,7 @@ function createChartData(
   });
 }
 
-function formatAxisCurrency(
-  value: number
-): string {
-  const absoluteValue = Math.abs(value);
 
-  if (absoluteValue >= 1_000_000) {
-    return `£${(
-      absoluteValue / 1_000_000
-    ).toFixed(1)}m`;
-  }
 
-  if (absoluteValue >= 1_000) {
-    return `£${Math.round(
-      absoluteValue / 1_000
-    )}k`;
-  }
 
-  return `£${Math.round(
-    absoluteValue
-  )}`;
-}
-
-function formatCurrency(
-  value: number
-): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
