@@ -39,10 +39,10 @@ export class PensionInputsValidator {
       "Annual return"
     );
 
-    this.requirePercentageBelowOne(
-      inputs.annualFee,
-      "Annual fee"
-    );
+    this.requireNonNegative(
+  inputs.annualFee,
+  "Annual fee"
+);
 
     this.requireNonNegative(
       inputs.inflation,
@@ -62,19 +62,63 @@ export class PensionInputsValidator {
       );
     }
 
-    if (inputs.annualReturn <= -1) {
-      throw new RangeError(
-        "Annual return must be greater than -100%."
-      );
-    }
+  
 
-    if (
-      inputs.annualContributionIncrease <= -1
-    ) {
-      throw new RangeError(
-        "Annual contribution increase must be greater than -100%."
-      );
-    }
+if (
+  inputs.currentAge < 18 ||
+  inputs.currentAge > 100
+) {
+  throw new RangeError(
+    "Current age must be between 18 and 100."
+  );
+}
+
+if (inputs.retirementAge > 100) {
+  throw new RangeError(
+    "Retirement age cannot be greater than 100."
+  );
+}
+
+if (
+  inputs.annualContributionIncrease < 0 ||
+  inputs.annualContributionIncrease > 0.2
+) {
+  throw new RangeError(
+    "Annual contribution increase must be between 0% and 20%."
+  );
+}
+
+if (
+  inputs.annualReturn < 0 ||
+  inputs.annualReturn > 0.2
+) {
+  throw new RangeError(
+    "Annual return must be between 0% and 20%."
+  );
+}
+
+if (
+  inputs.annualFee < 0 ||
+  inputs.annualFee > 0.05
+) {
+  throw new RangeError(
+    "Annual fee must be between 0% and 5%."
+  );
+}
+
+if (
+  inputs.inflation < 0 ||
+  inputs.inflation > 0.15
+) {
+  throw new RangeError(
+    "Inflation must be between 0% and 15%."
+  );
+}
+
+
+
+
+
 
     this.validateExtraContribution(inputs);
   }
@@ -186,16 +230,5 @@ export class PensionInputsValidator {
     }
   }
 
-  private static requirePercentageBelowOne(
-    value: number,
-    name: string
-  ): void {
-    this.requireNonNegative(value, name);
-
-    if (value >= 1) {
-      throw new RangeError(
-        `${name} must be below 100%.`
-      );
-    }
-  }
+ 
 }
