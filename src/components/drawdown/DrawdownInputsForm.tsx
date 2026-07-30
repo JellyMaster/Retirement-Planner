@@ -120,11 +120,38 @@ export function DrawdownInputsForm({
 
         <FormSection
           title="Retirement income"
-          description="Set the fixed annual income ceiling and starting State Pension amount."
+          description="Choose whether the annual target is before or after income tax."
         >
+          <div className="form-field form-field-wide">
+            <span className="form-field-label">Income target basis</span>
+            <div className="income-target-toggle" role="group" aria-label="Income target basis">
+              <button
+                type="button"
+                className={`income-target-option${value.incomeTargetMode === "net" ? " income-target-option-active" : ""}`}
+                aria-pressed={value.incomeTargetMode === "net"}
+                onClick={() => onChange("incomeTargetMode", "net")}
+              >
+                Net spendable income
+              </button>
+              <button
+                type="button"
+                className={`income-target-option${value.incomeTargetMode === "gross" ? " income-target-option-active" : ""}`}
+                aria-pressed={value.incomeTargetMode === "gross"}
+                onClick={() => onChange("incomeTargetMode", "gross")}
+              >
+                Gross income
+              </button>
+            </div>
+            <p className="field-help">
+              {value.incomeTargetMode === "net"
+                ? "The planner increases the taxable withdrawal enough to meet this amount after tax."
+                : "Income tax is deducted from this amount, so spendable income will be lower."}
+            </p>
+          </div>
+
           <NumberField
             id={createFieldId("desiredAnnualIncome")}
-            label="Desired annual income"
+            label={value.incomeTargetMode === "net" ? "Desired net annual income" : "Desired gross annual income"}
             prefix="£"
             value={value.desiredAnnualIncome}
             min={0}

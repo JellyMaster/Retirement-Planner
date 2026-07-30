@@ -6,6 +6,7 @@ export function createDefaultDrawdownInputs(): DrawdownInputs {
     retirementAge: 68,
     endAge: 95,
     desiredAnnualIncome: 30_000,
+    incomeTargetMode: "net",
     annualStatePension: 12_000,
     statePensionAge: 68,
     annualReturn: 0.05,

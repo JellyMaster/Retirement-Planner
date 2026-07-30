@@ -1,8 +1,10 @@
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
+import type { MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import { formatCurrency } from "../../utils/formatters";
 
 interface DrawdownAssumptionsPanelProps {
   inputs: DrawdownInputs;
+  displayMode: MoneyDisplayMode;
 }
 
 function formatPercentage(value: number, maximumFractionDigits = 2): string {
@@ -15,6 +17,7 @@ function formatPercentage(value: number, maximumFractionDigits = 2): string {
 
 export function DrawdownAssumptionsPanel({
   inputs,
+  displayMode,
 }: DrawdownAssumptionsPanelProps) {
   const projectionYears = Math.max(0, inputs.endAge - inputs.retirementAge);
 
@@ -28,7 +31,7 @@ export function DrawdownAssumptionsPanel({
       value: `${inputs.retirementAge} to ${inputs.endAge} (${projectionYears} years)`,
     },
     {
-      label: "Annual income ceiling",
+      label: inputs.incomeTargetMode === "net" ? "Net income target" : "Gross income target",
       value: formatCurrency(inputs.desiredAnnualIncome),
     },
     {
@@ -80,7 +83,12 @@ export function DrawdownAssumptionsPanel({
             <li>Apply any tax-free cash before the first projection year.</li>
             <li>Calculate the State Pension available at that age.</li>
             <li>
-              Withdraw only the amount needed to reach the annual income ceiling.
+              {inputs.incomeTargetMode === "net"
+                ? "Solve for the gross pension withdrawal needed to reach the net spendable-income target after tax."
+                : "Withdraw only the amount needed to reach the gross annual income target."}
+            </li>
+            <li>
+              Calculate income tax using the 2026/27 England, Wales and Northern Ireland rules.
             </li>
             <li>Apply investment growth to the remaining pension balance.</li>
             <li>Deduct the annual pension fee after growth.</li>
@@ -89,10 +97,12 @@ export function DrawdownAssumptionsPanel({
       </div>
 
       <div className="drawdown-basis-note" role="note">
-        <strong>Money basis:</strong> balances are projected in nominal pounds.
-        The desired-income ceiling remains fixed, while State Pension increases
-        using the inflation assumption and therefore reduces the private-pension
-        withdrawal over time.
+        <strong>Money basis:</strong> calculations remain in nominal pounds. Results are currently displayed in {displayMode === "today" ? "today&apos;s money using the first modelled drawdown year as the base and the inflation assumption" : "projected future pounds"}.
+        The desired-income target is treated as {inputs.incomeTargetMode === "net" ? "net spendable income" : "gross income"}. State Pension
+        increases using the inflation assumption and therefore reduces the private-
+        pension withdrawal required over time. State Pension and private-pension withdrawals
+        are treated as taxable income; the initial tax-free cash amount is excluded
+        from annual income.
       </div>
     </section>
   );

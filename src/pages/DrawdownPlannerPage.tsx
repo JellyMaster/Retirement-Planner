@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
 import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
@@ -5,8 +7,10 @@ import { DrawdownInputsForm } from "../components/drawdown/DrawdownInputsForm";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
 import { DrawdownSummary } from "../components/drawdown/DrawdownSummary";
 import { useDrawdownProjection } from "../hooks/useDrawdownProjection";
+import type { MoneyDisplayMode } from "../utils/drawdownDisplayValues";
 
 export function DrawdownPlannerPage() {
+  const [displayMode, setDisplayMode] = useState<MoneyDisplayMode>("nominal");
   const { inputs, validation, result, updateInput, resetInputs } =
     useDrawdownProjection();
 
@@ -21,6 +25,32 @@ export function DrawdownPlannerPage() {
         </p>
       </header>
 
+      <section className="panel money-display-panel" aria-labelledby="money-display-heading">
+        <div>
+          <p className="panel-eyebrow">Presentation only</p>
+          <h2 id="money-display-heading">Display values as</h2>
+          <p>Switch how projected amounts are presented without changing the underlying tax or drawdown calculation.</p>
+        </div>
+        <div className="income-target-toggle" role="group" aria-label="Money display basis">
+          <button
+            type="button"
+            className={`income-target-option${displayMode === "nominal" ? " income-target-option-active" : ""}`}
+            aria-pressed={displayMode === "nominal"}
+            onClick={() => setDisplayMode("nominal")}
+          >
+            Future money
+          </button>
+          <button
+            type="button"
+            className={`income-target-option${displayMode === "today" ? " income-target-option-active" : ""}`}
+            aria-pressed={displayMode === "today"}
+            onClick={() => setDisplayMode("today")}
+          >
+            Today&apos;s money
+          </button>
+        </div>
+      </section>
+
       <div className="planner-grid">
         <DrawdownInputsForm
           value={inputs}
@@ -30,7 +60,7 @@ export function DrawdownPlannerPage() {
         />
 
         {result ? (
-          <DrawdownSummary result={result} />
+          <DrawdownSummary result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
         ) : (
           <section className="panel" aria-live="polite">
             <div className="panel-heading">
@@ -44,7 +74,7 @@ export function DrawdownPlannerPage() {
         )}
       </div>
 
-      <DrawdownAssumptionsPanel inputs={inputs} />
+      <DrawdownAssumptionsPanel inputs={inputs} displayMode={displayMode} />
 
       {result && (
         <>
@@ -52,11 +82,13 @@ export function DrawdownPlannerPage() {
             <DrawdownBalanceChart
               years={result.years}
               depletionAge={result.depletionAge}
+              inflationRate={inputs.inflationRate}
+              displayMode={displayMode}
             />
-            <DrawdownIncomeChart years={result.years} />
+            <DrawdownIncomeChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
           </div>
 
-          <DrawdownProjectionTable years={result.years} />
+          <DrawdownProjectionTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
         </>
       )}
     </main>

@@ -52,6 +52,10 @@ export function validateDrawdownInputs(
       "Desired annual income must be zero or more.";
   }
 
+  if (inputs.incomeTargetMode !== "gross" && inputs.incomeTargetMode !== "net") {
+    errors.incomeTargetMode = "Income target must be gross or net.";
+  }
+
   if (
     !isFiniteNumber(inputs.annualStatePension) ||
     inputs.annualStatePension < 0

@@ -8,6 +8,7 @@ const baseInputs: DrawdownInputs = {
   retirementAge: 65,
   endAge: 68,
   desiredAnnualIncome: 20_000,
+  incomeTargetMode: "gross",
   annualStatePension: 10_000,
   statePensionAge: 66,
   annualReturn: 0.05,
@@ -130,6 +131,65 @@ describe("DrawdownEngine core calculations", () => {
     );
     expect(result.totalFees).toBe(
       result.years.reduce((sum, year) => sum + year.fees, 0),
+    );
+  });
+});
+
+describe("DrawdownEngine tax integration", () => {
+  it("calculates tax and net income for each drawdown year", () => {
+    const result = new DrawdownEngine().calculate({
+      ...baseInputs,
+      endAge: 66,
+      annualStatePension: 0,
+      annualReturn: 0,
+    });
+
+    expect(result.years[0]).toMatchObject({
+      grossIncome: 20_000,
+      personalAllowance: 12_570,
+      taxableIncome: 7_430,
+      incomeTax: 1_486,
+      netIncome: 18_514,
+      effectiveTaxRate: 0.0743,
+      netIncomeShortfall: 0,
+    });
+  });
+
+  it("treats State Pension and private pension withdrawals as taxable income", () => {
+    const result = new DrawdownEngine().calculate({
+      ...baseInputs,
+      retirementAge: 66,
+      endAge: 67,
+      annualReturn: 0,
+    });
+
+    expect(result.years[0]).toMatchObject({
+      statePensionIncome: 10_000,
+      pensionWithdrawal: 10_000,
+      grossIncome: 20_000,
+      taxableIncome: 7_430,
+      incomeTax: 1_486,
+      netIncome: 18_514,
+    });
+  });
+
+  it("reconciles tax-aware lifetime totals", () => {
+    const result = new DrawdownEngine().calculate(baseInputs);
+
+    expect(result.totalGrossIncome).toBe(
+      result.years.reduce((sum, year) => sum + year.grossIncome, 0),
+    );
+    expect(result.totalIncomeTax).toBe(
+      result.years.reduce((sum, year) => sum + year.incomeTax, 0),
+    );
+    expect(result.totalNetIncome).toBe(
+      result.years.reduce((sum, year) => sum + year.netIncome, 0),
+    );
+    expect(result.totalNetIncomeShortfall).toBe(
+      result.years.reduce((sum, year) => sum + year.netIncomeShortfall, 0),
+    );
+    expect(result.totalGrossIncome - result.totalIncomeTax).toBe(
+      result.totalNetIncome,
     );
   });
 });

@@ -1,8 +1,9 @@
 import {
   Bar,
-  BarChart,
   CartesianGrid,
+  ComposedChart,
   Legend,
+  Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -11,6 +12,7 @@ import {
 
 import type { DrawdownYear } from "../../engine/drawdown";
 import { useChartTheme } from "../../theme/useChartTheme";
+import { getDisplayYears, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import {
   formatCompactCurrency,
   formatCurrency,
@@ -18,44 +20,49 @@ import {
 
 interface DrawdownIncomeChartProps {
   years: DrawdownYear[];
+  inflationRate: number;
+  displayMode: MoneyDisplayMode;
 }
 
 interface ChartDataPoint {
   age: number;
   statePensionIncome: number;
   pensionWithdrawal: number;
-  incomeShortfall: number;
+  incomeTax: number;
+  netIncome: number;
+  desiredIncome: number;
 }
 
-export function DrawdownIncomeChart({
-  years,
-}: DrawdownIncomeChartProps) {
+export function DrawdownIncomeChart({ years, inflationRate, displayMode }: DrawdownIncomeChartProps) {
   const chartColours = useChartTheme();
 
   if (years.length === 0) {
     return null;
   }
 
-  const chartData: ChartDataPoint[] = years.map((year) => ({
+  const displayYears = getDisplayYears(years, inflationRate, displayMode);
+  const chartData: ChartDataPoint[] = displayYears.map((year) => ({
     age: year.age,
     statePensionIncome: year.statePensionIncome,
     pensionWithdrawal: year.pensionWithdrawal,
-    incomeShortfall: year.incomeShortfall,
+    incomeTax: year.incomeTax,
+    netIncome: year.netIncome,
+    desiredIncome: year.desiredIncome,
   }));
 
   return (
     <section className="panel drawdown-chart-panel">
       <div className="panel-heading">
-        <h2>Retirement income sources</h2>
+        <h2>Retirement income and tax</h2>
         <p>
-          See how State Pension and pension withdrawals combine to meet your
-          target income, including any shortfall.
+          Gross income sources are stacked. The lines show income tax, net
+          spendable income and the selected annual income target. Values are shown in {displayMode === "today" ? "today&apos;s money" : "future money"}.
         </p>
       </div>
 
       <div className="drawdown-chart">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
+          <ComposedChart
             data={chartData}
             margin={{ top: 10, right: 20, bottom: 10, left: 10 }}
           >
@@ -101,9 +108,7 @@ export function DrawdownIncomeChart({
                 const numericValue = Number(rawValue ?? 0);
 
                 return [
-                  formatCurrency(
-                    Number.isFinite(numericValue) ? numericValue : 0,
-                  ),
+                  formatCurrency(Number.isFinite(numericValue) ? numericValue : 0),
                   name,
                 ];
               }}
@@ -115,24 +120,41 @@ export function DrawdownIncomeChart({
             <Bar
               dataKey="statePensionIncome"
               name="State Pension"
-              stackId="income"
+              stackId="gross-income"
               fill={chartColours.tertiary}
             />
-
             <Bar
               dataKey="pensionWithdrawal"
               name="Pension withdrawal"
-              stackId="income"
+              stackId="gross-income"
               fill={chartColours.primary}
             />
-
-            <Bar
-              dataKey="incomeShortfall"
-              name="Income shortfall"
-              stackId="income"
-              fill={chartColours.fees}
+            <Line
+              type="monotone"
+              dataKey="netIncome"
+              name="Net income"
+              stroke={chartColours.secondary}
+              strokeWidth={3}
+              dot={false}
             />
-          </BarChart>
+            <Line
+              type="monotone"
+              dataKey="incomeTax"
+              name="Income tax"
+              stroke={chartColours.fees}
+              strokeWidth={2}
+              dot={false}
+            />
+            <Line
+              type="monotone"
+              dataKey="desiredIncome"
+              name={years[0]?.incomeTargetMode === "net" ? "Net target" : "Gross target"}
+              stroke={chartColours.text}
+              strokeDasharray="6 4"
+              strokeWidth={2}
+              dot={false}
+            />
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </section>

@@ -12,6 +12,7 @@ import {
 
 import type { DrawdownYear } from "../../engine/drawdown";
 import { useChartTheme } from "../../theme/useChartTheme";
+import { getDisplayYears, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import {
   formatCompactCurrency,
   formatCurrency,
@@ -20,6 +21,8 @@ import {
 interface DrawdownBalanceChartProps {
   years: DrawdownYear[];
   depletionAge: number | null;
+  inflationRate: number;
+  displayMode: MoneyDisplayMode;
 }
 
 interface ChartDataPoint {
@@ -31,6 +34,8 @@ interface ChartDataPoint {
 export function DrawdownBalanceChart({
   years,
   depletionAge,
+  inflationRate,
+  displayMode,
 }: DrawdownBalanceChartProps) {
   const chartColours = useChartTheme();
 
@@ -38,7 +43,8 @@ export function DrawdownBalanceChart({
     return null;
   }
 
-  const chartData: ChartDataPoint[] = years.map((year) => ({
+  const displayYears = getDisplayYears(years, inflationRate, displayMode);
+  const chartData: ChartDataPoint[] = displayYears.map((year) => ({
     age: year.age,
     openingBalance: year.openingBalance,
     closingBalance: year.closingBalance,
@@ -50,7 +56,7 @@ export function DrawdownBalanceChart({
         <h2>Pension balance through retirement</h2>
         <p>
           Track the opening and closing pension balance for each retirement
-          year.
+          year. Values are shown in {displayMode === "today" ? "today&apos;s money" : "future money"}.
         </p>
       </div>
 

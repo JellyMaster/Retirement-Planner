@@ -8,6 +8,7 @@ const inputs: DrawdownInputs = {
   retirementAge: 65,
   endAge: 68,
   desiredAnnualIncome: 20_000,
+  incomeTargetMode: "gross",
   annualStatePension: 10_000,
   statePensionAge: 67,
   annualReturn: 0,
