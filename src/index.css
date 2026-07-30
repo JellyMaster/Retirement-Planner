@@ -1,30 +1,49 @@
-/* Reset */
-:root {
+/* Global theme tokens and reset */
+/* :root {
   color-scheme: light;
 
   --colour-background: #f4f6f8;
   --colour-surface: #ffffff;
-  --colour-surface-secondary: #f8fafc;
-
-  --colour-text: #172033;
-  --colour-text-muted: #5f6b7a;
-
-  --colour-border: #d8dee8;
+  --colour-surface-secondary: #f8faf9;
+  --colour-surface-tertiary: #f3f4f6;
   --colour-input-background: #ffffff;
 
-  --colour-primary: #2563eb;
-  --colour-primary-hover: #1d4ed8;
-  --colour-primary-text: #ffffff;
+  --colour-text: #17202a;
+  --colour-text-secondary: #37424d;
+  --colour-text-muted: #5f6b76;
+
+  --colour-border: #dce2e7;
+  --colour-border-strong: #cbd3da;
+
+  --colour-accent: #287865;
+  --colour-accent-hover: #216453;
+  --colour-accent-contrast: #ffffff;
+  --colour-accent-surface: #f2f8f6;
 
   --colour-success: #15803d;
+  --colour-success-border: #a7d7cb;
+  --colour-success-surface: #f2faf7;
+
   --colour-warning: #b45309;
-  --colour-danger: #b91c1c;
+
+  --colour-danger: #c0392b;
+  --colour-danger-text: #8f2f25;
+  --colour-danger-border: #e5b8b3;
+  --colour-danger-surface: #fff5f4;
+
+  --colour-positive-text: #166534;
+  --colour-positive-surface: #dcfce7;
+  --colour-negative-text: #991b1b;
+  --colour-negative-surface: #fee2e2;
 
   --colour-chart-grid: #d8dee8;
-  --colour-chart-text: #5f6b7a;
+  --colour-chart-text: #5f6b76;
 
-  --shadow-card:
-    0 2px 8px rgb(15 23 42 / 8%);
+  --colour-focus-ring: rgb(40 120 101 / 14%);
+  --colour-focus-ring-strong: rgb(40 120 101 / 20%);
+  --colour-danger-ring: rgb(192 57 43 / 14%);
+
+  --shadow-panel: 0 8px 30px rgb(24 39 56 / 6%);
 }
 
 :root[data-theme="dark"] {
@@ -33,26 +52,210 @@
   --colour-background: #0f172a;
   --colour-surface: #172033;
   --colour-surface-secondary: #1e293b;
+  --colour-surface-tertiary: #263449;
+  --colour-input-background: #111827;
 
   --colour-text: #f1f5f9;
+  --colour-text-secondary: #d5deea;
   --colour-text-muted: #a8b3c4;
 
   --colour-border: #334155;
-  --colour-input-background: #111827;
+  --colour-border-strong: #475569;
 
-  --colour-primary: #60a5fa;
-  --colour-primary-hover: #93c5fd;
-  --colour-primary-text: #0f172a;
+  --colour-accent: #5ee0bd;
+  --colour-accent-hover: #86efcf;
+  --colour-accent-contrast: #082f29;
+  --colour-accent-surface: #173b36;
 
   --colour-success: #4ade80;
+  --colour-success-border: #2f8069;
+  --colour-success-surface: #173b36;
+
   --colour-warning: #fbbf24;
+
   --colour-danger: #f87171;
+  --colour-danger-text: #fecaca;
+  --colour-danger-border: #7f3b3b;
+  --colour-danger-surface: #3b1f24;
+
+  --colour-positive-text: #86efac;
+  --colour-positive-surface: #153c2a;
+  --colour-negative-text: #fca5a5;
+  --colour-negative-surface: #482127;
 
   --colour-chart-grid: #334155;
   --colour-chart-text: #a8b3c4;
 
+  --colour-focus-ring: rgb(94 224 189 / 18%);
+  --colour-focus-ring-strong: rgb(94 224 189 / 28%);
+  --colour-danger-ring: rgb(248 113 113 / 20%);
+
+  --shadow-panel: 0 12px 34px rgb(0 0 0 / 28%);
+} */
+/* =========================================================
+   LIGHT THEME — GMK NOEL
+   ========================================================= */
+
+:root {
+  color-scheme: light;
+
+  /*
+   * Core Noel references:
+   * White:       #ffffff
+   * Pink:        #eeb9c1
+   * Cyan:        #66b9d2
+   * Pale blue:   #b3dce2
+   */
+
+  --colour-background: #edf8fa;
+  --colour-surface: #ffffff;
+  --colour-surface-secondary: #f2fbfc;
+  --colour-surface-raised: #ffffff;
+  --colour-surface-hover: #e8f7f9;
+
+  --colour-text: #244552;
+  --colour-text-strong: #173541;
+  --colour-text-muted: #5f7b84;
+  --colour-text-subtle: #789099;
+
+  --colour-border: #c6e4e8;
+  --colour-border-strong: #9dcfd7;
+  --colour-input-background: #ffffff;
+
+  --colour-primary: #66b9d2;
+  --colour-primary-hover: #4ca8c4;
+  --colour-primary-active: #3898b5;
+  --colour-primary-text: #173541;
+
+  --colour-accent: #eeb9c1;
+  --colour-accent-hover: #e5a4af;
+  --colour-accent-soft: #fbe8eb;
+  --colour-accent-text: #783e49;
+
+  --colour-success: #3b927c;
+  --colour-success-background: #e3f5ef;
+  --colour-success-border: #9fd3c4;
+  --colour-success-text: #255f51;
+
+  --colour-warning: #b87932;
+  --colour-warning-background: #fff4df;
+  --colour-warning-border: #e9c98e;
+  --colour-warning-text: #78501f;
+
+  --colour-danger: #b84f64;
+  --colour-danger-background: #fff0f3;
+  --colour-danger-border: #e7b1bb;
+  --colour-danger-text: #813747;
+
+  --colour-positive: #2f7c68;
+  --colour-positive-background: #dff3ed;
+
+  --colour-negative: #a94357;
+  --colour-negative-background: #fde7eb;
+
+  --colour-neutral-badge: #e7f4f6;
+  --colour-neutral-badge-text: #466b75;
+
+  --colour-table-header: #eaf7f9;
+  --colour-table-hover: #f0fafb;
+  --colour-table-border: #d4e9ec;
+
+  --colour-chart-grid: #c7e2e6;
+  --colour-chart-text: #5f7b84;
+  --colour-chart-primary: #66b9d2;
+  --colour-chart-secondary: #eeb9c1;
+  --colour-chart-tertiary: #7dc8b8;
+
+  --focus-ring: rgb(102 185 210 / 30%);
+
   --shadow-card:
-    0 4px 16px rgb(0 0 0 / 25%);
+    0 8px 30px rgb(69 130 144 / 10%);
+
+  --shadow-raised:
+    0 12px 36px rgb(69 130 144 / 14%);
+}
+
+/* =========================================================
+   DARK THEME — GMK OLIVIA
+   ========================================================= */
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /*
+   * Olivia-inspired palette:
+   * Charcoal:    near-black warm grey
+   * Rose:        muted rose gold
+   * Cream:       warm off-white
+   * Grey:        soft warm neutral
+   */
+
+  --colour-background: #171515;
+  --colour-surface: #211e1e;
+  --colour-surface-secondary: #2a2626;
+  --colour-surface-raised: #302b2b;
+  --colour-surface-hover: #383131;
+
+  --colour-text: #f2efed;
+  --colour-text-strong: #fffaf7;
+  --colour-text-muted: #bcb4b0;
+  --colour-text-subtle: #958d89;
+
+  --colour-border: #463e3c;
+  --colour-border-strong: #665955;
+  --colour-input-background: #191717;
+
+  --colour-primary: #deaf9d;
+  --colour-primary-hover: #e8bdad;
+  --colour-primary-active: #f0cbbb;
+  --colour-primary-text: #241d1b;
+
+  --colour-accent: #deaf9d;
+  --colour-accent-hover: #ebc0b0;
+  --colour-accent-soft: #46332f;
+  --colour-accent-text: #f6d4c7;
+
+  --colour-success: #8fc3a8;
+  --colour-success-background: #20352c;
+  --colour-success-border: #3f6c58;
+  --colour-success-text: #bce5d0;
+
+  --colour-warning: #d7ae70;
+  --colour-warning-background: #3b3020;
+  --colour-warning-border: #725b32;
+  --colour-warning-text: #f1d59d;
+
+  --colour-danger: #d98b91;
+  --colour-danger-background: #43262a;
+  --colour-danger-border: #79434a;
+  --colour-danger-text: #f5bec3;
+
+  --colour-positive: #9bd0b4;
+  --colour-positive-background: #253d33;
+
+  --colour-negative: #e19ba1;
+  --colour-negative-background: #492a2e;
+
+  --colour-neutral-badge: #383231;
+  --colour-neutral-badge-text: #d0c7c3;
+
+  --colour-table-header: #2b2727;
+  --colour-table-hover: #332e2e;
+  --colour-table-border: #433c3a;
+
+  --colour-chart-grid: #4b4340;
+  --colour-chart-text: #bcb4b0;
+  --colour-chart-primary: #deaf9d;
+  --colour-chart-secondary: #f2efed;
+  --colour-chart-tertiary: #a39f9d;
+
+  --focus-ring: rgb(222 175 157 / 32%);
+
+  --shadow-card:
+    0 8px 30px rgb(0 0 0 / 28%);
+
+  --shadow-raised:
+    0 14px 40px rgb(0 0 0 / 38%);
 }
 *,
 *::before,
@@ -61,13 +264,16 @@
 }
 
 html {
+  min-width: 320px;
+  min-height: 100%;
   font-size: 16px;
+  background: var(--colour-background);
 }
 
 body {
-  margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  margin: 0;
 
   font-family:
     Inter,
@@ -83,11 +289,17 @@ body {
     "Helvetica Neue",
     sans-serif;
 
-  color: #17202a;
-  background-color: #f4f6f8;
+  color: var(--colour-text);
+  background: var(--colour-background);
 
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
 }
 
 #root {
@@ -105,6 +317,18 @@ button {
   cursor: pointer;
 }
 
+input,
+select,
+textarea {
+  color: var(--colour-text);
+  background: var(--colour-input-background);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--colour-text-muted);
+}
+
 img,
 picture,
 svg {
@@ -119,4 +343,9 @@ table {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+::selection {
+  color: var(--colour-accent-contrast);
+  background: var(--colour-accent);
 }
