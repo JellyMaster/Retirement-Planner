@@ -1,0 +1,140 @@
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import type { DrawdownYear } from "../../engine/drawdown";
+import { useChartTheme } from "../../theme/useChartTheme";
+import {
+  formatCompactCurrency,
+  formatCurrency,
+} from "../../utils/formatters";
+
+interface DrawdownIncomeChartProps {
+  years: DrawdownYear[];
+}
+
+interface ChartDataPoint {
+  age: number;
+  statePensionIncome: number;
+  pensionWithdrawal: number;
+  incomeShortfall: number;
+}
+
+export function DrawdownIncomeChart({
+  years,
+}: DrawdownIncomeChartProps) {
+  const chartColours = useChartTheme();
+
+  if (years.length === 0) {
+    return null;
+  }
+
+  const chartData: ChartDataPoint[] = years.map((year) => ({
+    age: year.age,
+    statePensionIncome: year.statePensionIncome,
+    pensionWithdrawal: year.pensionWithdrawal,
+    incomeShortfall: year.incomeShortfall,
+  }));
+
+  return (
+    <section className="panel drawdown-chart-panel">
+      <div className="panel-heading">
+        <h2>Retirement income sources</h2>
+        <p>
+          See how State Pension and pension withdrawals combine to meet your
+          target income, including any shortfall.
+        </p>
+      </div>
+
+      <div className="drawdown-chart">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={chartData}
+            margin={{ top: 10, right: 20, bottom: 10, left: 10 }}
+          >
+            <CartesianGrid
+              stroke={chartColours.grid}
+              strokeDasharray="3 3"
+              vertical={false}
+            />
+
+            <XAxis
+              dataKey="age"
+              tickLine={false}
+              tick={{ fill: chartColours.text }}
+              axisLine={false}
+              label={{
+                value: "Age",
+                position: "insideBottom",
+                offset: -5,
+                fill: chartColours.text,
+              }}
+            />
+
+            <YAxis
+              tickLine={false}
+              tick={{ fill: chartColours.text }}
+              axisLine={false}
+              width={85}
+              tickFormatter={formatCompactCurrency}
+            />
+
+            <Tooltip
+              cursor={{ fill: chartColours.cursor }}
+              contentStyle={{
+                backgroundColor: chartColours.tooltipBackground,
+                border: `1px solid ${chartColours.tooltipBorder}`,
+                borderRadius: "0.5rem",
+                color: chartColours.tooltipText,
+              }}
+              labelStyle={{ color: chartColours.tooltipText }}
+              itemStyle={{ color: chartColours.tooltipText }}
+              formatter={(value, name) => {
+                const rawValue = Array.isArray(value) ? value[0] : value;
+                const numericValue = Number(rawValue ?? 0);
+
+                return [
+                  formatCurrency(
+                    Number.isFinite(numericValue) ? numericValue : 0,
+                  ),
+                  name,
+                ];
+              }}
+              labelFormatter={(age) => `Age ${String(age)}`}
+            />
+
+            <Legend wrapperStyle={{ color: chartColours.text }} />
+
+            <Bar
+              dataKey="statePensionIncome"
+              name="State Pension"
+              stackId="income"
+              fill={chartColours.tertiary}
+            />
+
+            <Bar
+              dataKey="pensionWithdrawal"
+              name="Pension withdrawal"
+              stackId="income"
+              fill={chartColours.primary}
+            />
+
+            <Bar
+              dataKey="incomeShortfall"
+              name="Income shortfall"
+              stackId="income"
+              fill={chartColours.fees}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </section>
+  );
+}

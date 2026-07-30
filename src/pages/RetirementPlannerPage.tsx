@@ -19,7 +19,7 @@ import type { PensionInputs } from "../engine/models/PensionInputs";
 
 import { usePensionProjection } from "../hooks/usePensionProjection";
 
-import { ThemeToggle } from "../components/theme/ThemeToggle";
+
 import {
   formatCurrency,
   formatPercentage,
@@ -147,7 +147,7 @@ export function RetirementPlannerPage() {
           your pension could grow over time.
         </p>
 
-         <ThemeToggle />
+         
       </header>
 
       <div className="comparison-toggle-row">
