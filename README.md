@@ -4,6 +4,15 @@ This patch replaces the compact retirement planner's original side-by-side compa
 
 ## Included changes
 
+### Scenario editor update
+
+- **Edit current plan** opens from the left
+- **Edit comparison plan** opens from the right
+- Editors remain available at the top of the comparison instead of the bottom
+- Results stay visible behind the slide-over for context
+- Escape, backdrop click, close, and Done editing all dismiss the editor
+
+
 - Plain-English outcome banner
 - Difference-first metric cards
 - Existing overlaid balance chart retained
@@ -12,7 +21,7 @@ This patch replaces the compact retirement planner's original side-by-side compa
 - Optional display of unchanged assumptions
 - Retirement timeline
 - Collapsible year-by-year comparison table
-- Collapsible side-by-side scenario editors
+- Header-level edit controls with left and right slide-over scenario editors
 - Swap plans and copy current plan actions
 - Responsive desktop, tablet, and mobile styling
 
