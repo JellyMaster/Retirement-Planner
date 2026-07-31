@@ -1411,6 +1411,13 @@
   gap: 0.75rem;
 }
 
+/* Keep the standard planner's section spacing, but remove it inside the
+   comparison editor where every section is already a self-contained card. */
+.comparison-sidebar-content .form-section + .form-section {
+  padding-top: 0;
+  border-top: 0;
+}
+
 .comparison-sidebar-content .form-section-collapsible {
   padding: 0;
   overflow: hidden;
@@ -1467,4 +1474,798 @@
 
 .comparison-sidebar-content .form-section-collapsible-content {
   padding: 0.9rem;
+}
+
+/* Refined comparison editor accordion: natural page flow, compact summaries. */
+.comparison-assumptions-sidebar {
+  position: static;
+  max-height: none;
+  overflow: visible;
+}
+
+.comparison-sidebar-content {
+  max-height: none;
+  overflow: visible;
+}
+
+.comparison-sidebar-content .form-section-summary {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+}
+
+.comparison-sidebar-content .form-section-summary-copy {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.comparison-sidebar-content .form-section-summary-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.comparison-sidebar-content .form-section-summary small {
+  overflow: hidden;
+  color: var(--colour-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comparison-sidebar-content .form-section-changed-badge,
+.comparison-sidebar-content .form-section-error-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.25rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.comparison-sidebar-content .form-section-changed-badge {
+  background: var(--colour-accent-soft, var(--colour-surface-tertiary));
+  color: var(--colour-accent);
+}
+
+.comparison-sidebar-content .form-section-error-badge {
+  background: color-mix(in srgb, var(--colour-danger, #b91c1c) 14%, transparent);
+  color: var(--colour-danger, #b91c1c);
+}
+
+.comparison-sidebar-content .form-section-chevron {
+  flex: 0 0 auto;
+  transition: transform 160ms ease;
+}
+
+.comparison-sidebar-content .form-section-open .form-section-chevron {
+  transform: rotate(180deg);
+}
+
+.comparison-sidebar-content .form-section-open {
+  background: var(--colour-surface);
+}
+
+.comparison-sidebar-content .form-section-collapsible-content {
+  padding: 0 0.9rem 0.95rem;
+  border-top: 1px solid var(--colour-border);
+}
+
+.comparison-sidebar-content .form-section-summary:focus-visible {
+  outline: 3px solid var(--colour-focus-ring, var(--colour-accent));
+  outline-offset: -3px;
+}
+
+/* Comparison editor overlay/background correction.
+   Keep the editor in normal document flow and give every layer an opaque surface. */
+.retirement-comparison-workspace {
+  isolation: isolate;
+}
+
+.comparison-assumptions-sidebar {
+  position: relative;
+  top: auto;
+  z-index: auto;
+  min-width: 0;
+  max-height: none;
+  overflow: clip;
+  background: var(--colour-surface);
+}
+
+.comparison-sidebar-header,
+.comparison-editor-tabs,
+.comparison-active-editor-banner,
+.comparison-sidebar-content {
+  position: relative;
+  z-index: 0;
+  background-color: var(--colour-surface);
+}
+
+.comparison-editor-tabs {
+  background-color: var(--colour-surface-secondary);
+}
+
+.comparison-sidebar-content {
+  min-width: 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.comparison-sidebar-content .input-sections,
+.comparison-sidebar-content .form-section-collapsible,
+.comparison-sidebar-content .form-section-collapsible-content {
+  min-width: 0;
+}
+
+.comparison-sidebar-content .form-section-collapsible {
+  background-color: var(--colour-surface-secondary);
+}
+
+.comparison-sidebar-content details[open] > .form-section-summary,
+.comparison-sidebar-content .form-section-collapsible-content {
+  background-color: var(--colour-surface);
+}
+
+.comparison-sidebar-content input,
+.comparison-sidebar-content select,
+.comparison-sidebar-content textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 980px) {
+  .retirement-comparison-workspace,
+  .retirement-comparison-workspace.comparison-workspace-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .comparison-assumptions-sidebar {
+    width: 100%;
+  }
+}
+
+/* Comparison editor summary cards */
+.comparison-sidebar-content .form-section-collapsible {
+  border-radius: 0.9rem;
+  background: var(--colour-surface);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.comparison-sidebar-content .form-section-collapsible:hover {
+  border-color: var(--colour-border-strong);
+}
+
+.comparison-sidebar-content .form-section-open {
+  border-color: color-mix(in srgb, var(--colour-accent) 42%, var(--colour-border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--colour-accent) 8%, transparent);
+}
+
+.comparison-sidebar-content .form-section-summary {
+  align-items: flex-start;
+  padding: 0.95rem;
+}
+
+.comparison-sidebar-content .form-section-card-main {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.comparison-sidebar-content .form-section-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  place-items: center;
+  border: 1px solid var(--colour-border);
+  border-radius: 0.65rem;
+  background: var(--colour-surface-secondary);
+  color: var(--colour-accent);
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+.comparison-sidebar-content .form-section-summary-heading {
+  min-height: 1.35rem;
+}
+
+.comparison-sidebar-content .form-section-status-badge,
+.comparison-sidebar-content .form-section-error-badge {
+  display: inline-flex;
+  min-height: 1.25rem;
+  align-items: center;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.comparison-sidebar-content .form-section-status-changed {
+  background: var(--colour-accent-soft, var(--colour-surface-tertiary));
+  color: var(--colour-accent);
+}
+
+.comparison-sidebar-content .form-section-status-same {
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text-muted);
+}
+
+.comparison-sidebar-content .form-section-summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.comparison-sidebar-content .form-section-summary-metric {
+  display: grid;
+  min-width: 0;
+  gap: 0.1rem;
+}
+
+.comparison-sidebar-content .form-section-summary-metric small {
+  overflow: hidden;
+  color: var(--colour-text-muted);
+  font-size: 0.64rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comparison-sidebar-content .form-section-summary-metric strong {
+  overflow: hidden;
+  color: var(--colour-text);
+  font-size: 0.78rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comparison-sidebar-content .form-section-summary-action {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  color: var(--colour-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.comparison-sidebar-content .form-section-collapsible-content {
+  animation: comparison-editor-section-enter 160ms ease-out;
+}
+
+@keyframes comparison-editor-section-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 420px) {
+  .comparison-sidebar-content .form-section-summary-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .comparison-sidebar-content .form-section-summary-action > span:first-child {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comparison-sidebar-content .form-section-collapsible-content {
+    animation: none;
+  }
+}
+
+/* Comparison editor: uniform collapsed section headers.
+   This intentionally overrides earlier accordion selectors with higher specificity. */
+.comparison-sidebar-content .form-section-summary > .form-section-card-main {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.comparison-sidebar-content .form-section-summary > .form-section-card-main > .form-section-summary-copy {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 0.35rem;
+}
+
+.comparison-sidebar-content .form-section-collapsible:not(.form-section-open) > .form-section-summary {
+  min-height: 6.25rem;
+  align-items: center;
+  padding: 0.9rem 0.95rem;
+}
+
+.comparison-sidebar-content .form-section-collapsible:not(.form-section-open) .form-section-summary-heading {
+  min-height: 1.35rem;
+  align-items: center;
+}
+
+.comparison-sidebar-content .form-section-collapsible:not(.form-section-open) .form-section-summary-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  min-height: 2rem;
+  margin-top: 0;
+}
+
+.comparison-sidebar-content .form-section-collapsible:not(.form-section-open) .form-section-summary-metric {
+  align-content: start;
+}
+
+.comparison-sidebar-content .form-section-collapsible:not(.form-section-open) .form-section-summary-action {
+  align-self: center;
+  margin-top: 0;
+}
+
+.comparison-sidebar-content .form-section-open > .form-section-summary {
+  align-items: center;
+  padding: 0.9rem 0.95rem;
+}
+
+@media (max-width: 420px) {
+  .comparison-sidebar-content .form-section-collapsible:not(.form-section-open) > .form-section-summary {
+    min-height: auto;
+  }
+
+  .comparison-sidebar-content .form-section-collapsible:not(.form-section-open) .form-section-summary-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 0;
+  }
+}
+
+/* Collapsed comparison cards: keep content anchored to the top.
+   Do not vertically centre short summaries inside a forced minimum height. */
+.comparison-sidebar-content .form-section-collapsible:not(.form-section-open) > .form-section-summary {
+  min-height: 0;
+  align-items: flex-start;
+}
+
+.comparison-sidebar-content .form-section-collapsible:not(.form-section-open) > .form-section-summary > .form-section-card-main {
+  align-items: flex-start;
+}
+
+.comparison-sidebar-content .form-section-collapsible:not(.form-section-open) .form-section-summary-action {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+}
+
+/* Comparison editor: value-level plan differences */
+.comparison-sidebar-content .form-section-summary-value-row {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.comparison-sidebar-content .form-section-summary-metric-changed {
+  position: relative;
+}
+
+.comparison-sidebar-content .form-section-summary-metric-changed::before {
+  position: absolute;
+  top: 0.12rem;
+  left: -0.38rem;
+  width: 0.18rem;
+  height: calc(100% - 0.24rem);
+  border-radius: 999px;
+  background: var(--colour-accent);
+  content: "";
+}
+
+.comparison-sidebar-content .form-section-summary-difference {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 0.08rem 0.3rem;
+  border-radius: 999px;
+  background: var(--colour-accent-soft, var(--colour-surface-tertiary));
+  color: var(--colour-accent);
+  font-size: 0.61rem;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .comparison-sidebar-content .form-section-summary-value-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+}
+
+/* Comparison editor: readable value differences in narrow sidebars.
+   Two columns give labels, values and change badges enough room to remain legible. */
+.comparison-sidebar-content .form-section-summary-metrics,
+.comparison-sidebar-content .form-section-collapsible:not(.form-section-open) .form-section-summary-metrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 0.8rem;
+  row-gap: 0.55rem;
+  min-height: 0;
+}
+
+.comparison-sidebar-content .form-section-summary-metric {
+  gap: 0.18rem;
+}
+
+.comparison-sidebar-content .form-section-summary-metric small,
+.comparison-sidebar-content .form-section-summary-metric strong {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.comparison-sidebar-content .form-section-summary-metric small {
+  font-size: 0.65rem;
+}
+
+.comparison-sidebar-content .form-section-summary-metric strong {
+  font-size: 0.8rem;
+}
+
+.comparison-sidebar-content .form-section-summary-value-row {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.comparison-sidebar-content .form-section-summary-difference {
+  max-width: 100%;
+  white-space: normal;
+}
+
+/* A final unpaired metric should use the remaining width rather than looking cramped. */
+.comparison-sidebar-content .form-section-summary-metric:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 420px) {
+  .comparison-sidebar-content .form-section-summary-metrics,
+  .comparison-sidebar-content .form-section-collapsible:not(.form-section-open) .form-section-summary-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Comparison results: live outcome impact summary. */
+.comparison-impact-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.comparison-impact-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.comparison-impact-heading h2,
+.comparison-impact-heading p {
+  margin: 0;
+}
+
+.comparison-impact-heading > p {
+  max-width: 560px;
+  color: var(--colour-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.comparison-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.comparison-impact-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--colour-border);
+  border-top: 3px solid var(--colour-border-strong);
+  border-radius: 14px;
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.comparison-impact-positive {
+  border-top-color: var(--colour-positive, #267a55);
+}
+
+.comparison-impact-negative {
+  border-top-color: var(--colour-danger, #b14b4b);
+}
+
+.comparison-impact-lifestyle {
+  border-top-color: var(--colour-accent);
+}
+
+.comparison-impact-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.comparison-impact-card-header p {
+  margin: 0;
+  color: var(--colour-text-secondary);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.comparison-impact-card-header span {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text-muted);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.comparison-impact-card > strong {
+  display: block;
+  margin-top: 12px;
+  font-size: clamp(1.35rem, 2.3vw, 1.85rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.comparison-impact-positive > strong {
+  color: var(--colour-positive, #267a55);
+}
+
+.comparison-impact-negative > strong {
+  color: var(--colour-danger, #b14b4b);
+}
+
+.comparison-impact-lifestyle > strong {
+  color: var(--colour-accent);
+}
+
+.comparison-impact-card > small {
+  display: block;
+  min-height: 1.15rem;
+  margin-top: 5px;
+  color: var(--colour-text-muted);
+  font-size: 0.72rem;
+}
+
+.comparison-impact-card dl {
+  display: grid;
+  gap: 7px;
+  margin: 15px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--colour-border);
+}
+
+.comparison-impact-card dl div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.76rem;
+}
+
+.comparison-impact-card dt {
+  min-width: 0;
+  color: var(--colour-text-muted);
+}
+
+.comparison-impact-card dd {
+  margin: 0;
+  color: var(--colour-text);
+  font-weight: 800;
+  text-align: right;
+}
+
+@media (max-width: 1120px) {
+  .comparison-impact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .comparison-impact-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .comparison-impact-heading > p {
+    text-align: left;
+  }
+}
+
+/* Comparison results: enhanced year-by-year projection chart. */
+.comparison-chart-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.comparison-chart-heading > div:first-child {
+  min-width: 0;
+}
+
+.comparison-chart-key {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem 0.8rem;
+  max-width: 330px;
+  color: var(--colour-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.comparison-chart-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.comparison-chart-key i {
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--colour-accent);
+}
+
+.comparison-chart-key .comparison-chart-key-alternative {
+  background: var(--colour-text-secondary);
+}
+
+.comparison-chart-key .comparison-chart-key-gap {
+  height: 10px;
+  border: 1px solid var(--colour-border-strong);
+  background: var(--colour-accent-soft, var(--colour-surface-secondary));
+}
+
+@media (max-width: 760px) {
+  .comparison-chart-heading {
+    display: block;
+  }
+
+  .comparison-chart-key {
+    justify-content: flex-start;
+    max-width: none;
+    margin-top: 0.75rem;
+  }
+
+  .comparison-chart-stack .scenario-comparison-chart {
+    height: 340px;
+  }
+}
+
+/* Retirement goals and readiness */
+.retirement-goals-form {
+  padding: 22px;
+  border: 1px solid var(--colour-border);
+  border-radius: 18px;
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.retirement-goals-form-compact {
+  margin-bottom: 18px;
+  margin-top:18px;
+  padding: 18px;
+}
+
+.retirement-goals-form-heading,
+.retirement-health-overview,
+.comparison-impact-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.retirement-goals-form-heading h2 { margin: 2px 0 0; font-size: 1.05rem; }
+.retirement-goals-target-icon { font-size: 1.65rem; line-height: 1; }
+.retirement-goals-fields { display: grid; gap: 14px; margin-top: 18px; }
+.retirement-goals-fields label { display: grid; gap: 7px; font-size: .8rem; font-weight: 700; }
+.retirement-goals-fields input[type="number"] { width: 100%; min-width: 0; }
+.retirement-goals-money-input { display: grid; grid-template-columns: auto 1fr; align-items: center; border: 1px solid var(--colour-border); border-radius: 10px; overflow: hidden; background: var(--colour-surface); }
+.retirement-goals-money-input > span { padding-left: 11px; color: var(--colour-text-muted); font-weight: 700; }
+.retirement-goals-money-input input { border: 0 !important; box-shadow: none !important; }
+.retirement-goals-checkbox { display: flex !important; grid-template-columns: none !important; align-items: center; gap: 9px !important; }
+.retirement-goals-checkbox input { width: 17px; height: 17px; }
+.retirement-goals-state-grid { display: grid; grid-template-columns: minmax(0, 1fr) 104px; gap: 10px; }
+.retirement-goals-help { margin: 14px 0 0; color: var(--colour-text-muted); font-size: .72rem; line-height: 1.45; }
+.comparison-sidebar-goals { padding: 0 18px; }
+
+.retirement-health-dashboard,
+.comparison-goal-progress {
+  padding: 24px;
+  border: 1px solid var(--colour-border);
+  border-radius: 20px;
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.retirement-health-dashboard { margin-bottom: 20px; }
+.retirement-health-overview { padding-bottom: 20px; border-bottom: 1px solid var(--colour-border); }
+.retirement-health-overview h2 { margin: 4px 0 10px; }
+.retirement-health-overview p { margin: 8px 0 0; color: var(--colour-text-muted); }
+.retirement-health-status { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; }
+.retirement-health-status span { width: 9px; height: 9px; border-radius: 999px; background: currentColor; }
+.retirement-health-on-track .retirement-health-status,
+.retirement-health-on-track .comparison-goal-status { color: #14804a; }
+.retirement-health-close .retirement-health-status,
+.retirement-health-close .comparison-goal-status { color: #a56600; }
+.retirement-health-needs-attention .retirement-health-status,
+.retirement-health-needs-attention .comparison-goal-status { color: #b42318; }
+.retirement-health-score { min-width: 126px; padding: 16px; border-radius: 16px; text-align: center; background: var(--colour-background); }
+.retirement-health-score strong { font-size: 2.1rem; line-height: 1; }
+.retirement-health-score span { color: var(--colour-text-muted); }
+.retirement-health-score small { display: block; margin-top: 6px; color: var(--colour-text-muted); }
+.retirement-health-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+.retirement-health-metrics article { padding: 16px; border: 1px solid var(--colour-border); border-radius: 14px; background: var(--colour-background); }
+.retirement-health-metrics span, .retirement-health-metrics small { display: block; color: var(--colour-text-muted); }
+.retirement-health-metrics span { font-size: .76rem; font-weight: 700; }
+.retirement-health-metrics strong { display: block; margin: 7px 0 5px; font-size: 1.18rem; }
+.retirement-health-metrics .positive, .comparison-goal-card .positive, .comparison-goal-difference.positive { color: #14804a; }
+.retirement-health-metrics .negative, .comparison-goal-card .negative, .comparison-goal-difference.negative { color: #b42318; }
+.retirement-health-breakdown { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; color: var(--colour-text-muted); font-size: .78rem; }
+.retirement-health-disclaimer { margin: 14px 0 0; color: var(--colour-text-muted); font-size: .72rem; line-height: 1.45; }
+
+.comparison-goal-progress { margin-bottom: 20px; }
+.comparison-impact-heading > p { max-width: 430px; margin: 0; color: var(--colour-text-muted); font-size: .78rem; line-height: 1.45; text-align: right; }
+.comparison-goal-grid { display: grid; grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr); gap: 14px; align-items: stretch; margin-top: 20px; }
+.comparison-goal-card { padding: 18px; border: 1px solid var(--colour-border); border-radius: 16px; background: var(--colour-background); }
+.comparison-goal-score { margin-top: 18px; }
+.comparison-goal-score strong { font-size: 2rem; line-height: 1; }
+.comparison-goal-score span { color: var(--colour-text-muted); }
+.comparison-goal-meter { height: 7px; margin: 12px 0; overflow: hidden; border-radius: 999px; background: var(--colour-border); }
+.comparison-goal-meter span { display: block; height: 100%; max-width: 100%; border-radius: inherit; background: currentColor; }
+.comparison-goal-card-baseline .comparison-goal-meter { color: var(--comparison-baseline, #355caa); }
+.comparison-goal-card-alternative .comparison-goal-meter { color: var(--comparison-alternative, #8b5cf6); }
+.comparison-goal-status { display: block; margin-bottom: 14px; }
+.comparison-goal-card dl { display: grid; gap: 8px; margin: 0; }
+.comparison-goal-card dl div { display: flex; justify-content: space-between; gap: 12px; }
+.comparison-goal-card dt { color: var(--colour-text-muted); font-size: .76rem; }
+.comparison-goal-card dd { margin: 0; font-weight: 800; }
+.comparison-goal-difference { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 14px; border: 1px dashed var(--colour-border); border-radius: 16px; text-align: center; }
+.comparison-goal-difference span { color: var(--colour-text-muted); font-size: .72rem; font-weight: 700; }
+.comparison-goal-difference strong { margin: 8px 0 4px; font-size: 1.25rem; }
+.comparison-goal-difference small { color: inherit; }
+
+@media (max-width: 1100px) {
+  .retirement-health-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .comparison-goal-grid { grid-template-columns: 1fr 1fr; }
+  .comparison-goal-difference { grid-column: 1 / -1; grid-row: 2; min-height: 90px; }
+}
+
+@media (max-width: 720px) {
+  .retirement-health-overview, .comparison-impact-heading { flex-direction: column; }
+  .retirement-health-score { width: 100%; }
+  .retirement-health-metrics, .comparison-goal-grid { grid-template-columns: 1fr; }
+  .comparison-goal-difference { grid-column: auto; grid-row: auto; }
+  .comparison-impact-heading > p { text-align: left; }
 }

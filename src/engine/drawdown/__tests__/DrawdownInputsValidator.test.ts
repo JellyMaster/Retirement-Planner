@@ -7,6 +7,8 @@ const validInputs: DrawdownInputs = {
   startingBalance: 500_000,
   retirementAge: 68,
   endAge: 95,
+  withdrawalStrategy: "target-income",
+  withdrawalRate: 0.04,
   desiredAnnualIncome: 30_000,
   incomeTargetMode: "gross",
   annualStatePension: 12_000,

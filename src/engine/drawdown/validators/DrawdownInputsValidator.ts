@@ -44,6 +44,19 @@ export function validateDrawdownInputs(
     errors.endAge = "End age must be later than retirement age.";
   }
 
+
+  if (inputs.withdrawalStrategy !== "target-income" && inputs.withdrawalStrategy !== "percentage") {
+    errors.withdrawalStrategy = "Withdrawal strategy must be target income or percentage.";
+  }
+
+  if (
+    !isFiniteNumber(inputs.withdrawalRate) ||
+    inputs.withdrawalRate < 0 ||
+    inputs.withdrawalRate > 1
+  ) {
+    errors.withdrawalRate = "Withdrawal rate must be between 0% and 100%.";
+  }
+
   if (
     !isFiniteNumber(inputs.desiredAnnualIncome) ||
     inputs.desiredAnnualIncome < 0

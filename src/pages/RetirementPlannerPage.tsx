@@ -2,6 +2,9 @@ import { useMemo, useState } from "react";
 
 import { RetirementComparisonDashboard } from "../components/comparison/RetirementComparisonDashboard";
 import { PensionInputsForm } from "../components/inputs/PensionInputsForm";
+import { RetirementGoalsForm } from "../components/goals/RetirementGoalsForm";
+import { RetirementHealthDashboard } from "../components/goals/RetirementHealthDashboard";
+import { RetirementRecommendations } from "../components/goals/RetirementRecommendations";
 import { ContributionGrowthChart } from "../components/projection/ContributionGrowthChart";
 import { PensionBalanceChart } from "../components/projection/PensionBalanceChart";
 import { ProjectionTable } from "../components/projection/ProjectionTable";
@@ -10,10 +13,13 @@ import { ProjectionAssumptions } from "../components/summary/ProjectionAssumptio
 import { ProjectionMilestones } from "../components/summary/ProjectionMilestones";
 import { ProjectionSummary } from "../components/summary/ProjectionSummary";
 import { defaultPensionInputs } from "../config/defaultPensionInputs";
+import { defaultRetirementGoals } from "../config/defaultRetirementGoals";
 import type { PensionInputs } from "../engine/models/PensionInputs";
+import type { RetirementGoals } from "../engine/models/RetirementGoals";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { formatCurrency, formatPercentage } from "../utils/formatters";
 import "../styles/retirement-dashboard.css";
+import { FeeImpactDashboard } from "../components/fee-impact";
 
 type ChartView = "balance" | "contributions";
 
@@ -21,6 +27,7 @@ export function RetirementPlannerPage() {
   const [inputs, setInputs] = useState<PensionInputs>(() => ({ ...defaultPensionInputs }));
   const [comparisonInputs, setComparisonInputs] = useState<PensionInputs>(() => ({ ...defaultPensionInputs }));
   const [comparisonEnabled, setComparisonEnabled] = useState(false);
+  const [retirementGoals, setRetirementGoals] = useState<RetirementGoals>(() => ({ ...defaultRetirementGoals }));
   const [chartView, setChartView] = useState<ChartView>("balance");
 
   const currentScenario = usePensionProjection(inputs);
@@ -62,6 +69,11 @@ export function RetirementPlannerPage() {
     setComparisonEnabled(true);
   }
 
+  function applyRecommendationToComparison(recommendedInputs: PensionInputs) {
+    setComparisonInputs({ ...recommendedInputs });
+    setComparisonEnabled(true);
+  }
+
   return (
     <main className="planner-page retirement-dashboard-page">
       <header className="planner-header retirement-dashboard-header">
@@ -94,10 +106,13 @@ export function RetirementPlannerPage() {
           setComparisonInputs={setComparisonInputs}
           resetInputs={resetInputs}
           resetComparisonInputs={resetComparisonInputs}
+          retirementGoals={retirementGoals}
+          onRetirementGoalsChange={setRetirementGoals}
         />
       ) : (
         <div className="retirement-dashboard-shell">
           <aside className="retirement-dashboard-sidebar">
+            <RetirementGoalsForm value={retirementGoals} onChange={setRetirementGoals} compact />
             <PensionInputsForm
               idPrefix="current"
               value={inputs}
@@ -117,9 +132,28 @@ export function RetirementPlannerPage() {
               </section>
             ) : (
               <>
+                <RetirementHealthDashboard inputs={inputs} result={currentScenario.projection} goals={retirementGoals} />
+
+                <RetirementRecommendations
+                  inputs={inputs}
+                  result={currentScenario.projection}
+                  goals={retirementGoals}
+                  onApplyToComparison={applyRecommendationToComparison}
+                />
+
                 <div className="retirement-summary-strip">
                   <ProjectionSummary result={currentScenario.projection} />
                 </div>
+{currentScenario.comparison?.feeImpact && (
+
+    <FeeImpactDashboard
+        feeImpact={
+            currentScenario.comparison.feeImpact
+        }
+    />
+
+)}
+
 
                 <div className="retirement-dashboard-main-grid">
                   <section className="retirement-chart-workspace">
@@ -186,6 +220,8 @@ interface ComparisonLayoutProps {
   setComparisonInputs: (value: PensionInputs) => void;
   resetInputs: () => void;
   resetComparisonInputs: () => void;
+  retirementGoals: RetirementGoals;
+  onRetirementGoalsChange: (value: RetirementGoals) => void;
 }
 
 function ComparisonLayout({
@@ -197,6 +233,8 @@ function ComparisonLayout({
   setComparisonInputs,
   resetInputs,
   resetComparisonInputs,
+  retirementGoals,
+  onRetirementGoalsChange,
 }: ComparisonLayoutProps) {
 
   return (
@@ -209,6 +247,8 @@ function ComparisonLayout({
       onAlternativeChange={setComparisonInputs}
       onResetBaseline={resetInputs}
       onResetAlternative={resetComparisonInputs}
+      retirementGoals={retirementGoals}
+      onRetirementGoalsChange={onRetirementGoalsChange}
     />
   );
 }

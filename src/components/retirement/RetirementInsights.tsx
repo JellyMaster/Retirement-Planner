@@ -1,3 +1,6 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { AppIcons } from "../../icons";
 import type { PensionInputs } from "../../engine/models/PensionInputs";
 import type { ProjectionResult } from "../../engine/models/ProjectionResult";
 import { formatCurrency, formatPercentage } from "../../utils/formatters";
@@ -35,32 +38,32 @@ export function RetirementInsights({ inputs, result }: RetirementInsightsProps) 
 
       <ul className="retirement-insights-list">
         <li>
-          <span className="retirement-insight-marker" aria-hidden="true">✓</span>
+          <span className="retirement-insight-marker" aria-hidden="true"><FontAwesomeIcon icon={AppIcons.check} /></span>
           <span>
             <strong>{yearsToRetirement} years</strong> remain until the selected
             retirement age of {inputs.retirementAge}.
           </span>
         </li>
         <li>
-          <span className="retirement-insight-marker" aria-hidden="true">✓</span>
+          <span className="retirement-insight-marker" aria-hidden="true"><FontAwesomeIcon icon={AppIcons.check} /></span>
           <span>
             Total monthly pension saving is <strong>{formatCurrency(totalMonthlyContribution)}</strong>.
           </span>
         </li>
         <li>
-          <span className="retirement-insight-marker" aria-hidden="true">✓</span>
+          <span className="retirement-insight-marker" aria-hidden="true"><FontAwesomeIcon icon={AppIcons.check} /></span>
           <span>
             Investment growth contributes about <strong>{formatPercentage(growthShare)}</strong> of the projected pot.
           </span>
         </li>
         <li>
-          <span className="retirement-insight-marker" aria-hidden="true">✓</span>
+          <span className="retirement-insight-marker" aria-hidden="true"><FontAwesomeIcon icon={AppIcons.check} /></span>
           <span>
             Contributions account for about <strong>{formatPercentage(contributionShare)}</strong> of the projected pot.
           </span>
         </li>
         <li>
-          <span className="retirement-insight-marker" aria-hidden="true">✓</span>
+          <span className="retirement-insight-marker" aria-hidden="true"><FontAwesomeIcon icon={AppIcons.check} /></span>
           <span>
             Projected fees equal roughly <strong>{formatPercentage(feeShare)}</strong> of gross investment growth.
           </span>

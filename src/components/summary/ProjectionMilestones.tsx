@@ -1,4 +1,7 @@
 import { useMemo } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { AppIcons } from "../../icons";
 
 import type { ProjectionYear } from "../../engine/models/ProjectionYear";
 
@@ -80,7 +83,7 @@ function MilestoneCard({
       }
     >
       <div className="milestone-icon">
-        {milestone.reached ? "✓" : "–"}
+        <FontAwesomeIcon icon={milestone.reached ? AppIcons.success : AppIcons.minus} />
       </div>
 
       <div className="milestone-content">

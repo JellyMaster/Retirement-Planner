@@ -1,19 +1,25 @@
-import type {
-  ChangeEvent,
-  ReactNode,
-} from "react";
+import { useState } from "react";
 
 import type { PensionInputs } from "../../engine/models/PensionInputs";
 import type { PensionInputErrors } from "../../validation/validatePensionInputs";
+import { AppIcons } from "../../icons";
+import {
+  CurrencyInput,
+  FormField,
+  FormSection,
+  NumberInput,
+  PercentageInput,
+  type FormSectionSummaryItem,
+} from "../forms";
 
 interface PensionInputsFormProps {
-    idPrefix?: string;
+  idPrefix?: string;
   value: PensionInputs;
   errors: PensionInputErrors;
-
   onChange: (inputs: PensionInputs) => void;
   onReset: () => void;
   collapsibleSections?: boolean;
+  comparisonValue?: PensionInputs;
 }
 
 type RequiredNumericField =
@@ -34,498 +40,554 @@ export function PensionInputsForm({
   onChange,
   onReset,
   collapsibleSections = false,
+  comparisonValue,
 }: PensionInputsFormProps) {
- function createFieldId(
-    fieldName: string
-  ): string {
+  const [openSection, setOpenSection] = useState("personal");
+
+  function createFieldId(fieldName: string): string {
     return `${idPrefix}-${fieldName}`;
   }
 
   function updateRequiredNumber(
     field: RequiredNumericField,
-    event: ChangeEvent<HTMLInputElement>
+    nextValue: number | undefined
   ) {
     onChange({
       ...value,
-      [field]: event.target.valueAsNumber,
+      [field]: nextValue ?? Number.NaN,
     });
   }
 
   function updateOptionalNumber(
     field: OptionalNumericField,
-    event: ChangeEvent<HTMLInputElement>
+    nextValue: number | undefined
   ) {
-    const rawValue = event.target.value;
-
     onChange({
       ...value,
-      [field]:
-        rawValue === ""
-          ? undefined
-          : Number(rawValue),
+      [field]: nextValue,
     });
   }
+
+  function updatePercentage(
+    field: "annualReturn" | "annualFee" | "inflation" | "annualContributionIncrease",
+    nextValue: number | undefined
+  ) {
+    onChange({
+      ...value,
+      [field]: nextValue ?? Number.NaN,
+    });
+  }
+
+  function countChanged(fields: (keyof PensionInputs)[]): number {
+    if (!comparisonValue) return 0;
+    return fields.filter((field) => value[field] !== comparisonValue[field]).length;
+  }
+
+  function countErrors(fields: (keyof PensionInputErrors)[]): number {
+    return fields.filter((field) => Boolean(errors[field])).length;
+  }
+
+  function toggleSection(sectionId: string) {
+    setOpenSection((current) => (current === sectionId ? "" : sectionId));
+  }
+
+  function createSummaryItem(
+    label: string,
+    displayValue: string,
+    currentValue: number | undefined,
+    otherValue: number | undefined,
+    formatDifference: (difference: number) => string
+  ): FormSectionSummaryItem {
+    const changed =
+      comparisonValue !== undefined && currentValue !== otherValue;
+
+    return {
+      label,
+      value: displayValue,
+      changed,
+      difference:
+        changed && currentValue !== undefined && otherValue !== undefined
+          ? formatDifference(currentValue - otherValue)
+          : undefined,
+    };
+  }
+
+  function formatSignedNumber(difference: number, suffix = ""): string {
+    const sign = difference > 0 ? "+" : "";
+    return `${sign}${difference.toLocaleString()}${suffix}`;
+  }
+
+  function formatCurrencyDifference(difference: number): string {
+    const sign = difference > 0 ? "+" : difference < 0 ? "−" : "";
+    return `${sign}£${Math.abs(difference).toLocaleString()}`;
+  }
+
+  function formatPercentagePointDifference(difference: number): string {
+    const percentagePoints = difference * 100;
+    const sign = percentagePoints > 0 ? "+" : "";
+    return `${sign}${percentagePoints.toFixed(2)} pp`;
+  }
+
+  const totalMonthlyContribution =
+    value.monthlyEmployeeContribution + value.monthlyEmployerContribution;
+  const comparisonMonthlyContribution = comparisonValue
+    ? comparisonValue.monthlyEmployeeContribution +
+      comparisonValue.monthlyEmployerContribution
+    : undefined;
 
   return (
     <section className="panel">
       <div className="panel-heading panel-heading-row">
         <div>
           <h2>Your details</h2>
-
-          {/* <p>
-            Enter your current pension information and
-            planning assumptions.
-          </p> */}
+          <p>
+            Enter your pension details and planning assumptions. Your projection
+            updates automatically as the values change.
+          </p>
         </div>
 
-        <button
-          type="button"
-          className="reset-button"
-          onClick={onReset}
-        >
+        <button type="button" className="reset-button" onClick={onReset}>
           Reset defaults
         </button>
       </div>
 
       <div className="input-sections">
         <FormSection
+          sectionId="personal"
           title="Personal details"
+          icon={AppIcons.user}
           collapsible={collapsibleSections}
-          defaultOpen
-          description="Your current age and planned retirement age."
+          isOpen={openSection === "personal"}
+          onToggle={toggleSection}
+          summary={`Age ${value.currentAge} · Retire at ${value.retirementAge}`}
+          summaryItems={[
+            createSummaryItem(
+              "Current age",
+              String(value.currentAge),
+              value.currentAge,
+              comparisonValue?.currentAge,
+              (difference) =>
+                formatSignedNumber(
+                  difference,
+                  Math.abs(difference) === 1 ? " year" : " years"
+                )
+            ),
+            createSummaryItem(
+              "Retire at",
+              String(value.retirementAge),
+              value.retirementAge,
+              comparisonValue?.retirementAge,
+              (difference) =>
+                formatSignedNumber(
+                  difference,
+                  Math.abs(difference) === 1 ? " year" : " years"
+                )
+            ),
+          ]}
+          changedCount={countChanged(["currentAge", "retirementAge"])}
+          errorCount={countErrors(["currentAge", "retirementAge"])}
+          description="Your current age and the age at which you plan to retire."
         >
-          <NumberField
+          <FormField
             id={createFieldId("currentAge")}
             label="Current age"
-            value={value.currentAge}
-            min={18}
-            max={100}
+            hint="Enter your age today."
             error={errors.currentAge}
-            onChange={(event) =>
-              updateRequiredNumber(
-                "currentAge",
-                event
-              )
-            }
-          />
+          >
+            {(id, describedBy) => (
+              <NumberInput
+                id={id}
+                aria-describedby={describedBy}
+                value={Number.isFinite(value.currentAge) ? value.currentAge : ""}
+                min={18}
+                max={100}
+                suffix="years"
+                error={Boolean(errors.currentAge)}
+                onValueChange={(nextValue) =>
+                  updateRequiredNumber("currentAge", nextValue)
+                }
+              />
+            )}
+          </FormField>
 
-          <NumberField
+          <FormField
             id={createFieldId("retirementAge")}
-            label="Retirement age"
-            value={value.retirementAge}
-            min={18}
-            max={100}
+            label="Planned retirement age"
+            hint="Choose the age when regular pension contributions will stop."
             error={errors.retirementAge}
-            onChange={(event) =>
-              updateRequiredNumber(
-                "retirementAge",
-                event
-              )
-            }
-          />
+          >
+            {(id, describedBy) => (
+              <NumberInput
+                id={id}
+                aria-describedby={describedBy}
+                value={
+                  Number.isFinite(value.retirementAge)
+                    ? value.retirementAge
+                    : ""
+                }
+                min={18}
+                max={100}
+                suffix="years"
+                error={Boolean(errors.retirementAge)}
+                onValueChange={(nextValue) =>
+                  updateRequiredNumber("retirementAge", nextValue)
+                }
+              />
+            )}
+          </FormField>
         </FormSection>
 
         <FormSection
+          sectionId="pension"
           title="Current pension"
+          icon={AppIcons.pension}
           collapsible={collapsibleSections}
-          defaultOpen
+          isOpen={openSection === "pension"}
+          onToggle={toggleSection}
+          summary={`£${value.currentPot.toLocaleString()} pot · £${totalMonthlyContribution.toLocaleString()}/month`}
+          summaryItems={[
+            createSummaryItem(
+              "Pension pot",
+              `£${value.currentPot.toLocaleString()}`,
+              value.currentPot,
+              comparisonValue?.currentPot,
+              formatCurrencyDifference
+            ),
+            createSummaryItem(
+              "Monthly total",
+              `£${totalMonthlyContribution.toLocaleString()}`,
+              totalMonthlyContribution,
+              comparisonMonthlyContribution,
+              formatCurrencyDifference
+            ),
+            createSummaryItem(
+              "Your contribution",
+              `£${value.monthlyEmployeeContribution.toLocaleString()}`,
+              value.monthlyEmployeeContribution,
+              comparisonValue?.monthlyEmployeeContribution,
+              formatCurrencyDifference
+            ),
+          ]}
+          changedCount={countChanged([
+            "currentPot",
+            "monthlyEmployeeContribution",
+            "monthlyEmployerContribution",
+          ])}
+          errorCount={countErrors([
+            "currentPot",
+            "monthlyEmployeeContribution",
+            "monthlyEmployerContribution",
+          ])}
           description="Your pension balance and regular monthly contributions."
         >
-          <NumberField
+          <FormField
             id={createFieldId("currentPot")}
             label="Current pension pot"
-            prefix="£"
-            value={value.currentPot}
-            min={0}
-            step={100}
+            hint="Use the combined value of the pensions included in this plan."
             error={errors.currentPot}
-            onChange={(event) =>
-              updateRequiredNumber(
-                "currentPot",
-                event
-              )
-            }
-          />
+          >
+            {(id, describedBy) => (
+              <CurrencyInput
+                id={id}
+                aria-describedby={describedBy}
+                value={Number.isFinite(value.currentPot) ? value.currentPot : ""}
+                min={0}
+                step={100}
+                error={Boolean(errors.currentPot)}
+                onValueChange={(nextValue) =>
+                  updateRequiredNumber("currentPot", nextValue)
+                }
+              />
+            )}
+          </FormField>
 
-          <NumberField
-           id={createFieldId(
-  "employeeContribution"
-)}
+          <FormField
+            id={createFieldId("employeeContribution")}
             label="Your monthly contribution"
-            prefix="£"
-            value={
-              value.monthlyEmployeeContribution
-            }
-            min={0}
-            step={10}
-            error={
-              errors.monthlyEmployeeContribution
-            }
-            onChange={(event) =>
-              updateRequiredNumber(
-                "monthlyEmployeeContribution",
-                event
-              )
-            }
-          />
+            hint="Enter the amount paid into your pension from you each month."
+            error={errors.monthlyEmployeeContribution}
+          >
+            {(id, describedBy) => (
+              <CurrencyInput
+                id={id}
+                aria-describedby={describedBy}
+                value={
+                  Number.isFinite(value.monthlyEmployeeContribution)
+                    ? value.monthlyEmployeeContribution
+                    : ""
+                }
+                min={0}
+                step={10}
+                error={Boolean(errors.monthlyEmployeeContribution)}
+                onValueChange={(nextValue) =>
+                  updateRequiredNumber("monthlyEmployeeContribution", nextValue)
+                }
+              />
+            )}
+          </FormField>
 
-          <NumberField
-           id={createFieldId(
-  "employerContribution"
-)}
+          <FormField
+            id={createFieldId("employerContribution")}
             label="Employer monthly contribution"
-            prefix="£"
-            value={
-              value.monthlyEmployerContribution
-            }
-            min={0}
-            step={10}
-            error={
-              errors.monthlyEmployerContribution
-            }
-            onChange={(event) =>
-              updateRequiredNumber(
-                "monthlyEmployerContribution",
-                event
-              )
-            }
-          />
+            hint="Include the amount your employer pays into the pension each month."
+            error={errors.monthlyEmployerContribution}
+          >
+            {(id, describedBy) => (
+              <CurrencyInput
+                id={id}
+                aria-describedby={describedBy}
+                value={
+                  Number.isFinite(value.monthlyEmployerContribution)
+                    ? value.monthlyEmployerContribution
+                    : ""
+                }
+                min={0}
+                step={10}
+                error={Boolean(errors.monthlyEmployerContribution)}
+                onValueChange={(nextValue) =>
+                  updateRequiredNumber("monthlyEmployerContribution", nextValue)
+                }
+              />
+            )}
+          </FormField>
         </FormSection>
 
         <FormSection
+          sectionId="investment"
           title="Investment assumptions"
+          icon={AppIcons.growth}
           collapsible={collapsibleSections}
-          description="Expected return, pension fees and inflation."
+          isOpen={openSection === "investment"}
+          onToggle={toggleSection}
+          summary={`${(value.annualReturn * 100).toFixed(1)}% return · ${(value.annualFee * 100).toFixed(2)}% fee`}
+          summaryItems={[
+            createSummaryItem(
+              "Return",
+              `${(value.annualReturn * 100).toFixed(1)}%`,
+              value.annualReturn,
+              comparisonValue?.annualReturn,
+              formatPercentagePointDifference
+            ),
+            createSummaryItem(
+              "Annual fee",
+              `${(value.annualFee * 100).toFixed(2)}%`,
+              value.annualFee,
+              comparisonValue?.annualFee,
+              formatPercentagePointDifference
+            ),
+            createSummaryItem(
+              "Inflation",
+              `${(value.inflation * 100).toFixed(1)}%`,
+              value.inflation,
+              comparisonValue?.inflation,
+              formatPercentagePointDifference
+            ),
+          ]}
+          changedCount={countChanged(["annualReturn", "annualFee", "inflation"])}
+          errorCount={countErrors(["annualReturn", "annualFee", "inflation"])}
+          description="Expected investment growth, pension charges and inflation."
         >
-          <PercentageField
+          <FormField
             id={createFieldId("annualReturn")}
             label="Expected annual return"
-            value={value.annualReturn}
-            max={20}
+            hint="This is the assumed return before pension fees are deducted."
             error={errors.annualReturn}
-            onChange={(annualReturn) =>
-              onChange({
-                ...value,
-                annualReturn,
-              })
-            }
-          />
+          >
+            {(id, describedBy) => (
+              <PercentageInput
+                id={id}
+                aria-describedby={describedBy}
+                value={
+                  Number.isFinite(value.annualReturn) ? value.annualReturn : ""
+                }
+                min={0}
+                max={20}
+                step={0.1}
+                error={Boolean(errors.annualReturn)}
+                onValueChange={(nextValue) =>
+                  updatePercentage("annualReturn", nextValue)
+                }
+              />
+            )}
+          </FormField>
 
-          <PercentageField
+          <FormField
             id={createFieldId("annualFee")}
             label="Annual pension fee"
-            value={value.annualFee}
-            max={5}
-            step={0.01}
+            hint="Enter the total annual fund, platform and administration charge."
             error={errors.annualFee}
-            onChange={(annualFee) =>
-              onChange({
-                ...value,
-                annualFee,
-              })
-            }
-          />
+          >
+            {(id, describedBy) => (
+              <PercentageInput
+                id={id}
+                aria-describedby={describedBy}
+                value={Number.isFinite(value.annualFee) ? value.annualFee : ""}
+                min={0}
+                max={5}
+                step={0.01}
+                decimalPlaces={4}
+                error={Boolean(errors.annualFee)}
+                onValueChange={(nextValue) =>
+                  updatePercentage("annualFee", nextValue)
+                }
+              />
+            )}
+          </FormField>
 
-          <PercentageField
-           id={createFieldId("inflation")}
+          <FormField
+            id={createFieldId("inflation")}
             label="Expected inflation"
-            value={value.inflation}
-            max={15}
+            hint="Used to express future values in today's purchasing power."
             error={errors.inflation}
-            onChange={(inflation) =>
-              onChange({
-                ...value,
-                inflation,
-              })
-            }
-          />
+          >
+            {(id, describedBy) => (
+              <PercentageInput
+                id={id}
+                aria-describedby={describedBy}
+                value={Number.isFinite(value.inflation) ? value.inflation : ""}
+                min={0}
+                max={15}
+                step={0.1}
+                error={Boolean(errors.inflation)}
+                onValueChange={(nextValue) =>
+                  updatePercentage("inflation", nextValue)
+                }
+              />
+            )}
+          </FormField>
         </FormSection>
 
         <FormSection
+          sectionId="changes"
           title="Contribution changes"
+          icon={AppIcons.plus}
           collapsible={collapsibleSections}
-          description="Model annual increases or additional monthly payments."
+          isOpen={openSection === "changes"}
+          onToggle={toggleSection}
+          summary={`${(value.annualContributionIncrease * 100).toFixed(1)}% annual increase${
+            value.extraMonthlyContribution
+              ? ` · +£${value.extraMonthlyContribution.toLocaleString()} from age ${
+                  value.extraContributionAge ?? "—"
+                }`
+              : ""
+          }`}
+          summaryItems={[
+            createSummaryItem(
+              "Annual increase",
+              `${(value.annualContributionIncrease * 100).toFixed(1)}%`,
+              value.annualContributionIncrease,
+              comparisonValue?.annualContributionIncrease,
+              formatPercentagePointDifference
+            ),
+            createSummaryItem(
+              "Extra monthly",
+              value.extraMonthlyContribution
+                ? `£${value.extraMonthlyContribution.toLocaleString()}`
+                : "None",
+              value.extraMonthlyContribution ?? 0,
+              comparisonValue
+                ? comparisonValue.extraMonthlyContribution ?? 0
+                : undefined,
+              formatCurrencyDifference
+            ),
+            createSummaryItem(
+              "Starts at",
+              value.extraContributionAge
+                ? `Age ${value.extraContributionAge}`
+                : "—",
+              value.extraContributionAge,
+              comparisonValue?.extraContributionAge,
+              (difference) =>
+                formatSignedNumber(
+                  difference,
+                  Math.abs(difference) === 1 ? " year" : " years"
+                )
+            ),
+          ]}
+          changedCount={countChanged([
+            "annualContributionIncrease",
+            "extraContributionAge",
+            "extraMonthlyContribution",
+          ])}
+          errorCount={countErrors([
+            "annualContributionIncrease",
+            "extraContributionAge",
+            "extraMonthlyContribution",
+          ])}
+          description="Model regular contribution increases or a later additional payment."
         >
-          <PercentageField
-          id={createFieldId(
-  "contributionIncrease"
-)}
+          <FormField
+            id={createFieldId("contributionIncrease")}
             label="Annual contribution increase"
-            value={
-              value.annualContributionIncrease
-            }
-            max={20}
-            error={
-              errors.annualContributionIncrease
-            }
-            onChange={(
-              annualContributionIncrease
-            ) =>
-              onChange({
-                ...value,
-                annualContributionIncrease,
-              })
-            }
-          />
+            hint="Use this to model contributions rising each year, for example with salary."
+            error={errors.annualContributionIncrease}
+          >
+            {(id, describedBy) => (
+              <PercentageInput
+                id={id}
+                aria-describedby={describedBy}
+                value={
+                  Number.isFinite(value.annualContributionIncrease)
+                    ? value.annualContributionIncrease
+                    : ""
+                }
+                min={0}
+                max={20}
+                step={0.1}
+                error={Boolean(errors.annualContributionIncrease)}
+                onValueChange={(nextValue) =>
+                  updatePercentage("annualContributionIncrease", nextValue)
+                }
+              />
+            )}
+          </FormField>
 
-          <NumberField
-            id={createFieldId(
-  "extraContributionAge"
-)}
+          <FormField
+            id={createFieldId("extraContributionAge")}
             label="Extra contribution starts at age"
-            value={
-              value.extraContributionAge ?? ""
-            }
-            min={value.currentAge}
-            max={value.retirementAge}
+            hint="Leave blank when you are not planning a later contribution increase."
             error={errors.extraContributionAge}
-            onChange={(event) =>
-              updateOptionalNumber(
-                "extraContributionAge",
-                event
-              )
-            }
-          />
+            optional
+          >
+            {(id, describedBy) => (
+              <NumberInput
+                id={id}
+                aria-describedby={describedBy}
+                value={value.extraContributionAge ?? ""}
+                min={value.currentAge}
+                max={value.retirementAge}
+                suffix="years"
+                error={Boolean(errors.extraContributionAge)}
+                onValueChange={(nextValue) =>
+                  updateOptionalNumber("extraContributionAge", nextValue)
+                }
+              />
+            )}
+          </FormField>
 
-          <NumberField
-           id={createFieldId(
-  "extraMonthlyContribution"
-)}
+          <FormField
+            id={createFieldId("extraMonthlyContribution")}
             label="Extra monthly contribution"
-            prefix="£"
-            value={
-              value.extraMonthlyContribution ?? ""
-            }
-            min={0}
-            step={10}
-            error={
-              errors.extraMonthlyContribution
-            }
-            onChange={(event) =>
-              updateOptionalNumber(
-                "extraMonthlyContribution",
-                event
-              )
-            }
-          />
+            hint="The additional monthly amount paid from the selected age."
+            error={errors.extraMonthlyContribution}
+            optional
+          >
+            {(id, describedBy) => (
+              <CurrencyInput
+                id={id}
+                aria-describedby={describedBy}
+                value={value.extraMonthlyContribution ?? ""}
+                min={0}
+                step={10}
+                error={Boolean(errors.extraMonthlyContribution)}
+                onValueChange={(nextValue) =>
+                  updateOptionalNumber("extraMonthlyContribution", nextValue)
+                }
+              />
+            )}
+          </FormField>
         </FormSection>
       </div>
     </section>
-  );
-}
-
-interface FormSectionProps {
-  title: string;
-  description: string;
-  children: ReactNode;
-  collapsible?: boolean;
-  defaultOpen?: boolean;
-}
-
-function FormSection({
-  title,
-  description,
-  children,
-  collapsible = false,
-  defaultOpen = false,
-}: FormSectionProps) {
-  if (collapsible) {
-    return (
-      <details className="form-section form-section-collapsible" open={defaultOpen}>
-        <summary className="form-section-summary">
-          <span>
-            <strong>{title}</strong>
-            <small>{description}</small>
-          </span>
-          <span className="form-section-chevron" aria-hidden="true">⌄</span>
-        </summary>
-
-        <div className="form-grid form-section-collapsible-content">
-          {children}
-        </div>
-      </details>
-    );
-  }
-
-  return (
-    <section className="form-section">
-      <div className="form-section-heading">
-        <h3>{title}</h3>
-        <p>{description}</p>
-      </div>
-
-      <div className="form-grid">{children}</div>
-    </section>
-  );
-}
-
-interface NumberFieldProps {
-  id: string;
-  label: string;
-
-  value: number | "";
-
-  prefix?: string;
-  error?: string;
-
-  min?: number;
-  max?: number;
-  step?: number;
-
-  onChange: (
-    event: ChangeEvent<HTMLInputElement>
-  ) => void;
-}
-
-function NumberField({
-  id,
-  label,
-  value,
-  prefix,
-  error,
-  min,
-  max,
-  step = 1,
-  onChange,
-}: NumberFieldProps) {
-  const errorId = `${id}-error`;
-
-  return (
-    <div className="form-field">
-      <label htmlFor={id}>{label}</label>
-
-      <div
-        className={
-          error
-            ? "input-wrapper input-wrapper-error"
-            : "input-wrapper"
-        }
-      >
-        {prefix && (
-          <span
-            className="input-prefix"
-            aria-hidden="true"
-          >
-            {prefix}
-          </span>
-        )}
-
-        <input
-          id={id}
-          type="number"
-          value={value}
-          min={min}
-          max={max}
-          step={step}
-          aria-invalid={Boolean(error)}
-          aria-describedby={
-            error ? errorId : undefined
-          }
-          onChange={onChange}
-        />
-      </div>
-
-      {error && (
-        <p
-          id={errorId}
-          className="field-error"
-        >
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
-
-interface PercentageFieldProps {
-  id: string;
-  label: string;
-
-  value: number;
-
-  error?: string;
-
-  min?: number;
-  max?: number;
-  step?: number;
-
-  onChange: (value: number) => void;
-}
-
-function PercentageField({
-  id,
-  label,
-  value,
-  error,
-  min = 0,
-  max,
-  step = 0.1,
-  onChange,
-}: PercentageFieldProps) {
-  const errorId = `${id}-error`;
-
-  const displayedValue = Number(
-    (value * 100).toFixed(4)
-  );
-
-  function handleChange(
-    event: ChangeEvent<HTMLInputElement>
-  ) {
-    const percentage =
-      event.target.valueAsNumber;
-
-    if (Number.isNaN(percentage)) {
-      return;
-    }
-
-    const decimalValue = Number(
-      (percentage / 100).toFixed(10)
-    );
-
-    onChange(decimalValue);
-  }
-
-  return (
-    <div className="form-field">
-      <label htmlFor={id}>{label}</label>
-
-      <div
-        className={
-          error
-            ? "input-wrapper input-wrapper-error"
-            : "input-wrapper"
-        }
-      >
-        <input
-          id={id}
-          type="number"
-          value={displayedValue}
-          min={min}
-          max={max}
-          step={step}
-          aria-invalid={Boolean(error)}
-          aria-describedby={
-            error ? errorId : undefined
-          }
-          onChange={handleChange}
-        />
-
-        <span
-          className="input-suffix"
-          aria-hidden="true"
-        >
-          %
-        </span>
-      </div>
-
-      {error && (
-        <p
-          id={errorId}
-          className="field-error"
-        >
-          {error}
-        </p>
-      )}
-    </div>
   );
 }

@@ -1,0 +1,247 @@
+/* --------------------------------------------------
+   Shared retirement-planner form components
+--------------------------------------------------- */
+
+.form-section {
+  margin-bottom: 1.5rem;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.form-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.form-section-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.form-section-title-copy {
+  min-width: 0;
+}
+
+.form-section-icon {
+  display: inline-flex;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--colour-accent) 20%, transparent);
+  border-radius: 12px;
+  color: var(--colour-accent);
+  background: color-mix(in srgb, var(--colour-accent) 10%, var(--colour-surface));
+  font-size: 1.05rem;
+}
+
+.form-section-title h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.3;
+}
+
+.form-section-description {
+  margin: 0.35rem 0 0;
+  color: var(--colour-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.form-section-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.15rem;
+}
+
+.form-section-collapsible .form-section-header {
+  margin-bottom: 0;
+}
+
+.form-section-collapsible.form-section-expanded .form-section-header {
+  margin-bottom: 1.5rem;
+}
+
+.form-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.form-section-toggle:focus-visible {
+  outline: 3px solid var(--colour-focus-ring);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+.form-section-toggle-action {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--colour-accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.form-section-chevron {
+  display: inline-block;
+  font-size: 1rem;
+  transition: transform 160ms ease;
+}
+
+.form-section-expanded .form-section-chevron {
+  transform: rotate(180deg);
+}
+
+.form-field {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.form-field-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.form-field label,
+.form-field-label-row label {
+  color: var(--colour-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.form-field-optional {
+  color: var(--colour-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.form-field-hint {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.form-field .field-error {
+  margin: 0;
+}
+
+.toggle-switch-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 12px;
+  background: var(--colour-surface-secondary);
+  cursor: pointer;
+}
+
+.toggle-switch-copy {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.toggle-switch-copy strong {
+  color: var(--colour-text-secondary);
+  font-size: 0.9rem;
+}
+
+.toggle-switch-copy small {
+  color: var(--colour-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.toggle-switch-control {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.toggle-switch-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.toggle-switch-track {
+  position: relative;
+  display: block;
+  width: 46px;
+  height: 26px;
+  border: 1px solid var(--colour-border-strong);
+  border-radius: 999px;
+  background: var(--colour-surface);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.toggle-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--colour-text-muted);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.toggle-switch-control input:checked + .toggle-switch-track {
+  border-color: var(--colour-accent);
+  background: var(--colour-accent);
+}
+
+.toggle-switch-control input:checked + .toggle-switch-track .toggle-switch-thumb {
+  background: #fff;
+  transform: translateX(20px);
+}
+
+.toggle-switch-control input:focus-visible + .toggle-switch-track {
+  box-shadow: 0 0 0 3px var(--colour-focus-ring);
+}
+
+.toggle-switch-control input:disabled + .toggle-switch-track,
+.toggle-switch-field:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 700px) {
+  .form-section-body {
+    grid-template-columns: 1fr;
+  }
+
+  .form-section-toggle-action > span:first-child {
+    display: none;
+  }
+}

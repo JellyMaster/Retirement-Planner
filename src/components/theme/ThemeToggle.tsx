@@ -1,3 +1,6 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { AppIcons } from "../../icons";
 import { useTheme } from "../../theme/useTheme";
 
 export function ThemeToggle() {
@@ -30,7 +33,7 @@ export function ThemeToggle() {
         aria-hidden="true"
         className="theme-toggle__icon"
       >
-        {isDarkMode ? "☀️" : "🌙"}
+        <FontAwesomeIcon icon={isDarkMode ? AppIcons.sun : AppIcons.moon} />
       </span>
 
       <span className="theme-toggle__label">

@@ -1,3 +1,6 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { AppIcons } from "../../icons";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
 import { formatCurrency, formatPercentage } from "../../utils/formatters";
 
@@ -38,7 +41,7 @@ export function DrawdownInsights({ result }: DrawdownInsightsProps) {
 function Insight({ title, status = "neutral" }: { title: string; status?: "positive" | "warning" | "neutral" }) {
   return (
     <li className={`insight-item insight-item-${status}`}>
-      <span className="insight-icon" aria-hidden="true">{status === "warning" ? "!" : "✓"}</span>
+      <span className="insight-icon" aria-hidden="true"><FontAwesomeIcon icon={status === "warning" ? AppIcons.warning : AppIcons.check} /></span>
       <span>{title}</span>
     </li>
   );

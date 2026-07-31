@@ -5,27 +5,27 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false",
     "lint": "eslint .",
-    "preview": "vite preview",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "build": "tsc -b && vite build",
+    "check": "npm run lint && npm run typecheck && npm run test:run",
+    "verify": "npm run check && npm run build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.3",
-    "clsx": "^2.1.1",
-    "date-fns": "^4.4.0",
-    "framer-motion": "^12.43.0",
+    "@fortawesome/fontawesome-svg-core": "^7.3.1",
+    "@fortawesome/pro-solid-svg-icons": "^7.3.1",
+    "@fortawesome/react-fontawesome": "^3.5.0",
     "lucide-react": "^1.27.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.2",
-    "recharts": "^3.10.1",
-    "tailwindcss": "^4.3.3",
-    "zustand": "^5.0.14"
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

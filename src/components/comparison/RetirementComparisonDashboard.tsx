@@ -1,11 +1,17 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { AppIcons } from "../../icons";
 import { useState, type CSSProperties } from "react";
 
 import type { PensionInputs } from "../../engine/models/PensionInputs";
+import type { RetirementGoals } from "../../engine/models/RetirementGoals";
 import type { ProjectionResult } from "../../engine/models/ProjectionResult";
 import type { ProjectionYear } from "../../engine/models/ProjectionYear";
 import { formatCurrency, formatPercentage } from "../../utils/formatters";
 import type { PensionInputErrors } from "../../validation/validatePensionInputs";
 import { PensionInputsForm } from "../inputs/PensionInputsForm";
+import { RetirementGoalsForm } from "../goals/RetirementGoalsForm";
+import { calculateRetirementHealth } from "../goals/calculateRetirementHealth";
 import { ScenarioComparisonChart } from "./ScenarioComparisonChart";
 
 interface ProjectionScenario {
@@ -23,6 +29,8 @@ interface RetirementComparisonDashboardProps {
   onAlternativeChange: (inputs: PensionInputs) => void;
   onResetBaseline: () => void;
   onResetAlternative: () => void;
+  retirementGoals: RetirementGoals;
+  onRetirementGoalsChange: (value: RetirementGoals) => void;
 }
 
 type AssumptionKey = keyof PensionInputs;
@@ -102,6 +110,8 @@ export function RetirementComparisonDashboard({
   onAlternativeChange,
   onResetBaseline,
   onResetAlternative,
+  retirementGoals,
+  onRetirementGoalsChange,
 }: RetirementComparisonDashboardProps) {
   const [showUnchanged, setShowUnchanged] = useState(false);
   const [activeEditor, setActiveEditor] = useState<"baseline" | "alternative">("baseline");
@@ -125,6 +135,8 @@ export function RetirementComparisonDashboard({
       onAlternativeChange={onAlternativeChange}
       onResetBaseline={onResetBaseline}
       onResetAlternative={onResetAlternative}
+      retirementGoals={retirementGoals}
+      onRetirementGoalsChange={onRetirementGoalsChange}
     />
   );
 
@@ -176,47 +188,27 @@ export function RetirementComparisonDashboard({
 
       <OutcomeBanner comparison={comparison} />
 
-      <section className="comparison-difference-grid" aria-label="Key scenario differences">
-        <DifferenceCard
-          label="Retirement age"
-          difference={formatYearDifference(
-            baselineInputs.retirementAge,
-            alternativeInputs.retirementAge,
-          )}
-          baseline={String(baselineInputs.retirementAge)}
-          alternative={String(alternativeInputs.retirementAge)}
-          direction={getLowerIsLifestyleDirection(
-            alternativeInputs.retirementAge - baselineInputs.retirementAge,
-          )}
-        />
-        <DifferenceCard
-          label="Pot at retirement"
-          difference={formatSignedCurrency(comparison.finalBalanceDifference)}
-          baseline={formatCurrency(baselineScenario.projection.finalBalance.nominal)}
-          alternative={formatCurrency(alternativeScenario.projection.finalBalance.nominal)}
-          direction={getPositiveDirection(comparison.finalBalanceDifference)}
-        />
-        <DifferenceCard
-          label="Today's money value"
-          difference={formatSignedCurrency(comparison.realBalanceDifference)}
-          baseline={formatCurrency(baselineScenario.projection.finalBalance.real)}
-          alternative={formatCurrency(alternativeScenario.projection.finalBalance.real)}
-          direction={getPositiveDirection(comparison.realBalanceDifference)}
-        />
-        <DifferenceCard
-          label="Total contributions"
-          difference={formatSignedCurrency(comparison.contributionDifference)}
-          baseline={formatCurrency(baselineScenario.projection.totalContributions.nominal)}
-          alternative={formatCurrency(alternativeScenario.projection.totalContributions.nominal)}
-          direction="neutral"
-        />
-      </section>
+      <GoalProgressComparison
+        goals={retirementGoals}
+        baselineProjection={baselineScenario.projection}
+        alternativeProjection={alternativeScenario.projection}
+      />
+
+      <LiveImpactSummary
+        baselineInputs={baselineInputs}
+        alternativeInputs={alternativeInputs}
+        baselineProjection={baselineScenario.projection}
+        alternativeProjection={alternativeScenario.projection}
+        comparison={comparison}
+      />
 
       <div className="comparison-main-grid">
         <div className="comparison-chart-stack">
           <ScenarioComparisonChart
             baseYears={baselineScenario.projection.years}
             comparisonYears={alternativeScenario.projection.years}
+            baseRetirementAge={baselineInputs.retirementAge}
+            comparisonRetirementAge={alternativeInputs.retirementAge}
           />
           {comparison.crossoverAge !== undefined && (
             <p className="comparison-chart-note">
@@ -398,7 +390,7 @@ function OutcomeBanner({ comparison }: { comparison: ComparisonModel }) {
 
   return (
     <section className="comparison-outcome-banner">
-      <span className="comparison-outcome-icon" aria-hidden="true">↗</span>
+      <span className="comparison-outcome-icon" aria-hidden="true"><FontAwesomeIcon icon={AppIcons.growth} /></span>
       <div>
         <strong>What changes?</strong>
         <p>{message}</p>
@@ -407,23 +399,156 @@ function OutcomeBanner({ comparison }: { comparison: ComparisonModel }) {
   );
 }
 
-function DifferenceCard({
+function GoalProgressComparison({
+  goals,
+  baselineProjection,
+  alternativeProjection,
+}: {
+  goals: RetirementGoals;
+  baselineProjection: ProjectionResult;
+  alternativeProjection: ProjectionResult;
+}) {
+  const baseline = calculateRetirementHealth(baselineProjection, goals);
+  const alternative = calculateRetirementHealth(alternativeProjection, goals);
+  const scoreDifference = alternative.score - baseline.score;
+  const incomeDifference = alternative.estimatedAnnualIncome - baseline.estimatedAnnualIncome;
+
+  return (
+    <section className="comparison-goal-progress" aria-labelledby="comparison-goal-heading">
+      <div className="comparison-impact-heading">
+        <div>
+          <p className="planner-eyebrow">Goal progress</p>
+          <h2 id="comparison-goal-heading">Can each plan meet your income target?</h2>
+        </div>
+        <p>Readiness is based on your shared target of {formatCurrency(goals.desiredAnnualIncome)} a year in today&apos;s money.</p>
+      </div>
+      <div className="comparison-goal-grid">
+        <GoalPlanCard plan="baseline" label="Current plan" health={baseline} target={goals.desiredAnnualIncome} />
+        <div className={`comparison-goal-difference ${scoreDifference >= 0 ? "positive" : "negative"}`}>
+          <span>Comparison impact</span>
+          <strong>{scoreDifference >= 0 ? "+" : ""}{scoreDifference} points</strong>
+          <small>{formatSignedCurrency(incomeDifference)} a year</small>
+        </div>
+        <GoalPlanCard plan="alternative" label="Comparison plan" health={alternative} target={goals.desiredAnnualIncome} />
+      </div>
+      <p className="retirement-health-disclaimer">The score measures illustrated target coverage; it is not a probability of success or a guarantee.</p>
+    </section>
+  );
+}
+
+function GoalPlanCard({ plan, label, health, target }: {
+  plan: "baseline" | "alternative";
+  label: string;
+  health: ReturnType<typeof calculateRetirementHealth>;
+  target: number;
+}) {
+  const status = health.status === "on-track" ? "On track" : health.status === "close" ? "Close" : "Needs attention";
+  return (
+    <article className={`comparison-goal-card comparison-goal-card-${plan} retirement-health-${health.status}`}>
+      <PlanIdentity plan={plan} label={label} />
+      <div className="comparison-goal-score"><strong>{health.score}</strong><span>/100</span></div>
+      <div className="comparison-goal-meter"><span style={{ width: `${health.score}%` }} /></div>
+      <strong className="comparison-goal-status">{status}</strong>
+      <dl>
+        <div><dt>Estimated income</dt><dd>{formatCurrency(health.estimatedAnnualIncome)}</dd></div>
+        <div><dt>Target</dt><dd>{formatCurrency(target)}</dd></div>
+        <div><dt>Position</dt><dd className={health.annualGap >= 0 ? "positive" : "negative"}>{health.annualGap >= 0 ? "+" : "−"}{formatCurrency(Math.abs(health.annualGap))}</dd></div>
+      </dl>
+    </article>
+  );
+}
+
+function LiveImpactSummary({
+  baselineInputs,
+  alternativeInputs,
+  baselineProjection,
+  alternativeProjection,
+  comparison,
+}: {
+  baselineInputs: PensionInputs;
+  alternativeInputs: PensionInputs;
+  baselineProjection: ProjectionResult;
+  alternativeProjection: ProjectionResult;
+  comparison: ComparisonModel;
+}) {
+  const baselineAnnualIncome = baselineProjection.finalBalance.real * 0.04;
+  const alternativeAnnualIncome = alternativeProjection.finalBalance.real * 0.04;
+  const annualIncomeDifference = alternativeAnnualIncome - baselineAnnualIncome;
+
+  return (
+    <section className="comparison-impact-summary" aria-labelledby="comparison-impact-heading">
+      <div className="comparison-impact-heading">
+        <div>
+          <p className="planner-eyebrow">Live impact</p>
+          <h2 id="comparison-impact-heading">What the comparison changes</h2>
+        </div>
+        <p>Income is an illustration using 4% of the projected pot in today&apos;s money, not a guaranteed withdrawal rate.</p>
+      </div>
+
+      <div className="comparison-impact-grid">
+        <ImpactCard
+          label="Projected pension pot"
+          difference={formatSignedCurrency(comparison.finalBalanceDifference)}
+          baseline={formatCurrency(baselineProjection.finalBalance.nominal)}
+          alternative={formatCurrency(alternativeProjection.finalBalance.nominal)}
+          direction={getPositiveDirection(comparison.finalBalanceDifference)}
+          detail="At each plan's retirement age"
+        />
+        <ImpactCard
+          label="Illustrative retirement income"
+          difference={`${formatSignedCurrency(annualIncomeDifference)} / year`}
+          baseline={`${formatCurrency(baselineAnnualIncome)} / year`}
+          alternative={`${formatCurrency(alternativeAnnualIncome)} / year`}
+          direction={getPositiveDirection(annualIncomeDifference)}
+          detail={`${formatSignedCurrency(annualIncomeDifference / 12)} per month`}
+        />
+        <ImpactCard
+          label="Retirement timing"
+          difference={formatYearDifference(
+            baselineInputs.retirementAge,
+            alternativeInputs.retirementAge,
+          )}
+          baseline={`Age ${baselineInputs.retirementAge}`}
+          alternative={`Age ${alternativeInputs.retirementAge}`}
+          direction={getLowerIsLifestyleDirection(comparison.retirementAgeDifference)}
+          detail={comparison.retirementAgeDifference === 0 ? "Same retirement age" : "Lifestyle impact"}
+        />
+      </div>
+    </section>
+  );
+}
+
+function ImpactCard({
   label,
   difference,
   baseline,
   alternative,
   direction,
+  detail,
 }: {
   label: string;
   difference: string;
   baseline: string;
   alternative: string;
   direction: "positive" | "negative" | "neutral" | "lifestyle";
+  detail: string;
 }) {
+  const directionLabel = direction === "positive"
+    ? "Improvement"
+    : direction === "negative"
+      ? "Reduction"
+      : direction === "lifestyle"
+        ? "Timing change"
+        : "No change";
+
   return (
-    <article className={`comparison-difference-card comparison-difference-${direction}`}>
-      <p>{label}</p>
+    <article className={`comparison-impact-card comparison-impact-${direction}`}>
+      <div className="comparison-impact-card-header">
+        <p>{label}</p>
+        <span>{directionLabel}</span>
+      </div>
       <strong>{difference}</strong>
+      <small>{detail}</small>
       <dl>
         <div><dt><PlanIdentity plan="baseline" label="Current" compact /></dt><dd>{baseline}</dd></div>
         <div><dt><PlanIdentity plan="alternative" label="Comparison" compact /></dt><dd>{alternative}</dd></div>
@@ -591,6 +716,8 @@ interface ScenarioAssumptionsPanelProps {
   onAlternativeChange: (inputs: PensionInputs) => void;
   onResetBaseline: () => void;
   onResetAlternative: () => void;
+  retirementGoals: RetirementGoals;
+  onRetirementGoalsChange: (value: RetirementGoals) => void;
 }
 
 function ScenarioAssumptionsPanel({
@@ -606,6 +733,8 @@ function ScenarioAssumptionsPanel({
   onAlternativeChange,
   onResetBaseline,
   onResetAlternative,
+  retirementGoals,
+  onRetirementGoalsChange,
 }: ScenarioAssumptionsPanelProps) {
   const isBaseline = activeEditor === "baseline";
 
@@ -629,6 +758,10 @@ function ScenarioAssumptionsPanel({
             <h2>Edit plans</h2>
             <p>Changes update the comparison immediately.</p>
           </header>
+
+          <div className="comparison-sidebar-goals">
+            <RetirementGoalsForm value={retirementGoals} onChange={onRetirementGoalsChange} compact />
+          </div>
 
           <div className="comparison-editor-tabs" role="tablist" aria-label="Choose a scenario to edit">
             <button
@@ -669,6 +802,7 @@ function ScenarioAssumptionsPanel({
               onChange={isBaseline ? onBaselineChange : onAlternativeChange}
               onReset={isBaseline ? onResetBaseline : onResetAlternative}
               collapsibleSections
+              comparisonValue={isBaseline ? alternativeInputs : baselineInputs}
             />
           </div>
         </>

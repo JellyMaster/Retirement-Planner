@@ -19,6 +19,11 @@ export function DrawdownSummary({ result, inflationRate, displayMode }: Drawdown
       </div>
 
       <div className="summary-grid">
+        <SummaryCard
+          label="Withdrawal strategy"
+          value={result.withdrawalStrategy === "percentage" ? `${formatPercentage(result.withdrawalRate)} of pension` : "Target annual income"}
+          detail={result.withdrawalStrategy === "percentage" ? "Recalculated from each year's opening balance." : "A fixed annual income amount is requested."}
+        />
         <SummaryCard label="Balance at planning age" value={formatCurrency(display.finalBalance)} />
         <SummaryCard label="Gross retirement income" value={formatCurrency(display.totalGrossIncome)} />
         <SummaryCard label="Income tax" value={formatCurrency(display.totalIncomeTax)} />
@@ -33,7 +38,7 @@ export function DrawdownSummary({ result, inflationRate, displayMode }: Drawdown
           value={result.depletionAge === null ? "Not depleted" : `Age ${result.depletionAge}`}
           detail={result.depletionAge === null ? "The pension lasts through the modelled period." : "The pension reaches zero during the modelled period."}
         />
-        {result.incomeTargetMode === "gross" ? (
+        {result.withdrawalStrategy === "target-income" && (result.incomeTargetMode === "gross" ? (
           <SummaryCard
             label="First gross-income shortfall"
             value={result.firstShortfallAge === null ? "No shortfall" : `Age ${result.firstShortfallAge}`}
@@ -45,7 +50,7 @@ export function DrawdownSummary({ result, inflationRate, displayMode }: Drawdown
             value={result.firstNetIncomeShortfallAge === null ? "No shortfall" : `Age ${result.firstNetIncomeShortfallAge}`}
             detail={display.totalNetIncomeShortfall > 0 ? `${formatCurrency(display.totalNetIncomeShortfall)} total shortfall` : "The net spendable-income target is fully funded."}
           />
-        )}
+        ))}
         <SummaryCard label="Tax-free cash taken" value={formatCurrency(display.taxFreeCashTaken)} />
       </div>
     </section>

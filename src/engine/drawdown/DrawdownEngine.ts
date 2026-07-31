@@ -65,22 +65,28 @@ export class DrawdownEngine {
 
     for (let age = inputs.retirementAge, year = 1; age < inputs.endAge; age += 1, year += 1) {
       const inflationMultiplier = (1 + inputs.inflationRate) ** (year - 1);
-      const desiredIncome = roundMoney(inputs.desiredAnnualIncome);
       const statePensionIncome = age >= inputs.statePensionAge
         ? roundMoney(inputs.annualStatePension * inflationMultiplier)
         : 0;
 
-      const requiredPensionWithdrawal = inputs.incomeTargetMode === "net"
-        ? this.solveWithdrawalForNetIncome(desiredIncome, statePensionIncome)
-        : roundMoney(Math.max(0, desiredIncome - statePensionIncome));
+      const percentageWithdrawal = roundMoney(openingBalance * inputs.withdrawalRate);
+      const fixedIncomeTarget = roundMoney(inputs.desiredAnnualIncome);
+      const requiredPensionWithdrawal = inputs.withdrawalStrategy === "percentage"
+        ? percentageWithdrawal
+        : inputs.incomeTargetMode === "net"
+          ? this.solveWithdrawalForNetIncome(fixedIncomeTarget, statePensionIncome)
+          : roundMoney(Math.max(0, fixedIncomeTarget - statePensionIncome));
 
       const pensionWithdrawal = roundMoney(Math.min(openingBalance, requiredPensionWithdrawal));
       const tax = this.calculateTax(pensionWithdrawal, statePensionIncome);
+      const desiredIncome = inputs.withdrawalStrategy === "percentage"
+        ? (inputs.incomeTargetMode === "net" ? tax.netIncome : tax.grossIncome)
+        : fixedIncomeTarget;
 
-      const incomeShortfall = inputs.incomeTargetMode === "gross"
+      const incomeShortfall = inputs.withdrawalStrategy === "target-income" && inputs.incomeTargetMode === "gross"
         ? roundMoney(Math.max(0, desiredIncome - tax.grossIncome))
         : 0;
-      const netIncomeShortfall = inputs.incomeTargetMode === "net"
+      const netIncomeShortfall = inputs.withdrawalStrategy === "target-income" && inputs.incomeTargetMode === "net"
         ? roundMoney(Math.max(0, desiredIncome - tax.netIncome))
         : 0;
 
@@ -98,7 +104,7 @@ export class DrawdownEngine {
         personalAllowance: tax.personalAllowance, incomeTax: tax.incomeTax,
         netIncome: tax.netIncome, effectiveTaxRate: tax.effectiveTaxRate,
         netIncomeShortfall, incomeShortfall, investmentGrowth, fees, closingBalance,
-        isDepleted: closingBalance === 0 && requiredPensionWithdrawal > pensionWithdrawal,
+        isDepleted: closingBalance === 0 && openingBalance > 0,
       });
       openingBalance = closingBalance;
     }
@@ -111,6 +117,8 @@ export class DrawdownEngine {
 
     return {
       startingBalance: roundMoney(inputs.startingBalance),
+      withdrawalStrategy: inputs.withdrawalStrategy,
+      withdrawalRate: roundRate(inputs.withdrawalRate),
       incomeTargetMode: inputs.incomeTargetMode,
       taxFreeCashTaken, balanceAfterTaxFreeCash, years,
       finalBalance: years.at(-1)?.closingBalance ?? balanceAfterTaxFreeCash,

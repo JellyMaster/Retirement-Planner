@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { ProjectionResultFactory } from "../engine/factories/ProjectionResultFactory";
 import type { PensionInputs } from "../engine/models/PensionInputs";
-import { RetirementProjectionEngine } from "../engine/services/RetirementProjectionEngine";
+import { RetirementComparisonEngine } from "../engine/services/RetirementComparisonEngine";
 
 import {
   hasPensionInputErrors,
@@ -22,19 +22,22 @@ export function usePensionProjection(
     [errors]
   );
 
-  const projection = useMemo(() => {
+  const comparisonResult = useMemo(() => {
     if (hasErrors) {
-      return ProjectionResultFactory.create([]);
+      return null;
     }
 
-    return RetirementProjectionEngine.calculate(
-      inputs
-    );
+    return RetirementComparisonEngine.calculate(inputs);
   }, [inputs, hasErrors]);
+
+  const projection =
+    comparisonResult?.projection ??
+    ProjectionResultFactory.create([]);
 
   return {
     errors,
     hasErrors,
     projection,
+    comparison: comparisonResult?.comparison ?? null,
   };
 }

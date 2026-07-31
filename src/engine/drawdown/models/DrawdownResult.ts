@@ -1,8 +1,10 @@
-import type { IncomeTargetMode } from "./DrawdownInputs";
+import type { IncomeTargetMode, WithdrawalStrategy } from "./DrawdownInputs";
 import type { DrawdownYear } from "./DrawdownYear";
 
 export interface DrawdownResult {
   startingBalance: number;
+  withdrawalStrategy: WithdrawalStrategy;
+  withdrawalRate: number;
   incomeTargetMode: IncomeTargetMode;
   taxFreeCashTaken: number;
   balanceAfterTaxFreeCash: number;

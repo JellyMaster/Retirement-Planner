@@ -31,8 +31,16 @@ export function DrawdownAssumptionsPanel({
       value: `${inputs.retirementAge} to ${inputs.endAge} (${projectionYears} years)`,
     },
     {
-      label: inputs.incomeTargetMode === "net" ? "Net income target" : "Gross income target",
-      value: formatCurrency(inputs.desiredAnnualIncome),
+      label: "Withdrawal strategy",
+      value: inputs.withdrawalStrategy === "percentage" ? "Percentage of pension" : "Target annual income",
+    },
+    {
+      label: inputs.withdrawalStrategy === "percentage"
+        ? "Annual withdrawal rate"
+        : inputs.incomeTargetMode === "net" ? "Net income target" : "Gross income target",
+      value: inputs.withdrawalStrategy === "percentage"
+        ? formatPercentage(inputs.withdrawalRate)
+        : formatCurrency(inputs.desiredAnnualIncome),
     },
     {
       label: "State Pension",
@@ -83,9 +91,11 @@ export function DrawdownAssumptionsPanel({
             <li>Apply any tax-free cash before the first projection year.</li>
             <li>Calculate the State Pension available at that age.</li>
             <li>
-              {inputs.incomeTargetMode === "net"
-                ? "Solve for the gross pension withdrawal needed to reach the net spendable-income target after tax."
-                : "Withdraw only the amount needed to reach the gross annual income target."}
+              {inputs.withdrawalStrategy === "percentage"
+                ? `Withdraw ${formatPercentage(inputs.withdrawalRate)} of that year's opening pension balance.`
+                : inputs.incomeTargetMode === "net"
+                  ? "Solve for the gross pension withdrawal needed to reach the net spendable-income target after tax."
+                  : "Withdraw only the amount needed to reach the gross annual income target."}
             </li>
             <li>
               Calculate income tax using the 2026/27 England, Wales and Northern Ireland rules.
@@ -98,9 +108,9 @@ export function DrawdownAssumptionsPanel({
 
       <div className="drawdown-basis-note" role="note">
         <strong>Money basis:</strong> calculations remain in nominal pounds. Results are currently displayed in {displayMode === "today" ? "today&apos;s money using the first modelled drawdown year as the base and the inflation assumption" : "projected future pounds"}.
-        The desired-income target is treated as {inputs.incomeTargetMode === "net" ? "net spendable income" : "gross income"}. State Pension
-        increases using the inflation assumption and therefore reduces the private-
-        pension withdrawal required over time. State Pension and private-pension withdrawals
+        {inputs.withdrawalStrategy === "percentage"
+          ? `The pension withdrawal is recalculated each year as ${formatPercentage(inputs.withdrawalRate)} of the opening pension balance, so private-pension income can rise or fall. State Pension is added separately.`
+          : `The desired-income target is treated as ${inputs.incomeTargetMode === "net" ? "net spendable income" : "gross income"}. State Pension increases using the inflation assumption and therefore reduces the private-pension withdrawal required over time.`} State Pension and private-pension withdrawals
         are treated as taxable income; the initial tax-free cash amount is excluded
         from annual income.
       </div>
