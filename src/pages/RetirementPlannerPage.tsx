@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 
 import { RetirementComparisonDashboard } from "../components/comparison/RetirementComparisonDashboard";
-import { PensionInputsForm } from "../components/inputs/PensionInputsForm";
+import { GuidedPensionInputsForm } from "../components/inputs/guided";
 import { RetirementGoalsForm } from "../components/goals/RetirementGoalsForm";
 import { RetirementHealthDashboard } from "../components/goals/RetirementHealthDashboard";
 import { RetirementRecommendations } from "../components/goals/RetirementRecommendations";
+import { RetirementWhatIfAnalysis } from "../components/goals/RetirementWhatIfAnalysis";
 import { ContributionGrowthChart } from "../components/projection/ContributionGrowthChart";
 import { PensionBalanceChart } from "../components/projection/PensionBalanceChart";
 import { ProjectionTable } from "../components/projection/ProjectionTable";
@@ -19,6 +20,7 @@ import type { RetirementGoals } from "../engine/models/RetirementGoals";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { formatCurrency, formatPercentage } from "../utils/formatters";
 import "../styles/retirement-dashboard.css";
+import "../styles/retirement-what-if.css";
 import { FeeImpactDashboard } from "../components/fee-impact";
 
 type ChartView = "balance" | "contributions";
@@ -110,20 +112,23 @@ export function RetirementPlannerPage() {
           onRetirementGoalsChange={setRetirementGoals}
         />
       ) : (
-        <div className="retirement-dashboard-shell">
-          <aside className="retirement-dashboard-sidebar">
-            <RetirementGoalsForm value={retirementGoals} onChange={setRetirementGoals} compact />
-            <PensionInputsForm
+        <div className="retirement-planner-workspace">
+          <section className="retirement-guided-input-region" aria-label="Build your retirement plan">
+            <GuidedPensionInputsForm
               idPrefix="current"
               value={inputs}
               errors={currentScenario.errors}
               onChange={setInputs}
               onReset={resetInputs}
-              collapsibleSections
             />
-          </aside>
+          </section>
 
-          <div className="retirement-dashboard-content">
+          <div className="retirement-dashboard-shell retirement-results-shell">
+            <aside className="retirement-dashboard-sidebar retirement-results-sidebar">
+              <RetirementGoalsForm value={retirementGoals} onChange={setRetirementGoals} compact />
+            </aside>
+
+            <div className="retirement-dashboard-content" id="retirement-projection-results">
             {currentScenario.hasErrors ? (
               <section className="panel" role="alert">
                 <div className="panel-heading">
@@ -134,6 +139,13 @@ export function RetirementPlannerPage() {
             ) : (
               <>
                 <RetirementHealthDashboard inputs={inputs} result={currentScenario.projection} goals={retirementGoals} />
+
+                <RetirementWhatIfAnalysis
+                  inputs={inputs}
+                  result={currentScenario.projection}
+                  goals={retirementGoals}
+                  onApplyToComparison={applyRecommendationToComparison}
+                />
 
                 <RetirementRecommendations
                   inputs={inputs}
@@ -205,6 +217,7 @@ export function RetirementPlannerPage() {
                 </details>
               </>
             )}
+            </div>
           </div>
         </div>
       )}

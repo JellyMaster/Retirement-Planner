@@ -1,0 +1,1 @@
+export { GuidedPensionInputsForm } from "./GuidedPensionInputsForm";

@@ -191,6 +191,14 @@ describe("RetirementPlannerPage", () => {
         "Retirement age"
       );
 
+    await user.clear(
+      retirementAgeInput
+    );
+    await user.type(
+      retirementAgeInput,
+      "68"
+    );
+
     await user.click(
       screen.getByRole("button", {
         name: /contribution changes/i,
@@ -201,14 +209,6 @@ describe("RetirementPlannerPage", () => {
       screen.getByLabelText(
         "Extra contribution age"
       );
-
-    await user.clear(
-      retirementAgeInput
-    );
-    await user.type(
-      retirementAgeInput,
-      "68"
-    );
 
     await user.clear(
       extraContributionAgeInput

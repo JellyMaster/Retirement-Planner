@@ -609,3 +609,609 @@
     order: -1;
   }
 }
+
+/* --------------------------------------------------
+   Guided pension input journey
+--------------------------------------------------- */
+.guided-pension-form {
+  overflow: hidden;
+  padding: 0;
+}
+
+.guided-pension-form-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.guided-pension-form-header h2,
+.guided-pension-form-header p {
+  margin-top: 0;
+}
+
+.guided-pension-form-header h2 {
+  margin-bottom: 0.4rem;
+}
+
+.guided-pension-form-header > div > p:last-child {
+  margin-bottom: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.guided-pension-progress {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--colour-border);
+  background: var(--colour-surface-secondary);
+}
+
+.guided-pension-progress-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border: 0;
+  color: var(--colour-text-muted);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.guided-pension-progress-step:not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  right: -0.2rem;
+  width: 0.4rem;
+  height: 1px;
+  background: var(--colour-border-strong);
+  content: "";
+}
+
+.guided-pension-progress-step > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+
+.guided-pension-progress-step small {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.guided-pension-progress-step strong {
+  overflow: hidden;
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guided-pension-progress-marker {
+  display: inline-flex;
+  flex: 0 0 1.8rem;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 1px solid var(--colour-border-strong);
+  border-radius: 999px;
+  background: var(--colour-surface);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.guided-pension-progress-step.active {
+  color: var(--colour-accent);
+}
+
+.guided-pension-progress-step.active .guided-pension-progress-marker {
+  border-color: var(--colour-accent);
+  color: #fff;
+  background: var(--colour-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--colour-accent) 14%, transparent);
+}
+
+.guided-pension-progress-step.complete .guided-pension-progress-marker {
+  border-color: var(--colour-positive);
+  color: #fff;
+  background: var(--colour-positive);
+}
+
+.guided-pension-progress-step.has-errors:not(.active) .guided-pension-progress-marker {
+  border-color: var(--colour-negative);
+  color: var(--colour-negative);
+}
+
+.guided-pension-summary-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1.4rem;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid var(--colour-border);
+  color: var(--colour-text-muted);
+  background: color-mix(in srgb, var(--colour-accent) 4%, var(--colour-surface));
+  font-size: 0.82rem;
+}
+
+.guided-pension-summary-strip strong {
+  color: var(--colour-text-primary);
+}
+
+.guided-pension-step {
+  min-height: 340px;
+  padding: 1.75rem 1.5rem;
+  animation: guided-step-enter 180ms ease-out;
+}
+
+@keyframes guided-step-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.guided-step-shell {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.guided-step-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.guided-step-heading > span {
+  display: inline-flex;
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  color: var(--colour-accent);
+  background: color-mix(in srgb, var(--colour-accent) 11%, var(--colour-surface));
+}
+
+.guided-step-heading p,
+.guided-step-heading h3,
+.guided-step-heading small {
+  margin: 0;
+}
+
+.guided-step-heading p {
+  margin-bottom: 0.25rem;
+  color: var(--colour-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.guided-step-heading h3 {
+  margin-bottom: 0.35rem;
+  font-size: 1.25rem;
+}
+
+.guided-step-heading small {
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.guided-step-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.guided-step-fields > .form-field:first-child:nth-last-child(3) {
+  grid-column: 1 / -1;
+}
+
+.guided-pension-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem 1.4rem;
+  border-top: 1px solid var(--colour-border);
+  background: var(--colour-surface-secondary);
+}
+
+.guided-pension-actions button {
+  min-width: 112px;
+}
+
+.guided-pension-actions [aria-disabled="true"] {
+  opacity: 0.58;
+}
+
+.guided-plan-review {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  grid-column: 1 / -1;
+}
+
+.guided-review-group {
+  padding: 1rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 14px;
+  background: var(--colour-surface-secondary);
+}
+
+.guided-review-group header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.guided-review-group header > span {
+  color: var(--colour-accent);
+}
+
+.guided-review-group h4 {
+  margin: 0;
+}
+
+.guided-review-group button {
+  padding: 0;
+  border: 0;
+  color: var(--colour-accent);
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.guided-review-group dl {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.guided-review-group dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.guided-review-group dt {
+  color: var(--colour-text-muted);
+}
+
+.guided-review-group dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+}
+
+.guided-review-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  grid-column: 1 / -1;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+}
+
+.guided-review-status.ready {
+  color: var(--colour-positive);
+  background: color-mix(in srgb, var(--colour-positive) 9%, var(--colour-surface));
+}
+
+.guided-review-status.review {
+  color: var(--colour-negative);
+  background: color-mix(in srgb, var(--colour-negative) 9%, var(--colour-surface));
+}
+
+.guided-review-status span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.guided-review-status small {
+  color: var(--colour-text-muted);
+}
+
+@media (max-width: 980px) {
+  .guided-pension-progress-step strong { display: none; }
+  .guided-pension-progress-step { justify-content: center; }
+  .guided-pension-progress-step > span:last-child { display: none; }
+  .guided-pension-progress-step:not(:last-child)::after { right: -0.1rem; width: 0.2rem; }
+}
+
+@media (max-width: 700px) {
+  .guided-pension-form-header { flex-direction: column; }
+  .guided-pension-progress { padding-inline: 0.6rem; }
+  .guided-pension-progress-step { padding-inline: 0.2rem; }
+  .guided-pension-summary-strip { display: grid; gap: 0.35rem; }
+  .guided-pension-step { min-height: 0; padding: 1.35rem 1rem; }
+  .guided-step-fields,
+  .guided-plan-review { grid-template-columns: 1fr; }
+  .guided-step-fields > .form-field:first-child:nth-last-child(3) { grid-column: auto; }
+  .guided-pension-actions { padding-inline: 1rem; }
+}
+
+/* --------------------------------------------------
+   Planner V3: full-width guided journey
+--------------------------------------------------- */
+.retirement-guided-input-region .guided-pension-form-header {
+  padding: 1.75rem 2rem 1.4rem;
+}
+
+.retirement-guided-input-region .guided-pension-form-header h2 {
+  font-size: clamp(1.45rem, 2vw, 1.9rem);
+}
+
+.retirement-guided-input-region .guided-pension-progress {
+  position: relative;
+  gap: 0;
+  padding: 1.35rem 2rem 1.25rem;
+}
+
+.retirement-guided-input-region .guided-pension-progress::before {
+  position: absolute;
+  top: 2.25rem;
+  right: calc(10% + 1.05rem);
+  left: calc(10% + 1.05rem);
+  height: 2px;
+  background: var(--colour-border-strong);
+  content: "";
+}
+
+.retirement-guided-input-region .guided-pension-progress-step {
+  z-index: 1;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  padding: 0;
+  text-align: center;
+}
+
+.retirement-guided-input-region .guided-pension-progress-step:not(:last-child)::after {
+  display: none;
+}
+
+.retirement-guided-input-region .guided-pension-progress-step > span:last-child {
+  justify-items: center;
+}
+
+.retirement-guided-input-region .guided-pension-progress-step small {
+  color: var(--colour-text-muted);
+}
+
+.retirement-guided-input-region .guided-pension-progress-step strong {
+  max-width: 9rem;
+  font-size: 0.88rem;
+}
+
+.retirement-guided-input-region .guided-pension-progress-marker {
+  flex-basis: 2.2rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  box-shadow: 0 0 0 5px var(--colour-surface-secondary);
+}
+
+.retirement-guided-input-region .guided-pension-progress-step.complete::before {
+  position: absolute;
+  top: 1.05rem;
+  left: 50%;
+  z-index: -1;
+  width: 100%;
+  height: 2px;
+  background: var(--colour-positive);
+  content: "";
+}
+
+.retirement-guided-input-region .guided-pension-progress-step.complete:last-child::before {
+  display: none;
+}
+
+.retirement-guided-input-region .guided-pension-summary-strip {
+  justify-content: center;
+  gap: 0.75rem 2rem;
+  padding: 0.9rem 2rem;
+}
+
+.retirement-guided-input-region .guided-pension-step {
+  min-height: 360px;
+  padding: 2.2rem 2rem;
+}
+
+.retirement-guided-input-region .guided-step-shell {
+  max-width: 980px;
+}
+
+.retirement-guided-input-region .guided-step-heading {
+  max-width: 760px;
+  margin: 0 auto 1.8rem;
+}
+
+.retirement-guided-input-region .guided-step-heading h3 {
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+}
+
+.retirement-guided-input-region .guided-step-fields {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.retirement-guided-input-region .guided-pension-actions {
+  padding: 1.15rem 2rem 1.5rem;
+}
+
+.retirement-guided-input-region .guided-pension-actions button {
+  min-width: 132px;
+}
+
+@media (max-width: 980px) {
+  .retirement-guided-input-region .guided-pension-progress::before {
+    right: calc(10% + 0.9rem);
+    left: calc(10% + 0.9rem);
+  }
+
+  .retirement-guided-input-region .guided-pension-progress-step > span:last-child {
+    display: grid;
+  }
+
+  .retirement-guided-input-region .guided-pension-progress-step strong {
+    display: block;
+    font-size: 0.76rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .retirement-guided-input-region .guided-pension-form-header,
+  .retirement-guided-input-region .guided-pension-step,
+  .retirement-guided-input-region .guided-pension-actions {
+    padding-inline: 1rem;
+  }
+
+  .retirement-guided-input-region .guided-pension-progress {
+    padding-inline: 0.65rem;
+  }
+
+  .retirement-guided-input-region .guided-pension-progress::before {
+    right: calc(10% + 0.8rem);
+    left: calc(10% + 0.8rem);
+  }
+
+  .retirement-guided-input-region .guided-pension-progress-step > span:last-child {
+    display: none;
+  }
+
+  .retirement-guided-input-region .guided-pension-progress-marker {
+    flex-basis: 1.9rem;
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .retirement-guided-input-region .guided-pension-progress-step.complete::before {
+    top: 0.95rem;
+  }
+}
+
+/* --------------------------------------------------
+   Completed guided-plan summary
+--------------------------------------------------- */
+.guided-pension-form-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.15rem 1.35rem;
+  overflow: visible;
+  animation: guided-plan-collapse 180ms ease-out;
+}
+
+@keyframes guided-plan-collapse {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.guided-pension-collapsed-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.guided-pension-collapsed-icon {
+  display: inline-flex;
+  flex: 0 0 2.75rem;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--colour-positive);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--colour-positive) 12%, transparent);
+}
+
+.guided-pension-collapsed-copy {
+  min-width: 0;
+}
+
+.guided-pension-collapsed-copy .planner-eyebrow,
+.guided-pension-collapsed-copy h2 {
+  margin: 0;
+}
+
+.guided-pension-collapsed-copy h2 {
+  margin-top: 0.15rem;
+  font-size: 1.08rem;
+}
+
+.guided-pension-collapsed-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1.35rem;
+  margin-top: 0.65rem;
+}
+
+.guided-pension-collapsed-metrics > span {
+  display: grid;
+  gap: 0.05rem;
+}
+
+.guided-pension-collapsed-metrics small {
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.guided-pension-collapsed-metrics strong {
+  color: var(--colour-text-primary);
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.guided-pension-edit-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 850px) {
+  .guided-pension-form-collapsed {
+    align-items: flex-start;
+  }
+
+  .guided-pension-collapsed-metrics {
+    gap-inline: 1rem;
+  }
+}
+
+@media (max-width: 650px) {
+  .guided-pension-form-collapsed {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .guided-pension-collapsed-main {
+    align-items: flex-start;
+  }
+
+  .guided-pension-collapsed-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .guided-pension-edit-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

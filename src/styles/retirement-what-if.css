@@ -1,0 +1,194 @@
+.retirement-what-if {
+  margin-top: 20px;
+  padding: 24px;
+  border: 1px solid var(--colour-border);
+  border-radius: 18px;
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.retirement-what-if-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.retirement-what-if-heading h2 {
+  margin: 3px 0 5px;
+}
+
+.retirement-what-if-heading p:last-child {
+  max-width: 720px;
+  margin: 0;
+  color: var(--colour-text-muted);
+}
+
+.retirement-what-if-baseline {
+  min-width: 118px;
+  padding: 12px 14px;
+  border: 1px solid var(--colour-border);
+  border-radius: 14px;
+  background: var(--colour-surface-subtle);
+  text-align: right;
+}
+
+.retirement-what-if-baseline span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--colour-text-muted);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.retirement-what-if-baseline strong {
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.retirement-what-if-baseline small {
+  margin-left: 2px;
+  color: var(--colour-text-muted);
+  font-size: .76rem;
+}
+
+.retirement-what-if-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.retirement-what-if-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 18px;
+  border: 1px solid var(--colour-border);
+  border-top-width: 3px;
+  border-radius: 15px;
+  background: var(--colour-surface-subtle);
+}
+
+.retirement-what-if-card-positive { border-top-color: var(--colour-positive, #16794d); }
+.retirement-what-if-card-caution { border-top-color: var(--colour-warning, #d18a00); }
+.retirement-what-if-card-neutral { border-top-color: var(--colour-comparison, #6b5ac7); }
+
+.retirement-what-if-card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.retirement-what-if-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--colour-primary);
+  background: color-mix(in srgb, var(--colour-primary) 11%, transparent);
+}
+
+.retirement-what-if-card-caution .retirement-what-if-icon {
+  color: var(--colour-warning-text, #8a5a00);
+  background: color-mix(in srgb, #e9a400 14%, transparent);
+}
+
+.retirement-what-if-card-neutral .retirement-what-if-icon {
+  color: var(--colour-comparison, #6b5ac7);
+  background: color-mix(in srgb, var(--colour-comparison, #6b5ac7) 12%, transparent);
+}
+
+.retirement-what-if-card h3 {
+  margin: 0 0 5px;
+  font-size: 1rem;
+}
+
+.retirement-what-if-card-heading p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: .82rem;
+  line-height: 1.42;
+}
+
+.retirement-what-if-impact {
+  display: grid;
+  gap: 8px;
+  margin: auto 0 16px;
+}
+
+.retirement-what-if-impact > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border: 1px solid var(--colour-border);
+  border-radius: 10px;
+  background: var(--colour-surface);
+}
+
+.retirement-what-if-impact dt {
+  color: var(--colour-text-muted);
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.retirement-what-if-impact dd {
+  margin: 0;
+  text-align: right;
+  font-size: .86rem;
+  font-weight: 800;
+}
+
+.retirement-what-if-impact dd small {
+  color: var(--colour-text-muted);
+  font-size: .68rem;
+}
+
+.retirement-what-if-impact dd span {
+  display: block;
+  margin-top: 2px;
+  font-size: .68rem;
+}
+
+.retirement-what-if-impact .positive { color: var(--colour-positive, #16794d); }
+.retirement-what-if-impact .negative { color: var(--colour-negative, #b42318); }
+
+.retirement-what-if-card button {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--colour-primary);
+  border-radius: 10px;
+  color: var(--colour-primary);
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.retirement-what-if-card button:hover {
+  color: var(--colour-primary-contrast, #fff);
+  background: var(--colour-primary);
+}
+
+.retirement-what-if-disclaimer {
+  margin: 16px 0 0;
+  color: var(--colour-text-muted);
+  font-size: .76rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 1180px) {
+  .retirement-what-if-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .retirement-what-if-heading { flex-direction: column; }
+  .retirement-what-if-baseline { width: 100%; text-align: left; }
+  .retirement-what-if-grid { grid-template-columns: 1fr; }
+}
