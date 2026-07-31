@@ -1,94 +1,129 @@
-# Retirement Planner
+<div align="center">
 
-A modern retirement planning application built with **React**, **TypeScript** and **Vite** that helps users model their retirement savings, understand the long-term impact of fees and investment growth, compare retirement scenarios and explore different retirement strategies.
+# 💷 Retirement Planner
 
-The application has evolved beyond a simple pension calculator into a comprehensive retirement planning tool with interactive modelling, retirement health analysis and guided financial planning.
+### A modern retirement planning application built with React, TypeScript and Vite
 
----
-
-## Features
-
-### Retirement Planning
-
-- Guided multi-step retirement planning workflow
-- Responsive planner designed for desktop and mobile
-- Real-time projection updates
-- Current and future contribution modelling
-- Salary growth modelling
-- Inflation-aware calculations
-- Pension fee modelling
-- Today's Money vs Future Money calculations
+Model your retirement, understand the impact of fees, compare retirement strategies, and explore **"What If?"** scenarios through an intuitive guided planning experience.
 
 ---
 
-### Pension Projection Engine
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)
+![Vitest](https://img.shields.io/badge/Vitest-Tested-6E9F18?logo=vitest)
+![ESLint](https://img.shields.io/badge/ESLint-Quality-4B32C3?logo=eslint)
+
+</div>
+
+---
+
+# Overview
+
+Retirement Planner is a modern retirement modelling application designed to help users understand how today's financial decisions affect their future retirement.
+
+Unlike a traditional pension calculator, Retirement Planner combines:
+
+- 📈 Pension projections
+- 💰 Drawdown modelling
+- ❤️ Retirement health analysis
+- 🎯 Goal tracking
+- 🔍 Interactive "What If?" scenarios
+- ⚖️ Scenario comparison
+- 📉 Fee impact analysis
+
+into a single guided experience.
+
+The application has been designed around one goal:
+
+> **Help users understand whether they are on track for retirement—and what they can do to improve it.**
+
+---
+
+# Features
+
+## 🧭 Guided Retirement Planner
+
+A modern step-by-step planning experience.
+
+- Multi-step guided workflow
+- Live validation
+- Retirement plan review
+- Collapsible completed plan
+- Responsive design
+- Font Awesome Pro interface
+
+---
+
+## 📈 Pension Projection Engine
+
+The projection engine models long-term pension growth including:
 
 - Compound investment growth
-- Monthly contributions
+- Monthly employee contributions
 - Employer contributions
-- Annual salary increases
-- Annual contribution increases
+- Salary growth
+- Contribution increases
+- Inflation
 - Pension fees
-- Inflation adjustments
-- Retirement age modelling
-- Life expectancy modelling
+- Retirement age
+- Life expectancy
 
 ---
 
-### Drawdown Planning
+## 💳 Retirement Drawdown
 
-The application includes a dedicated retirement drawdown engine.
+Model retirement withdrawals using multiple strategies.
 
-Features include:
+Supports:
 
-- Fixed annual income withdrawals
-- Percentage of pension pot withdrawals
-- Tax-aware income calculations
+- Fixed annual income
+- Percentage-based withdrawals
+- Tax calculations
 - State Pension integration
-- Pension depletion detection
 - Income shortfall analysis
-- Drawdown projection tables
-- Inflation-adjusted income
-- Today's Money and Future Money views
+- Pension depletion forecasting
+- Today's Money / Future Money calculations
 
 ---
 
-### Retirement Health Dashboard
+## ❤️ Retirement Health Dashboard
 
-A retirement health score is calculated from multiple factors including:
+Receive an overall retirement health score based on:
 
 - Retirement readiness
 - Savings adequacy
-- Pension sustainability
 - Contribution levels
 - Investment assumptions
 - Drawdown sustainability
 
-The dashboard provides:
+The dashboard highlights:
 
-- Overall retirement score
-- Visual health indicators
 - Strengths
 - Risks
 - Personalised recommendations
 
 ---
 
-### Retirement Goals
+## 🎯 Retirement Goals
 
-Goal tracking includes:
+Track progress towards your retirement objectives.
 
-- Target retirement income
-- Desired retirement age
-- Pension target tracking
+Features include:
+
+- Target retirement age
+- Desired retirement income
 - Retirement readiness
-- Progress indicators
+- Goal progress
+- Milestone tracking
 
 ---
 
-### Fee Impact Analysis
+## 💸 Fee Impact Analysis
 
-The planner demonstrates the long-term effect of pension charges by comparing:
+Understand how pension charges affect long-term wealth.
+
+Compare:
 
 - Projection with fees
 - Projection without fees
@@ -98,25 +133,24 @@ The planner demonstrates the long-term effect of pension charges by comparing:
 
 ---
 
-### Scenario Comparison
+## ⚖️ Scenario Comparison
 
-Users can compare multiple retirement plans.
+Compare multiple retirement plans side-by-side.
 
-Comparison includes:
+Compare:
 
-- Pension value
+- Pension values
 - Retirement income
-- Retirement age
 - Contributions
+- Retirement health
+- Drawdown strategies
 - Investment assumptions
-- Drawdown strategy
-- Retirement health score
 
 ---
 
-### Interactive "What If" Analysis
+## 🔍 Interactive "What If?" Analysis
 
-The application includes interactive scenario modelling.
+Instantly explore retirement scenarios without changing your existing plan.
 
 Current scenarios include:
 
@@ -127,55 +161,53 @@ Current scenarios include:
 - Higher inflation
 - Remove future planned contributions
 
-Scenarios can be previewed without modifying the current retirement plan.
-
 ---
 
-### Guided Planning Experience
+## 📊 Visual Dashboards
 
-The planner has been redesigned into a guided workflow.
+Interactive dashboards help explain your retirement journey.
 
-Features include:
-
-- Step-by-step retirement planning
-- Progress indicator
-- Review page
-- Collapsible completed plan summary
-- Quick plan editing
-- Live retirement snapshot
-
----
-
-### Charts and Visualisations
-
-The application includes a range of interactive visualisations:
+Includes:
 
 - Pension growth
-- Contributions vs investment growth
 - Fee impact
-- Retirement income
 - Drawdown projections
+- Retirement summary
+- Retirement health
 - Projection tables
 
 ---
 
-## Technology Stack
+# Technology Stack
 
-- React
-- TypeScript
-- Vite
-- Font Awesome Pro
-- Vitest
-- ESLint
+| Technology | Purpose |
+|------------|---------|
+| React | User Interface |
+| TypeScript | Type safety |
+| Vite | Build tooling |
+| Vitest | Unit testing |
+| ESLint | Code quality |
+| Font Awesome Pro | Icons |
 
 ---
 
-## Project Structure
+# Project Structure
 
-```
+```text
 src/
+
 ├── components/
+│   ├── comparison/
+│   ├── drawdown/
+│   ├── forms/
+│   ├── goals/
+│   ├── planner/
+│   └── shared/
+│
 ├── engine/
+│   ├── projection/
+│   └── drawdown/
+│
 ├── hooks/
 ├── pages/
 ├── styles/
@@ -185,21 +217,13 @@ src/
 
 ---
 
-## Quality
+# Getting Started
 
-The project includes:
+Clone the repository
 
-- TypeScript type safety
-- Unit tests
-- Edge case testing
-- ESLint
-- Modular projection engine
-- Modular drawdown engine
-- Reusable form component library
-
----
-
-## Running the Project
+```bash
+git clone https://github.com/<your-username>/retirement-planner.git
+```
 
 Install dependencies
 
@@ -213,35 +237,61 @@ Start the development server
 npm run dev
 ```
 
-Run tests
+Open:
+
+```
+http://localhost:5173
+```
+
+---
+
+# Available Scripts
+
+```bash
+npm run dev
+```
+
+Starts the development server.
 
 ```bash
 npm run test:run
 ```
 
-Run linting
+Runs the unit tests.
 
 ```bash
 npm run lint
 ```
 
-Verify the project
+Runs ESLint.
+
+```bash
+npm run check
+```
+
+Runs:
+
+- ESLint
+- TypeScript
+- Tests
 
 ```bash
 npm run verify
 ```
 
-Build for production
+Runs the complete verification process.
 
 ```bash
 npm run build
 ```
 
+Creates a production build.
+
 ---
 
-## Roadmap
+# Roadmap
 
-### Current
+## ✅ Completed
 
 - Guided retirement planner
 - Pension projection engine
@@ -251,20 +301,77 @@ npm run build
 - Fee impact analysis
 - Scenario comparison
 - Interactive What If analysis
-
-### Planned
-
-- Monte Carlo simulation
-- PDF retirement reports
-- UK tax planning improvements
-- ISA optimisation
-- State Pension forecasting improvements
-- Cashflow timeline
-- AI-powered retirement insights
-- Save and load retirement plans
+- Modern reusable component library
 
 ---
 
-## License
+## 🚧 In Progress
 
-This project is currently under active development.
+- Results dashboard redesign
+- Interactive scenario drawer
+- Custom What If builder
+
+---
+
+## 📅 Planned
+
+- Monte Carlo retirement simulation
+- PDF retirement reports
+- ISA optimisation
+- Retirement cashflow planner
+- UK tax optimisation
+- Save and load retirement plans
+- AI retirement insights
+
+---
+
+# Testing
+
+The application includes:
+
+- Unit tests
+- Engine edge-case testing
+- TypeScript type checking
+- ESLint validation
+
+Business logic is intentionally separated from the UI to make calculations easier to test and maintain.
+
+---
+
+# Design Philosophy
+
+The application is built around four principles:
+
+- **Clarity** — complex financial concepts presented in a simple way.
+- **Transparency** — show how every result is calculated.
+- **Experimentation** — encourage users to explore different retirement scenarios.
+- **Confidence** — help users make informed retirement decisions.
+
+---
+
+# Future Vision
+
+Retirement Planner is intended to evolve into a complete retirement planning platform, including:
+
+- Pension optimisation
+- ISA modelling
+- Monte Carlo simulations
+- Tax planning
+- Professional PDF reports
+- AI-assisted retirement guidance
+
+---
+
+# Contributing
+
+The project is currently under active development.
+
+Suggestions, ideas and feedback are always welcome.
+
+---
+
+<div align="center">
+
+**Built with ❤️ using React, TypeScript and Vite**
+
+</div>
