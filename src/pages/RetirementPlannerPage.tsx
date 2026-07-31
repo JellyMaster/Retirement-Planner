@@ -119,6 +119,7 @@ export function RetirementPlannerPage() {
               errors={currentScenario.errors}
               onChange={setInputs}
               onReset={resetInputs}
+              collapsibleSections
             />
           </aside>
 

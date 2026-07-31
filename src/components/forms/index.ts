@@ -15,3 +15,5 @@ export type { PercentageInputProps } from "./PercentageInput";
 
 export { ToggleSwitch } from "./ToggleSwitch";
 export type { ToggleSwitchProps } from "./ToggleSwitch";
+export { RetirementInputSnapshot } from "./RetirementInputSnapshot";
+export type { RetirementInputSnapshotProps, RetirementSnapshotSection } from "./RetirementInputSnapshot";

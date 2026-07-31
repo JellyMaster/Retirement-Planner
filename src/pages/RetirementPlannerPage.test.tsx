@@ -191,6 +191,12 @@ describe("RetirementPlannerPage", () => {
         "Retirement age"
       );
 
+    await user.click(
+      screen.getByRole("button", {
+        name: /contribution changes/i,
+      })
+    );
+
     const extraContributionAgeInput =
       screen.getByLabelText(
         "Extra contribution age"

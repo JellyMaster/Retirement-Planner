@@ -1,21 +1,21 @@
-# Pension input form refactor
+# Sticky Retirement Snapshot Workspace
 
 Copy the included `src` folder over the project `src` folder.
 
-Changes:
-- Refactors `PensionInputsForm.tsx` to use the shared form component library.
-- Removes the locally duplicated `FormSection`, `NumberField`, and `PercentageField` implementations.
-- Preserves collapsible comparison summaries, changed/error badges, section state, validation, and calculations.
-- Adds contextual hints and optional labels.
-- Extends shared `FormSection` to support controlled accordion state and comparison summary metrics.
+This update:
 
-Expected existing icons in `AppIcons`:
-- `user`
-- `pension`
-- `growth`
-- `plus`
-- `chevronDown`
+- places the live retirement snapshot beside the guided input sections on wide desktop layouts;
+- keeps the snapshot visible while editing sections;
+- adds required-section completion progress;
+- adds section navigation shortcuts;
+- highlights sections containing validation errors;
+- opens and scrolls to the selected section;
+- stacks the snapshot above the form on narrow screens;
+- preserves scenario-comparison behaviour.
 
 Validation performed:
-- `npx tsc -b`
-- `node node_modules/eslint/bin/eslint.js .`
+
+```bash
+npx tsc -b --pretty false
+node node_modules/eslint/bin/eslint.js .
+```

@@ -9,6 +9,7 @@ import {
   FormSection,
   NumberInput,
   PercentageInput,
+  RetirementInputSnapshot,
   type FormSectionSummaryItem,
 } from "../forms";
 
@@ -91,6 +92,17 @@ export function PensionInputsForm({
     setOpenSection((current) => (current === sectionId ? "" : sectionId));
   }
 
+  function navigateToSection(sectionId: string) {
+    setOpenSection(sectionId);
+
+    window.requestAnimationFrame(() => {
+      document.getElementById(sectionId)?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    });
+  }
+
   function createSummaryItem(
     label: string,
     displayValue: string,
@@ -135,6 +147,24 @@ export function PensionInputsForm({
       comparisonValue.monthlyEmployerContribution
     : undefined;
 
+  const comparisonMode = comparisonValue !== undefined;
+  const personalErrorCount = countErrors(["currentAge", "retirementAge"]);
+  const pensionErrorCount = countErrors([
+    "currentPot",
+    "monthlyEmployeeContribution",
+    "monthlyEmployerContribution",
+  ]);
+  const investmentErrorCount = countErrors([
+    "annualReturn",
+    "annualFee",
+    "inflation",
+  ]);
+  const contributionErrorCount = countErrors([
+    "annualContributionIncrease",
+    "extraContributionAge",
+    "extraMonthlyContribution",
+  ]);
+
   return (
     <section className="panel">
       <div className="panel-heading panel-heading-row">
@@ -151,7 +181,8 @@ export function PensionInputsForm({
         </button>
       </div>
 
-      <div className="input-sections">
+      <div className={comparisonMode ? "input-sections" : "retirement-input-workspace"}>
+        <div className="input-sections">
         <FormSection
           sectionId="personal"
           title="Personal details"
@@ -185,7 +216,11 @@ export function PensionInputsForm({
             ),
           ]}
           changedCount={countChanged(["currentAge", "retirementAge"])}
-          errorCount={countErrors(["currentAge", "retirementAge"])}
+          errorCount={personalErrorCount}
+          comparisonMode={comparisonMode}
+          status={personalErrorCount > 0 ? "review" : "complete"}
+          step={1}
+          totalSteps={4}
           description="Your current age and the age at which you plan to retire."
         >
           <FormField
@@ -273,11 +308,11 @@ export function PensionInputsForm({
             "monthlyEmployeeContribution",
             "monthlyEmployerContribution",
           ])}
-          errorCount={countErrors([
-            "currentPot",
-            "monthlyEmployeeContribution",
-            "monthlyEmployerContribution",
-          ])}
+          errorCount={pensionErrorCount}
+          comparisonMode={comparisonMode}
+          status={pensionErrorCount > 0 ? "review" : "complete"}
+          step={2}
+          totalSteps={4}
           description="Your pension balance and regular monthly contributions."
         >
           <FormField
@@ -384,7 +419,11 @@ export function PensionInputsForm({
             ),
           ]}
           changedCount={countChanged(["annualReturn", "annualFee", "inflation"])}
-          errorCount={countErrors(["annualReturn", "annualFee", "inflation"])}
+          errorCount={investmentErrorCount}
+          comparisonMode={comparisonMode}
+          status={investmentErrorCount > 0 ? "review" : "complete"}
+          step={3}
+          totalSteps={4}
           description="Expected investment growth, pension charges and inflation."
         >
           <FormField
@@ -509,11 +548,11 @@ export function PensionInputsForm({
             "extraContributionAge",
             "extraMonthlyContribution",
           ])}
-          errorCount={countErrors([
-            "annualContributionIncrease",
-            "extraContributionAge",
-            "extraMonthlyContribution",
-          ])}
+          errorCount={contributionErrorCount}
+          comparisonMode={comparisonMode}
+          status={contributionErrorCount > 0 ? "review" : "optional"}
+          step={4}
+          totalSteps={4}
           description="Model regular contribution increases or a later additional payment."
         >
           <FormField
@@ -587,6 +626,44 @@ export function PensionInputsForm({
             )}
           </FormField>
         </FormSection>
+        </div>
+
+        {!comparisonMode && (
+          <div className="retirement-input-snapshot-column">
+            <RetirementInputSnapshot
+              inputs={value}
+              errors={errors}
+              sections={[
+                {
+                  id: "personal",
+                  label: "Personal details",
+                  icon: AppIcons.user,
+                  errorCount: personalErrorCount,
+                },
+                {
+                  id: "pension",
+                  label: "Current pension",
+                  icon: AppIcons.pension,
+                  errorCount: pensionErrorCount,
+                },
+                {
+                  id: "investment",
+                  label: "Investment assumptions",
+                  icon: AppIcons.growth,
+                  errorCount: investmentErrorCount,
+                },
+                {
+                  id: "changes",
+                  label: "Contribution changes",
+                  icon: AppIcons.plus,
+                  errorCount: contributionErrorCount,
+                  optional: true,
+                },
+              ]}
+              onNavigate={navigateToSection}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

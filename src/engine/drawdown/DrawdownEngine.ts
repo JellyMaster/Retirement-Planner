@@ -96,16 +96,31 @@ export class DrawdownEngine {
       const fees = roundMoney(balanceBeforeFees * inputs.annualFee);
       const closingBalance = roundMoney(Math.max(0, balanceBeforeFees - fees));
 
-      years.push({
-        year, age, openingBalance, desiredIncome,
-        incomeTargetMode: inputs.incomeTargetMode,
-        statePensionIncome, requiredPensionWithdrawal, pensionWithdrawal,
-        grossIncome: tax.grossIncome, taxableIncome: tax.taxableIncome,
-        personalAllowance: tax.personalAllowance, incomeTax: tax.incomeTax,
-        netIncome: tax.netIncome, effectiveTaxRate: tax.effectiveTaxRate,
-        netIncomeShortfall, incomeShortfall, investmentGrowth, fees, closingBalance,
-        isDepleted: closingBalance === 0 && openingBalance > 0,
-      });
+     years.push({
+  year,
+  age,
+  openingBalance,
+  desiredIncome,
+  incomeTargetMode: inputs.incomeTargetMode,
+  statePensionIncome,
+  requiredPensionWithdrawal,
+  pensionWithdrawal,
+  grossIncome: tax.grossIncome,
+  taxableIncome: tax.taxableIncome,
+  personalAllowance: tax.personalAllowance,
+  incomeTax: tax.incomeTax,
+  netIncome: tax.netIncome,
+  effectiveTaxRate: tax.effectiveTaxRate,
+  netIncomeShortfall,
+  incomeShortfall,
+  investmentGrowth,
+  fees,
+  closingBalance,
+
+  isDepleted:
+    closingBalance === 0 &&
+    requiredPensionWithdrawal > pensionWithdrawal,
+});
       openingBalance = closingBalance;
     }
 

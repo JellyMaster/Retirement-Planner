@@ -12,6 +12,8 @@ export interface FormSectionSummaryItem {
   difference?: string;
 }
 
+export type FormSectionStatus = "complete" | "review" | "optional";
+
 export interface FormSectionProps {
   title: string;
   children: ReactNode;
@@ -20,18 +22,18 @@ export interface FormSectionProps {
   collapsible?: boolean;
   defaultExpanded?: boolean;
   className?: string;
-
-  /** Optional controlled expansion state. */
   isOpen?: boolean;
-  /** Stable identifier used for aria-controls and controlled toggling. */
   sectionId?: string;
   onToggle?: (sectionId: string) => void;
-
-  /** Compact content shown while a section is collapsed. */
   summary?: string;
   summaryItems?: FormSectionSummaryItem[];
   changedCount?: number;
   errorCount?: number;
+  status?: FormSectionStatus;
+  statusLabel?: string;
+  comparisonMode?: boolean;
+  step?: number;
+  totalSteps?: number;
 }
 
 export function FormSection({
@@ -49,6 +51,11 @@ export function FormSection({
   summaryItems = [],
   changedCount = 0,
   errorCount = 0,
+  status = "complete",
+  statusLabel,
+  comparisonMode = false,
+  step,
+  totalSteps,
 }: FormSectionProps) {
   const generatedId = useId();
   const resolvedSectionId =
@@ -73,6 +80,26 @@ export function FormSection({
     setInternalExpanded((current) => !current);
   }
 
+  const resolvedStatusLabel =
+    statusLabel ??
+    (status === "complete"
+      ? "Complete"
+      : status === "review"
+        ? "Review"
+        : "Optional");
+
+  const statusBadgeClassName = comparisonMode
+    ? changedCount > 0
+      ? "form-section-status-badge form-section-status-changed"
+      : "form-section-status-badge form-section-status-same"
+    : `form-section-status-badge form-section-status-${status}`;
+
+  const visibleStatusLabel = comparisonMode
+    ? changedCount > 0
+      ? "Changed"
+      : "Same"
+    : resolvedStatusLabel;
+
   const sectionClassName = [
     "form-section",
     collapsible && "form-section-collapsible",
@@ -84,7 +111,7 @@ export function FormSection({
 
   if (collapsible) {
     return (
-      <section className={sectionClassName}>
+      <section id={resolvedSectionId} className={sectionClassName}>
         <button
           type="button"
           className="form-section-summary"
@@ -99,16 +126,17 @@ export function FormSection({
 
             <span className="form-section-summary-copy">
               <span className="form-section-summary-heading">
-                <strong>{title}</strong>
+                <span className="form-section-summary-title-group">
+                  {step !== undefined && totalSteps !== undefined && (
+                    <small className="form-section-step">
+                      Step {step} of {totalSteps}
+                    </small>
+                  )}
+                  <strong>{title}</strong>
+                </span>
 
-                <span
-                  className={
-                    changedCount > 0
-                      ? "form-section-status-badge form-section-status-changed"
-                      : "form-section-status-badge form-section-status-same"
-                  }
-                >
-                  {changedCount > 0 ? "Changed" : "Same"}
+                <span className={statusBadgeClassName}>
+                  {visibleStatusLabel}
                 </span>
 
                 {errorCount > 0 && (
@@ -129,15 +157,17 @@ export function FormSection({
                       }`}
                       key={item.label}
                       aria-label={
-                        item.changed && item.difference
-                          ? `${item.label}: ${item.value}, ${item.difference} compared with the other plan`
-                          : `${item.label}: ${item.value}, unchanged`
+                        comparisonMode
+                          ? item.changed && item.difference
+                            ? `${item.label}: ${item.value}, ${item.difference} compared with the other plan`
+                            : `${item.label}: ${item.value}, unchanged`
+                          : `${item.label}: ${item.value}`
                       }
                     >
                       <small>{item.label}</small>
                       <span className="form-section-summary-value-row">
                         <strong>{item.value}</strong>
-                        {item.changed && item.difference && (
+                        {comparisonMode && item.changed && item.difference && (
                           <span
                             className="form-section-summary-difference"
                             aria-hidden="true"
@@ -164,7 +194,10 @@ export function FormSection({
         </button>
 
         {expanded && (
-          <div id={contentId} className="form-section-body form-section-collapsible-content">
+          <div
+            id={contentId}
+            className="form-section-body form-section-collapsible-content"
+          >
             {children}
           </div>
         )}
@@ -173,7 +206,7 @@ export function FormSection({
   }
 
   return (
-    <section className={sectionClassName}>
+    <section id={resolvedSectionId} className={sectionClassName}>
       <header className="form-section-heading">
         <div className="form-section-title">
           {icon && (
@@ -183,10 +216,17 @@ export function FormSection({
           )}
 
           <div className="form-section-title-copy">
+            {step !== undefined && totalSteps !== undefined && (
+              <small className="form-section-step">
+                Step {step} of {totalSteps}
+              </small>
+            )}
             <h3>{title}</h3>
             {description && <p>{description}</p>}
           </div>
         </div>
+
+        <span className={statusBadgeClassName}>{visibleStatusLabel}</span>
       </header>
 
       <div className="form-section-body">{children}</div>
