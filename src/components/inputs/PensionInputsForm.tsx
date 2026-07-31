@@ -13,6 +13,7 @@ interface PensionInputsFormProps {
 
   onChange: (inputs: PensionInputs) => void;
   onReset: () => void;
+  collapsibleSections?: boolean;
 }
 
 type RequiredNumericField =
@@ -32,6 +33,7 @@ export function PensionInputsForm({
   errors,
   onChange,
   onReset,
+  collapsibleSections = false,
 }: PensionInputsFormProps) {
  function createFieldId(
     fieldName: string
@@ -70,10 +72,10 @@ export function PensionInputsForm({
         <div>
           <h2>Your details</h2>
 
-          <p>
+          {/* <p>
             Enter your current pension information and
             planning assumptions.
-          </p>
+          </p> */}
         </div>
 
         <button
@@ -88,6 +90,8 @@ export function PensionInputsForm({
       <div className="input-sections">
         <FormSection
           title="Personal details"
+          collapsible={collapsibleSections}
+          defaultOpen
           description="Your current age and planned retirement age."
         >
           <NumberField
@@ -123,6 +127,8 @@ export function PensionInputsForm({
 
         <FormSection
           title="Current pension"
+          collapsible={collapsibleSections}
+          defaultOpen
           description="Your pension balance and regular monthly contributions."
         >
           <NumberField
@@ -188,6 +194,7 @@ export function PensionInputsForm({
 
         <FormSection
           title="Investment assumptions"
+          collapsible={collapsibleSections}
           description="Expected return, pension fees and inflation."
         >
           <PercentageField
@@ -236,6 +243,7 @@ export function PensionInputsForm({
 
         <FormSection
           title="Contribution changes"
+          collapsible={collapsibleSections}
           description="Model annual increases or additional monthly payments."
         >
           <PercentageField
@@ -310,24 +318,43 @@ interface FormSectionProps {
   title: string;
   description: string;
   children: ReactNode;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 }
 
 function FormSection({
   title,
   description,
   children,
+  collapsible = false,
+  defaultOpen = false,
 }: FormSectionProps) {
+  if (collapsible) {
+    return (
+      <details className="form-section form-section-collapsible" open={defaultOpen}>
+        <summary className="form-section-summary">
+          <span>
+            <strong>{title}</strong>
+            <small>{description}</small>
+          </span>
+          <span className="form-section-chevron" aria-hidden="true">⌄</span>
+        </summary>
+
+        <div className="form-grid form-section-collapsible-content">
+          {children}
+        </div>
+      </details>
+    );
+  }
+
   return (
     <section className="form-section">
       <div className="form-section-heading">
         <h3>{title}</h3>
-
         <p>{description}</p>
       </div>
 
-      <div className="form-grid">
-        {children}
-      </div>
+      <div className="form-grid">{children}</div>
     </section>
   );
 }

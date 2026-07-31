@@ -23,8 +23,6 @@ interface RetirementComparisonDashboardProps {
   onAlternativeChange: (inputs: PensionInputs) => void;
   onResetBaseline: () => void;
   onResetAlternative: () => void;
-  onDuplicateBaseline: () => void;
-  onSwap: () => void;
 }
 
 type AssumptionKey = keyof PensionInputs;
@@ -104,12 +102,14 @@ export function RetirementComparisonDashboard({
   onAlternativeChange,
   onResetBaseline,
   onResetAlternative,
-  onDuplicateBaseline,
-  onSwap,
 }: RetirementComparisonDashboardProps) {
   const [showUnchanged, setShowUnchanged] = useState(false);
   const [activeEditor, setActiveEditor] = useState<"baseline" | "alternative">("baseline");
   const [isEditorCollapsed, setIsEditorCollapsed] = useState(false);
+
+  function handleSelectPlan(plan: "baseline" | "alternative") {
+    setActiveEditor(plan);
+  }
 
   const editorPanel = (
     <ScenarioAssumptionsPanel
@@ -134,8 +134,8 @@ export function RetirementComparisonDashboard({
         {editorPanel}
         <main className="retirement-comparison-dashboard">
           <ComparisonToolbar
-            onDuplicateBaseline={onDuplicateBaseline}
-            onSwap={onSwap}
+            activePlan={activeEditor}
+            onSelectPlan={handleSelectPlan}
           />
           <section className="validation-notice comparison-validation-notice" role="alert">
             <div>
@@ -170,8 +170,8 @@ export function RetirementComparisonDashboard({
       {editorPanel}
       <main className="retirement-comparison-dashboard">
       <ComparisonToolbar
-        onDuplicateBaseline={onDuplicateBaseline}
-        onSwap={onSwap}
+        activePlan={activeEditor}
+        onSelectPlan={handleSelectPlan}
       />
 
       <OutcomeBanner comparison={comparison} />
@@ -255,8 +255,8 @@ export function RetirementComparisonDashboard({
               <thead>
                 <tr>
                   <th>Assumption</th>
-                  <th>Current plan</th>
-                  <th>Comparison plan</th>
+                  <th><PlanIdentity plan="baseline" label="Current plan" compact /></th>
+                  <th><PlanIdentity plan="alternative" label="Comparison plan" compact /></th>
                   <th>Difference</th>
                 </tr>
               </thead>
@@ -300,29 +300,75 @@ export function RetirementComparisonDashboard({
 }
 
 function ComparisonToolbar({
-  onDuplicateBaseline,
-  onSwap,
+  activePlan,
+  onSelectPlan,
 }: {
-  onDuplicateBaseline: () => void;
-  onSwap: () => void;
+  activePlan: "baseline" | "alternative";
+  onSelectPlan: (plan: "baseline" | "alternative") => void;
 }) {
   return (
-    <section className="comparison-toolbar" aria-label="Comparison controls">
+    <section className="comparison-toolbar" aria-label="Select a plan to edit">
       <div>
         <p className="planner-eyebrow">Scenario comparison</p>
-        <h2>Current plan <span>versus</span> Comparison plan</h2>
-      </div>
-      <div className="comparison-toolbar-actions">
-        <div className="comparison-plan-actions">
-          <button type="button" className="comparison-secondary-button" onClick={onSwap}>
-            Swap plans
+        <h2 className="comparison-plan-title">
+          <button
+            type="button"
+            className="comparison-plan-selector"
+            onClick={() => onSelectPlan("baseline")}
+            aria-pressed={activePlan === "baseline"}
+          >
+            <PlanIdentity
+              plan="baseline"
+              label="Current plan"
+              active={activePlan === "baseline"}
+            />
           </button>
-          <button type="button" className="comparison-secondary-button" onClick={onDuplicateBaseline}>
-            Copy current plan
+          <span className="comparison-versus">versus</span>
+          <button
+            type="button"
+            className="comparison-plan-selector"
+            onClick={() => onSelectPlan("alternative")}
+            aria-pressed={activePlan === "alternative"}
+          >
+            <PlanIdentity
+              plan="alternative"
+              label="Comparison plan"
+              active={activePlan === "alternative"}
+            />
           </button>
-        </div>
+        </h2>
+        <p className="comparison-plan-selector-hint">Select a plan to view and edit its assumptions.</p>
       </div>
     </section>
+  );
+}
+
+function PlanIdentity({
+  plan,
+  label,
+  compact = false,
+  active = false,
+}: {
+  plan: "baseline" | "alternative";
+  label: string;
+  compact?: boolean;
+  active?: boolean;
+}) {
+  const classNames = [
+    "comparison-plan-identity",
+    `comparison-plan-${plan}`,
+    compact ? "comparison-plan-identity-compact" : "",
+    active ? "comparison-plan-identity-active" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <span className={classNames} aria-current={active ? "true" : undefined}>
+      <span className="comparison-plan-dot" aria-hidden="true" />
+      <span>{label}</span>
+      {active && <span className="comparison-plan-viewing-label">Viewing</span>}
+    </span>
   );
 }
 
@@ -379,8 +425,8 @@ function DifferenceCard({
       <p>{label}</p>
       <strong>{difference}</strong>
       <dl>
-        <div><dt>Current</dt><dd>{baseline}</dd></div>
-        <div><dt>Comparison</dt><dd>{alternative}</dd></div>
+        <div><dt><PlanIdentity plan="baseline" label="Current" compact /></dt><dd>{baseline}</dd></div>
+        <div><dt><PlanIdentity plan="alternative" label="Comparison" compact /></dt><dd>{alternative}</dd></div>
       </dl>
     </article>
   );
@@ -510,8 +556,8 @@ function YearComparisonTable({ rows }: { rows: YearComparisonRow[] }) {
         <thead>
           <tr>
             <th>Age</th>
-            <th>Current plan</th>
-            <th>Comparison plan</th>
+            <th><PlanIdentity plan="baseline" label="Current plan" compact /></th>
+            <th><PlanIdentity plan="alternative" label="Comparison plan" compact /></th>
             <th>Difference</th>
           </tr>
         </thead>
@@ -592,7 +638,7 @@ function ScenarioAssumptionsPanel({
               className={isBaseline ? "comparison-editor-tab-active" : undefined}
               onClick={() => onSelectEditor("baseline")}
             >
-              Current plan
+              <PlanIdentity plan="baseline" label="Current plan" compact />
               {baselineScenario.hasErrors && <span className="comparison-tab-error" aria-label="Has validation errors">!</span>}
             </button>
             <button
@@ -602,9 +648,17 @@ function ScenarioAssumptionsPanel({
               className={!isBaseline ? "comparison-editor-tab-active" : undefined}
               onClick={() => onSelectEditor("alternative")}
             >
-              Comparison plan
+              <PlanIdentity plan="alternative" label="Comparison plan" compact />
               {alternativeScenario.hasErrors && <span className="comparison-tab-error" aria-label="Has validation errors">!</span>}
             </button>
+          </div>
+
+          <div className={`comparison-active-editor-banner comparison-active-editor-${activeEditor}`}>
+            <span>Editing</span>
+            <PlanIdentity
+              plan={activeEditor}
+              label={isBaseline ? "Current plan" : "Comparison plan"}
+            />
           </div>
 
           <div className="comparison-sidebar-content" role="tabpanel">
@@ -614,6 +668,7 @@ function ScenarioAssumptionsPanel({
               errors={isBaseline ? baselineScenario.errors : alternativeScenario.errors}
               onChange={isBaseline ? onBaselineChange : onAlternativeChange}
               onReset={isBaseline ? onResetBaseline : onResetAlternative}
+              collapsibleSections
             />
           </div>
         </>

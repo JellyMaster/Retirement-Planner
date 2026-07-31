@@ -198,11 +198,6 @@ function ComparisonLayout({
   resetInputs,
   resetComparisonInputs,
 }: ComparisonLayoutProps) {
-  function swapPlans() {
-    const previousBaseline = { ...inputs };
-    setInputs({ ...comparisonInputs });
-    setComparisonInputs(previousBaseline);
-  }
 
   return (
     <RetirementComparisonDashboard
@@ -214,8 +209,6 @@ function ComparisonLayout({
       onAlternativeChange={setComparisonInputs}
       onResetBaseline={resetInputs}
       onResetAlternative={resetComparisonInputs}
-      onDuplicateBaseline={() => setComparisonInputs({ ...inputs })}
-      onSwap={swapPlans}
     />
   );
 }
