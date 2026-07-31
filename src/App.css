@@ -1294,3 +1294,15 @@
 @media (max-width:900px) { .dashboard-header{align-items:stretch;flex-direction:column}.dashboard-display-control{min-width:0}.drawdown-dashboard-shell{grid-template-columns:1fr}.drawdown-dashboard-sidebar{position:static;max-height:none;overflow:visible}.drawdown-dashboard-sidebar .form-grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (max-width:680px) { .drawdown-dashboard-sidebar .form-grid,.drawdown-dashboard-content .summary-grid,.dashboard-insights .insights-list{grid-template-columns:1fr 1fr}.dashboard-main-grid{display:block}.dashboard-insights{margin-top:18px}.dashboard-chart-toolbar{align-items:stretch;flex-direction:column}.dashboard-details > summary span{display:none} }
 @media (max-width:480px) { .drawdown-dashboard-sidebar .form-grid,.drawdown-dashboard-content .summary-grid,.dashboard-insights .insights-list{grid-template-columns:1fr} }
+
+.comparison-editor-panel {
+    background: var(--card-background);
+    color: var(--text-primary);
+
+    border: 1px solid var(--border-colour);
+    border-radius: 14px;
+
+    box-shadow: var(--card-shadow);
+
+    transition: width .25s ease;
+}

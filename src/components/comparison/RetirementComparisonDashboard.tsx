@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 
 import type { PensionInputs } from "../../engine/models/PensionInputs";
 import type { ProjectionResult } from "../../engine/models/ProjectionResult";
@@ -108,12 +108,15 @@ export function RetirementComparisonDashboard({
   onSwap,
 }: RetirementComparisonDashboardProps) {
   const [showUnchanged, setShowUnchanged] = useState(false);
-  const [activeEditor, setActiveEditor] = useState<"baseline" | "alternative" | null>(null);
+  const [activeEditor, setActiveEditor] = useState<"baseline" | "alternative">("baseline");
+  const [isEditorCollapsed, setIsEditorCollapsed] = useState(false);
 
-  const editors = (
-    <ScenarioEditorDrawer
+  const editorPanel = (
+    <ScenarioAssumptionsPanel
       activeEditor={activeEditor}
-      onClose={() => setActiveEditor(null)}
+      isCollapsed={isEditorCollapsed}
+      onSelectEditor={setActiveEditor}
+      onToggleCollapsed={() => setIsEditorCollapsed((current) => !current)}
       baselineInputs={baselineInputs}
       alternativeInputs={alternativeInputs}
       baselineScenario={baselineScenario}
@@ -127,24 +130,20 @@ export function RetirementComparisonDashboard({
 
   if (baselineScenario.hasErrors || alternativeScenario.hasErrors) {
     return (
-      <div className="retirement-comparison-dashboard">
-        <ComparisonToolbar
-          onDuplicateBaseline={onDuplicateBaseline}
-          onSwap={onSwap}
-          onEditBaseline={() => setActiveEditor("baseline")}
-          onEditAlternative={() => setActiveEditor("alternative")}
-        />
-        <section className="validation-notice comparison-validation-notice" role="alert">
-          <div>
-            <strong>Some scenario assumptions need attention.</strong>
-            <p>Open the relevant editor to correct the highlighted fields.</p>
-          </div>
-          <div className="comparison-validation-actions">
-            <button type="button" className="comparison-secondary-button" onClick={() => setActiveEditor("baseline")}>Edit current plan</button>
-            <button type="button" className="comparison-secondary-button" onClick={() => setActiveEditor("alternative")}>Edit comparison plan</button>
-          </div>
-        </section>
-        {editors}
+      <div className={`retirement-comparison-workspace ${isEditorCollapsed ? "comparison-workspace-collapsed" : ""}`}>
+        {editorPanel}
+        <main className="retirement-comparison-dashboard">
+          <ComparisonToolbar
+            onDuplicateBaseline={onDuplicateBaseline}
+            onSwap={onSwap}
+          />
+          <section className="validation-notice comparison-validation-notice" role="alert">
+            <div>
+              <strong>Some scenario assumptions need attention.</strong>
+              <p>Use the assumptions panel on the left to correct the highlighted fields.</p>
+            </div>
+          </section>
+        </main>
       </div>
     );
   }
@@ -167,12 +166,12 @@ export function RetirementComparisonDashboard({
     : differingAssumptions;
 
   return (
-    <div className="retirement-comparison-dashboard">
+    <div className={`retirement-comparison-workspace ${isEditorCollapsed ? "comparison-workspace-collapsed" : ""}`}>
+      {editorPanel}
+      <main className="retirement-comparison-dashboard">
       <ComparisonToolbar
         onDuplicateBaseline={onDuplicateBaseline}
         onSwap={onSwap}
-        onEditBaseline={() => setActiveEditor("baseline")}
-        onEditAlternative={() => setActiveEditor("alternative")}
       />
 
       <OutcomeBanner comparison={comparison} />
@@ -295,7 +294,7 @@ export function RetirementComparisonDashboard({
         <YearComparisonTable rows={comparison.yearRows} />
       </details>
 
-      {editors}
+      </main>
     </div>
   );
 }
@@ -303,13 +302,9 @@ export function RetirementComparisonDashboard({
 function ComparisonToolbar({
   onDuplicateBaseline,
   onSwap,
-  onEditBaseline,
-  onEditAlternative,
 }: {
   onDuplicateBaseline: () => void;
   onSwap: () => void;
-  onEditBaseline: () => void;
-  onEditAlternative: () => void;
 }) {
   return (
     <section className="comparison-toolbar" aria-label="Comparison controls">
@@ -318,14 +313,6 @@ function ComparisonToolbar({
         <h2>Current plan <span>versus</span> Comparison plan</h2>
       </div>
       <div className="comparison-toolbar-actions">
-        <div className="comparison-edit-actions" aria-label="Edit scenario assumptions">
-          <button type="button" className="comparison-edit-button comparison-edit-baseline" onClick={onEditBaseline}>
-            <span aria-hidden="true">←</span> Edit current plan
-          </button>
-          <button type="button" className="comparison-edit-button comparison-edit-alternative" onClick={onEditAlternative}>
-            Edit comparison plan <span aria-hidden="true">→</span>
-          </button>
-        </div>
         <div className="comparison-plan-actions">
           <button type="button" className="comparison-secondary-button" onClick={onSwap}>
             Swap plans
@@ -545,9 +532,11 @@ function YearComparisonTable({ rows }: { rows: YearComparisonRow[] }) {
   );
 }
 
-interface ScenarioEditorDrawerProps {
-  activeEditor: "baseline" | "alternative" | null;
-  onClose: () => void;
+interface ScenarioAssumptionsPanelProps {
+  activeEditor: "baseline" | "alternative";
+  isCollapsed: boolean;
+  onSelectEditor: (editor: "baseline" | "alternative") => void;
+  onToggleCollapsed: () => void;
   baselineInputs: PensionInputs;
   alternativeInputs: PensionInputs;
   baselineScenario: ProjectionScenario;
@@ -558,9 +547,11 @@ interface ScenarioEditorDrawerProps {
   onResetAlternative: () => void;
 }
 
-function ScenarioEditorDrawer({
+function ScenarioAssumptionsPanel({
   activeEditor,
-  onClose,
+  isCollapsed,
+  onSelectEditor,
+  onToggleCollapsed,
   baselineInputs,
   alternativeInputs,
   baselineScenario,
@@ -569,58 +560,65 @@ function ScenarioEditorDrawer({
   onAlternativeChange,
   onResetBaseline,
   onResetAlternative,
-}: ScenarioEditorDrawerProps) {
-  useEffect(() => {
-    if (activeEditor === null) return undefined;
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeEditor, onClose]);
-
-  if (activeEditor === null) return null;
-
+}: ScenarioAssumptionsPanelProps) {
   const isBaseline = activeEditor === "baseline";
 
   return (
-    <div className={`comparison-drawer-layer comparison-drawer-${activeEditor}`}>
+    <aside className="comparison-assumptions-sidebar" aria-label="Scenario assumptions">
       <button
         type="button"
-        className="comparison-drawer-backdrop"
-        aria-label="Close scenario editor"
-        onClick={onClose}
-      />
-      <aside
-        className="comparison-scenario-drawer"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="comparison-drawer-title"
+        className="comparison-sidebar-toggle"
+        onClick={onToggleCollapsed}
+        aria-expanded={!isCollapsed}
+        aria-label={isCollapsed ? "Expand scenario assumptions" : "Minimise scenario assumptions"}
       >
-        <header className="comparison-drawer-header">
-          <div>
-            <p className="planner-eyebrow">{isBaseline ? "Baseline scenario" : "Alternative scenario"}</p>
-            <h2 id="comparison-drawer-title">{isBaseline ? "Edit current plan" : "Edit comparison plan"}</h2>
+        <span aria-hidden="true">{isCollapsed ? "›" : "‹"}</span>
+        <span className="comparison-sidebar-toggle-text">{isCollapsed ? "Edit plans" : "Minimise"}</span>
+      </button>
+
+      {!isCollapsed && (
+        <>
+          <header className="comparison-sidebar-header">
+            <p className="planner-eyebrow">Scenario assumptions</p>
+            <h2>Edit plans</h2>
             <p>Changes update the comparison immediately.</p>
+          </header>
+
+          <div className="comparison-editor-tabs" role="tablist" aria-label="Choose a scenario to edit">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={isBaseline}
+              className={isBaseline ? "comparison-editor-tab-active" : undefined}
+              onClick={() => onSelectEditor("baseline")}
+            >
+              Current plan
+              {baselineScenario.hasErrors && <span className="comparison-tab-error" aria-label="Has validation errors">!</span>}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={!isBaseline}
+              className={!isBaseline ? "comparison-editor-tab-active" : undefined}
+              onClick={() => onSelectEditor("alternative")}
+            >
+              Comparison plan
+              {alternativeScenario.hasErrors && <span className="comparison-tab-error" aria-label="Has validation errors">!</span>}
+            </button>
           </div>
-          <button type="button" className="comparison-drawer-close" onClick={onClose} aria-label="Close editor">×</button>
-        </header>
-        <div className="comparison-drawer-content">
-          <PensionInputsForm
-            idPrefix={isBaseline ? "current" : "comparison"}
-            value={isBaseline ? baselineInputs : alternativeInputs}
-            errors={isBaseline ? baselineScenario.errors : alternativeScenario.errors}
-            onChange={isBaseline ? onBaselineChange : onAlternativeChange}
-            onReset={isBaseline ? onResetBaseline : onResetAlternative}
-          />
-        </div>
-        <footer className="comparison-drawer-footer">
-          <button type="button" className="comparison-drawer-done" onClick={onClose}>Done editing</button>
-        </footer>
-      </aside>
-    </div>
+
+          <div className="comparison-sidebar-content" role="tabpanel">
+            <PensionInputsForm
+              idPrefix={isBaseline ? "current" : "comparison"}
+              value={isBaseline ? baselineInputs : alternativeInputs}
+              errors={isBaseline ? baselineScenario.errors : alternativeScenario.errors}
+              onChange={isBaseline ? onBaselineChange : onAlternativeChange}
+              onReset={isBaseline ? onResetBaseline : onResetAlternative}
+            />
+          </div>
+        </>
+      )}
+    </aside>
   );
 }
 

@@ -1,44 +1,31 @@
-# Retirement comparison dashboard patch
+# Themed comparison assumptions panel patch
 
-This patch replaces the compact retirement planner's original side-by-side comparison results with a decision-focused comparison dashboard.
+This patch updates the retirement comparison editor so the left assumptions panel uses the same theme tokens and component styling as the rest of the application.
 
-## Included changes
+## Changes
 
-### Scenario editor update
-
-- **Edit current plan** opens from the left
-- **Edit comparison plan** opens from the right
-- Editors remain available at the top of the comparison instead of the bottom
-- Results stay visible behind the slide-over for context
-- Escape, backdrop click, close, and Done editing all dismiss the editor
-
-
-- Plain-English outcome banner
-- Difference-first metric cards
-- Existing overlaid balance chart retained
-- Benefits and trade-offs panel
-- Assumptions table showing changed values first
-- Optional display of unchanged assumptions
-- Retirement timeline
-- Collapsible year-by-year comparison table
-- Header-level edit controls with left and right slide-over scenario editors
-- Swap plans and copy current plan actions
-- Responsive desktop, tablet, and mobile styling
+- Uses the dashboard theme variables for panel, text, border, accent and shadow colours.
+- Supports light and dark modes without hard-coded white surfaces.
+- Matches the existing dashboard card and chart-tab styling.
+- Styles inputs, selects, prefixes, suffixes, validation states and focus states consistently.
+- Makes the active editor tab clearer.
+- Gives the collapsed Edit plans rail a themed, visible treatment.
+- Keeps the existing current/comparison tabs and horizontal minimise behaviour.
 
 ## Installation
 
 Copy the included `src` folder over the existing project `src` folder.
 
-This patch assumes the earlier compact retirement dashboard patch is already installed.
-
-## Validation
-
-TypeScript compilation passed with:
+Then run:
 
 ```powershell
-node node_modules/typescript/bin/tsc -b
+npm run test:run
+npm run build
 ```
 
-The Vite production build could not run in the Linux validation container because the existing project dependency tree is missing the optional native package `@rolldown/binding-linux-x64-gnu`. This is the same environment-specific Rolldown issue encountered with earlier patches.
+The TypeScript component logic is unchanged; this is primarily a theme and presentation update.
 
-No pension projection calculations were changed.
+
+## Header control cleanup
+
+The duplicate **Edit current plan** and **Edit comparison plan** buttons have been removed from the comparison header. Scenario editing now lives exclusively in the tabbed assumptions panel. When the panel is minimised, the themed **Edit plans** rail remains visible as the single way to restore it. The header now focuses only on comparison-level actions such as swapping and copying plans.
