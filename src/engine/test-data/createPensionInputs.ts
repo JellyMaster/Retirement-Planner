@@ -4,17 +4,17 @@ export function createPensionInputs(
   overrides: Partial<PensionInputs> = {}
 ): PensionInputs {
   return {
-    currentAge: 47,
-    retirementAge: 67,
+    currentAge: 25,
+    retirementAge: 68,
 
     currentPot: 100000,
 
-    monthlyEmployeeContribution: 500,
-    monthlyEmployerContribution: 250,
+    monthlyEmployeeContribution: 0,
+    monthlyEmployerContribution: 0,
 
     annualContributionIncrease: 0,
 
-    annualReturn: 0.05,
+    annualReturn: 0.27,
     annualFee: 0,
     inflation: 0,
 

@@ -1,0 +1,250 @@
+.retirement-journey {
+  display: grid;
+  gap: 26px;
+  padding: clamp(24px, 4vw, 36px);
+  border: 1px solid var(--colour-border);
+  border-radius: 22px;
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.retirement-journey-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.retirement-journey-heading h2,
+.retirement-journey-heading p {
+  margin: 0;
+}
+
+.retirement-journey-heading h2 {
+  margin-top: 5px;
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+}
+
+.retirement-journey-heading > div > p:last-child {
+  max-width: 720px;
+  margin-top: 9px;
+  color: var(--colour-text-muted);
+  line-height: 1.55;
+}
+
+.retirement-journey-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border: 1px solid var(--colour-border);
+  border-radius: 999px;
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text-secondary);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.retirement-journey-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.retirement-journey-track::before {
+  position: absolute;
+  top: 27px;
+  right: 8%;
+  left: 8%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--colour-accent),
+    var(--colour-positive, #23865f)
+  );
+  content: "";
+  opacity: 0.34;
+}
+
+.retirement-journey-milestone {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.retirement-journey-milestone-button {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  padding: 0 10px 14px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.retirement-journey-marker {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 5px solid var(--colour-surface);
+  border-radius: 50%;
+  background: var(--colour-surface-secondary);
+  color: var(--colour-accent);
+  box-shadow: 0 0 0 1px var(--colour-border), 0 7px 18px rgb(18 40 35 / 10%);
+  transition: transform 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.retirement-journey-milestone-button:hover .retirement-journey-marker,
+.retirement-journey-milestone-button:focus-visible .retirement-journey-marker,
+.retirement-journey-milestone-active .retirement-journey-marker {
+  transform: translateY(-3px) scale(1.04);
+  background: var(--colour-accent);
+  color: #fff;
+}
+
+.retirement-journey-milestone-button:focus-visible {
+  outline: 3px solid var(--colour-focus-ring);
+  outline-offset: 3px;
+  border-radius: 14px;
+}
+
+.retirement-journey-milestone-copy {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  margin-top: 11px;
+}
+
+.retirement-journey-milestone-copy small {
+  color: var(--colour-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.retirement-journey-milestone-copy strong {
+  font-size: 0.96rem;
+}
+
+.retirement-journey-milestone-copy span {
+  color: var(--colour-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.retirement-journey-detail {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid var(--colour-border);
+  border-left: 4px solid var(--colour-accent);
+  border-radius: 16px;
+  background: var(--colour-surface-secondary);
+}
+
+.retirement-journey-detail-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--colour-surface);
+  color: var(--colour-accent);
+  box-shadow: 0 4px 12px rgb(18 40 35 / 8%);
+}
+
+.retirement-journey-detail small,
+.retirement-journey-detail h3,
+.retirement-journey-detail p {
+  margin: 0;
+}
+
+.retirement-journey-detail small {
+  color: var(--colour-accent);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.retirement-journey-detail h3 {
+  margin-top: 3px;
+  font-size: 1.05rem;
+}
+
+.retirement-journey-detail p {
+  margin-top: 5px;
+  color: var(--colour-text-muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.retirement-journey-detail > strong {
+  color: var(--colour-text);
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  white-space: nowrap;
+}
+
+.retirement-journey-disclaimer {
+  margin: -9px 0 0;
+  color: var(--colour-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 820px) {
+  .retirement-journey-heading {
+    flex-direction: column;
+  }
+
+  .retirement-journey-track {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .retirement-journey-track::before {
+    top: 22px;
+    bottom: 22px;
+    left: 27px;
+    width: 3px;
+    height: auto;
+  }
+
+  .retirement-journey-milestone-button {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    justify-items: stretch;
+    padding: 0 0 12px;
+    text-align: left;
+  }
+
+  .retirement-journey-milestone-copy {
+    justify-items: start;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 620px) {
+  .retirement-journey-detail {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .retirement-journey-detail > strong {
+    grid-column: 1 / -1;
+    padding-left: 62px;
+  }
+}

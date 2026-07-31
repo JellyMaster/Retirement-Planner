@@ -2,7 +2,7 @@ import type { DrawdownInputs } from "../models/DrawdownInputs";
 
 export function createDefaultDrawdownInputs(): DrawdownInputs {
   return {
-    startingBalance: 500_000,
+    startingBalance: 200_000,
     retirementAge: 68,
     endAge: 95,
     withdrawalStrategy: "target-income",
@@ -11,7 +11,7 @@ export function createDefaultDrawdownInputs(): DrawdownInputs {
     incomeTargetMode: "net",
     annualStatePension: 12_000,
     statePensionAge: 68,
-    annualReturn: 0.05,
+    annualReturn: 0.27,
     annualFee: 0.0005,
     inflationRate: 0.025,
     taxFreeCash: 0,

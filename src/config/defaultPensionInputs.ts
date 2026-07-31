@@ -1,18 +1,18 @@
 import type { PensionInputs } from "../engine/models/PensionInputs";
 
 export const defaultPensionInputs: PensionInputs = {
-  currentAge: 47,
+  currentAge: 25,
   retirementAge: 68,
 
-  currentPot: 200_000,
+  currentPot: 0,
 
-  monthlyEmployeeContribution: 750,
-  monthlyEmployerContribution: 375,
+  monthlyEmployeeContribution: 100,
+  monthlyEmployerContribution: 25,
 
-  annualContributionIncrease: 0.03,
+  annualContributionIncrease: 0.00,
 
   annualReturn: 0.05,
-  annualFee: 0.0005,
+  annualFee: 0.0027,
   inflation: 0.02,
 
   extraContributionAge: undefined,

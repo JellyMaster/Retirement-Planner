@@ -2307,3 +2307,202 @@
     overflow: visible;
   }
 }
+
+/* Compact retirement-goals control shown between the completed plan and results. */
+.retirement-goals-control-region {
+  min-width: 0;
+}
+
+.retirement-goals-control-region .retirement-goals-form-compact {
+  margin: 0;
+}
+
+.retirement-goals-form-collapsible {
+  padding: 0;
+  overflow: hidden;
+}
+
+.retirement-goals-form-collapsible.retirement-goals-form-expanded {
+  padding: 22px;
+}
+
+.retirement-goals-summary-button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 18px 20px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.retirement-goals-summary-button:hover {
+  background: var(--colour-surface-secondary);
+}
+
+.retirement-goals-summary-button:focus-visible {
+  outline: 3px solid var(--colour-focus-ring);
+  outline-offset: -3px;
+}
+
+.retirement-goals-summary-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--colour-border);
+  border-radius: 13px;
+  background: var(--colour-accent-soft, var(--colour-surface-secondary));
+  color: var(--colour-accent);
+  font-size: 1.15rem;
+}
+
+.retirement-goals-summary-copy {
+  display: grid;
+  grid-template-columns: minmax(135px, 0.55fr) minmax(0, 1.45fr);
+  align-items: center;
+  gap: 22px;
+  min-width: 0;
+}
+
+.retirement-goals-summary-heading {
+  display: grid;
+  gap: 3px;
+}
+
+.retirement-goals-summary-heading small,
+.retirement-goals-summary-metrics small {
+  color: var(--colour-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.retirement-goals-summary-heading strong {
+  font-size: 1rem;
+}
+
+.retirement-goals-summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+.retirement-goals-summary-metrics > span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.retirement-goals-summary-metrics strong {
+  overflow: hidden;
+  font-size: 0.92rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retirement-goals-summary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  color: var(--colour-accent);
+  font-size: 0.84rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.retirement-goals-heading-copy {
+  max-width: 560px;
+  margin: 8px 0 0;
+  color: var(--colour-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.retirement-goals-form-expanded .retirement-goals-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.retirement-goals-form-expanded .retirement-goals-checkbox,
+.retirement-goals-form-expanded .retirement-goals-state-grid {
+  grid-column: 1 / -1;
+}
+
+.retirement-goals-form-expanded .retirement-goals-state-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 0.45fr);
+}
+
+.retirement-goals-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--colour-border);
+}
+
+.retirement-goals-footer .retirement-goals-help {
+  margin: 0;
+}
+
+.retirement-goals-done-button {
+  flex: 0 0 auto;
+  padding: 9px 18px;
+  border: 1px solid var(--colour-accent);
+  border-radius: 10px;
+  background: var(--colour-accent);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .retirement-goals-summary-copy {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .retirement-goals-summary-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .retirement-goals-summary-button {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .retirement-goals-summary-action {
+    grid-column: 1 / -1;
+    justify-content: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--colour-border);
+  }
+
+  .retirement-goals-summary-metrics,
+  .retirement-goals-form-expanded .retirement-goals-fields,
+  .retirement-goals-form-expanded .retirement-goals-state-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .retirement-goals-summary-metrics strong {
+    white-space: normal;
+  }
+
+  .retirement-goals-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .retirement-goals-done-button {
+    width: 100%;
+  }
+}

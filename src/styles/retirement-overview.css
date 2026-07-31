@@ -1,0 +1,363 @@
+.retirement-overview {
+  --overview-accent: var(--colour-accent);
+  display: grid;
+  gap: 18px;
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--colour-border);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--overview-accent) 15%, transparent), transparent 30%),
+    linear-gradient(145deg, var(--colour-surface), var(--colour-surface-secondary));
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+}
+
+.retirement-overview-excellent,
+.retirement-overview-good {
+  --overview-accent: var(--colour-positive, #23865f);
+}
+
+.retirement-overview-fair {
+  --overview-accent: #b7791f;
+}
+
+.retirement-overview-needs-attention {
+  --overview-accent: var(--colour-negative, #c54a4a);
+}
+
+.retirement-overview-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+}
+
+.retirement-overview-hero-copy {
+  max-width: 780px;
+}
+
+.retirement-overview-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 5px 0 10px;
+}
+
+.retirement-overview-title-row h2 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  line-height: 1;
+}
+
+.retirement-overview-status {
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--overview-accent) 35%, var(--colour-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--overview-accent) 10%, transparent);
+  color: var(--overview-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.retirement-overview-hero-copy > p:last-child {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--colour-text-secondary);
+  font-size: clamp(0.95rem, 1.5vw, 1.08rem);
+  line-height: 1.65;
+}
+
+.retirement-overview-ring {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  flex: 0 0 150px;
+}
+
+.retirement-overview-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.retirement-overview-ring circle {
+  fill: none;
+  stroke-width: 10;
+}
+
+.retirement-overview-ring-track {
+  stroke: color-mix(in srgb, var(--colour-border) 75%, transparent);
+}
+
+.retirement-overview-ring-value {
+  stroke: var(--overview-accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 500ms ease;
+}
+
+.retirement-overview-ring-copy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-content: center;
+  text-align: center;
+}
+
+.retirement-overview-ring-copy strong {
+  font-size: 2.35rem;
+  line-height: 1;
+}
+
+.retirement-overview-ring-copy > span {
+  color: var(--colour-text-muted);
+  font-weight: 700;
+}
+
+.retirement-overview-ring-copy small {
+  flex-basis: 100%;
+  margin-top: 6px;
+  color: var(--overview-accent);
+  font-weight: 800;
+}
+
+.retirement-overview-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.retirement-overview-kpi {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--colour-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--colour-surface) 88%, transparent);
+}
+
+.retirement-overview-kpi-icon,
+.retirement-overview-opportunity-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--overview-accent) 12%, transparent);
+  color: var(--overview-accent);
+}
+
+.retirement-overview-kpi > div {
+  min-width: 0;
+}
+
+.retirement-overview-kpi span,
+.retirement-overview-kpi small {
+  display: block;
+}
+
+.retirement-overview-kpi > div > span {
+  color: var(--colour-text-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.retirement-overview-kpi strong {
+  display: block;
+  margin: 5px 0;
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+  overflow-wrap: anywhere;
+}
+
+.retirement-overview-kpi small {
+  color: var(--colour-text-secondary);
+  line-height: 1.4;
+}
+
+.retirement-overview-kpi-positive strong,
+.retirement-overview-kpi-positive small {
+  color: var(--colour-positive, #23865f);
+}
+
+.retirement-overview-kpi-negative strong,
+.retirement-overview-kpi-negative small {
+  color: var(--colour-negative, #c54a4a);
+}
+
+.retirement-overview-support-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 14px;
+}
+
+.retirement-overview-support-card {
+  padding: 18px;
+  border: 1px solid var(--colour-border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--colour-surface) 92%, transparent);
+}
+
+.retirement-overview-section-heading {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.retirement-overview-section-heading > span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--overview-accent) 12%, transparent);
+  color: var(--overview-accent);
+}
+
+.retirement-overview-section-heading h3,
+.retirement-overview-section-heading p {
+  margin: 0;
+}
+
+.retirement-overview-section-heading h3 {
+  margin-top: 2px;
+  font-size: 1.05rem;
+}
+
+.retirement-overview-strength-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.retirement-overview-strength-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: start;
+  color: var(--colour-text-secondary);
+  line-height: 1.45;
+}
+
+.retirement-overview-strength-list svg {
+  margin-top: 4px;
+  color: var(--colour-positive, #23865f);
+}
+
+.retirement-overview-opportunity-list {
+  display: grid;
+  gap: 10px;
+}
+
+.retirement-overview-opportunity-list article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid var(--colour-border);
+  border-radius: 13px;
+  background: var(--colour-surface-secondary);
+}
+
+.retirement-overview-opportunity-copy h4,
+.retirement-overview-opportunity-copy p {
+  margin: 0;
+}
+
+.retirement-overview-opportunity-copy h4 {
+  font-size: 0.95rem;
+}
+
+.retirement-overview-opportunity-copy p {
+  margin-top: 4px;
+  color: var(--colour-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.retirement-overview-opportunity-impact {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-top: 7px;
+}
+
+.retirement-overview-opportunity-impact strong {
+  color: var(--colour-positive, #23865f);
+}
+
+.retirement-overview-opportunity-impact span,
+.retirement-overview-opportunity-impact small {
+  color: var(--colour-text-muted);
+  font-size: 0.76rem;
+}
+
+.retirement-overview-opportunity-list button {
+  padding: 8px 11px;
+  border: 1px solid var(--colour-border-strong);
+  border-radius: 9px;
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.retirement-overview-opportunity-list button:hover {
+  border-color: var(--overview-accent);
+  color: var(--overview-accent);
+}
+
+.retirement-overview-disclaimer {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 1120px) {
+  .retirement-overview-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .retirement-overview-support-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .retirement-overview-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .retirement-overview-ring {
+    width: 132px;
+    height: 132px;
+  }
+
+  .retirement-overview-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .retirement-overview-opportunity-list article {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .retirement-overview-opportunity-list button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}

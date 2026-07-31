@@ -2,10 +2,12 @@ import { useMemo, useState } from "react";
 
 import { RetirementComparisonDashboard } from "../components/comparison/RetirementComparisonDashboard";
 import { GuidedPensionInputsForm } from "../components/inputs/guided";
+import { RetirementJourney } from "../components/journey";
 import { RetirementGoalsForm } from "../components/goals/RetirementGoalsForm";
 import { RetirementHealthDashboard } from "../components/goals/RetirementHealthDashboard";
 import { RetirementRecommendations } from "../components/goals/RetirementRecommendations";
 import { RetirementWhatIfAnalysis } from "../components/goals/RetirementWhatIfAnalysis";
+import { RetirementOverview } from "../components/overview";
 import { ContributionGrowthChart } from "../components/projection/ContributionGrowthChart";
 import { PensionBalanceChart } from "../components/projection/PensionBalanceChart";
 import { ProjectionTable } from "../components/projection/ProjectionTable";
@@ -21,6 +23,9 @@ import { usePensionProjection } from "../hooks/usePensionProjection";
 import { formatCurrency, formatPercentage } from "../utils/formatters";
 import "../styles/retirement-dashboard.css";
 import "../styles/retirement-what-if.css";
+import "../styles/retirement-overview.css";
+import "../styles/retirement-journey.css";
+import "../styles/smart-retirement-recommendations.css";
 import { FeeImpactDashboard } from "../components/fee-impact";
 
 type ChartView = "balance" | "contributions";
@@ -123,12 +128,16 @@ export function RetirementPlannerPage() {
             />
           </section>
 
-          <div className="retirement-dashboard-shell retirement-results-shell">
-            <aside className="retirement-dashboard-sidebar retirement-results-sidebar">
-              <RetirementGoalsForm value={retirementGoals} onChange={setRetirementGoals} compact />
-            </aside>
+          <section className="retirement-goals-control-region" aria-label="Retirement goals">
+            <RetirementGoalsForm
+              value={retirementGoals}
+              onChange={setRetirementGoals}
+              compact
+              collapsible
+            />
+          </section>
 
-            <div className="retirement-dashboard-content" id="retirement-projection-results">
+          <div className="retirement-dashboard-content" id="retirement-projection-results">
             {currentScenario.hasErrors ? (
               <section className="panel" role="alert">
                 <div className="panel-heading">
@@ -138,13 +147,30 @@ export function RetirementPlannerPage() {
               </section>
             ) : (
               <>
-                <RetirementHealthDashboard inputs={inputs} result={currentScenario.projection} goals={retirementGoals} />
+                <RetirementOverview
+                  inputs={inputs}
+                  result={currentScenario.projection}
+                  goals={retirementGoals}
+                  onApplyToComparison={applyRecommendationToComparison}
+                />
+
+                <RetirementJourney
+                  inputs={inputs}
+                  result={currentScenario.projection}
+                  goals={retirementGoals}
+                />
 
                 <RetirementWhatIfAnalysis
                   inputs={inputs}
                   result={currentScenario.projection}
                   goals={retirementGoals}
                   onApplyToComparison={applyRecommendationToComparison}
+                />
+
+                <RetirementHealthDashboard
+                  inputs={inputs}
+                  result={currentScenario.projection}
+                  goals={retirementGoals}
                 />
 
                 <RetirementRecommendations
@@ -217,7 +243,6 @@ export function RetirementPlannerPage() {
                 </details>
               </>
             )}
-            </div>
           </div>
         </div>
       )}
