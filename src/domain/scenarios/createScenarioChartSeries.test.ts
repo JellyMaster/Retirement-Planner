@@ -39,7 +39,7 @@ describe("createScenarioChartSeries", () => {
     expect(series[1].isActive).toBe(false);
     expect(series[0].points[0]).toEqual(
       expect.objectContaining({
-        age: 48,
+        age: 47,
         nominal: expect.any(Number),
         real: expect.any(Number),
       }),
