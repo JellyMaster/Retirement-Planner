@@ -26,7 +26,7 @@ describe("CompareScenariosPage", () => {
     });
   });
 
-  it("creates the initial baseline scenario", () => {
+  it("creates the initial baseline scenario and comparison table", () => {
     renderPage();
 
     expect(
@@ -34,10 +34,14 @@ describe("CompareScenariosPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Baseline")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Compare projected outcomes" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("row", { name: /projected pension pot/i })).toBeInTheDocument();
     expect(localStorage.getItem(SCENARIO_STORAGE_KEY)).not.toBeNull();
   });
 
-  it("creates a scenario from the active plan", async () => {
+  it("creates and automatically selects a scenario from the active plan", async () => {
     const user = userEvent.setup();
     renderPage();
 
@@ -50,13 +54,52 @@ describe("CompareScenariosPage", () => {
     expect(
       screen.getByRole("heading", { name: "Retire at 65" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("2 scenarios")).toBeInTheDocument();
+    expect(screen.getByText("2 of 3 selected")).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "Retire at 65" }),
+    ).toBeInTheDocument();
 
     const card = screen
       .getByRole("heading", { name: "Retire at 65" })
       .closest("article");
     expect(card).not.toBeNull();
     expect(within(card as HTMLElement).getByText("Active")).toBeInTheDocument();
+    expect(
+      within(card as HTMLElement).getByRole("checkbox", {
+        name: "Include in comparison",
+      }),
+    ).toBeChecked();
+  });
+
+  it("can remove and restore an alternative in the comparison", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Scenario name" }),
+      "Higher Contributions",
+    );
+    await user.click(screen.getByRole("button", { name: "Create scenario" }));
+
+    const card = screen
+      .getByRole("heading", { name: "Higher Contributions" })
+      .closest("article");
+    expect(card).not.toBeNull();
+    const checkbox = within(card as HTMLElement).getByRole("checkbox", {
+      name: "Include in comparison",
+    });
+
+    await user.click(checkbox);
+    expect(screen.getByText("1 of 3 selected")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", { name: "Higher Contributions" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(checkbox);
+    expect(screen.getByText("2 of 3 selected")).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: "Higher Contributions" }),
+    ).toBeInTheDocument();
   });
 
   it("duplicates, renames and deletes an alternative scenario", async () => {
@@ -104,6 +147,6 @@ describe("CompareScenariosPage", () => {
     expect(
       screen.queryByRole("heading", { name: "Higher Contributions" }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText("1 scenario")).toBeInTheDocument();
+    expect(screen.getByText("1 of 3 selected")).toBeInTheDocument();
   });
 });
