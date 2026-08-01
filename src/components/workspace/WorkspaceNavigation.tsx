@@ -50,6 +50,7 @@ export function WorkspaceNavigation({
               key={section.id}
               type="button"
               id={`workspace-tab-${section.id}`}
+              data-workspace-section={section.id}
               role="tab"
               aria-selected={isActive}
               aria-controls={`workspace-panel-${section.id}`}
