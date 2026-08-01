@@ -52,8 +52,9 @@ describe("CompareScenariosPage", () => {
     expect(screen.getByText("Baseline")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Compare projected outcomes" }),
+      screen.getByRole("heading", { name: "Compare selected plans" }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Growth chart" })).toBeInTheDocument();
     expect(
       screen.getByRole("row", { name: /projected pension pot/i }),
     ).toBeInTheDocument();
