@@ -16,3 +16,4 @@ export {
   ScenarioService,
   createBrowserScenarioDependencies,
 } from "./ScenarioService";
+export { createBrowserScenarioService } from "./createScenarioService";
