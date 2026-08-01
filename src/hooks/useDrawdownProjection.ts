@@ -23,10 +23,12 @@ export interface UseDrawdownProjectionResult {
 
 const drawdownEngine = new DrawdownEngine();
 
-export function useDrawdownProjection(): UseDrawdownProjectionResult {
-  const [inputs, setInputsState] = useState<DrawdownInputs>(
-    createDefaultDrawdownInputs,
-  );
+export function useDrawdownProjection(
+  initialInputs: DrawdownInputs = createDefaultDrawdownInputs(),
+): UseDrawdownProjectionResult {
+  const [inputs, setInputsState] = useState<DrawdownInputs>(() => ({
+    ...initialInputs,
+  }));
 
   const validation = useMemo(
     () => validateDrawdownInputs(inputs),
@@ -55,12 +57,12 @@ export function useDrawdownProjection(): UseDrawdownProjectionResult {
   );
 
   const setInputs = useCallback((nextInputs: DrawdownInputs) => {
-    setInputsState(nextInputs);
+    setInputsState({ ...nextInputs });
   }, []);
 
   const resetInputs = useCallback(() => {
-    setInputsState(createDefaultDrawdownInputs());
-  }, []);
+    setInputsState({ ...initialInputs });
+  }, [initialInputs]);
 
   return {
     inputs,
