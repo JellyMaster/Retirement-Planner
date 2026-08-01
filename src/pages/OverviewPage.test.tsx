@@ -11,6 +11,9 @@ import { OverviewPage } from "./OverviewPage";
 vi.mock("../hooks/usePensionProjection");
 vi.mock("../hooks/useStoredPensionInputs");
 
+const mockedUsePensionProjection = vi.mocked(usePensionProjection);
+const mockedUseStoredPensionInputs = vi.mocked(useStoredPensionInputs);
+
 const zeroMoney = { nominal: 0, real: 0 };
 
 function createProjectionYear(finalBalance: number): ProjectionYear {
@@ -73,12 +76,16 @@ describe("OverviewPage", () => {
 
     renderPage();
 
-    expect(screen.getByRole("heading", { name: "Your retirement at a glance" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Your retirement at a glance" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("£194,421")).toBeInTheDocument();
     expect(screen.getByText("£1,126")).toBeInTheDocument();
     expect(screen.getByText("Age 68")).toBeInTheDocument();
     expect(screen.getByText("£750,000")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Your baseline plan is available" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Your baseline plan is available" }),
+    ).toBeInTheDocument();
   });
 
   it("shows incomplete guidance when no pension balance is available", () => {
@@ -93,17 +100,23 @@ describe("OverviewPage", () => {
 
     renderPage();
 
-    expect(screen.getByRole("heading", { name: "Add your pension details" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Add your pension details" }),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Not added")).toHaveLength(2);
     expect(screen.getByText("Add this in My Plan")).toBeInTheDocument();
-    expect(screen.getByText("Add employee and employer contributions")).toBeInTheDocument();
+    expect(
+      screen.getByText("Add employee and employer contributions"),
+    ).toBeInTheDocument();
   });
 
   it("shows an unavailable projection when inputs contain errors", () => {
     mockedUseStoredPensionInputs.mockReturnValue(createPlan());
     mockedUsePensionProjection.mockReturnValue({
       hasErrors: true,
-      errors: { retirementAge: "Retirement age must be greater than current age" },
+      errors: {
+        retirementAge: "Retirement age must be greater than current age",
+      },
       projection: {
         years: [],
         finalBalance: zeroMoney,
@@ -117,6 +130,8 @@ describe("OverviewPage", () => {
     renderPage();
 
     expect(screen.getByText("Unavailable")).toBeInTheDocument();
-    expect(screen.getByText("Review the plan inputs to calculate a projection")).toBeInTheDocument();
+    expect(
+      screen.getByText("Review the plan inputs to calculate a projection"),
+    ).toBeInTheDocument();
   });
 });
