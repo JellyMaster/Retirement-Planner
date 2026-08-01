@@ -1,0 +1,200 @@
+/* =========================================================
+   Summary, insight and status callouts
+
+   Shared presentation for legacy summary blocks that have not
+   yet moved onto explicit .ui-* primitives.
+   ========================================================= */
+
+.assumptions-panel,
+.milestones-panel,
+.scenario-results-panel,
+.dashboard-insights {
+  min-width: 0;
+}
+
+.assumptions-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+}
+
+.assumption-row {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--colour-border);
+  background: var(--colour-surface);
+}
+
+.assumption-row dt {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.assumption-row dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--colour-text-strong);
+  font-size: var(--ui-font-size-md);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+
+.insights-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insight-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--status-info-border);
+  border-radius: var(--radius-md);
+  color: var(--status-info-text);
+  background: var(--status-info-background);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.insight-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  color: var(--status-info);
+  background: color-mix(in srgb, var(--status-info) 14%, transparent);
+  line-height: 1;
+}
+
+.insight-item-warning {
+  border-color: var(--status-warning-border);
+  color: var(--status-warning-text);
+  background: var(--status-warning-background);
+}
+
+.insight-item-warning .insight-icon {
+  color: var(--status-warning);
+  background: color-mix(in srgb, var(--status-warning) 16%, transparent);
+}
+
+.insight-item-success {
+  border-color: var(--status-good-border);
+  color: var(--status-good-text);
+  background: var(--status-good-background);
+}
+
+.insight-item-success .insight-icon {
+  color: var(--status-good);
+  background: color-mix(in srgb, var(--status-good) 15%, transparent);
+}
+
+.insight-item-danger,
+.insight-item-error {
+  border-color: var(--status-danger-border);
+  color: var(--status-danger-text);
+  background: var(--status-danger-background);
+}
+
+.insight-item-danger .insight-icon,
+.insight-item-error .insight-icon {
+  color: var(--status-danger);
+  background: color-mix(in srgb, var(--status-danger) 15%, transparent);
+}
+
+.validation-notice,
+.comparison-validation-notice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--status-danger-border);
+  border-left: 4px solid var(--status-danger);
+  border-radius: var(--radius-md);
+  color: var(--status-danger-text);
+  background: var(--status-danger-background);
+}
+
+.validation-notice strong,
+.comparison-validation-notice strong {
+  color: var(--status-danger-text);
+}
+
+.validation-notice p,
+.comparison-validation-notice p {
+  margin: var(--space-1) 0 0;
+  color: inherit;
+  line-height: 1.5;
+}
+
+.comparison-empty-state,
+.retirement-dashboard-empty-state,
+.custom-what-if-empty-state {
+  margin: 0;
+  padding: var(--space-6);
+  border: 1px dashed var(--colour-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--colour-text-muted);
+  background: var(--colour-surface-secondary);
+  text-align: center;
+  line-height: 1.55;
+}
+
+.dashboard-panel-heading {
+  display: grid;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.dashboard-panel-heading h2 {
+  margin: 0;
+  color: var(--colour-text-strong);
+  font-size: var(--ui-font-size-lg);
+  line-height: 1.3;
+}
+
+.dashboard-panel-heading p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+@media (min-width: 700px) {
+  .assumption-row {
+    border-right: 1px solid var(--colour-border);
+  }
+}
+
+@media (max-width: 640px) {
+  .assumptions-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .assumption-row {
+    border-right: 0;
+  }
+
+  .validation-notice,
+  .comparison-validation-notice {
+    padding: var(--space-4);
+  }
+}
