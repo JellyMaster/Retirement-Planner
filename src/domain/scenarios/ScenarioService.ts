@@ -6,14 +6,19 @@ import {
   type ScenarioId,
   type ScenarioState,
 } from "./Scenario";
-import type { ScenarioDrawdownPreferences } from "./ScenarioDrawdownPreferences";
+import {
+  createDefaultScenarioDrawdownPreferences,
+  type ScenarioDrawdownPreferences,
+} from "./ScenarioDrawdownPreferences";
 import type { ScenarioRepository } from "./ScenarioRepository";
 
 function cloneScenario(scenario: Scenario): Scenario {
   return {
     ...scenario,
     inputs: { ...scenario.inputs },
-    drawdown: { ...scenario.drawdown },
+    drawdown: {
+      ...(scenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
+    },
   };
 }
 
