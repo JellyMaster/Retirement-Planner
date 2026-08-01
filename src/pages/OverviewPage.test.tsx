@@ -2,9 +2,12 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
 
-import { useScenarios } from "../components/scenarios";
+import {
+  useScenarios,
+  type ScenarioContextValue,
+} from "../components/scenarios";
 import { createDefaultPensionInputs } from "../config/defaultPensionInputs";
-import type { Scenario, ScenarioContextValue } from "../components/scenarios";
+import type { Scenario } from "../domain/scenarios";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import type { ProjectionYear } from "../engine/models/ProjectionYear";
 import { usePensionProjection } from "../hooks/usePensionProjection";
