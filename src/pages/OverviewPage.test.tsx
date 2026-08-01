@@ -37,6 +37,7 @@ describe("OverviewPage", () => {
           real: finalBalance,
         },
       },
+      comparison: null,
     } as ReturnType<typeof usePensionProjection>);
   }
 
@@ -89,6 +90,7 @@ describe("OverviewPage", () => {
         years: [],
         finalBalance: { nominal: 0, real: 0 },
       },
+      comparison: null,
     } as ReturnType<typeof usePensionProjection>);
 
     renderPage();
