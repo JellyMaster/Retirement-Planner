@@ -1,0 +1,212 @@
+/* =========================================================
+   Drawdown planner page and dashboard composition
+   ========================================================= */
+
+.drawdown-dashboard-page {
+  width: min(var(--content-width-wide), 100%);
+}
+
+.drawdown-dashboard-page .dashboard-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-5);
+}
+
+.drawdown-dashboard-page .dashboard-header h1 {
+  margin-bottom: var(--space-2);
+}
+
+.drawdown-dashboard-shell {
+  display: grid;
+  grid-template-columns: minmax(18rem, 21.25rem) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.drawdown-dashboard-sidebar {
+  position: sticky;
+  top: 5.5rem;
+  max-height: calc(100vh - 6.75rem);
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.drawdown-dashboard-content {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-5);
+}
+
+.drawdown-dashboard-content > .panel {
+  margin: 0;
+}
+
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 18.75rem);
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+.dashboard-chart-panel,
+.dashboard-insights {
+  min-width: 0;
+  padding: var(--space-5);
+}
+
+.dashboard-chart-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.dashboard-chart-toolbar h2,
+.dashboard-panel-heading h2 {
+  margin: 0;
+  font-size: var(--ui-font-size-lg);
+}
+
+.dashboard-chart-stage > .panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.dashboard-chart-stage > .panel .panel-heading {
+  display: none;
+}
+
+.dashboard-chart-stage .drawdown-chart {
+  height: 24.375rem;
+}
+
+.drawdown-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.drawdown-chart-panel {
+  min-width: 0;
+}
+
+.drawdown-chart {
+  width: 100%;
+  height: 24.375rem;
+}
+
+.dashboard-details {
+  overflow: hidden;
+  padding: 0;
+}
+
+.dashboard-details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  color: var(--colour-text-strong);
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+}
+
+.dashboard-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.dashboard-details > summary::after {
+  color: var(--colour-primary);
+  font-size: 1.25rem;
+  content: "+";
+}
+
+.dashboard-details[open] > summary::after {
+  content: "−";
+}
+
+.dashboard-details > summary span {
+  margin-left: auto;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 500;
+}
+
+.dashboard-details > .panel {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--colour-border);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.dashboard-details .projection-table-panel,
+.dashboard-details .drawdown-assumptions-panel {
+  margin: 0;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-insights .insights-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1050px) {
+  .drawdown-charts-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .drawdown-dashboard-page .dashboard-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .drawdown-dashboard-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .drawdown-dashboard-sidebar {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 680px) {
+  .dashboard-main-grid {
+    display: block;
+  }
+
+  .dashboard-insights {
+    margin-top: var(--space-5);
+  }
+
+  .dashboard-chart-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dashboard-details > summary span {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .drawdown-chart,
+  .dashboard-chart-stage .drawdown-chart {
+    height: 20rem;
+  }
+}
