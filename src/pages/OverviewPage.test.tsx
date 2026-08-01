@@ -13,6 +13,8 @@ vi.mock("../hooks/useStoredPensionInputs");
 const mockedUsePensionProjection = vi.mocked(usePensionProjection);
 const mockedUseStoredPensionInputs = vi.mocked(useStoredPensionInputs);
 
+const zeroMoney = { nominal: 0, real: 0 };
+
 describe("OverviewPage", () => {
   function createPlan(overrides: Partial<PensionInputs> = {}): PensionInputs {
     return {
@@ -31,14 +33,17 @@ describe("OverviewPage", () => {
       hasErrors: false,
       errors: {},
       projection: {
-        years: [{}],
+        years: [],
         finalBalance: {
           nominal: finalBalance,
           real: finalBalance,
         },
+        totalContributions: zeroMoney,
+        totalInvestmentGrowth: zeroMoney,
+        totalFees: zeroMoney,
       },
       comparison: null,
-    } as ReturnType<typeof usePensionProjection>);
+    });
   }
 
   function renderPage() {
@@ -88,10 +93,13 @@ describe("OverviewPage", () => {
       errors: { retirementAge: "Retirement age must be greater than current age" },
       projection: {
         years: [],
-        finalBalance: { nominal: 0, real: 0 },
+        finalBalance: zeroMoney,
+        totalContributions: zeroMoney,
+        totalInvestmentGrowth: zeroMoney,
+        totalFees: zeroMoney,
       },
       comparison: null,
-    } as ReturnType<typeof usePensionProjection>);
+    });
 
     renderPage();
 
