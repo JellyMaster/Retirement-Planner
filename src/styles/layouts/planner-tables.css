@@ -54,7 +54,7 @@
 }
 
 .projection-table tbody tr {
-  transition: background-color var(--motion-fast) var(--motion-ease-standard);
+  transition: background-color var(--duration-fast) var(--ease-standard);
 }
 
 .projection-table tbody tr:hover {
