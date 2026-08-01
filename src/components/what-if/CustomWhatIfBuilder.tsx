@@ -164,7 +164,7 @@ export function CustomWhatIfBuilder({
             <ButtonGroup className="custom-what-if-preset-list">
               {presets.map((preset) => (
                 <Button
-                  variant="subtle"
+                  variant="compare"
                   size="small"
                   key={preset.id}
                   title={preset.description}
@@ -173,7 +173,7 @@ export function CustomWhatIfBuilder({
                   {preset.label}
                 </Button>
               ))}
-              <Button variant="secondary" size="small" onClick={() => setScenarioInputs({ ...inputs })}>
+              <Button variant="warning" size="small" onClick={() => setScenarioInputs({ ...inputs })}>
                 Reset to current plan
               </Button>
             </ButtonGroup>
@@ -192,43 +192,29 @@ export function CustomWhatIfBuilder({
 
               <div className="custom-what-if-fields">
                 <WhatIfAdjustmentField label="Retirement age" description={`Current plan: age ${inputs.retirementAge}`}>
-                  <input
-                    type="number"
-                    min={inputs.currentAge + 1}
-                    max={100}
-                    value={scenarioInputs.retirementAge}
-                    onChange={(event) => update("retirementAge", event.target.valueAsNumber)}
-                  />
+                  <input type="number" min={inputs.currentAge + 1} max={100} value={scenarioInputs.retirementAge} onChange={(event) => update("retirementAge", event.target.valueAsNumber)} />
                 </WhatIfAdjustmentField>
-
                 <WhatIfAdjustmentField label="Your monthly contribution" description={`Current plan: ${formatCurrency(inputs.monthlyEmployeeContribution)}`}>
                   <div className="custom-what-if-money-input"><span>£</span><input type="number" min={0} step={10} value={scenarioInputs.monthlyEmployeeContribution} onChange={(event) => update("monthlyEmployeeContribution", event.target.valueAsNumber)} /></div>
                 </WhatIfAdjustmentField>
-
                 <WhatIfAdjustmentField label="Employer monthly contribution" description={`Current plan: ${formatCurrency(inputs.monthlyEmployerContribution)}`}>
                   <div className="custom-what-if-money-input"><span>£</span><input type="number" min={0} step={10} value={scenarioInputs.monthlyEmployerContribution} onChange={(event) => update("monthlyEmployerContribution", event.target.valueAsNumber)} /></div>
                 </WhatIfAdjustmentField>
-
                 <WhatIfAdjustmentField label="Expected annual return" description={`Current plan: ${percentageValue(inputs.annualReturn).toFixed(2)}%`}>
                   <div className="custom-what-if-percent-input"><input type="number" min={-99} max={30} step={0.1} value={percentageValue(scenarioInputs.annualReturn)} onChange={(event) => update("annualReturn", decimalValue(event.target.valueAsNumber))} /><span>%</span></div>
                 </WhatIfAdjustmentField>
-
                 <WhatIfAdjustmentField label="Annual pension fee" description={`Current plan: ${percentageValue(inputs.annualFee).toFixed(2)}%`}>
                   <div className="custom-what-if-percent-input"><input type="number" min={0} max={10} step={0.01} value={percentageValue(scenarioInputs.annualFee)} onChange={(event) => update("annualFee", decimalValue(event.target.valueAsNumber))} /><span>%</span></div>
                 </WhatIfAdjustmentField>
-
                 <WhatIfAdjustmentField label="Inflation" description={`Current plan: ${percentageValue(inputs.inflation).toFixed(2)}%`}>
                   <div className="custom-what-if-percent-input"><input type="number" min={0} max={20} step={0.1} value={percentageValue(scenarioInputs.inflation)} onChange={(event) => update("inflation", decimalValue(event.target.valueAsNumber))} /><span>%</span></div>
                 </WhatIfAdjustmentField>
-
                 <WhatIfAdjustmentField label="Annual contribution increase" description={`Current plan: ${percentageValue(inputs.annualContributionIncrease).toFixed(2)}%`}>
                   <div className="custom-what-if-percent-input"><input type="number" min={0} max={30} step={0.1} value={percentageValue(scenarioInputs.annualContributionIncrease)} onChange={(event) => update("annualContributionIncrease", decimalValue(event.target.valueAsNumber))} /><span>%</span></div>
                 </WhatIfAdjustmentField>
-
                 <WhatIfAdjustmentField label="Future extra monthly contribution" description="Use zero to remove the planned increase.">
                   <div className="custom-what-if-money-input"><span>£</span><input type="number" min={0} step={10} value={scenarioInputs.extraMonthlyContribution ?? 0} onChange={(event) => update("extraMonthlyContribution", event.target.valueAsNumber || undefined)} /></div>
                 </WhatIfAdjustmentField>
-
                 <WhatIfAdjustmentField label="Extra contribution starts at age" description="Only used when a future extra contribution is set.">
                   <input type="number" min={inputs.currentAge} max={scenarioInputs.retirementAge} value={scenarioInputs.extraContributionAge ?? ""} onChange={(event) => update("extraContributionAge", event.target.value === "" ? undefined : event.target.valueAsNumber)} />
                 </WhatIfAdjustmentField>
@@ -236,13 +222,11 @@ export function CustomWhatIfBuilder({
 
               <div className={`custom-what-if-smart-hint ${projectedPotChange >= 0 ? "positive" : "negative"}`}>
                 <strong>Live impact</strong>
-                <span>
-                  This combination changes the projected pot by {projectedPotChange >= 0 ? "+" : "−"}{formatCurrency(Math.abs(projectedPotChange))} in today&apos;s money.
-                </span>
+                <span>This combination changes the projected pot by {projectedPotChange >= 0 ? "+" : "−"}{formatCurrency(Math.abs(projectedPotChange))} in today&apos;s money.</span>
               </div>
 
               <ButtonGroup align="end" className="custom-what-if-save-row">
-                <Button onClick={saveScenario}>Save scenario</Button>
+                <Button variant="success" onClick={saveScenario}>Save scenario</Button>
               </ButtonGroup>
 
               {savedScenarios.length > 0 ? (
@@ -251,7 +235,7 @@ export function CustomWhatIfBuilder({
                   <div>
                     {savedScenarios.map((scenario) => (
                       <article key={scenario.id}>
-                        <Button variant="subtle" onClick={() => { setScenarioName(scenario.name); setScenarioInputs({ ...scenario.inputs }); }}>
+                        <Button variant="compare" onClick={() => { setScenarioName(scenario.name); setScenarioInputs({ ...scenario.inputs }); }}>
                           <strong>{scenario.name}</strong>
                           <small>Retire at {scenario.inputs.retirementAge} · {formatCurrency(scenario.inputs.monthlyEmployeeContribution + scenario.inputs.monthlyEmployerContribution)}/month</small>
                         </Button>
@@ -263,13 +247,7 @@ export function CustomWhatIfBuilder({
               ) : null}
             </Stack>
 
-            <CustomWhatIfPreview
-              baselineInputs={inputs}
-              scenarioInputs={scenarioInputs}
-              baselineResult={result}
-              goals={goals}
-              onApplyToComparison={onApplyToComparison}
-            />
+            <CustomWhatIfPreview baselineInputs={inputs} scenarioInputs={scenarioInputs} baselineResult={result} goals={goals} onApplyToComparison={onApplyToComparison} />
           </div>
         </div>
       ) : null}
