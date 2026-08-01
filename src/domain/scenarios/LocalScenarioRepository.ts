@@ -114,11 +114,19 @@ function loadLegacyBaselineInputs(
 }
 
 export class LocalScenarioRepository implements ScenarioRepository {
+  private readonly storage: Storage;
+  private readonly fallbackInputs: PensionInputs;
+  private readonly dependencies: ScenarioDependencies;
+
   constructor(
-    private readonly storage: Storage,
-    private readonly fallbackInputs: PensionInputs,
-    private readonly dependencies: ScenarioDependencies,
-  ) {}
+    storage: Storage,
+    fallbackInputs: PensionInputs,
+    dependencies: ScenarioDependencies,
+  ) {
+    this.storage = storage;
+    this.fallbackInputs = fallbackInputs;
+    this.dependencies = dependencies;
+  }
 
   load(): ScenarioState {
     const saved = this.storage.getItem(SCENARIO_STORAGE_KEY);
