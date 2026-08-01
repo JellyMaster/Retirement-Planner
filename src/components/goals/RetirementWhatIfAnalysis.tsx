@@ -209,7 +209,7 @@ export function RetirementWhatIfAnalysis({
               </div>
             </dl>
 
-            <Button fullWidth onClick={() => onApplyToComparison(scenario.nextInputs)}>
+            <Button variant="compare" fullWidth onClick={() => onApplyToComparison(scenario.nextInputs)}>
               Apply to comparison
             </Button>
           </Card>
