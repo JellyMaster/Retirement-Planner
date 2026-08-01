@@ -114,7 +114,7 @@ describe("OverviewPage", () => {
     );
   }
 
-  it("shows the active baseline plan and projected pension pot", () => {
+  it("shows the active plan, growth chart and preparedness", () => {
     mockActiveScenario(createScenario());
     mockProjection(750_000);
 
@@ -130,6 +130,27 @@ describe("OverviewPage", () => {
     expect(
       screen.getByRole("heading", { name: "Baseline Plan is available" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Pension growth over time" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "Projected pension growth by age in today's money",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "How prepared is this plan?" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("progressbar", { name: "Retirement preparedness" }),
+    ).toHaveAttribute("aria-valuenow");
+
+    expect(
+      screen.queryByRole("link", { name: "Review active plan" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Open My Plan" })).toHaveClass(
+      "ui-button-primary",
+    );
   });
 
   it("shows values from a non-baseline active scenario", () => {
@@ -185,7 +206,7 @@ describe("OverviewPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows an unavailable projection when inputs contain errors", () => {
+  it("shows unavailable chart and preparedness guidance for invalid inputs", () => {
     mockActiveScenario(createScenario());
     mockedUsePensionProjection.mockReturnValue({
       hasErrors: true,
@@ -207,6 +228,12 @@ describe("OverviewPage", () => {
     expect(screen.getByText("Unavailable")).toBeInTheDocument();
     expect(
       screen.getByText("Review the plan inputs to calculate a projection"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Add valid plan inputs to see pension growth over time."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Correct the active plan inputs to calculate preparedness."),
     ).toBeInTheDocument();
   });
 });
