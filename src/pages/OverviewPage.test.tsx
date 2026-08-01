@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 
 import { createDefaultPensionInputs } from "../config/defaultPensionInputs";
 import type { PensionInputs } from "../engine/models/PensionInputs";
+import type { ProjectionYear } from "../engine/models/ProjectionYear";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredPensionInputs } from "../hooks/useStoredPensionInputs";
 import { OverviewPage } from "./OverviewPage";
@@ -10,10 +11,22 @@ import { OverviewPage } from "./OverviewPage";
 vi.mock("../hooks/usePensionProjection");
 vi.mock("../hooks/useStoredPensionInputs");
 
-const mockedUsePensionProjection = vi.mocked(usePensionProjection);
-const mockedUseStoredPensionInputs = vi.mocked(useStoredPensionInputs);
-
 const zeroMoney = { nominal: 0, real: 0 };
+
+function createProjectionYear(finalBalance: number): ProjectionYear {
+  return {
+    yearIndex: 1,
+    age: 68,
+    openingBalance: zeroMoney,
+    contributions: zeroMoney,
+    investmentGrowth: zeroMoney,
+    fees: zeroMoney,
+    closingBalance: {
+      nominal: finalBalance,
+      real: finalBalance,
+    },
+  };
+}
 
 describe("OverviewPage", () => {
   function createPlan(overrides: Partial<PensionInputs> = {}): PensionInputs {
@@ -33,7 +46,7 @@ describe("OverviewPage", () => {
       hasErrors: false,
       errors: {},
       projection: {
-        years: [],
+        years: [createProjectionYear(finalBalance)],
         finalBalance: {
           nominal: finalBalance,
           real: finalBalance,
