@@ -22,6 +22,8 @@
     "prune:retirement-dashboard-css:write": "node scripts/prune-retirement-dashboard-css.mjs --write",
     "prune:shared-layout-css": "node scripts/prune-shared-layout-css.mjs",
     "prune:shared-layout-css:write": "node scripts/prune-shared-layout-css.mjs --write",
+    "prune:final-css": "node scripts/prune-final-css.mjs",
+    "prune:final-css:write": "node scripts/prune-final-css.mjs --write",
     "preview": "vite preview"
   },
   "dependencies": {
