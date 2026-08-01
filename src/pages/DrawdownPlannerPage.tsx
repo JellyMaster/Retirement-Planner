@@ -16,8 +16,9 @@ import {
   DrawdownWorkspaceNavigation,
   type DrawdownWorkspaceSection,
 } from "../components/drawdown/DrawdownWorkspaceNavigation";
-import { useScenarios } from "../components/scenarios";
+import { ScenarioEditModal, useScenarios } from "../components/scenarios";
 import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
+import type { PensionInputs } from "../engine/models/PensionInputs";
 import { useDrawdownProjection } from "../hooks/useDrawdownProjection";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
@@ -33,8 +34,9 @@ function getInitialMoneyDisplayMode(): MoneyDisplayMode {
 }
 
 export function DrawdownPlannerPage() {
-  const { activeScenario } = useScenarios();
+  const { activeScenario, updateScenarioInputs } = useScenarios();
   const [retirementGoals] = useStoredRetirementGoals();
+  const [isEditingPlan, setIsEditingPlan] = useState(false);
   const pensionProjection = usePensionProjection(activeScenario.inputs);
   const initialDrawdownInputs = useMemo(
     () =>
@@ -57,6 +59,11 @@ export function DrawdownPlannerPage() {
     window.localStorage.setItem(MONEY_DISPLAY_STORAGE_KEY, displayMode);
   }, [displayMode]);
 
+  function saveActivePlan(nextInputs: PensionInputs) {
+    updateScenarioInputs(activeScenario.id, nextInputs);
+    setIsEditingPlan(false);
+  }
+
   return (
     <main className="planner-page drawdown-dashboard-page drawdown-workspace-page drawdown-guided-page">
       <header className="planner-header dashboard-header drawdown-workspace-header">
@@ -72,31 +79,23 @@ export function DrawdownPlannerPage() {
         <MoneyDisplaySelector value={displayMode} onChange={setDisplayMode} />
       </header>
 
-      <DrawdownPlanContext activePlanName={activeScenario.name} value={inputs} />
+      <DrawdownPlanContext
+        activePlanName={activeScenario.name}
+        value={inputs}
+        onEdit={() => setIsEditingPlan(true)}
+      />
 
-      <section className="drawdown-income-setup" aria-labelledby="drawdown-income-setup-title">
-        <div className="drawdown-guided-section-heading">
-          <div>
-            <p className="panel-eyebrow">Step 1</p>
-            <h2 id="drawdown-income-setup-title">Set your retirement income</h2>
-          </div>
-          <p>
-            These are the only choices specific to drawdown. Plan values remain
-            controlled by My Plan.
-          </p>
-        </div>
-        <DrawdownInputsForm
-          value={inputs}
-          errors={validation.errors}
-          onChange={updateInput}
-          onReset={resetInputs}
-        />
-      </section>
+      <DrawdownInputsForm
+        value={inputs}
+        errors={validation.errors}
+        onChange={updateInput}
+        onReset={resetInputs}
+      />
 
       <section className="drawdown-results-workspace" aria-labelledby="drawdown-results-title">
         <div className="drawdown-guided-section-heading">
           <div>
-            <p className="panel-eyebrow">Step 2</p>
+            <p className="panel-eyebrow">Retirement outcome</p>
             <h2 id="drawdown-results-title">Review the outcome</h2>
           </div>
           <p>Start with the overview, then explore income, tax and balance detail.</p>
@@ -291,6 +290,14 @@ export function DrawdownPlannerPage() {
           )}
         </section>
       </section>
+
+      {isEditingPlan && (
+        <ScenarioEditModal
+          scenario={activeScenario}
+          onClose={() => setIsEditingPlan(false)}
+          onSave={saveActivePlan}
+        />
+      )}
     </main>
   );
 }
