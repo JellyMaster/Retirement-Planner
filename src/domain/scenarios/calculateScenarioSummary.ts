@@ -1,6 +1,9 @@
 import type { PensionInputs } from "../../engine/models/PensionInputs";
 import { RetirementComparisonEngine } from "../../engine/services/RetirementComparisonEngine";
-import { hasPensionInputErrors, validatePensionInputs } from "../../validation/validatePensionInputs";
+import {
+  hasPensionInputErrors,
+  validatePensionInputs,
+} from "../../validation/validatePensionInputs";
 import type { Scenario } from "./Scenario";
 
 export interface ScenarioSummary {
@@ -16,7 +19,9 @@ export interface ScenarioSummary {
 function calculateProjection(inputs: PensionInputs) {
   const errors = validatePensionInputs(inputs);
   if (hasPensionInputErrors(errors)) return null;
-  return RetirementComparisonEngine.calculate(inputs).projection;
+
+  const projection = RetirementComparisonEngine.calculate(inputs).projection;
+  return projection.years.length > 0 ? projection : null;
 }
 
 export function calculateScenarioSummary(scenario: Scenario): ScenarioSummary {
