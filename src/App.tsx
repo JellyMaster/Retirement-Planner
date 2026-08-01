@@ -79,10 +79,12 @@ function AppContent() {
                 <span>{label}</span>
               </NavLink>
             ))}
+
+            <span className="app-navigation-divider" aria-hidden="true" />
+            <ActiveScenarioSwitcher />
           </nav>
 
           <div className="app-header-actions">
-            <ActiveScenarioSwitcher />
             <ThemeToggle />
           </div>
         </div>
