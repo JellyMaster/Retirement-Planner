@@ -1,0 +1,156 @@
+/* =========================================================
+   Projection milestone cards
+   ========================================================= */
+
+.milestones-grid,
+.projection-milestones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-4);
+}
+
+.milestone-card,
+.projection-milestone-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 8rem;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  overflow: hidden;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.milestone-card:hover,
+.projection-milestone-card:hover {
+  border-color: var(--colour-border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.milestone-card-reached,
+.projection-milestone-card-reached,
+.milestone-card[data-status="reached"] {
+  border-color: var(--status-good-border);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--status-good-background) 72%, var(--colour-surface)),
+      var(--colour-surface)
+    );
+}
+
+.milestone-card-unreached,
+.projection-milestone-card-unreached,
+.milestone-card[data-status="unreached"] {
+  background: var(--colour-surface-secondary);
+  box-shadow: none;
+}
+
+.milestone-icon,
+.projection-milestone-icon {
+  display: inline-flex;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-sm);
+  color: var(--colour-text-muted);
+  background: var(--colour-surface);
+  font-size: var(--ui-font-size-sm);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.milestone-card-reached .milestone-icon,
+.projection-milestone-card-reached .projection-milestone-icon,
+.milestone-card[data-status="reached"] .milestone-icon {
+  border-color: var(--status-good-border);
+  color: var(--status-good-text);
+  background: var(--status-good-background);
+}
+
+.milestone-content,
+.projection-milestone-content {
+  min-width: 0;
+}
+
+.milestone-content h3,
+.projection-milestone-content h3 {
+  margin: 0 0 var(--space-2);
+  color: var(--colour-text-strong);
+  font-size: var(--ui-font-size-lg);
+  line-height: 1.3;
+}
+
+.milestone-content p,
+.projection-milestone-content p {
+  margin: 0;
+  color: var(--colour-text-secondary);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.milestone-content strong,
+.projection-milestone-content strong {
+  color: var(--colour-text-strong);
+}
+
+.milestone-balance,
+.projection-milestone-balance {
+  display: block;
+  margin-top: var(--space-2);
+  overflow-wrap: anywhere;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+}
+
+.milestone-card-reached::after,
+.projection-milestone-card-reached::after,
+.milestone-card[data-status="reached"]::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0 0 0 100%;
+  background: color-mix(in srgb, var(--status-good) 10%, transparent);
+  content: "";
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .milestones-grid,
+  .projection-milestones-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .milestone-card,
+  .projection-milestone-card {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .milestone-card,
+  .projection-milestone-card {
+    transition: none;
+  }
+
+  .milestone-card:hover,
+  .projection-milestone-card:hover {
+    transform: none;
+  }
+}
