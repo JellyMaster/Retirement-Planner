@@ -1,0 +1,95 @@
+/* =========================================================
+   Workspace navigation
+
+   Permanent ownership for semantic workspace accents and navigation
+   interaction states. Each item exposes its section through
+   data-workspace-section, so styling is independent of DOM order.
+   ========================================================= */
+
+.workspace-navigation-item {
+  --workspace-section-accent: var(--workspace-overview);
+  --workspace-section-soft: color-mix(
+    in srgb,
+    var(--workspace-section-accent) 12%,
+    var(--colour-surface)
+  );
+}
+
+.workspace-navigation-item[data-workspace-section="overview"] {
+  --workspace-section-accent: var(--workspace-overview);
+}
+
+.workspace-navigation-item[data-workspace-section="growth"] {
+  --workspace-section-accent: var(--workspace-growth);
+}
+
+.workspace-navigation-item[data-workspace-section="confidence"] {
+  --workspace-section-accent: var(--workspace-confidence);
+}
+
+.workspace-navigation-item[data-workspace-section="income"] {
+  --workspace-section-accent: var(--workspace-income);
+}
+
+.workspace-navigation-item[data-workspace-section="sustainability"] {
+  --workspace-section-accent: var(--workspace-sustainability);
+}
+
+.workspace-navigation-item[data-workspace-section="improve"] {
+  --workspace-section-accent: var(--workspace-improve);
+}
+
+.workspace-navigation-item[data-workspace-section="details"] {
+  --workspace-section-accent: var(--workspace-assumptions);
+}
+
+.workspace-navigation-item .workspace-navigation-icon {
+  color: var(--workspace-section-accent);
+  background: var(--workspace-section-soft);
+  transition:
+    color var(--ui-duration-fast) var(--ui-ease-standard),
+    background-color var(--ui-duration-fast) var(--ui-ease-standard),
+    transform var(--ui-duration-fast) var(--ui-ease-standard);
+}
+
+.workspace-navigation-item:hover {
+  background: var(--workspace-section-soft);
+}
+
+.workspace-navigation-item:hover .workspace-navigation-icon {
+  transform: translateY(-1px);
+}
+
+.workspace-navigation-item.active {
+  color: var(--colour-text-strong);
+  background: var(--workspace-section-soft);
+  box-shadow: inset 3px 0 0 var(--workspace-section-accent);
+}
+
+.workspace-navigation-item.active .workspace-navigation-icon {
+  color: var(--workspace-section-accent);
+  background: color-mix(
+    in srgb,
+    var(--workspace-section-accent) 20%,
+    var(--colour-surface)
+  );
+}
+
+.workspace-navigation-item:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px color-mix(
+    in srgb,
+    var(--workspace-section-accent) 28%,
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-navigation-item .workspace-navigation-icon {
+    transition: none;
+  }
+
+  .workspace-navigation-item:hover .workspace-navigation-icon {
+    transform: none;
+  }
+}
