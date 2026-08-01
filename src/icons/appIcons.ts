@@ -47,8 +47,7 @@ import {
  * Existing top-level names remain available for backward compatibility, while
  * Project Polaris can use the grouped navigation, concepts and status names.
  */
-export const AppIcons = {
-  // Existing application icons
+const iconRegistry = {
   home: faHouse,
   user: faUser,
   employment: faBriefcase,
@@ -81,8 +80,6 @@ export const AppIcons = {
   moon: faMoon,
   settings: faSliders,
   gear: faGear,
-
-  // Project Polaris grouped icons
   navigation: {
     overview: faHouse,
     plan: faClipboardList,
@@ -107,5 +104,8 @@ export const AppIcons = {
     information: faCircleInfo,
   },
 } as const;
+
+export const AppIcons = iconRegistry as typeof iconRegistry &
+  Record<string, IconDefinition>;
 
 export type AppIcon = IconDefinition;
