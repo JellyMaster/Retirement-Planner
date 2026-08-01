@@ -1,13 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
-import { defaultPensionInputs } from "../config/defaultPensionInputs";
 import { usePensionProjection } from "../hooks/usePensionProjection";
+import { useStoredPensionInputs } from "../hooks/useStoredPensionInputs";
 import { AppIcons } from "../icons";
 import { formatCurrency } from "../utils/formatters";
 
 export function OverviewPage() {
-  const inputs = defaultPensionInputs;
+  const inputs = useStoredPensionInputs();
   const scenario = usePensionProjection(inputs);
   const monthlyContribution =
     inputs.monthlyEmployeeContribution + inputs.monthlyEmployerContribution;
@@ -97,11 +97,10 @@ export function OverviewPage() {
       <section className="polaris-overview-next-step">
         <div>
           <p className="planner-eyebrow">Next step</p>
-          <h2>Make the overview personal to you</h2>
+          <h2>Keep your plan information up to date</h2>
           <p>
-            Review your age, pension balance, contributions and retirement age in
-            My Plan. Future Polaris updates will use one shared plan across every
-            workspace.
+            Changes saved in My Plan now update this overview immediately and are
+            restored when you return to the application.
           </p>
         </div>
 
@@ -131,9 +130,9 @@ function OverviewMetric({
   return (
     <article className={`polaris-overview-metric${incomplete ? " is-incomplete" : ""}`}>
       <span className="polaris-overview-metric-icon" aria-hidden="true">
-        <FontAwesomeIcon icon={icon} />
+        <FontAwesomeIcon icon={icon} fixedWidth />
       </span>
-      <div>
+      <div className="polaris-overview-metric-copy">
         <p>{label}</p>
         <strong>{value}</strong>
         <span>{detail}</span>
