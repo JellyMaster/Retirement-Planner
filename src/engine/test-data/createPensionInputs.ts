@@ -14,7 +14,7 @@ export function createPensionInputs(
 
     annualContributionIncrease: 0,
 
-    annualReturn: 0.27,
+    annualReturn: 0.05,
     annualFee: 0,
     inflation: 0,
 

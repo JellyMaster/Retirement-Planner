@@ -100,12 +100,19 @@ export function GuidedPensionInputsForm({
   function goToStep(step: StepId) {
     setIsCollapsed(false);
     setActiveStep(step);
-    window.requestAnimationFrame(() => {
-      document.getElementById("guided-pension-form")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+   window.requestAnimationFrame(() => {
+  const formElement = document.getElementById("guided-pension-form");
+
+  if (
+    formElement &&
+    typeof formElement.scrollIntoView === "function"
+  ) {
+    formElement.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
     });
+  }
+});
   }
 
   function continueForward() {

@@ -93,11 +93,12 @@ export function RetirementGoalsForm({
           />
 
           <div className="retirement-goals-fields">
-            <label>
-              <span>Desired annual income</span>
+            <div className="retirement-goals-field">
+              <label htmlFor="retirement-goals-income">Desired annual income</label>
               <div className="retirement-goals-money-input">
-                <span>£</span>
+                <span aria-hidden="true">£</span>
                 <input
+                  id="retirement-goals-income"
                   type="number"
                   min="0"
                   step="500"
@@ -105,13 +106,14 @@ export function RetirementGoalsForm({
                   onChange={(event) => update("desiredAnnualIncome", Number(event.target.value))}
                 />
               </div>
-            </label>
+            </div>
 
-            <label>
-              <span>Emergency reserve</span>
+            <div className="retirement-goals-field">
+              <label htmlFor="retirement-goals-reserve">Emergency reserve</label>
               <div className="retirement-goals-money-input">
-                <span>£</span>
+                <span aria-hidden="true">£</span>
                 <input
+                  id="retirement-goals-reserve"
                   type="number"
                   min="0"
                   step="1000"
@@ -119,7 +121,7 @@ export function RetirementGoalsForm({
                   onChange={(event) => update("emergencyReserve", Number(event.target.value))}
                 />
               </div>
-            </label>
+            </div>
 
             <label className="retirement-goals-checkbox">
               <input
@@ -132,11 +134,12 @@ export function RetirementGoalsForm({
 
             {value.includeStatePension && (
               <div className="retirement-goals-state-grid">
-                <label>
-                  <span>Annual amount</span>
+                <div className="retirement-goals-field">
+                  <label htmlFor="retirement-goals-state-pension">Annual amount</label>
                   <div className="retirement-goals-money-input">
-                    <span>£</span>
+                    <span aria-hidden="true">£</span>
                     <input
+                      id="retirement-goals-state-pension"
                       type="number"
                       min="0"
                       step="100"
@@ -146,18 +149,19 @@ export function RetirementGoalsForm({
                       }
                     />
                   </div>
-                </label>
+                </div>
 
-                <label>
-                  <span>Starts at age</span>
+                <div className="retirement-goals-field">
+                  <label htmlFor="retirement-goals-state-pension-age">Starts at age</label>
                   <input
+                    id="retirement-goals-state-pension-age"
                     type="number"
                     min="55"
                     max="80"
                     value={value.statePensionAge}
                     onChange={(event) => update("statePensionAge", Number(event.target.value))}
                   />
-                </label>
+                </div>
               </div>
             )}
           </div>
