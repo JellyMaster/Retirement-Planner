@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { defaultPensionInputs } from "../../config/defaultPensionInputs";
 import type { PensionInputs } from "../../engine/models/PensionInputs";
 import { savePensionInputs } from "../../state/planStorage";
 
@@ -20,7 +19,6 @@ function commitPlan(
   onCommit: (inputs: PensionInputs) => void,
 ): void {
   const committed = { ...inputs };
-  Object.assign(defaultPensionInputs, committed);
   savePensionInputs(committed);
   onCommit(committed);
 }
