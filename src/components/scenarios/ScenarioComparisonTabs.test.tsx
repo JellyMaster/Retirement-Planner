@@ -12,19 +12,22 @@ describe("ScenarioComparisonTabs", () => {
         outcomes={<p>Outcome content</p>}
         chart={<p>Chart content</p>}
         changes={<p>Changes content</p>}
+        insights={<p>Insights content</p>}
       />,
     );
 
     expect(screen.getByText("Outcome content")).toBeVisible();
     expect(screen.getByText("Chart content")).not.toBeVisible();
+    expect(screen.getByText("Insights content")).not.toBeVisible();
 
-    await user.click(screen.getByRole("tab", { name: "Growth chart" }));
+    await user.click(screen.getByRole("tab", { name: "Insights" }));
 
     expect(screen.getByText("Outcome content")).not.toBeVisible();
-    expect(screen.getByText("Chart content")).toBeVisible();
-    expect(
-      screen.getByRole("tab", { name: "Growth chart" }),
-    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("Insights content")).toBeVisible();
+    expect(screen.getByRole("tab", { name: "Insights" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
   });
 
   it("supports arrow-key navigation", async () => {
@@ -34,6 +37,7 @@ describe("ScenarioComparisonTabs", () => {
         outcomes={<p>Outcome content</p>}
         chart={<p>Chart content</p>}
         changes={<p>Changes content</p>}
+        insights={<p>Insights content</p>}
       />,
     );
 
@@ -43,5 +47,23 @@ describe("ScenarioComparisonTabs", () => {
 
     expect(screen.getByRole("tab", { name: "Growth chart" })).toHaveFocus();
     expect(screen.getByText("Chart content")).toBeVisible();
+  });
+
+  it("moves to insights with the End key", async () => {
+    const user = userEvent.setup();
+    render(
+      <ScenarioComparisonTabs
+        outcomes={<p>Outcome content</p>}
+        chart={<p>Chart content</p>}
+        changes={<p>Changes content</p>}
+        insights={<p>Insights content</p>}
+      />,
+    );
+
+    screen.getByRole("tab", { name: "Outcomes" }).focus();
+    await user.keyboard("{End}");
+
+    expect(screen.getByRole("tab", { name: "Insights" })).toHaveFocus();
+    expect(screen.getByText("Insights content")).toBeVisible();
   });
 });
