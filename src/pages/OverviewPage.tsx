@@ -176,14 +176,16 @@ export function OverviewPage() {
                     {formatCurrency(Math.abs(preparedness.annualGap))}/year
                   </dd>
                 </div>
+                <div>
+                  <dt>State Pension</dt>
+                  <dd>
+                    {retirementGoals.includeStatePension
+                      ? `${formatCurrency(retirementGoals.statePensionAnnualAmount)}/year from age ${retirementGoals.statePensionAge}`
+                      : "Not included"}
+                  </dd>
+                </div>
               </dl>
 
-              <Link
-                className="polaris-overview-goal-link"
-                to="/plan#overview"
-              >
-                Edit retirement goal in My Plan
-              </Link>
               <small>
                 This is an illustrative planning score based on your saved goals,
                 not a guarantee or financial advice.
