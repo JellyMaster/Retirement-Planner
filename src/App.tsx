@@ -7,6 +7,7 @@ import { SkipLink } from "./components/ui";
 
 import "./styles/ui-components.css";
 import "./styles/semantic-colours.css";
+import "./styles/action-intent-migrations.css";
 import "./App.css";
 
 export default function App() {
