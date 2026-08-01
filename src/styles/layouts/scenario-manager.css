@@ -39,7 +39,8 @@
   color: var(--colour-text-muted);
 }
 
-.scenario-manager-create {
+.scenario-manager-create,
+.scenario-comparison {
   padding: var(--ui-space-5);
   border: 1px solid var(--colour-border);
   border-radius: var(--ui-radius-panel);
@@ -99,6 +100,9 @@
 
 .scenario-card.is-active {
   border-color: var(--colour-primary);
+}
+
+.scenario-card.is-selected {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--colour-primary) 20%, transparent);
 }
 
@@ -147,6 +151,22 @@
   color: var(--colour-primary);
 }
 
+.scenario-card-compare-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-3);
+  border-radius: var(--ui-radius-control);
+  background: color-mix(in srgb, var(--colour-primary) 7%, transparent);
+  font-weight: 700;
+}
+
+.scenario-card-compare-toggle input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--colour-primary);
+}
+
 .scenario-card-metrics {
   display: grid;
   gap: var(--ui-space-3);
@@ -168,6 +188,7 @@
 .scenario-card-metrics dd {
   margin: 0;
   font-weight: 700;
+  text-align: right;
 }
 
 .scenario-card-actions {
@@ -183,6 +204,57 @@
 .scenario-card-rename > div {
   display: flex;
   gap: var(--ui-space-2);
+}
+
+.scenario-comparison {
+  display: grid;
+  gap: var(--ui-space-5);
+}
+
+.scenario-comparison-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+}
+
+.scenario-comparison-table {
+  width: 100%;
+  min-width: 48rem;
+  border-collapse: collapse;
+}
+
+.scenario-comparison-table th,
+.scenario-comparison-table td {
+  padding: var(--ui-space-4);
+  border-bottom: 1px solid var(--colour-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.scenario-comparison-table thead th {
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+}
+
+.scenario-comparison-table tbody th {
+  width: 14rem;
+  color: var(--colour-text-muted);
+  font-weight: 600;
+}
+
+.scenario-comparison-table tbody tr:last-child th,
+.scenario-comparison-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.scenario-comparison-table td strong,
+.scenario-comparison-delta {
+  display: block;
+}
+
+.scenario-comparison-delta {
+  margin-top: var(--ui-space-1);
+  color: var(--colour-text-muted);
+  font-size: 0.8rem;
 }
 
 @media (max-width: 48rem) {
