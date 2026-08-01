@@ -1,0 +1,22 @@
+/* =========================================================
+   Motion foundation
+   ========================================================= */
+
+:root {
+  --duration-fast: var(--ui-duration-fast, 160ms);
+  --duration-normal: var(--ui-duration-normal, 240ms);
+  --duration-slow: 420ms;
+  --ease-standard: var(--ui-ease-standard, cubic-bezier(0.2, 0, 0, 1));
+  --ease-emphasised: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
