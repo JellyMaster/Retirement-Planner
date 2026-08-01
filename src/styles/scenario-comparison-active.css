@@ -55,6 +55,68 @@
   font-weight: 600;
 }
 
+.scenario-changes {
+  display: grid;
+  gap: var(--ui-space-5);
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.scenario-changes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--ui-space-4);
+}
+
+.scenario-changes-card {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-space-4);
+  padding: var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-card);
+  background: color-mix(in srgb, var(--colour-primary) 5%, var(--colour-surface));
+}
+
+.scenario-changes-card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ui-space-3);
+}
+
+.scenario-changes-card-heading h3,
+.scenario-changes-card-heading p,
+.scenario-changes-empty,
+.scenario-changes-none {
+  margin: 0;
+}
+
+.scenario-changes-card-heading p,
+.scenario-changes-empty,
+.scenario-changes-none {
+  color: var(--colour-text-muted);
+}
+
+.scenario-changes-list {
+  display: grid;
+  gap: var(--ui-space-2);
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.scenario-changes-list li::marker {
+  color: var(--colour-primary);
+}
+
+.scenario-changes-none {
+  padding: var(--ui-space-3);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-neutral-badge);
+}
+
 @media (forced-colors: active) {
   .scenario-comparison-table th.is-active-plan,
   .scenario-comparison-table td.is-active-plan {
