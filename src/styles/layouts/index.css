@@ -17,6 +17,7 @@
 @import "./drawdown-tables.css";
 @import "./drawdown-workspace.css";
 @import "./drawdown-plan-context.css";
+@import "./drawdown-guided-layout.css";
 @import "./comparison-workspace.css";
 @import "./comparison-controls.css";
 @import "./comparison-results.css";
