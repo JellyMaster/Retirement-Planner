@@ -199,6 +199,32 @@
   box-shadow: inset 3px 0 0 var(--status-danger);
 }
 
+/* Retirement health metrics ---------------------------------------------
+   Legacy retirement-dashboard.css applies display:block to every span in
+   this grid. Target only the text elements here and explicitly preserve the
+   shared icon wrapper's inline-flex layout without using !important.
+   ---------------------------------------------------------------------- */
+.retirement-health-metrics .ui-metric-card-label,
+.retirement-health-metrics .ui-metric-card-helper,
+.retirement-health-metrics .ui-metric-card-trend {
+  display: block;
+}
+
+.retirement-health-metrics .ui-metric-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.retirement-health-metrics .ui-metric-card-icon .svg-inline--fa {
+  position: static;
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .workspace-navigation-item .workspace-navigation-icon {
     transition: none;
@@ -207,27 +233,4 @@
   .workspace-navigation-item:hover .workspace-navigation-icon {
     transform: none;
   }
-}
-
-.ui-metric-card-icon {
-   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--colour-border);
-  border-radius: var(--ui-radius-control);
-  color: var(--colour-primary);
-  background: var(--colour-surface);
-  font-size: 1.05rem;
-}
-
-.ui-metric-card-icon .svg-inline--fa {
-  position: static;
-  display: block !important;
-  width: 1rem ;
-  height: 1rem ;
-  margin: 0;
-  transform: none;
 }
