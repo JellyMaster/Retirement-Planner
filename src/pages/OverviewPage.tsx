@@ -1,7 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
+import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
+import { OverviewGrowthChart } from "../components/overview/OverviewGrowthChart";
 import { useScenarios } from "../components/scenarios";
+import { defaultRetirementGoals } from "../config/defaultRetirementGoals";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { AppIcons } from "../icons";
 import { formatCurrency } from "../utils/formatters";
@@ -16,6 +19,9 @@ export function OverviewPage() {
   const hasPensionBalance = inputs.currentPot > 0;
   const hasContributions = monthlyContribution > 0;
   const hasProjection = !scenario.hasErrors && scenario.projection.years.length > 0;
+  const preparedness = hasProjection
+    ? calculateRetirementHealth(scenario.projection, defaultRetirementGoals)
+    : null;
 
   return (
     <main className="planner-page polaris-overview-page">
@@ -28,11 +34,6 @@ export function OverviewPage() {
             where more detail would improve the projection.
           </p>
         </div>
-
-        <Link className="ui-button ui-button-primary" to="/plan">
-          <FontAwesomeIcon icon={AppIcons.navigation.plan} aria-hidden="true" />
-          Review active plan
-        </Link>
       </header>
 
       <section className="polaris-overview-status" aria-labelledby="overview-status-title">
@@ -97,6 +98,63 @@ export function OverviewPage() {
         />
       </section>
 
+      <section className="polaris-overview-outlook" aria-label="Active plan outlook">
+        <article className="polaris-overview-chart-panel">
+          <div className="polaris-overview-panel-heading">
+            <div>
+              <p className="planner-eyebrow">Growth</p>
+              <h2>Pension growth over time</h2>
+            </div>
+            <span>Today&apos;s money</span>
+          </div>
+          <OverviewGrowthChart years={scenario.projection.years} />
+        </article>
+
+        <article
+          className={`polaris-overview-preparedness${
+            preparedness ? ` is-${preparedness.status}` : " is-unavailable"
+          }`}
+        >
+          <div>
+            <p className="planner-eyebrow">Preparedness</p>
+            <h2>How prepared is this plan?</h2>
+          </div>
+
+          {preparedness ? (
+            <>
+              <div className="polaris-overview-preparedness-score">
+                <strong>{preparedness.score}</strong>
+                <span>out of 100</span>
+              </div>
+              <div
+                className="polaris-overview-preparedness-progress"
+                role="progressbar"
+                aria-label="Retirement preparedness"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={preparedness.score}
+              >
+                <span style={{ width: `${preparedness.score}%` }} />
+              </div>
+              <strong className="polaris-overview-preparedness-label">
+                {formatPreparednessStatus(preparedness.status)}
+              </strong>
+              <p>
+                The active plan is estimated to provide {formatCurrency(
+                  preparedness.estimatedAnnualIncome,
+                )} per year against the default income goal.
+              </p>
+              <small>
+                This is an illustrative score using the default retirement goals in
+                My Plan, not a guarantee or financial advice.
+              </small>
+            </>
+          ) : (
+            <p>Correct the active plan inputs to calculate preparedness.</p>
+          )}
+        </article>
+      </section>
+
       <section className="polaris-overview-next-step">
         <div>
           <p className="planner-eyebrow">Next step</p>
@@ -107,7 +165,8 @@ export function OverviewPage() {
           </p>
         </div>
 
-        <Link className="ui-button ui-button-secondary" to="/plan">
+        <Link className="ui-button ui-button-primary ui-button-medium" to="/plan">
+          <FontAwesomeIcon icon={AppIcons.navigation.plan} aria-hidden="true" />
           Open My Plan
         </Link>
       </section>
@@ -142,4 +201,17 @@ function OverviewMetric({
       </div>
     </article>
   );
+}
+
+function formatPreparednessStatus(
+  status: "on-track" | "close" | "needs-attention",
+): string {
+  switch (status) {
+    case "on-track":
+      return "On track";
+    case "close":
+      return "Close to target";
+    case "needs-attention":
+      return "Needs attention";
+  }
 }
