@@ -12,6 +12,7 @@ import { calculateRetirementHealth } from "../components/goals/calculateRetireme
 import { GuidedPensionInputsForm } from "../components/inputs/guided";
 import { RetirementJourney } from "../components/journey";
 import { PlanPreviewBanner, usePlanPreview } from "../components/preview";
+import { useScenarios } from "../components/scenarios";
 import {
   MonteCarloConfidenceDashboard,
   MonteCarloConfidenceExplorer,
@@ -46,7 +47,7 @@ import {
 } from "../engine/monte-carlo";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { AppIcons } from "../icons";
-import { loadStoredPensionInputs } from "../state/planStorage";
+import { savePensionInputs } from "../state/planStorage";
 import { formatCurrency, formatPercentage } from "../utils/formatters";
 import "../styles/retirement-dashboard.css";
 import "../styles/retirement-what-if.css";
@@ -62,7 +63,7 @@ import "../styles/retirement-workspace.css";
 import "../styles/retirement-sustainability.css";
 import "../styles/action-centre.css";
 import "../styles/plan-preview.css";
-
+import "../styles/scenario-planner.css";
 
 type ChartView = "balance" | "contributions";
 
@@ -80,18 +81,35 @@ function getInitialWorkspaceSection(): WorkspaceSectionId {
     : "overview";
 }
 
-function getInitialPensionInputs(): PensionInputs {
-  return loadStoredPensionInputs(createDefaultPensionInputs());
-}
-
 export function RetirementPlannerPage() {
-  const [inputs, setInputs] = useState<PensionInputs>(getInitialPensionInputs);
-  const [comparisonInputs, setComparisonInputs] =
-    useState<PensionInputs>(getInitialPensionInputs);
+  const { activeScenario, updateScenarioInputs } = useScenarios();
+  const [inputs, setInputs] = useState<PensionInputs>(() => ({
+    ...activeScenario.inputs,
+  }));
+  const [comparisonInputs, setComparisonInputs] = useState<PensionInputs>(() => ({
+    ...activeScenario.inputs,
+  }));
   const [comparisonEnabled, setComparisonEnabled] = useState(false);
-  const [retirementGoals, setRetirementGoals] = useState<RetirementGoals>(() => ({ ...defaultRetirementGoals }));
+  const [retirementGoals, setRetirementGoals] = useState<RetirementGoals>(() => ({
+    ...defaultRetirementGoals,
+  }));
   const [chartView, setChartView] = useState<ChartView>("balance");
-  const [activeSection, setActiveSection] = useState<WorkspaceSectionId>(getInitialWorkspaceSection);
+  const [activeSection, setActiveSection] = useState<WorkspaceSectionId>(
+    getInitialWorkspaceSection,
+  );
+
+  const commitActiveInputs = useCallback(
+    (nextInputs: PensionInputs) => {
+      const committed = { ...nextInputs };
+      updateScenarioInputs(activeScenario.id, committed);
+      setInputs(committed);
+
+      if (activeScenario.isBaseline) {
+        savePensionInputs(committed);
+      }
+    },
+    [activeScenario.id, activeScenario.isBaseline, updateScenarioInputs],
+  );
 
   const {
     preview,
@@ -100,7 +118,15 @@ export function RetirementPlannerPage() {
     updateEffectiveInputs,
     keepPreview,
     discardPreview,
-  } = usePlanPreview({ committedInputs: inputs, onCommit: setInputs });
+  } = usePlanPreview({ committedInputs: inputs, onCommit: commitActiveInputs });
+
+  useEffect(() => {
+    const scenarioInputs = { ...activeScenario.inputs };
+    setInputs(scenarioInputs);
+    setComparisonInputs(scenarioInputs);
+    setComparisonEnabled(false);
+    discardPreview();
+  }, [activeScenario.id, activeScenario.inputs, discardPreview]);
 
   const currentScenario = usePensionProjection(effectiveInputs);
   const comparisonScenario = usePensionProjection(comparisonInputs);
@@ -109,16 +135,29 @@ export function RetirementPlannerPage() {
     () => [
       { label: "Current age", value: String(effectiveInputs.currentAge) },
       { label: "Retirement age", value: String(effectiveInputs.retirementAge) },
-      { label: "Starting pension", value: formatCurrency(effectiveInputs.currentPot) },
+      {
+        label: "Starting pension",
+        value: formatCurrency(effectiveInputs.currentPot),
+      },
       {
         label: "Monthly contribution",
         value: formatCurrency(
-          effectiveInputs.monthlyEmployeeContribution + effectiveInputs.monthlyEmployerContribution,
+          effectiveInputs.monthlyEmployeeContribution +
+            effectiveInputs.monthlyEmployerContribution,
         ),
       },
-      { label: "Annual return", value: formatPercentage(effectiveInputs.annualReturn) },
-      { label: "Inflation", value: formatPercentage(effectiveInputs.inflation) },
-      { label: "Annual fund fee", value: formatPercentage(effectiveInputs.annualFee) },
+      {
+        label: "Annual return",
+        value: formatPercentage(effectiveInputs.annualReturn),
+      },
+      {
+        label: "Inflation",
+        value: formatPercentage(effectiveInputs.inflation),
+      },
+      {
+        label: "Annual fund fee",
+        value: formatPercentage(effectiveInputs.annualFee),
+      },
       {
         label: "Contribution increase",
         value: formatPercentage(effectiveInputs.annualContributionIncrease),
@@ -156,7 +195,12 @@ export function RetirementPlannerPage() {
       projectedPot: currentScenario.projection.finalBalance.real,
       illustratedIncome: health.estimatedAnnualIncome,
     };
-  }, [currentScenario.hasErrors, currentScenario.projection, effectiveInputs, retirementGoals]);
+  }, [
+    currentScenario.hasErrors,
+    currentScenario.projection,
+    effectiveInputs,
+    retirementGoals,
+  ]);
 
   const changeWorkspaceSection = useCallback((section: WorkspaceSectionId) => {
     setActiveSection(section);
@@ -189,27 +233,20 @@ export function RetirementPlannerPage() {
     };
   }, []);
 
-const displayedWorkspaceSection =
-  currentScenario.hasErrors
+  const displayedWorkspaceSection = currentScenario.hasErrors
     ? "overview"
     : activeSection;
 
-    const handleWorkspaceSectionChange = useCallback(
-  (section: WorkspaceSectionId) => {
-    if (
-      currentScenario.hasErrors &&
-      section !== "overview"
-    ) {
-      return;
-    }
+  const handleWorkspaceSectionChange = useCallback(
+    (section: WorkspaceSectionId) => {
+      if (currentScenario.hasErrors && section !== "overview") {
+        return;
+      }
 
-    changeWorkspaceSection(section);
-  },
-  [
-    changeWorkspaceSection,
-    currentScenario.hasErrors,
-  ],
-);
+      changeWorkspaceSection(section);
+    },
+    [changeWorkspaceSection, currentScenario.hasErrors],
+  );
 
   function resetInputs() {
     updateEffectiveInputs(createDefaultPensionInputs());
@@ -233,7 +270,10 @@ const displayedWorkspaceSection =
     if (currentScenario.hasErrors) {
       return (
         <>
-          <section className="retirement-guided-input-region" aria-label="Build your retirement plan">
+          <section
+            className="retirement-guided-input-region"
+            aria-label="Build your retirement plan"
+          >
             <GuidedPensionInputsForm
               idPrefix="current"
               value={effectiveInputs}
@@ -256,7 +296,10 @@ const displayedWorkspaceSection =
       case "overview":
         return (
           <>
-            <section className="retirement-guided-input-region" aria-label="Build your retirement plan">
+            <section
+              className="retirement-guided-input-region"
+              aria-label="Build your retirement plan"
+            >
               <GuidedPensionInputsForm
                 idPrefix="current"
                 value={effectiveInputs}
@@ -265,7 +308,10 @@ const displayedWorkspaceSection =
                 onReset={resetInputs}
               />
             </section>
-            <section className="retirement-goals-control-region" aria-label="Retirement goals">
+            <section
+              className="retirement-goals-control-region"
+              aria-label="Retirement goals"
+            >
               <RetirementGoalsForm
                 value={retirementGoals}
                 onChange={setRetirementGoals}
@@ -300,7 +346,11 @@ const displayedWorkspaceSection =
             />
             <div className="retirement-dashboard-main-grid">
               <section className="retirement-chart-workspace">
-                <div className="retirement-chart-tabs" role="tablist" aria-label="Projection chart">
+                <div
+                  className="retirement-chart-tabs"
+                  role="tablist"
+                  aria-label="Projection chart"
+                >
                   <button
                     type="button"
                     role="tab"
@@ -320,23 +370,42 @@ const displayedWorkspaceSection =
                     aria-controls="projection-contributions-panel"
                     aria-selected={chartView === "contributions"}
                     tabIndex={chartView === "contributions" ? 0 : -1}
-                    className={chartView === "contributions" ? "active" : undefined}
+                    className={
+                      chartView === "contributions" ? "active" : undefined
+                    }
                     onClick={() => setChartView("contributions")}
                   >
                     Contributions & growth
                   </button>
                 </div>
                 {chartView === "balance" ? (
-                  <div id="projection-balance-panel" role="tabpanel" aria-labelledby="projection-balance-tab" tabIndex={0}>
-                    <PensionBalanceChart years={currentScenario.projection.years} />
+                  <div
+                    id="projection-balance-panel"
+                    role="tabpanel"
+                    aria-labelledby="projection-balance-tab"
+                    tabIndex={0}
+                  >
+                    <PensionBalanceChart
+                      years={currentScenario.projection.years}
+                    />
                   </div>
                 ) : (
-                  <div id="projection-contributions-panel" role="tabpanel" aria-labelledby="projection-contributions-tab" tabIndex={0}>
-                    <ContributionGrowthChart years={currentScenario.projection.years} />
+                  <div
+                    id="projection-contributions-panel"
+                    role="tabpanel"
+                    aria-labelledby="projection-contributions-tab"
+                    tabIndex={0}
+                  >
+                    <ContributionGrowthChart
+                      years={currentScenario.projection.years}
+                    />
                   </div>
                 )}
               </section>
-              <RetirementInsights inputs={effectiveInputs} result={currentScenario.projection} />
+              <RetirementInsights
+                inputs={effectiveInputs}
+                result={currentScenario.projection}
+              />
             </div>
             <details className="retirement-dashboard-details" open>
               <summary>Projection milestones</summary>
@@ -348,8 +417,14 @@ const displayedWorkspaceSection =
       case "confidence":
         return (
           <>
-            <MonteCarloConfidenceDashboard inputs={effectiveInputs} goals={retirementGoals} />
-            <MonteCarloConfidenceExplorer inputs={effectiveInputs} goals={retirementGoals} />
+            <MonteCarloConfidenceDashboard
+              inputs={effectiveInputs}
+              goals={retirementGoals}
+            />
+            <MonteCarloConfidenceExplorer
+              inputs={effectiveInputs}
+              goals={retirementGoals}
+            />
             <RetirementScoreBreakdown
               inputs={effectiveInputs}
               result={currentScenario.projection}
@@ -369,10 +444,17 @@ const displayedWorkspaceSection =
               badge={<StatusBadge tone="info">Dedicated workspace</StatusBadge>}
             />
             <div className="workspace-bridge-actions">
-              <Link className="ui-button ui-button-primary ui-button-medium" to="/drawdown">
+              <Link
+                className="ui-button ui-button-primary ui-button-medium"
+                to="/drawdown"
+              >
                 Open retirement income planner
               </Link>
-              <button type="button" className="ui-button ui-button-secondary ui-button-medium" onClick={() => changeWorkspaceSection("sustainability")}>
+              <button
+                type="button"
+                className="ui-button ui-button-secondary ui-button-medium"
+                onClick={() => changeWorkspaceSection("sustainability")}
+              >
                 Review sustainability
               </button>
             </div>
@@ -422,7 +504,9 @@ const displayedWorkspaceSection =
         return (
           <>
             {currentScenario.comparison?.feeImpact && (
-              <FeeImpactDashboard feeImpact={currentScenario.comparison.feeImpact} />
+              <FeeImpactDashboard
+                feeImpact={currentScenario.comparison.feeImpact}
+              />
             )}
             <details className="retirement-dashboard-details" open>
               <summary>Projection assumptions</summary>
@@ -443,16 +527,51 @@ const displayedWorkspaceSection =
         <div>
           <p className="planner-eyebrow">Retirement planning workspace</p>
           <h1>Retirement Planner</h1>
-          <p>Focus on one retirement question at a time while keeping the headline plan visible.</p>
+          <p>
+            Focus on one retirement question at a time while keeping the headline
+            plan visible.
+          </p>
         </div>
         <button
           type="button"
-          className={comparisonEnabled ? "comparison-toggle-button comparison-toggle-button-active" : "comparison-toggle-button"}
-          onClick={() => (comparisonEnabled ? setComparisonEnabled(false) : enableComparison())}
+          className={
+            comparisonEnabled
+              ? "comparison-toggle-button comparison-toggle-button-active"
+              : "comparison-toggle-button"
+          }
+          onClick={() =>
+            comparisonEnabled
+              ? setComparisonEnabled(false)
+              : enableComparison()
+          }
         >
           {comparisonEnabled ? "Stop comparing" : "Compare scenario"}
         </button>
       </header>
+
+      <section
+        className={`scenario-planner-status${
+          activeScenario.isBaseline ? " is-baseline" : " is-alternative"
+        }`}
+        aria-label="Scenario being edited"
+      >
+        <div>
+          <p className="planner-eyebrow">
+            {activeScenario.isBaseline
+              ? "Editing baseline plan"
+              : "Editing scenario"}
+          </p>
+          <h2>{activeScenario.name}</h2>
+          <p>
+            {activeScenario.isBaseline
+              ? "Changes here update your main retirement plan and overview."
+              : "This is an alternative scenario. Your baseline plan remains unchanged."}
+          </p>
+        </div>
+        <Link className="ui-button ui-button-secondary" to="/compare">
+          Manage scenarios
+        </Link>
+      </section>
 
       {preview && !comparisonEnabled && (
         <PlanPreviewBanner
@@ -488,7 +607,10 @@ const displayedWorkspaceSection =
               retirementAge={effectiveInputs.retirementAge}
             />
           )}
-          <RetirementWorkspace activeSection={displayedWorkspaceSection} onSectionChange={handleWorkspaceSectionChange}>
+          <RetirementWorkspace
+            activeSection={displayedWorkspaceSection}
+            onSectionChange={handleWorkspaceSectionChange}
+          >
             {renderWorkspaceContent()}
           </RetirementWorkspace>
         </>
