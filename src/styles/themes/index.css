@@ -1,0 +1,5 @@
+/* Theme semantics.
+   Noel and Olivia palette values currently live in src/index.css.
+   Semantic colour roles are centralised here. */
+
+@import "../semantic-colours.css";
