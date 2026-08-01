@@ -1,0 +1,23 @@
+/*
+ * Retirement Planner stylesheet entry point.
+ *
+ * Import order is intentional:
+ * 1. foundations establish reusable values and global behaviour;
+ * 2. shared UI primitives define component defaults;
+ * 3. semantic layers map intent and status onto the active theme;
+ * 4. the legacy application stylesheet remains last while feature rules
+ *    are migrated into dedicated modules.
+ */
+
+@import "./foundations/tokens.css";
+@import "./foundations/typography.css";
+@import "./foundations/motion.css";
+@import "./utilities/accessibility.css";
+
+@import "./ui-components.css";
+@import "./semantic-colours.css";
+@import "./action-intent-migrations.css";
+@import "./semantic-state-migrations.css";
+
+/* Temporary compatibility entry point. Reduce this file feature by feature. */
+@import "../App.css";
