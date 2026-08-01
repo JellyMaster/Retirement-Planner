@@ -11,8 +11,11 @@ import { ScenarioService } from "./ScenarioService";
 
 class MemoryScenarioRepository implements ScenarioRepository {
   savedStates: ScenarioState[] = [];
+  private state: ScenarioState;
 
-  constructor(private state: ScenarioState) {}
+  constructor(state: ScenarioState) {
+    this.state = state;
+  }
 
   load(): ScenarioState {
     return structuredClone(this.state);
