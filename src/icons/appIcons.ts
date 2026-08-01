@@ -1,3 +1,4 @@
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faArrowTrendUp,
   faBriefcase,
@@ -8,10 +9,14 @@ import {
   faCheck,
   faChevronDown,
   faCircleCheck,
+  faCircleExclamation,
   faCircleInfo,
   faClipboardList,
   faClock,
+  faCodeCompare,
   faCoins,
+  faCompass,
+  faDice,
   faExclamation,
   faFlagCheckered,
   faGear,
@@ -24,48 +29,45 @@ import {
   faPercent,
   faPiggyBank,
   faPlus,
+  faReceipt,
   faScaleBalanced,
   faSliders,
   faSterlingSign,
   faSunBright,
   faTable,
+  faTriangleExclamation,
+  faUmbrellaBeach,
   faUser,
   faWallet,
 } from "@fortawesome/pro-solid-svg-icons";
 
+/**
+ * Shared semantic icon registry.
+ *
+ * Existing top-level names remain available for backward compatibility, while
+ * Project Polaris can use the grouped navigation, concepts and status names.
+ */
 export const AppIcons = {
-  // Navigation
+  // Existing application icons
   home: faHouse,
-
-  // Planner
   user: faUser,
   employment: faBriefcase,
   pension: faLandmark,
   retirement: faPiggyBank,
   goals: faBullseye,
-
-  // Finance
   money: faSterlingSign,
   wallet: faWallet,
   coins: faCoins,
-
-  // Charts and growth
   chart: faChartArea,
   chartLine: faChartLine,
   growth: faArrowTrendUp,
-
-  // Comparison and fees
   comparison: faScaleBalanced,
   fees: faPercent,
-
-  // Dashboard
   health: faHeartPulse,
   recommendations: faLightbulb,
   milestones: faFlagCheckered,
   assumptions: faClipboardList,
   projection: faTable,
-
-  // Status and controls
   check: faCheck,
   success: faCircleCheck,
   warning: faExclamation,
@@ -79,4 +81,31 @@ export const AppIcons = {
   moon: faMoon,
   settings: faSliders,
   gear: faGear,
+
+  // Project Polaris grouped icons
+  navigation: {
+    overview: faHouse,
+    plan: faClipboardList,
+    drawdown: faWallet,
+    compare: faCodeCompare,
+    explore: faCompass,
+    guidance: faLightbulb,
+  },
+  concepts: {
+    pension: faPiggyBank,
+    income: faSterlingSign,
+    projection: faChartLine,
+    monteCarlo: faDice,
+    tax: faReceipt,
+    retirement: faUmbrellaBeach,
+    settings: faSliders,
+  },
+  status: {
+    success: faCircleCheck,
+    warning: faCircleExclamation,
+    danger: faTriangleExclamation,
+    information: faCircleInfo,
+  },
 } as const;
+
+export type AppIcon = IconDefinition;
