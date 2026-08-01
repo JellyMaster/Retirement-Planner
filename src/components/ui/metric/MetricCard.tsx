@@ -48,7 +48,7 @@ export function MetricCard({
       <div className="ui-metric-card-heading">
         {icon && (
           <span className="ui-metric-card-icon" aria-hidden="true">
-            <FontAwesomeIcon icon={icon}   />
+            <FontAwesomeIcon icon={icon} fixedWidth />
           </span>
         )}
         <span className="ui-metric-card-label">{label}</span>
