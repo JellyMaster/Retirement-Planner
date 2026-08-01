@@ -15,7 +15,9 @@
 
 .polaris-overview-header h1,
 .polaris-overview-status h2,
-.polaris-overview-next-step h2 {
+.polaris-overview-next-step h2,
+.polaris-overview-panel-heading h2,
+.polaris-overview-preparedness h2 {
   margin: 0;
 }
 
@@ -28,7 +30,9 @@
 }
 
 .polaris-overview-status,
-.polaris-overview-next-step {
+.polaris-overview-next-step,
+.polaris-overview-chart-panel,
+.polaris-overview-preparedness {
   padding: var(--ui-space-5);
   border: 1px solid var(--colour-border);
   border-radius: var(--ui-radius-panel);
@@ -129,9 +133,133 @@
   line-height: 1.45;
 }
 
+.polaris-overview-outlook {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(18rem, 0.8fr);
+  gap: var(--ui-space-4);
+}
+
+.polaris-overview-chart-panel,
+.polaris-overview-preparedness {
+  min-width: 0;
+}
+
+.polaris-overview-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-4);
+  margin-bottom: var(--ui-space-4);
+}
+
+.polaris-overview-panel-heading > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.polaris-overview-chart-canvas {
+  width: 100%;
+  height: 15rem;
+}
+
+.polaris-overview-chart-empty {
+  display: grid;
+  place-items: center;
+  min-height: 15rem;
+  padding: var(--ui-space-5);
+  border: 1px dashed var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  color: var(--colour-text-muted);
+  text-align: center;
+}
+
+.polaris-overview-preparedness {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-3);
+  border-top: 4px solid var(--colour-primary);
+}
+
+.polaris-overview-preparedness.is-on-track {
+  border-top-color: var(--colour-positive, #16845b);
+}
+
+.polaris-overview-preparedness.is-close {
+  border-top-color: var(--colour-warning, #b7791f);
+}
+
+.polaris-overview-preparedness.is-needs-attention,
+.polaris-overview-preparedness.is-unavailable {
+  border-top-color: var(--colour-negative, #c2414b);
+}
+
+.polaris-overview-preparedness-score {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ui-space-2);
+}
+
+.polaris-overview-preparedness-score strong {
+  color: var(--colour-text);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 1;
+}
+
+.polaris-overview-preparedness-score span,
+.polaris-overview-preparedness p,
+.polaris-overview-preparedness small {
+  color: var(--colour-text-muted);
+}
+
+.polaris-overview-preparedness p,
+.polaris-overview-preparedness small {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.polaris-overview-preparedness-progress {
+  height: 0.65rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--colour-surface-secondary);
+}
+
+.polaris-overview-preparedness-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--colour-primary);
+}
+
+.polaris-overview-preparedness.is-on-track
+  .polaris-overview-preparedness-progress > span {
+  background: var(--colour-positive, #16845b);
+}
+
+.polaris-overview-preparedness.is-close
+  .polaris-overview-preparedness-progress > span {
+  background: var(--colour-warning, #b7791f);
+}
+
+.polaris-overview-preparedness.is-needs-attention
+  .polaris-overview-preparedness-progress > span {
+  background: var(--colour-negative, #c2414b);
+}
+
+.polaris-overview-preparedness-label {
+  color: var(--colour-text);
+  font-size: 1.05rem;
+}
+
 @media (max-width: 1000px) {
   .polaris-overview-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .polaris-overview-outlook {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -142,7 +270,6 @@
     flex-direction: column;
   }
 
-  .polaris-overview-header .ui-button,
   .polaris-overview-next-step .ui-button {
     width: 100%;
   }
@@ -155,5 +282,13 @@
 
   .polaris-overview-status {
     align-items: flex-start;
+  }
+
+  .polaris-overview-panel-heading {
+    flex-direction: column;
+  }
+
+  .polaris-overview-chart-canvas {
+    height: 13rem;
   }
 }
