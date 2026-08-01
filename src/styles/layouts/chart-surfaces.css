@@ -1,0 +1,245 @@
+/* =========================================================
+   Shared chart surfaces and controls
+
+   Presentation-only compatibility for existing planner charts.
+   Chart data, Recharts configuration and feature-specific colours remain
+   owned by their components and theme tokens.
+   ========================================================= */
+
+.projection-chart-panel,
+.contribution-growth-chart-panel,
+.scenario-chart-panel,
+.dashboard-chart-panel,
+.drawdown-chart-panel,
+.monte-carlo-chart-panel,
+.monte-carlo-percentile-chart,
+.retirement-chart-workspace,
+.comparison-chart-stack {
+  min-width: 0;
+}
+
+.projection-chart-panel,
+.contribution-growth-chart-panel,
+.scenario-chart-panel {
+  margin-block: var(--space-6);
+}
+
+.dashboard-chart-toolbar,
+.projection-chart-header,
+.chart-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.dashboard-chart-toolbar h2,
+.projection-chart-header h2,
+.chart-panel-header h2 {
+  margin: 0;
+  color: var(--colour-text-strong);
+  font-size: var(--ui-font-size-lg);
+  line-height: 1.3;
+}
+
+.dashboard-chart-stage,
+.chart-stage,
+.projection-chart-stage {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.dashboard-chart-stage > .panel,
+.chart-stage > .panel,
+.projection-chart-stage > .panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.dashboard-chart-stage > .panel > .panel-heading,
+.chart-stage > .panel > .panel-heading,
+.projection-chart-stage > .panel > .panel-heading {
+  display: none;
+}
+
+.pension-balance-chart,
+.contribution-growth-chart,
+.scenario-comparison-chart,
+.drawdown-chart,
+.monte-carlo-chart,
+.monte-carlo-percentile-chart .recharts-responsive-container {
+  width: 100%;
+  min-width: 0;
+  height: clamp(20rem, 34vw, 26.25rem);
+}
+
+.chart-tabs,
+.retirement-chart-tabs,
+.projection-segmented-control {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.chart-tab,
+.retirement-chart-tabs button,
+.projection-segmented-control button {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--action-neutral-text);
+  background: transparent;
+  font: inherit;
+  font-size: var(--ui-font-size-sm);
+  font-weight: 750;
+  line-height: 1.1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.chart-tab:hover:not(:disabled),
+.retirement-chart-tabs button:hover:not(:disabled),
+.projection-segmented-control button:hover:not(:disabled) {
+  color: var(--colour-text-strong);
+  background: var(--colour-surface-hover);
+  border-color: var(--colour-border-strong);
+}
+
+.chart-tab-active,
+.chart-tab[aria-selected="true"],
+.retirement-chart-tabs button.active,
+.retirement-chart-tabs button[aria-selected="true"],
+.projection-segmented-control button.is-active,
+.projection-segmented-control button[aria-pressed="true"] {
+  color: var(--action-run-text);
+  background: var(--action-run-background);
+  border-color: var(--action-run-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-tab:focus-visible,
+.retirement-chart-tabs button:focus-visible,
+.projection-segmented-control button:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--action-run-focus);
+}
+
+.chart-tab:active:not(:disabled),
+.retirement-chart-tabs button:active:not(:disabled),
+.projection-segmented-control button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.chart-tab:disabled,
+.retirement-chart-tabs button:disabled,
+.projection-segmented-control button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.comparison-chart-note,
+.chart-footnote,
+.chart-description {
+  max-width: 72ch;
+  margin: var(--space-3) 0 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+/* Recharts text and interaction consistency. */
+.recharts-wrapper,
+.recharts-responsive-container {
+  min-width: 0;
+}
+
+.recharts-cartesian-axis-tick-value,
+.recharts-polar-angle-axis-tick-value {
+  fill: var(--colour-text-muted);
+  font-size: 0.75rem;
+}
+
+.recharts-cartesian-grid line {
+  stroke: var(--colour-border);
+  stroke-opacity: 0.7;
+}
+
+.recharts-default-tooltip {
+  border-color: var(--colour-border) !important;
+  border-radius: var(--radius-sm) !important;
+  background: var(--colour-surface) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.recharts-tooltip-label {
+  color: var(--colour-text-strong);
+  font-weight: 800;
+}
+
+@media (max-width: 700px) {
+  .dashboard-chart-toolbar,
+  .projection-chart-header,
+  .chart-panel-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .chart-tabs,
+  .retirement-chart-tabs,
+  .projection-segmented-control {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .chart-tab,
+  .retirement-chart-tabs button,
+  .projection-segmented-control button {
+    flex: 1 0 auto;
+  }
+
+  .pension-balance-chart,
+  .contribution-growth-chart,
+  .scenario-comparison-chart,
+  .drawdown-chart,
+  .monte-carlo-chart,
+  .monte-carlo-percentile-chart .recharts-responsive-container {
+    height: 21.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-tab,
+  .retirement-chart-tabs button,
+  .projection-segmented-control button {
+    transition: none;
+  }
+
+  .chart-tab:active:not(:disabled),
+  .retirement-chart-tabs button:active:not(:disabled),
+  .projection-segmented-control button:active:not(:disabled) {
+    transform: none;
+  }
+}
