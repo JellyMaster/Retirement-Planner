@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from "react";
 import {
   BarChart3,
   ClipboardList,
@@ -35,7 +36,7 @@ export function DrawdownWorkspaceNavigation({
   onChange,
 }: DrawdownWorkspaceNavigationProps) {
   function handleKeyDown(
-    event: React.KeyboardEvent<HTMLButtonElement>,
+    event: KeyboardEvent<HTMLButtonElement>,
     currentIndex: number,
   ) {
     let nextIndex: number;
