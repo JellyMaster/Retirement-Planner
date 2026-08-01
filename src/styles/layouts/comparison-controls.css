@@ -1,0 +1,194 @@
+/* =========================================================
+   Retirement comparison controls
+   ========================================================= */
+
+.comparison-plan-selector {
+  display: inline-flex;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.comparison-plan-selector:hover {
+  border-color: var(--action-analyse-border);
+  background: var(--action-analyse-background);
+}
+
+.comparison-plan-selector:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--action-analyse-focus);
+}
+
+.comparison-plan-selector[aria-pressed="true"] {
+  border-color: var(--action-analyse);
+  background: color-mix(in srgb, var(--action-analyse) 10%, var(--colour-surface));
+}
+
+.comparison-plan-identity {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--colour-text-strong);
+  font-weight: 800;
+}
+
+.comparison-plan-identity-compact {
+  font-size: var(--ui-font-size-sm);
+}
+
+.comparison-plan-dot {
+  flex: 0 0 auto;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--colour-chart-primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--colour-chart-primary) 14%, transparent);
+}
+
+.comparison-plan-alternative .comparison-plan-dot {
+  background: var(--colour-chart-secondary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--colour-chart-secondary) 14%, transparent);
+}
+
+.comparison-plan-viewing-label {
+  padding: 0.22rem 0.5rem;
+  border: 1px solid var(--action-analyse-border);
+  border-radius: var(--radius-pill);
+  color: var(--action-analyse-text);
+  background: var(--action-analyse-background);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.comparison-editor-panel {
+  position: sticky;
+  top: calc(var(--space-3) + 4.75rem);
+  min-width: 0;
+  max-height: calc(100vh - 6.5rem);
+  overflow: auto;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  color: var(--colour-text);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-md);
+  scrollbar-width: thin;
+}
+
+.comparison-workspace-collapsed .comparison-editor-panel {
+  width: 4.25rem;
+  overflow: visible;
+}
+
+.comparison-text-button {
+  flex: 0 0 auto;
+  min-height: 2.4rem;
+  padding: 0.5rem var(--space-3);
+  border: 1px solid var(--action-neutral-border);
+  border-radius: var(--radius-sm);
+  color: var(--action-neutral-text);
+  background: var(--action-neutral-background);
+  font-size: var(--ui-font-size-sm);
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.comparison-text-button:hover {
+  color: var(--action-analyse-text);
+  background: var(--action-analyse-background);
+  border-color: var(--action-analyse);
+}
+
+.comparison-text-button:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--action-analyse-focus);
+}
+
+.comparison-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.comparison-toggle-row h2 {
+  margin: 0 0 var(--space-1);
+  color: var(--colour-text-strong);
+  font-size: var(--ui-font-size-lg);
+}
+
+.comparison-toggle-row p {
+  margin: 0;
+  color: var(--colour-text-muted);
+}
+
+.comparison-toggle-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-height: 2.65rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem var(--space-4);
+  border: 1px solid var(--action-analyse-border);
+  border-radius: var(--radius-md);
+  color: var(--action-analyse-text);
+  background: var(--action-analyse-background);
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.comparison-toggle-button:hover {
+  border-color: var(--action-analyse);
+  color: var(--action-analyse-text-hover);
+}
+
+.comparison-toggle-button-active {
+  border-color: var(--action-neutral-border);
+  color: var(--action-neutral-text);
+  background: var(--action-neutral-background);
+}
+
+@media (max-width: 1180px) {
+  .comparison-editor-panel {
+    position: static;
+    max-height: none;
+  }
+
+  .comparison-workspace-collapsed .comparison-editor-panel {
+    width: auto;
+  }
+}
+
+@media (max-width: 650px) {
+  .comparison-toggle-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .comparison-toggle-button,
+  .comparison-text-button {
+    width: 100%;
+  }
+}
