@@ -1,0 +1,125 @@
+.monte-carlo-confidence-explorer {
+  display: grid;
+  gap: var(--space-lg, 1.5rem);
+}
+
+.monte-carlo-percentile-chart {
+  height: 430px;
+  margin-top: var(--space-md, 1rem);
+}
+
+.monte-carlo-settings-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md, 1rem);
+}
+
+.monte-carlo-settings-fields {
+  margin-top: var(--space-lg, 1.5rem);
+  padding-top: var(--space-lg, 1.5rem);
+  border-top: 1px solid var(--colour-border);
+}
+
+.monte-carlo-setting-field {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--colour-text-secondary);
+  font-weight: 600;
+}
+
+.monte-carlo-setting-field input,
+.monte-carlo-setting-field select {
+  min-height: 44px;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--colour-border-strong);
+  border-radius: var(--radius-sm, 0.625rem);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  font: inherit;
+}
+
+.monte-carlo-setting-field small {
+  color: var(--colour-text-muted);
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.monte-carlo-range-row,
+.monte-carlo-percent-input {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.monte-carlo-range-row input[type="range"] {
+  padding: 0;
+}
+
+.monte-carlo-range-row output,
+.monte-carlo-percent-input span {
+  min-width: 3rem;
+  color: var(--colour-text);
+  font-weight: 700;
+  text-align: right;
+}
+
+.monte-carlo-settings-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.monte-carlo-sensitivity-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.monte-carlo-sensitivity-card-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.monte-carlo-sensitivity-grid article > p {
+  margin: 0.75rem 0;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.monte-carlo-sensitivity-score {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 1.05rem;
+}
+
+.monte-carlo-sensitivity-score strong {
+  font-size: 1.35rem;
+}
+
+.monte-carlo-explorer-disclaimer {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 760px) {
+  .monte-carlo-settings-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .monte-carlo-percentile-chart {
+    height: 340px;
+  }
+}
+
+@media (max-width: 480px) {
+  .monte-carlo-percentile-chart {
+    height: 300px;
+  }
+}
