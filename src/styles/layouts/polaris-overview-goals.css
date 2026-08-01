@@ -1,0 +1,52 @@
+.polaris-overview-goal-summary {
+  display: grid;
+  gap: var(--ui-space-2);
+  margin: 0;
+  padding: var(--ui-space-3) 0;
+  border-top: 1px solid var(--colour-border);
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.polaris-overview-goal-summary > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+}
+
+.polaris-overview-goal-summary dt {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.polaris-overview-goal-summary dd {
+  margin: 0;
+  color: var(--colour-text);
+  font-weight: 800;
+  text-align: right;
+}
+
+.polaris-overview-goal-link {
+  align-self: flex-start;
+  color: var(--colour-primary);
+  font-size: var(--ui-font-size-sm);
+  font-weight: 800;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.polaris-overview-goal-link:hover {
+  text-decoration-thickness: 3px;
+}
+
+@media (max-width: 30rem) {
+  .polaris-overview-goal-summary > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--ui-space-1);
+  }
+
+  .polaris-overview-goal-summary dd {
+    text-align: left;
+  }
+}
