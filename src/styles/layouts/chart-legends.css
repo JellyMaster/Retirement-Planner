@@ -1,0 +1,121 @@
+/* =========================================================
+   Shared chart legends
+   ========================================================= */
+
+.chart-legend,
+.projection-chart-legend,
+.projection-table-legend,
+.monte-carlo-legend,
+.comparison-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-3) 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.4;
+}
+
+.chart-legend > span,
+.projection-chart-legend > span,
+.projection-table-legend > span,
+.monte-carlo-legend > span,
+.comparison-chart-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.legend-dot,
+.chart-legend-swatch,
+.projection-legend-swatch {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 0.625rem;
+  height: 0.625rem;
+  border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.chart-legend-line,
+.projection-legend-line {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1.5rem;
+  height: 0.1875rem;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+
+.legend-dot-state,
+.legend-state-pension {
+  color: var(--status-info);
+}
+
+.legend-dot-warning,
+.legend-warning,
+.legend-shortfall {
+  color: var(--status-warning);
+}
+
+.legend-dot-depleted,
+.legend-danger,
+.legend-depleted {
+  color: var(--status-danger);
+}
+
+.legend-success,
+.legend-on-track,
+.legend-positive {
+  color: var(--status-good);
+}
+
+.legend-current,
+.legend-baseline {
+  color: var(--colour-primary);
+}
+
+.legend-comparison,
+.legend-alternative {
+  color: var(--action-analyse);
+}
+
+.recharts-default-legend {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2) var(--space-4);
+  margin: 0 !important;
+  padding-top: var(--space-3) !important;
+}
+
+.recharts-legend-item {
+  display: inline-flex !important;
+  align-items: center;
+  margin-right: 0 !important;
+  color: var(--colour-text-muted) !important;
+  font-size: var(--ui-font-size-sm);
+}
+
+.recharts-legend-item-text {
+  color: inherit !important;
+}
+
+@media (max-width: 640px) {
+  .chart-legend,
+  .projection-chart-legend,
+  .projection-table-legend,
+  .monte-carlo-legend,
+  .comparison-chart-legend {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .recharts-default-legend {
+    justify-content: flex-start;
+  }
+}
