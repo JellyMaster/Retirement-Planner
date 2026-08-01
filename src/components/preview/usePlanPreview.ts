@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
 import type { PensionInputs } from "../../engine/models/PensionInputs";
-import { savePensionInputs } from "../../state/planStorage";
 
 export interface PlanPreviewState {
   label: string;
@@ -18,9 +17,7 @@ function commitPlan(
   inputs: PensionInputs,
   onCommit: (inputs: PensionInputs) => void,
 ): void {
-  const committed = { ...inputs };
-  savePensionInputs(committed);
-  onCommit(committed);
+  onCommit({ ...inputs });
 }
 
 export function usePlanPreview({
