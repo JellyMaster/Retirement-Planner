@@ -1,0 +1,41 @@
+.scenario-planner-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: var(--space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.scenario-planner-status.is-alternative {
+  border-color: color-mix(in srgb, var(--colour-primary) 45%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 7%, var(--colour-surface));
+}
+
+.scenario-planner-status h2,
+.scenario-planner-status p {
+  margin: 0;
+}
+
+.scenario-planner-status h2 {
+  margin-top: var(--space-1);
+}
+
+.scenario-planner-status p:last-child {
+  margin-top: var(--space-2);
+  color: var(--colour-text-muted);
+}
+
+@media (max-width: 48rem) {
+  .scenario-planner-status {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .scenario-planner-status .ui-button {
+    width: 100%;
+  }
+}
