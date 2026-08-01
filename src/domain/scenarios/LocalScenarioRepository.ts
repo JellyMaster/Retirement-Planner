@@ -6,15 +6,19 @@ import {
   type ScenarioDependencies,
   type ScenarioState,
 } from "./Scenario";
+import {
+  createDefaultScenarioDrawdownPreferences,
+  type ScenarioDrawdownPreferences,
+} from "./ScenarioDrawdownPreferences";
 import type { ScenarioRepository } from "./ScenarioRepository";
 
 export const SCENARIO_STORAGE_KEY = "retirement-planner:scenarios";
-const SCENARIO_STORAGE_VERSION = 1;
+const SCENARIO_STORAGE_VERSION = 2;
 
 interface StoredScenarioState {
-  version: typeof SCENARIO_STORAGE_VERSION;
+  version: number;
   activeScenarioId: string;
-  scenarios: Scenario[];
+  scenarios: unknown[];
 }
 
 function isFiniteNumber(value: unknown): value is number {
@@ -46,40 +50,76 @@ function isPensionInputs(value: unknown): value is PensionInputs {
   );
 }
 
-function isScenario(value: unknown): value is Scenario {
+function isScenarioDrawdownPreferences(
+  value: unknown,
+): value is ScenarioDrawdownPreferences {
   if (!value || typeof value !== "object") return false;
 
-  const scenario = value as Partial<Scenario>;
+  const preferences = value as Partial<ScenarioDrawdownPreferences>;
   return (
-    typeof scenario.id === "string" &&
-    scenario.id.length > 0 &&
-    typeof scenario.name === "string" &&
-    scenario.name.trim().length > 0 &&
-    typeof scenario.colour === "string" &&
-    typeof scenario.isBaseline === "boolean" &&
-    typeof scenario.createdAt === "string" &&
-    typeof scenario.updatedAt === "string" &&
-    isPensionInputs(scenario.inputs)
+    (preferences.withdrawalStrategy === "target-income" ||
+      preferences.withdrawalStrategy === "percentage") &&
+    (preferences.incomeTargetMode === "gross" ||
+      preferences.incomeTargetMode === "net") &&
+    isFiniteNumber(preferences.withdrawalRate) &&
+    isFiniteNumber(preferences.desiredAnnualIncome) &&
+    isFiniteNumber(preferences.taxFreeCash)
   );
+}
+
+function normaliseScenario(value: unknown): Scenario | null {
+  if (!value || typeof value !== "object") return null;
+
+  const scenario = value as Partial<Scenario>;
+  if (
+    typeof scenario.id !== "string" ||
+    scenario.id.length === 0 ||
+    typeof scenario.name !== "string" ||
+    scenario.name.trim().length === 0 ||
+    typeof scenario.colour !== "string" ||
+    typeof scenario.isBaseline !== "boolean" ||
+    typeof scenario.createdAt !== "string" ||
+    typeof scenario.updatedAt !== "string" ||
+    !isPensionInputs(scenario.inputs)
+  ) {
+    return null;
+  }
+
+  return {
+    ...scenario,
+    id: scenario.id,
+    name: scenario.name,
+    colour: scenario.colour,
+    isBaseline: scenario.isBaseline,
+    createdAt: scenario.createdAt,
+    updatedAt: scenario.updatedAt,
+    inputs: { ...scenario.inputs },
+    drawdown: isScenarioDrawdownPreferences(scenario.drawdown)
+      ? { ...scenario.drawdown }
+      : createDefaultScenarioDrawdownPreferences(),
+  };
 }
 
 function parseStoredState(value: string): ScenarioState | null {
   try {
     const parsed = JSON.parse(value) as Partial<StoredScenarioState>;
     if (
-      parsed.version !== SCENARIO_STORAGE_VERSION ||
+      (parsed.version !== 1 && parsed.version !== SCENARIO_STORAGE_VERSION) ||
       typeof parsed.activeScenarioId !== "string" ||
       !Array.isArray(parsed.scenarios) ||
-      parsed.scenarios.length === 0 ||
-      !parsed.scenarios.every(isScenario)
+      parsed.scenarios.length === 0
     ) {
       return null;
     }
 
-    const baselineCount = parsed.scenarios.filter(
+    const scenarios = parsed.scenarios.map(normaliseScenario);
+    if (scenarios.some((scenario) => scenario === null)) return null;
+
+    const validScenarios = scenarios as Scenario[];
+    const baselineCount = validScenarios.filter(
       (scenario) => scenario.isBaseline,
     ).length;
-    const activeScenarioExists = parsed.scenarios.some(
+    const activeScenarioExists = validScenarios.some(
       (scenario) => scenario.id === parsed.activeScenarioId,
     );
 
@@ -87,10 +127,7 @@ function parseStoredState(value: string): ScenarioState | null {
 
     return {
       activeScenarioId: parsed.activeScenarioId,
-      scenarios: parsed.scenarios.map((scenario) => ({
-        ...scenario,
-        inputs: { ...scenario.inputs },
-      })),
+      scenarios: validScenarios,
     };
   } catch {
     return null;
@@ -113,6 +150,14 @@ function loadLegacyBaselineInputs(
   }
 }
 
+function cloneScenario(scenario: Scenario): Scenario {
+  return {
+    ...scenario,
+    inputs: { ...scenario.inputs },
+    drawdown: { ...scenario.drawdown },
+  };
+}
+
 export class LocalScenarioRepository implements ScenarioRepository {
   private readonly storage: Storage;
   private readonly fallbackInputs: PensionInputs;
@@ -131,7 +176,10 @@ export class LocalScenarioRepository implements ScenarioRepository {
   load(): ScenarioState {
     const saved = this.storage.getItem(SCENARIO_STORAGE_KEY);
     const storedState = saved ? parseStoredState(saved) : null;
-    if (storedState) return storedState;
+    if (storedState) {
+      this.save(storedState);
+      return storedState;
+    }
 
     const baselineInputs = loadLegacyBaselineInputs(
       this.storage,
@@ -151,13 +199,10 @@ export class LocalScenarioRepository implements ScenarioRepository {
   }
 
   save(state: ScenarioState): void {
-    const storedState: StoredScenarioState = {
+    const storedState = {
       version: SCENARIO_STORAGE_VERSION,
       activeScenarioId: state.activeScenarioId,
-      scenarios: state.scenarios.map((scenario) => ({
-        ...scenario,
-        inputs: { ...scenario.inputs },
-      })),
+      scenarios: state.scenarios.map(cloneScenario),
     };
 
     this.storage.setItem(
