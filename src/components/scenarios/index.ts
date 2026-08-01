@@ -1,3 +1,4 @@
+export { ActiveScenarioSwitcher } from "./ActiveScenarioSwitcher";
 export { ScenarioChangesSummary } from "./ScenarioChangesSummary";
 export { ScenarioComparisonTabs } from "./ScenarioComparisonTabs";
 export { ScenarioEditModal } from "./ScenarioEditModal";
