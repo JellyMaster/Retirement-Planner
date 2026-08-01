@@ -1,0 +1,67 @@
+.scenario-comparison-table th.is-active-plan,
+.scenario-comparison-table td.is-active-plan {
+  border-inline: 2px solid color-mix(in srgb, var(--colour-primary) 58%, transparent);
+  background: color-mix(in srgb, var(--colour-primary) 9%, var(--colour-surface));
+}
+
+.scenario-comparison-table thead th.is-active-plan {
+  border-top: 2px solid var(--colour-primary);
+  background: color-mix(in srgb, var(--colour-primary) 18%, var(--colour-surface));
+}
+
+.scenario-comparison-table tbody tr:last-child td.is-active-plan {
+  border-bottom: 2px solid var(--colour-primary);
+}
+
+.scenario-comparison-table thead th > span:first-child {
+  display: block;
+}
+
+.scenario-comparison-active-badge {
+  display: inline-flex;
+  margin-top: var(--ui-space-2);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--ui-radius-pill);
+  background: var(--colour-primary);
+  color: var(--colour-on-primary, white);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.scenario-comparison-reference,
+.scenario-comparison-indicator {
+  display: block;
+  margin-top: var(--ui-space-1);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.scenario-comparison-reference {
+  color: var(--colour-primary);
+}
+
+.scenario-comparison-indicator.is-greater {
+  color: var(--colour-primary);
+}
+
+.scenario-comparison-indicator.is-less {
+  color: var(--colour-text-muted);
+}
+
+.scenario-comparison-indicator.is-same {
+  color: var(--colour-text-muted);
+  font-weight: 600;
+}
+
+@media (forced-colors: active) {
+  .scenario-comparison-table th.is-active-plan,
+  .scenario-comparison-table td.is-active-plan {
+    border-color: Highlight;
+  }
+
+  .scenario-comparison-active-badge {
+    border: 1px solid HighlightText;
+  }
+}
