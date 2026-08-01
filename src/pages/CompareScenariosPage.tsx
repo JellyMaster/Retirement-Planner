@@ -20,7 +20,8 @@ export function CompareScenariosPage() {
     setActiveScenario,
     deleteScenario,
   } = useScenarios();
-  const baselineScenario = scenarios.find((scenario) => scenario.isBaseline) ?? scenarios[0];
+  const baselineScenario =
+    scenarios.find((scenario) => scenario.isBaseline) ?? activeScenario;
   const [selectedScenarioIds, setSelectedScenarioIds] = useState<string[]>(() => {
     const initial = [baselineScenario.id];
     if (activeScenarioId !== baselineScenario.id) initial.push(activeScenarioId);
