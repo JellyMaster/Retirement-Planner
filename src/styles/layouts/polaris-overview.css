@@ -42,13 +42,24 @@
 
 .polaris-overview-status-icon,
 .polaris-overview-metric-icon {
-  display: inline-flex;
+  display: inline-flex !important;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+  place-self: start;
+  padding: 0;
   border-radius: var(--ui-radius-control);
   background: color-mix(in srgb, var(--colour-primary) 14%, transparent);
   color: var(--colour-primary);
+  line-height: 1;
+}
+
+.polaris-overview-status-icon > svg,
+.polaris-overview-metric-icon > svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+  margin: 0;
 }
 
 .polaris-overview-status-icon {
@@ -66,6 +77,7 @@
 .polaris-overview-metric {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
   gap: var(--ui-space-3);
   min-width: 0;
   padding: var(--ui-space-5);
@@ -83,29 +95,34 @@
 .polaris-overview-metric-icon {
   width: 40px;
   height: 40px;
+  font-size: 1rem;
 }
 
-.polaris-overview-metric p,
-.polaris-overview-metric strong,
-.polaris-overview-metric span {
+.polaris-overview-metric-copy {
+  min-width: 0;
+}
+
+.polaris-overview-metric-copy > p,
+.polaris-overview-metric-copy > strong,
+.polaris-overview-metric-copy > span {
   display: block;
 }
 
-.polaris-overview-metric p {
+.polaris-overview-metric-copy > p {
   margin: 0;
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-sm);
   font-weight: 700;
 }
 
-.polaris-overview-metric strong {
+.polaris-overview-metric-copy > strong {
   margin-top: var(--ui-space-1);
   color: var(--colour-text);
   font-size: clamp(1.3rem, 2vw, 1.8rem);
   line-height: 1.15;
 }
 
-.polaris-overview-metric span:not(.polaris-overview-metric-icon) {
+.polaris-overview-metric-copy > span {
   margin-top: var(--ui-space-2);
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
