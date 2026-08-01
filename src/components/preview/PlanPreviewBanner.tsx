@@ -45,14 +45,14 @@ export function PlanPreviewBanner({
 
       <div className="plan-preview-banner-actions">
         <Button
-          variant="primary"
+          variant="success"
           icon={AppIcons.check}
           onClick={onKeep}
         >
           Keep changes
         </Button>
         <Button
-          variant="secondary"
+          variant="danger"
           icon={AppIcons.minus}
           onClick={onDiscard}
         >
