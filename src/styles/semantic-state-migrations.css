@@ -208,3 +208,23 @@
     transform: none;
   }
 }
+
+
+.ui-metric-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  color: var(--colour-primary);
+  background: var(--colour-surface-secondary);
+  font-size: 1.05rem;
+  
+}
+
+
+
+
