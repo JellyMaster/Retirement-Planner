@@ -43,7 +43,7 @@ describe("CompareScenariosPage", () => {
     ).toBeInTheDocument();
 
     const activeHeader = screen.getByRole("columnheader", {
-      name: /baseline plan active plan/i,
+      name: /baseline plan\s*active plan/i,
     });
     expect(activeHeader).toHaveClass("is-active-plan");
     expect(screen.getAllByText("Current active plan")).not.toHaveLength(0);
@@ -65,7 +65,9 @@ describe("CompareScenariosPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("2 of 3 selected")).toBeInTheDocument();
     expect(
-      screen.getByRole("columnheader", { name: /retire at 65 active plan/i }),
+      screen.getByRole("columnheader", {
+        name: /retire at 65\s*active plan/i,
+      }),
     ).toBeInTheDocument();
 
     const card = screen
@@ -111,7 +113,7 @@ describe("CompareScenariosPage", () => {
     );
 
     const scenarioHeader = screen.getByRole("columnheader", {
-      name: /retire at 65 active plan/i,
+      name: /retire at 65\s*active plan/i,
     });
     expect(scenarioHeader).toHaveClass("is-active-plan");
 
@@ -136,7 +138,9 @@ describe("CompareScenariosPage", () => {
     );
 
     expect(
-      screen.getByRole("columnheader", { name: /baseline plan active plan/i }),
+      screen.getByRole("columnheader", {
+        name: /baseline plan\s*active plan/i,
+      }),
     ).toHaveClass("is-active-plan");
     expect(
       within(screen.getByRole("row", { name: /retirement age/i })).getByText(
