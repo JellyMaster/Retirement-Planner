@@ -11,7 +11,7 @@
 - `utilities/` contains narrowly scoped accessibility and helper classes.
 - Existing feature files in `src/styles/` continue to own one feature each while they are migrated.
 - `App.css` is a temporary compatibility file. Do not add new feature rules to it.
-- `action-intent-migrations.css` and `semantic-state-migrations.css` are temporary compatibility layers. Remove selectors from them when the relevant component adopts explicit semantic classes or variants.
+- `semantic-state-migrations.css` is the only remaining temporary semantic bridge. Move its selectors into their permanent owners before deleting it.
 
 ## Selector rules
 
@@ -24,7 +24,7 @@
 
 ## Import order
 
-The central entry point loads foundations, shared components, semantic mappings, layouts and compatibility migrations. Within `layouts/index.css`, legacy `App.css` loads first and dedicated layout modules load afterwards. This lets an extracted module become authoritative before its duplicate legacy block is deleted.
+The central entry point loads foundations, shared components, semantic mappings, layouts and the remaining state compatibility bridge. Within `layouts/index.css`, legacy `App.css` loads first and dedicated layout modules load afterwards. This lets an extracted module become authoritative before its duplicate legacy block is deleted.
 
 Feature styles imported by pages remain independent until their migration is complete.
 
@@ -48,6 +48,15 @@ Feature styles imported by pages remain independent until their migration is com
 - `layouts/summary-callouts.css`: assumptions, insights, validation, empty states and callouts.
 - `layouts/legacy-actions.css`: compatibility styling for older native action classes.
 
+### Cleanup completed
+
+- Retirement Coach comparison actions use `variant="compare"`.
+- Standard What-if actions use `variant="compare"`.
+- Scenario presets and saved scenarios use `variant="compare"`.
+- Scenario saving uses `variant="success"`.
+- Scenario and Monte Carlo resets use `variant="warning"`.
+- `action-intent-migrations.css` has been deleted.
+
 ### Still in `App.css`
 
 - duplicate rules already covered by the authoritative modules above;
@@ -56,8 +65,8 @@ Feature styles imported by pages remain independent until their migration is com
 
 ### Remaining migration order
 
-1. visually verify the newly extracted summary, callout and legacy-action modules;
-2. remove obsolete selectors from `action-intent-migrations.css` and `semantic-state-migrations.css` where explicit component variants now exist;
+1. move workspace, status and metric rules out of `semantic-state-migrations.css` into their permanent owners;
+2. delete `semantic-state-migrations.css`;
 3. delete verified duplicate blocks from `App.css` in cohesive sections;
 4. audit remaining selectors for active usage and remove dead rules;
 5. remove the `App.css` import when no active selector depends on it.
