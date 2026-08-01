@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ScenarioProvider } from "../components/scenarios";
 import { SCENARIO_STORAGE_KEY } from "../domain/scenarios";
+import { PLAN_STORAGE_KEY } from "../state/planStorage";
 import { CompareScenariosPage } from "./CompareScenariosPage";
 
 function renderPage() {
@@ -69,6 +70,89 @@ describe("CompareScenariosPage", () => {
         name: "Include in comparison",
       }),
     ).toBeChecked();
+  });
+
+  it("edits a scenario in a modal and refreshes its comparison", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Scenario name" }),
+      "Retire at 65",
+    );
+    await user.click(screen.getByRole("button", { name: "Create scenario" }));
+
+    const card = screen
+      .getByRole("heading", { name: "Retire at 65" })
+      .closest("article");
+    expect(card).not.toBeNull();
+
+    await user.click(
+      within(card as HTMLElement).getByRole("button", { name: "Edit scenario" }),
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "Retire at 65" });
+    const retirementAge = within(dialog).getByRole("spinbutton", {
+      name: "Retirement age",
+    });
+    await user.clear(retirementAge);
+    await user.type(retirementAge, "65");
+    await user.click(within(dialog).getByRole("button", { name: "Save changes" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(within(card as HTMLElement).getByText("Age 65")).toBeInTheDocument();
+    expect(
+      screen.getByRole("row", { name: /retirement age age 68 age 65/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("cancels modal edits without changing the scenario", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    const card = screen
+      .getByRole("heading", { name: "Baseline Plan" })
+      .closest("article");
+    expect(card).not.toBeNull();
+
+    await user.click(
+      within(card as HTMLElement).getByRole("button", { name: "Edit scenario" }),
+    );
+    const dialog = screen.getByRole("dialog", { name: "Baseline Plan" });
+    const currentPot = within(dialog).getByRole("spinbutton", {
+      name: "Current pension pot",
+    });
+    await user.clear(currentPot);
+    await user.type(currentPot, "250000");
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(within(card as HTMLElement).queryByText("£250,000")).not.toBeInTheDocument();
+    expect(localStorage.getItem(PLAN_STORAGE_KEY)).toBeNull();
+  });
+
+  it("keeps baseline storage synchronized when the baseline is edited", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    const card = screen
+      .getByRole("heading", { name: "Baseline Plan" })
+      .closest("article");
+    expect(card).not.toBeNull();
+
+    await user.click(
+      within(card as HTMLElement).getByRole("button", { name: "Edit scenario" }),
+    );
+    const dialog = screen.getByRole("dialog", { name: "Baseline Plan" });
+    const currentPot = within(dialog).getByRole("spinbutton", {
+      name: "Current pension pot",
+    });
+    await user.clear(currentPot);
+    await user.type(currentPot, "250000");
+    await user.click(within(dialog).getByRole("button", { name: "Save changes" }));
+
+    const saved = JSON.parse(localStorage.getItem(PLAN_STORAGE_KEY) ?? "null");
+    expect(saved.currentPot).toBe(250_000);
   });
 
   it("can remove and restore an alternative in the comparison", async () => {
