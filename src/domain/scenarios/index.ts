@@ -22,3 +22,13 @@ export {
   type ScenarioChartPoint,
   type ScenarioChartSeries,
 } from "./createScenarioChartSeries";
+export {
+  createScenarioInsights,
+  type ScenarioInsight,
+  type ScenarioInsightGroup,
+  type ScenarioInsightImportance,
+} from "./createScenarioInsights";
+export {
+  findScenarioCrossover,
+  type ScenarioCrossover,
+} from "./findScenarioCrossover";
