@@ -36,7 +36,7 @@ import {
   WorkspaceSummaryRibbon,
   type WorkspaceSectionId,
 } from "../components/workspace";
-import { defaultPensionInputs } from "../config/defaultPensionInputs";
+import { createDefaultPensionInputs } from "../config/defaultPensionInputs";
 import { defaultRetirementGoals } from "../config/defaultRetirementGoals";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import type { RetirementGoals } from "../engine/models/RetirementGoals";
@@ -46,6 +46,7 @@ import {
 } from "../engine/monte-carlo";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { AppIcons } from "../icons";
+import { loadStoredPensionInputs } from "../state/planStorage";
 import { formatCurrency, formatPercentage } from "../utils/formatters";
 import "../styles/retirement-dashboard.css";
 import "../styles/retirement-what-if.css";
@@ -79,9 +80,14 @@ function getInitialWorkspaceSection(): WorkspaceSectionId {
     : "overview";
 }
 
+function getInitialPensionInputs(): PensionInputs {
+  return loadStoredPensionInputs(createDefaultPensionInputs());
+}
+
 export function RetirementPlannerPage() {
-  const [inputs, setInputs] = useState<PensionInputs>(() => ({ ...defaultPensionInputs }));
-  const [comparisonInputs, setComparisonInputs] = useState<PensionInputs>(() => ({ ...defaultPensionInputs }));
+  const [inputs, setInputs] = useState<PensionInputs>(getInitialPensionInputs);
+  const [comparisonInputs, setComparisonInputs] =
+    useState<PensionInputs>(getInitialPensionInputs);
   const [comparisonEnabled, setComparisonEnabled] = useState(false);
   const [retirementGoals, setRetirementGoals] = useState<RetirementGoals>(() => ({ ...defaultRetirementGoals }));
   const [chartView, setChartView] = useState<ChartView>("balance");
@@ -206,11 +212,11 @@ const displayedWorkspaceSection =
 );
 
   function resetInputs() {
-    updateEffectiveInputs({ ...defaultPensionInputs });
+    updateEffectiveInputs(createDefaultPensionInputs());
   }
 
   function resetComparisonInputs() {
-    setComparisonInputs({ ...defaultPensionInputs });
+    setComparisonInputs(createDefaultPensionInputs());
   }
 
   function enableComparison() {
