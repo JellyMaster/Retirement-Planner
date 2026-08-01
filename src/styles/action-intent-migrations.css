@@ -1,0 +1,108 @@
+/* =========================================================
+   Semantic action migrations
+
+   These scoped rules map older feature markup onto the new
+   intent-based colour language. They can be removed gradually
+   as each component adopts explicit Button variants.
+   ========================================================= */
+
+/* Retirement Coach: applying an idea to comparison is analysis. */
+.retirement-coach-card > .ui-button-primary {
+  color: var(--action-analyse-text);
+  background: var(--action-analyse-background);
+  border-color: var(--action-analyse-border);
+}
+
+.retirement-coach-card > .ui-button-primary:hover:not(:disabled) {
+  color: var(--action-analyse-text-hover);
+  background: var(--colour-surface-hover);
+  border-color: var(--action-analyse);
+}
+
+.retirement-coach-card > .ui-button-primary:active:not(:disabled) {
+  color: var(--action-analyse-active);
+  background: var(--colour-surface);
+  border-color: var(--action-analyse-active);
+}
+
+.retirement-coach-card > .ui-button-primary:focus-visible {
+  box-shadow: 0 0 0 3px var(--action-analyse-focus);
+}
+
+/* Custom Scenario Studio: presets and saved scenarios are exploratory. */
+.custom-what-if-preset-list .ui-button-subtle,
+.custom-what-if-library article > .ui-button-subtle {
+  color: var(--action-analyse-text);
+  background: var(--action-analyse-background);
+  border-color: var(--action-analyse-border);
+}
+
+.custom-what-if-preset-list .ui-button-subtle:hover:not(:disabled),
+.custom-what-if-library article > .ui-button-subtle:hover:not(:disabled) {
+  color: var(--action-analyse-text-hover);
+  background: var(--colour-surface-hover);
+  border-color: var(--action-analyse);
+}
+
+.custom-what-if-preset-list .ui-button-subtle:focus-visible,
+.custom-what-if-library article > .ui-button-subtle:focus-visible {
+  box-shadow: 0 0 0 3px var(--action-analyse-focus);
+}
+
+/* Saving commits an intentional scenario to the local library. */
+.custom-what-if-save-row .ui-button-primary {
+  color: var(--action-success-text);
+  background: var(--action-success-background);
+  border-color: var(--action-success-border);
+}
+
+.custom-what-if-save-row .ui-button-primary:hover:not(:disabled) {
+  color: var(--action-success-text-on-fill);
+  background: var(--action-success-hover);
+  border-color: var(--action-success-hover);
+}
+
+.custom-what-if-save-row .ui-button-primary:active:not(:disabled) {
+  color: var(--action-success-text-on-fill);
+  background: var(--action-success-active);
+  border-color: var(--action-success-active);
+}
+
+.custom-what-if-save-row .ui-button-primary:focus-visible {
+  box-shadow: 0 0 0 3px var(--action-success-focus);
+}
+
+/* Resets are cautionary because they replace current adjustments. */
+.custom-what-if-preset-list .ui-button-secondary,
+.monte-carlo-settings-actions .ui-button-secondary {
+  color: var(--action-warning-text);
+  background: var(--action-warning-background);
+  border-color: var(--action-warning-border);
+}
+
+.custom-what-if-preset-list .ui-button-secondary:hover:not(:disabled),
+.monte-carlo-settings-actions .ui-button-secondary:hover:not(:disabled) {
+  color: var(--action-warning-text);
+  background: color-mix(
+    in srgb,
+    var(--action-warning-background) 78%,
+    var(--action-warning)
+  );
+  border-color: var(--action-warning-hover);
+}
+
+.custom-what-if-preset-list .ui-button-secondary:active:not(:disabled),
+.monte-carlo-settings-actions .ui-button-secondary:active:not(:disabled) {
+  color: var(--action-warning-text);
+  background: color-mix(
+    in srgb,
+    var(--action-warning-background) 65%,
+    var(--action-warning)
+  );
+  border-color: var(--action-warning-active);
+}
+
+.custom-what-if-preset-list .ui-button-secondary:focus-visible,
+.monte-carlo-settings-actions .ui-button-secondary:focus-visible {
+  box-shadow: 0 0 0 3px var(--action-warning-focus);
+}
