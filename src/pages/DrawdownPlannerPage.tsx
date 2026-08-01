@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, Info, PoundSterling, TrendingUp } from "lucide-react";
 
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
@@ -15,7 +15,11 @@ import {
   DrawdownWorkspaceNavigation,
   type DrawdownWorkspaceSection,
 } from "../components/drawdown/DrawdownWorkspaceNavigation";
+import { useScenarios } from "../components/scenarios";
+import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
 import { useDrawdownProjection } from "../hooks/useDrawdownProjection";
+import { usePensionProjection } from "../hooks/usePensionProjection";
+import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import type { MoneyDisplayMode } from "../utils/drawdownDisplayValues";
 
 const MONEY_DISPLAY_STORAGE_KEY = "retirement-planner:drawdown-money-display";
@@ -30,9 +34,22 @@ function getInitialMoneyDisplayMode(): MoneyDisplayMode {
 }
 
 export function DrawdownPlannerPage() {
+  const { activeScenario } = useScenarios();
+  const [retirementGoals] = useStoredRetirementGoals();
+  const pensionProjection = usePensionProjection(activeScenario.inputs);
+  const initialDrawdownInputs = useMemo(
+    () =>
+      createDrawdownInputsFromPlan({
+        pensionInputs: activeScenario.inputs,
+        projection: pensionProjection.projection,
+        retirementGoals,
+      }),
+    [activeScenario.inputs, pensionProjection.projection, retirementGoals],
+  );
   const [displayMode, setDisplayMode] = useState<MoneyDisplayMode>(getInitialMoneyDisplayMode);
   const [activeSection, setActiveSection] = useState<DrawdownWorkspaceSection>("overview");
-  const { inputs, validation, result, updateInput, resetInputs } = useDrawdownProjection();
+  const { inputs, validation, result, updateInput, resetInputs } =
+    useDrawdownProjection(initialDrawdownInputs);
 
   useEffect(() => {
     window.localStorage.setItem(MONEY_DISPLAY_STORAGE_KEY, displayMode);
@@ -45,6 +62,9 @@ export function DrawdownPlannerPage() {
           <p className="planner-eyebrow">Retirement income</p>
           <h1>Drawdown Planner</h1>
           <p>Understand how long your pension may last, how much income it can support and where risks could emerge.</p>
+          <p className="drawdown-active-plan-source">
+            Starting assumptions are based on <strong>{activeScenario.name}</strong> and your saved retirement goals.
+          </p>
         </div>
 
         <section className="money-display-selector" aria-labelledby="money-display-title">
