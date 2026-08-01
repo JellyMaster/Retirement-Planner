@@ -8,6 +8,10 @@ export {
   type ScenarioState,
 } from "./Scenario";
 export {
+  createDefaultScenarioDrawdownPreferences,
+  type ScenarioDrawdownPreferences,
+} from "./ScenarioDrawdownPreferences";
+export {
   LocalScenarioRepository,
   SCENARIO_STORAGE_KEY,
 } from "./LocalScenarioRepository";
