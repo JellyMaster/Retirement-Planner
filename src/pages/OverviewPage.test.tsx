@@ -1,16 +1,18 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { vi } from "vitest";
+import { beforeEach, vi } from "vitest";
 
 import {
   useScenarios,
   type ScenarioContextValue,
 } from "../components/scenarios";
 import { createDefaultPensionInputs } from "../config/defaultPensionInputs";
+import { defaultRetirementGoals } from "../config/defaultRetirementGoals";
 import type { Scenario } from "../domain/scenarios";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import type { ProjectionYear } from "../engine/models/ProjectionYear";
 import { usePensionProjection } from "../hooks/usePensionProjection";
+import { RETIREMENT_GOALS_STORAGE_KEY } from "../state/retirementGoalsStorage";
 import { OverviewPage } from "./OverviewPage";
 
 vi.mock("../components/scenarios", async () => {
@@ -45,6 +47,10 @@ function createProjectionYear(finalBalance: number): ProjectionYear {
 }
 
 describe("OverviewPage", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   function createPlan(overrides: Partial<PensionInputs> = {}): PensionInputs {
     return {
       ...createDefaultPensionInputs(),
@@ -145,12 +151,45 @@ describe("OverviewPage", () => {
       screen.getByRole("progressbar", { name: "Retirement preparedness" }),
     ).toHaveAttribute("aria-valuenow");
 
+    expect(screen.getByText("State Pension")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        `${defaultRetirementGoals.statePensionAnnualAmount.toLocaleString(
+          "en-GB",
+          { style: "currency", currency: "GBP", maximumFractionDigits: 0 },
+        )}/year from age ${defaultRetirementGoals.statePensionAge}`,
+      ),
+    ).toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Review active plan" }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", {
+        name: "Edit retirement goal in My Plan",
+      }),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Open My Plan" })).toHaveLength(1);
     expect(screen.getByRole("link", { name: "Open My Plan" })).toHaveClass(
       "ui-button-primary",
     );
+  });
+
+  it("shows when State Pension is not included", () => {
+    localStorage.setItem(
+      RETIREMENT_GOALS_STORAGE_KEY,
+      JSON.stringify({
+        ...defaultRetirementGoals,
+        includeStatePension: false,
+      }),
+    );
+    mockActiveScenario(createScenario());
+    mockProjection(750_000);
+
+    renderPage();
+
+    const statePension = screen.getByText("State Pension").closest("div");
+    expect(statePension).not.toBeNull();
+    expect(statePension).toHaveTextContent("Not included");
   });
 
   it("shows values from a non-baseline active scenario", () => {
