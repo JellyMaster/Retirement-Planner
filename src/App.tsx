@@ -1,29 +1,30 @@
-import {
-  Compass,
-  GitCompareArrows,
-  LayoutDashboard,
-  Lightbulb,
-  Settings2,
-  WalletCards,
-} from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
 
 import { ThemeToggle } from "./components/theme/ThemeToggle";
 import { SkipLink } from "./components/ui";
+import { AppIcons, type AppIcon } from "./icons/AppIcons";
 import { DrawdownPlannerPage } from "./pages/DrawdownPlannerPage";
 import { PolarisSectionPage } from "./pages/PolarisSectionPage";
 import { RetirementPlannerPage } from "./pages/RetirementPlannerPage";
 
 import "./styles/index.css";
 
-const navigationItems = [
-  { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/plan", label: "My Plan", icon: Settings2 },
-  { to: "/drawdown", label: "Drawdown", icon: WalletCards },
-  { to: "/compare", label: "Compare", icon: GitCompareArrows },
-  { to: "/explore", label: "Explore", icon: Compass },
-  { to: "/guidance", label: "Guidance", icon: Lightbulb },
-] as const;
+interface NavigationItem {
+  to: string;
+  label: string;
+  icon: AppIcon;
+  end?: boolean;
+}
+
+const navigationItems: readonly NavigationItem[] = [
+  { to: "/", label: "Overview", icon: AppIcons.navigation.overview, end: true },
+  { to: "/plan", label: "My Plan", icon: AppIcons.navigation.plan },
+  { to: "/drawdown", label: "Drawdown", icon: AppIcons.navigation.drawdown },
+  { to: "/compare", label: "Compare", icon: AppIcons.navigation.compare },
+  { to: "/explore", label: "Explore", icon: AppIcons.navigation.explore },
+  { to: "/guidance", label: "Guidance", icon: AppIcons.navigation.guidance },
+];
 
 export default function App() {
   return (
@@ -45,7 +46,7 @@ export default function App() {
             </NavLink>
 
             <nav className="app-navigation" aria-label="Primary navigation">
-              {navigationItems.map(({ to, label, icon: Icon, end }) => (
+              {navigationItems.map(({ to, label, icon, end }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -55,7 +56,7 @@ export default function App() {
                   }
                 >
                   <span className="nav-link-icon" aria-hidden="true">
-                    <Icon size={16} strokeWidth={2} />
+                    <FontAwesomeIcon icon={icon} fixedWidth />
                   </span>
                   <span>{label}</span>
                 </NavLink>
