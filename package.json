@@ -18,6 +18,8 @@
     "audit:css": "node scripts/audit-css.mjs",
     "prune:app-css": "node scripts/prune-app-css.mjs",
     "prune:app-css:write": "node scripts/prune-app-css.mjs --write",
+    "prune:retirement-dashboard-css": "node scripts/prune-retirement-dashboard-css.mjs",
+    "prune:retirement-dashboard-css:write": "node scripts/prune-retirement-dashboard-css.mjs --write",
     "preview": "vite preview"
   },
   "dependencies": {
