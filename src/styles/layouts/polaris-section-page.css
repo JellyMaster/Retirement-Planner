@@ -1,0 +1,52 @@
+.polaris-section-page {
+  width: min(var(--ui-content-wide, 1400px), 100%);
+  margin: 0 auto;
+  padding: var(--ui-space-8) var(--ui-space-6);
+}
+
+.polaris-section-hero {
+  display: grid;
+  max-width: 760px;
+  gap: var(--ui-space-3);
+  padding: clamp(24px, 5vw, 52px);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel, 20px);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.polaris-section-hero h1,
+.polaris-section-hero p {
+  margin: 0;
+}
+
+.polaris-section-hero h1 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.05;
+}
+
+.polaris-section-hero > p:not(.planner-eyebrow) {
+  max-width: 62ch;
+  color: var(--colour-text-secondary);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.polaris-section-hero .ui-button {
+  justify-self: start;
+  margin-top: var(--ui-space-2);
+}
+
+.polaris-section-content {
+  margin-top: var(--ui-space-6);
+}
+
+@media (max-width: 640px) {
+  .polaris-section-page {
+    padding: var(--ui-space-5) var(--ui-space-4);
+  }
+
+  .polaris-section-hero {
+    padding: var(--ui-space-6);
+  }
+}
