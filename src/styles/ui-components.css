@@ -553,3 +553,86 @@
 .fee-impact-dashboard > .ui-card-header {
   margin-bottom: 0;
 }
+
+/* =========================================================
+   Accessibility and mobile resilience
+   ========================================================= */
+.ui-skip-link {
+  position: fixed;
+  z-index: 10000;
+  top: var(--ui-space-3);
+  left: var(--ui-space-3);
+  padding: 10px 14px;
+  border: 2px solid var(--colour-primary);
+  border-radius: var(--ui-radius-control);
+  color: var(--colour-primary-contrast, #fff);
+  background: var(--colour-primary);
+  box-shadow: var(--ui-shadow-card-hover);
+  font-weight: 800;
+  transform: translateY(-160%);
+  transition: transform var(--ui-duration-fast) var(--ui-ease-standard);
+}
+
+.ui-skip-link:focus {
+  transform: translateY(0);
+}
+
+.ui-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.app-main-content:focus {
+  outline: none;
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.ui-button-small {
+  min-height: 40px;
+}
+
+@media (pointer: coarse) {
+  .ui-button,
+  .retirement-journey-milestone-button,
+  .retirement-chart-tabs button,
+  summary {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ui-card-header-title,
+  .ui-section-title-heading {
+    overflow-wrap: anywhere;
+  }
+
+  .ui-card-header-badge,
+  .ui-status-badge {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .ui-progress-ring-small,
+  .ui-progress-ring-medium,
+  .ui-progress-ring-large {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-skip-link {
+    transition: none;
+  }
+}

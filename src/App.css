@@ -2377,3 +2377,52 @@ thead .projection-sticky-age,.drawdown-projection-table thead th:first-child { z
     flex-shrink: 0;
 
 }
+/* Global accessibility and mobile hardening */
+html {
+  scroll-padding-top: 1rem;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+.app-brand,
+.nav-link,
+.theme-toggle {
+  touch-action: manipulation;
+}
+
+@media (max-width: 640px) {
+  .app-header-inner {
+    min-width: 0;
+  }
+
+  .app-brand-copy,
+  .app-brand-copy strong,
+  .app-brand-copy span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .app-navigation {
+    max-width: 100%;
+    overscroll-behavior-inline: contain;
+  }
+
+  .planner-page {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .table-scroll,
+  .comparison-table-scroll,
+  .drawdown-table-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}

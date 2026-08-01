@@ -216,7 +216,10 @@ export function RetirementPlannerPage() {
                       <button
                         type="button"
                         role="tab"
+                        id="projection-balance-tab"
+                        aria-controls="projection-balance-panel"
                         aria-selected={chartView === "balance"}
+                        tabIndex={chartView === "balance" ? 0 : -1}
                         className={chartView === "balance" ? "active" : undefined}
                         onClick={() => setChartView("balance")}
                       >
@@ -225,7 +228,10 @@ export function RetirementPlannerPage() {
                       <button
                         type="button"
                         role="tab"
+                        id="projection-contributions-tab"
+                        aria-controls="projection-contributions-panel"
                         aria-selected={chartView === "contributions"}
+                        tabIndex={chartView === "contributions" ? 0 : -1}
                         className={chartView === "contributions" ? "active" : undefined}
                         onClick={() => setChartView("contributions")}
                       >
@@ -234,9 +240,23 @@ export function RetirementPlannerPage() {
                     </div>
 
                     {chartView === "balance" ? (
-                      <PensionBalanceChart years={currentScenario.projection.years} />
+                      <div
+                        id="projection-balance-panel"
+                        role="tabpanel"
+                        aria-labelledby="projection-balance-tab"
+                        tabIndex={0}
+                      >
+                        <PensionBalanceChart years={currentScenario.projection.years} />
+                      </div>
                     ) : (
-                      <ContributionGrowthChart years={currentScenario.projection.years} />
+                      <div
+                        id="projection-contributions-panel"
+                        role="tabpanel"
+                        aria-labelledby="projection-contributions-tab"
+                        tabIndex={0}
+                      >
+                        <ContributionGrowthChart years={currentScenario.projection.years} />
+                      </div>
                     )}
                   </section>
 

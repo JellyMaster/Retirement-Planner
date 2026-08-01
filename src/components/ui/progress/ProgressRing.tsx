@@ -36,8 +36,12 @@ export function ProgressRing({
       className={["ui-progress-ring", `ui-progress-ring-${tone}`, `ui-progress-ring-${size}`, className]
         .filter(Boolean)
         .join(" ")}
-      role="img"
-      aria-label={`${String(label ?? "Progress")}: ${Math.round(safeValue)} out of ${safeMax}`}
+      role="progressbar"
+      aria-label={typeof label === "string" ? label : "Progress"}
+      aria-valuemin={0}
+      aria-valuemax={safeMax}
+      aria-valuenow={safeValue}
+      aria-valuetext={`${Math.round(safeValue)} out of ${safeMax}`}
       {...props}
     >
       <svg viewBox="0 0 124 124" aria-hidden="true">

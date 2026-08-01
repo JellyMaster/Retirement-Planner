@@ -2498,3 +2498,54 @@
     width: 100%;
   }
 }
+
+/* Accessibility and narrow-screen dashboard improvements */
+.retirement-chart-tabs {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.retirement-chart-tabs button {
+  flex: 0 0 auto;
+}
+
+.retirement-chart-workspace [role="tabpanel"]:focus-visible {
+  border-radius: var(--ui-radius-control);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.comparison-table-scroll,
+.table-scroll {
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.retirement-dashboard-details > summary {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+@media (max-width: 640px) {
+  .retirement-dashboard-content,
+  .retirement-dashboard-main-grid,
+  .retirement-chart-workspace,
+  .retirement-summary-strip {
+    min-width: 0;
+  }
+
+  .retirement-chart-tabs {
+    margin-inline: calc(var(--ui-space-2) * -1);
+    padding-inline: var(--ui-space-2);
+  }
+
+  .retirement-chart-tabs button {
+    white-space: nowrap;
+  }
+
+  .retirement-dashboard-details > summary {
+    padding-block: 12px;
+    line-height: 1.35;
+  }
+}

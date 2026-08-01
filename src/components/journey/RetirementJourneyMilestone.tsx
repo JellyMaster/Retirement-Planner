@@ -41,6 +41,7 @@ export function RetirementJourneyMilestone({
         className="retirement-journey-milestone-button"
         aria-pressed={isActive}
         aria-controls="retirement-journey-detail"
+        aria-label={`Age ${milestone.age}: ${milestone.title}. ${milestone.summary}`}
         onClick={() => onSelect(milestone.id)}
       >
         <span className="retirement-journey-marker" aria-hidden="true">

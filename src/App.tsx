@@ -3,6 +3,7 @@ import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import { RetirementPlannerPage } from "./pages/RetirementPlannerPage";
 import { DrawdownPlannerPage } from "./pages/DrawdownPlannerPage";
 import { ThemeToggle } from "./components/theme/ThemeToggle";
+import { SkipLink } from "./components/ui";
 
 import "./styles/ui-components.css";
 import "./App.css";
@@ -11,6 +12,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app-shell">
+        <SkipLink />
        <header className="app-header">
   <div className="app-header-inner">
     <NavLink to="/" className="app-brand">
@@ -57,10 +59,12 @@ export default function App() {
   </div>
 </header>
 
-        <Routes>
-          <Route path="/" element={<RetirementPlannerPage />} />
-          <Route path="/drawdown" element={<DrawdownPlannerPage />} />
-        </Routes>
+        <div id="app-main-content" className="app-main-content" tabIndex={-1}>
+          <Routes>
+            <Route path="/" element={<RetirementPlannerPage />} />
+            <Route path="/drawdown" element={<DrawdownPlannerPage />} />
+          </Routes>
+        </div>
       </div>
     </BrowserRouter>
   );
