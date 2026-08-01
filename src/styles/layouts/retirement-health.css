@@ -1,0 +1,29 @@
+/* =========================================================
+   Retirement health compatibility
+
+   The legacy retirement dashboard stylesheet applies display:block to
+   broad span descendants in the health metrics grid. Keep the shared
+   metric-card text and icon roles explicit here until that legacy selector
+   is removed during the App.css and feature-style deletion pass.
+   ========================================================= */
+
+.retirement-health-metrics .ui-metric-card-label,
+.retirement-health-metrics .ui-metric-card-helper,
+.retirement-health-metrics .ui-metric-card-trend {
+  display: block;
+}
+
+.retirement-health-metrics .ui-metric-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.retirement-health-metrics .ui-metric-card-icon .svg-inline--fa {
+  position: static;
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  transform: none;
+}
