@@ -1,10 +1,5 @@
 /* =========================================================
-   Application shell and primary navigation
-
-   This module is the authoritative home for the application frame,
-   header, brand, primary navigation and theme toggle layout.
-   It intentionally loads after the legacy App.css compatibility file
-   while the duplicate legacy block is retired incrementally.
+   Application shell and Project Polaris primary navigation
    ========================================================= */
 
 .app-shell {
@@ -33,10 +28,10 @@
 
 .app-header-inner {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--ui-space-6);
-  width: min(var(--ui-content-wide, 1400px), 100%);
+  gap: var(--ui-space-4);
+  width: min(var(--ui-content-max, 1680px), 100%);
   min-height: 76px;
   margin: 0 auto;
   padding: var(--ui-space-3) var(--ui-space-6);
@@ -87,34 +82,44 @@
 }
 
 .app-brand-copy span {
+  max-width: 250px;
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
   line-height: 1.35;
 }
 
 .app-navigation {
-  display: inline-flex;
+  display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: center;
   gap: var(--ui-space-1);
   padding: 5px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
   border: 1px solid var(--colour-border);
   border-radius: calc(var(--ui-radius-control) + 2px);
   background: var(--colour-surface-secondary);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+  scrollbar-width: none;
+}
+
+.app-navigation::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-link {
   display: inline-flex;
   min-height: 40px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   gap: var(--ui-space-2);
-  padding: 8px 15px;
+  padding: 8px 12px;
   border: 1px solid transparent;
   border-radius: calc(var(--ui-radius-control) - 2px);
   color: var(--colour-text-muted);
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
@@ -157,7 +162,6 @@
   place-items: center;
   border-radius: 7px;
   background: color-mix(in srgb, currentColor 12%, transparent);
-  font-size: 0.78rem;
   line-height: 1;
 }
 
@@ -169,9 +173,9 @@
 
 .theme-toggle {
   display: inline-flex;
+  min-height: 42px;
   align-items: center;
   gap: var(--ui-space-2);
-  min-height: 42px;
   padding: 0.55rem 0.8rem;
   border: 1px solid var(--colour-border);
   border-radius: calc(var(--ui-radius-control) - 2px);
@@ -201,6 +205,13 @@
   white-space: nowrap;
 }
 
+@media (max-width: 1220px) {
+  .app-brand-copy span,
+  .nav-link-icon {
+    display: none;
+  }
+}
+
 @media (max-width: 900px) {
   .app-header-inner {
     grid-template-columns: 1fr auto;
@@ -209,11 +220,7 @@
   .app-navigation {
     grid-column: 1 / -1;
     grid-row: 2;
-    justify-self: stretch;
-  }
-
-  .nav-link {
-    flex: 1;
+    justify-content: flex-start;
   }
 }
 
@@ -227,28 +234,13 @@
     padding: var(--ui-space-3) var(--ui-space-4);
   }
 
-  .app-brand-copy span {
-    display: none;
-  }
-
-  .app-navigation {
-    max-width: 100%;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    scrollbar-width: none;
-  }
-
-  .app-navigation::-webkit-scrollbar {
+  .app-brand-copy span,
+  .theme-toggle__label {
     display: none;
   }
 
   .nav-link {
     padding-inline: var(--ui-space-3);
-  }
-
-  .nav-link-icon,
-  .theme-toggle__label {
-    display: none;
   }
 }
 
