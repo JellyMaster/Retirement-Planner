@@ -1,5 +1,5 @@
 import type { PensionInputs } from "../../engine/models/PensionInputs";
-import { loadStoredPensionInputs } from "../../state/planStorage";
+import { PLAN_STORAGE_KEY } from "../../state/planStorage";
 import {
   createBaselineScenario,
   type Scenario,
@@ -21,21 +21,29 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
+function isOptionalFiniteNumber(value: unknown): boolean {
+  return value === undefined || isFiniteNumber(value);
+}
+
 function isPensionInputs(value: unknown): value is PensionInputs {
   if (!value || typeof value !== "object") return false;
 
   const inputs = value as Partial<PensionInputs>;
-  return [
-    inputs.currentAge,
-    inputs.retirementAge,
-    inputs.currentPot,
-    inputs.monthlyEmployeeContribution,
-    inputs.monthlyEmployerContribution,
-    inputs.annualContributionIncrease,
-    inputs.annualReturn,
-    inputs.annualFee,
-    inputs.inflation,
-  ].every(isFiniteNumber);
+  return (
+    [
+      inputs.currentAge,
+      inputs.retirementAge,
+      inputs.currentPot,
+      inputs.monthlyEmployeeContribution,
+      inputs.monthlyEmployerContribution,
+      inputs.annualContributionIncrease,
+      inputs.annualReturn,
+      inputs.annualFee,
+      inputs.inflation,
+    ].every(isFiniteNumber) &&
+    isOptionalFiniteNumber(inputs.extraContributionAge) &&
+    isOptionalFiniteNumber(inputs.extraMonthlyContribution)
+  );
 }
 
 function isScenario(value: unknown): value is Scenario {
@@ -89,6 +97,22 @@ function parseStoredState(value: string): ScenarioState | null {
   }
 }
 
+function loadLegacyBaselineInputs(
+  storage: Storage,
+  fallback: PensionInputs,
+): PensionInputs {
+  const saved = storage.getItem(PLAN_STORAGE_KEY);
+  if (!saved) return { ...fallback };
+
+  try {
+    const parsed = JSON.parse(saved) as Partial<PensionInputs>;
+    const merged = { ...fallback, ...parsed };
+    return isPensionInputs(merged) ? merged : { ...fallback };
+  } catch {
+    return { ...fallback };
+  }
+}
+
 export class LocalScenarioRepository implements ScenarioRepository {
   constructor(
     private readonly storage: Storage,
@@ -101,7 +125,10 @@ export class LocalScenarioRepository implements ScenarioRepository {
     const storedState = saved ? parseStoredState(saved) : null;
     if (storedState) return storedState;
 
-    const baselineInputs = loadStoredPensionInputs(this.fallbackInputs);
+    const baselineInputs = loadLegacyBaselineInputs(
+      this.storage,
+      this.fallbackInputs,
+    );
     const baseline = createBaselineScenario(
       baselineInputs,
       this.dependencies,
