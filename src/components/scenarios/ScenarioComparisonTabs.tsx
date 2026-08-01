@@ -1,4 +1,10 @@
-import { useState, type ReactNode } from "react";
+import {
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
+
+import "../../styles/scenario-intelligence-tabs.css";
 
 interface ScenarioComparisonTabsProps {
   outcomes: ReactNode;
@@ -22,7 +28,10 @@ export function ScenarioComparisonTabs({
   const [activeTab, setActiveTab] = useState<ComparisonTab>("outcomes");
 
   return (
-    <section className="scenario-intelligence-panel" aria-labelledby="scenario-intelligence-title">
+    <section
+      className="scenario-intelligence-panel"
+      aria-labelledby="scenario-intelligence-title"
+    >
       <div className="scenario-manager-section-heading">
         <div>
           <p className="planner-eyebrow">Scenario intelligence</p>
@@ -31,7 +40,11 @@ export function ScenarioComparisonTabs({
         <span>Active plan shown first</span>
       </div>
 
-      <div className="scenario-intelligence-tabs" role="tablist" aria-label="Comparison views">
+      <div
+        className="scenario-intelligence-tabs"
+        role="tablist"
+        aria-label="Comparison views"
+      >
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -42,7 +55,9 @@ export function ScenarioComparisonTabs({
             aria-controls={`scenario-panel-${tab.id}`}
             tabIndex={activeTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id)}
-            onKeyDown={(event) => handleTabKeyDown(event, tab.id, setActiveTab)}
+            onKeyDown={(event) =>
+              handleTabKeyDown(event, tab.id, setActiveTab)
+            }
           >
             {tab.label}
           </button>
@@ -58,7 +73,11 @@ export function ScenarioComparisonTabs({
           hidden={activeTab !== tab.id}
           className="scenario-intelligence-content"
         >
-          {tab.id === "outcomes" ? outcomes : tab.id === "chart" ? chart : changes}
+          {tab.id === "outcomes"
+            ? outcomes
+            : tab.id === "chart"
+              ? chart
+              : changes}
         </div>
       ))}
     </section>
@@ -66,7 +85,7 @@ export function ScenarioComparisonTabs({
 }
 
 function handleTabKeyDown(
-  event: React.KeyboardEvent<HTMLButtonElement>,
+  event: KeyboardEvent<HTMLButtonElement>,
   current: ComparisonTab,
   setActive: (tab: ComparisonTab) => void,
 ) {
@@ -74,8 +93,9 @@ function handleTabKeyDown(
   let nextIndex = currentIndex;
 
   if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
-  else if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-  else if (event.key === "Home") nextIndex = 0;
+  else if (event.key === "ArrowLeft") {
+    nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+  } else if (event.key === "Home") nextIndex = 0;
   else if (event.key === "End") nextIndex = tabs.length - 1;
   else return;
 
