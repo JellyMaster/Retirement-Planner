@@ -1,0 +1,228 @@
+/* =========================================================
+   Retirement Planner semantic colour language
+
+   Components should consume these intent-based tokens rather
+   than theme-specific palette values. Noel and Olivia continue
+   to define the underlying visual identity in index.css.
+   ========================================================= */
+
+:root {
+  /* Actions: run / calculate / preview */
+  --action-run: var(--colour-primary);
+  --action-run-hover: var(--colour-primary-hover);
+  --action-run-active: var(--colour-primary-active);
+  --action-run-background: var(--colour-primary);
+  --action-run-border: var(--colour-primary);
+  --action-run-text: var(--colour-primary-contrast);
+  --action-run-focus: var(--focus-ring);
+
+  /* Actions: compare / analyse / explore */
+  --action-analyse: var(--colour-compare);
+  --action-analyse-hover: var(--colour-compare-hover);
+  --action-analyse-active: var(--colour-compare-active);
+  --action-analyse-background: var(--colour-surface-secondary);
+  --action-analyse-border: var(--colour-border-strong);
+  --action-analyse-text: var(--colour-compare);
+  --action-analyse-text-hover: var(--colour-compare-hover);
+  --action-analyse-focus: rgb(222 175 157 / 28%);
+
+  /* Actions: keep / save / apply / confirm */
+  --action-success: var(--colour-success);
+  --action-success-hover: color-mix(in srgb, var(--colour-success) 86%, white);
+  --action-success-active: color-mix(in srgb, var(--colour-success) 84%, black);
+  --action-success-background: var(--colour-success-background);
+  --action-success-border: var(--colour-success-border);
+  --action-success-text: var(--colour-success-text);
+  --action-success-text-on-fill: var(--colour-primary-contrast);
+  --action-success-focus: color-mix(in srgb, var(--colour-success) 28%, transparent);
+
+  /* Actions: review / caution */
+  --action-warning: var(--colour-warning);
+  --action-warning-hover: color-mix(in srgb, var(--colour-warning) 86%, white);
+  --action-warning-active: color-mix(in srgb, var(--colour-warning) 84%, black);
+  --action-warning-background: var(--colour-warning-background);
+  --action-warning-border: var(--colour-warning-border);
+  --action-warning-text: var(--colour-warning-text);
+  --action-warning-focus: color-mix(in srgb, var(--colour-warning) 28%, transparent);
+
+  /* Actions: discard / delete / remove */
+  --action-danger: var(--colour-danger);
+  --action-danger-hover: color-mix(in srgb, var(--colour-danger) 86%, white);
+  --action-danger-active: color-mix(in srgb, var(--colour-danger) 84%, black);
+  --action-danger-background: var(--colour-danger-background);
+  --action-danger-border: var(--colour-danger-border);
+  --action-danger-text: var(--colour-danger-text);
+  --action-danger-focus: color-mix(in srgb, var(--colour-danger) 28%, transparent);
+
+  /* Actions: back / cancel / close / navigation */
+  --action-neutral: var(--colour-text-strong);
+  --action-neutral-hover: var(--colour-primary);
+  --action-neutral-active: var(--colour-text);
+  --action-neutral-background: var(--colour-surface);
+  --action-neutral-background-subtle: var(--colour-surface-secondary);
+  --action-neutral-border: var(--colour-border-strong);
+  --action-neutral-text: var(--colour-text-strong);
+  --action-neutral-focus: var(--focus-ring);
+
+  /* Status language: describes state, never an action. */
+  --status-good: var(--colour-success);
+  --status-good-background: var(--colour-success-background);
+  --status-good-border: var(--colour-success-border);
+  --status-good-text: var(--colour-success-text);
+
+  --status-info: var(--colour-primary);
+  --status-info-background: var(--colour-surface-hover);
+  --status-info-border: var(--colour-border-strong);
+  --status-info-text: var(--colour-text-strong);
+
+  --status-warning: var(--colour-warning);
+  --status-warning-background: var(--colour-warning-background);
+  --status-warning-border: var(--colour-warning-border);
+  --status-warning-text: var(--colour-warning-text);
+
+  --status-danger: var(--colour-danger);
+  --status-danger-background: var(--colour-danger-background);
+  --status-danger-border: var(--colour-danger-border);
+  --status-danger-text: var(--colour-danger-text);
+
+  /* Workspace accents: subtle navigation and heading identity. */
+  --workspace-overview: var(--colour-primary);
+  --workspace-growth: var(--colour-success);
+  --workspace-confidence: var(--colour-accent);
+  --workspace-income: var(--colour-warning);
+  --workspace-sustainability: var(--colour-chart-tertiary);
+  --workspace-improve: var(--colour-compare);
+  --workspace-assumptions: var(--colour-text-muted);
+}
+
+/* Existing Button variants now consume semantic action tokens. */
+.ui-button-primary {
+  color: var(--action-run-text);
+  background: var(--action-run-background);
+  border-color: var(--action-run-border);
+}
+
+.ui-button-primary:hover:not(:disabled) {
+  color: var(--action-run-text);
+  background: var(--action-run-hover);
+  border-color: var(--action-run-hover);
+}
+
+.ui-button-primary:active:not(:disabled) {
+  background: var(--action-run-active);
+  border-color: var(--action-run-active);
+}
+
+.ui-button-primary:focus-visible {
+  box-shadow: 0 0 0 3px var(--action-run-focus);
+}
+
+.ui-button-secondary {
+  color: var(--action-neutral-text);
+  background: var(--action-neutral-background);
+  border-color: var(--action-neutral-border);
+}
+
+.ui-button-secondary:hover:not(:disabled) {
+  color: var(--action-neutral-hover);
+  background: var(--colour-surface-hover);
+  border-color: var(--action-neutral-hover);
+}
+
+.ui-button-secondary:active:not(:disabled) {
+  color: var(--action-neutral-active);
+  background: var(--action-neutral-background-subtle);
+}
+
+.ui-button-subtle {
+  color: var(--colour-text-secondary, var(--colour-text));
+  background: var(--action-neutral-background-subtle);
+  border-color: var(--colour-border);
+}
+
+.ui-button-compare {
+  color: var(--action-analyse-text);
+  background: var(--action-analyse-background);
+  border-color: var(--action-analyse-border);
+}
+
+.ui-button-compare:hover:not(:disabled) {
+  color: var(--action-analyse-text-hover);
+  background: var(--colour-surface-hover);
+  border-color: var(--action-analyse);
+}
+
+.ui-button-compare:active:not(:disabled) {
+  color: var(--action-analyse-active);
+  background: var(--colour-surface);
+  border-color: var(--action-analyse-active);
+}
+
+.ui-button-compare:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--action-analyse-focus);
+}
+
+.ui-button-success {
+  color: var(--action-success-text);
+  background: var(--action-success-background);
+  border-color: var(--action-success-border);
+}
+
+.ui-button-success:hover:not(:disabled) {
+  color: var(--action-success-text-on-fill);
+  background: var(--action-success-hover);
+  border-color: var(--action-success-hover);
+}
+
+.ui-button-success:active:not(:disabled) {
+  color: var(--action-success-text-on-fill);
+  background: var(--action-success-active);
+  border-color: var(--action-success-active);
+}
+
+.ui-button-success:focus-visible {
+  box-shadow: 0 0 0 3px var(--action-success-focus);
+}
+
+.ui-button-warning {
+  color: var(--action-warning-text);
+  background: var(--action-warning-background);
+  border-color: var(--action-warning-border);
+}
+
+.ui-button-warning:hover:not(:disabled) {
+  color: var(--action-warning-text);
+  background: color-mix(in srgb, var(--action-warning-background) 78%, var(--action-warning));
+  border-color: var(--action-warning-hover);
+}
+
+.ui-button-warning:active:not(:disabled) {
+  background: color-mix(in srgb, var(--action-warning-background) 65%, var(--action-warning));
+  border-color: var(--action-warning-active);
+}
+
+.ui-button-warning:focus-visible {
+  box-shadow: 0 0 0 3px var(--action-warning-focus);
+}
+
+.ui-button-danger {
+  color: var(--action-danger-text);
+  background: var(--action-danger-background);
+  border-color: var(--action-danger-border);
+}
+
+.ui-button-danger:hover:not(:disabled) {
+  color: var(--action-danger-text);
+  background: color-mix(in srgb, var(--action-danger-background) 78%, var(--action-danger));
+  border-color: var(--action-danger-hover);
+}
+
+.ui-button-danger:active:not(:disabled) {
+  background: color-mix(in srgb, var(--action-danger-background) 65%, var(--action-danger));
+  border-color: var(--action-danger-active);
+}
+
+.ui-button-danger:focus-visible {
+  box-shadow: 0 0 0 3px var(--action-danger-focus);
+}
