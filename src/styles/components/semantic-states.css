@@ -1,0 +1,119 @@
+/* =========================================================
+   Shared semantic component states
+
+   Permanent ownership for status badges, toned cards, metric states and
+   generic alert semantics. Feature styles should consume these shared
+   states rather than redefining success, warning, danger or information
+   colours locally.
+   ========================================================= */
+
+.ui-status-badge-info {
+  color: var(--status-info-text);
+  background: var(--status-info-background);
+  border-color: var(--status-info-border);
+}
+
+.ui-status-badge-success {
+  color: var(--status-good-text);
+  background: var(--status-good-background);
+  border-color: var(--status-good-border);
+}
+
+.ui-status-badge-warning {
+  color: var(--status-warning-text);
+  background: var(--status-warning-background);
+  border-color: var(--status-warning-border);
+}
+
+.ui-status-badge-danger {
+  color: var(--status-danger-text);
+  background: var(--status-danger-background);
+  border-color: var(--status-danger-border);
+}
+
+.ui-card-success {
+  background: var(--status-good-background);
+  border-color: var(--status-good-border);
+}
+
+.ui-card-warning {
+  background: var(--status-warning-background);
+  border-color: var(--status-warning-border);
+}
+
+.ui-card-danger {
+  background: var(--status-danger-background);
+  border-color: var(--status-danger-border);
+}
+
+.ui-metric-card-positive .ui-metric-card-icon,
+.ui-metric-card-positive .ui-metric-card-trend {
+  color: var(--status-good-text);
+}
+
+.ui-metric-card-warning .ui-metric-card-icon,
+.ui-metric-card-warning .ui-metric-card-trend {
+  color: var(--status-warning-text);
+}
+
+.ui-metric-card-negative .ui-metric-card-icon,
+.ui-metric-card-negative .ui-metric-card-trend {
+  color: var(--status-danger-text);
+}
+
+.workspace-summary-metric-positive .workspace-summary-metric-icon {
+  color: var(--status-good);
+  background: var(--status-good-background);
+}
+
+.workspace-summary-metric-warning .workspace-summary-metric-icon {
+  color: var(--status-warning);
+  background: var(--status-warning-background);
+}
+
+.workspace-summary-metric-negative .workspace-summary-metric-icon {
+  color: var(--status-danger);
+  background: var(--status-danger-background);
+}
+
+[role="alert"] {
+  --alert-accent: var(--status-danger);
+  --alert-background: var(--status-danger-background);
+  --alert-border: var(--status-danger-border);
+  --alert-text: var(--status-danger-text);
+}
+
+[role="alert"].success,
+[role="alert"].positive,
+[role="alert"][data-tone="success"] {
+  --alert-accent: var(--status-good);
+  --alert-background: var(--status-good-background);
+  --alert-border: var(--status-good-border);
+  --alert-text: var(--status-good-text);
+}
+
+[role="alert"].warning,
+[role="alert"][data-tone="warning"] {
+  --alert-accent: var(--status-warning);
+  --alert-background: var(--status-warning-background);
+  --alert-border: var(--status-warning-border);
+  --alert-text: var(--status-warning-text);
+}
+
+[role="alert"].info,
+[role="alert"][data-tone="info"] {
+  --alert-accent: var(--status-info);
+  --alert-background: var(--status-info-background);
+  --alert-border: var(--status-info-border);
+  --alert-text: var(--status-info-text);
+}
+
+.planner-error,
+.projection-error,
+.validation-summary,
+.form-error-summary {
+  color: var(--status-danger-text);
+  background: var(--status-danger-background);
+  border-color: var(--status-danger-border);
+  box-shadow: inset 3px 0 0 var(--status-danger);
+}
