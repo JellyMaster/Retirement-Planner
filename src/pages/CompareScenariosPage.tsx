@@ -2,9 +2,14 @@ import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
-import { useScenarios } from "../components/scenarios";
+import {
+  ScenarioEditModal,
+  useScenarios,
+} from "../components/scenarios";
+import type { PensionInputs } from "../engine/models/PensionInputs";
 import { calculateScenarioSummary } from "../domain/scenarios/calculateScenarioSummary";
 import { AppIcons } from "../icons";
+import { savePensionInputs } from "../state/planStorage";
 import { formatCurrency } from "../utils/formatters";
 
 const MAX_COMPARED_SCENARIOS = 3;
@@ -17,6 +22,7 @@ export function CompareScenariosPage() {
     createScenario,
     duplicateScenario,
     renameScenario,
+    updateScenarioInputs,
     setActiveScenario,
     deleteScenario,
   } = useScenarios();
@@ -30,6 +36,7 @@ export function CompareScenariosPage() {
   const [newScenarioName, setNewScenarioName] = useState("");
   const [editingScenarioId, setEditingScenarioId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [scenarioEditorId, setScenarioEditorId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const selectedScenarios = useMemo(() => {
@@ -40,6 +47,10 @@ export function CompareScenariosPage() {
       .map((id) => scenarios.find((scenario) => scenario.id === id))
       .filter((scenario) => scenario !== undefined);
   }, [baselineScenario.id, scenarios, selectedScenarioIds]);
+
+  const scenarioBeingEdited = scenarios.find(
+    (scenario) => scenario.id === scenarioEditorId,
+  );
 
   const summaries = useMemo(
     () => selectedScenarios.map(calculateScenarioSummary),
@@ -79,6 +90,19 @@ export function CompareScenariosPage() {
       setError(null);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Scenario could not be renamed.");
+    }
+  }
+
+  function handleScenarioSave(inputs: PensionInputs) {
+    if (!scenarioBeingEdited) return;
+
+    try {
+      updateScenarioInputs(scenarioBeingEdited.id, inputs);
+      if (scenarioBeingEdited.isBaseline) savePensionInputs(inputs);
+      setScenarioEditorId(null);
+      setError(null);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Scenario could not be updated.");
     }
   }
 
@@ -235,10 +259,17 @@ export function CompareScenariosPage() {
                 </dl>
 
                 <div className="scenario-card-actions">
+                  <button
+                    type="button"
+                    className="ui-button ui-button-primary"
+                    onClick={() => setScenarioEditorId(scenario.id)}
+                  >
+                    Edit scenario
+                  </button>
                   {!isActive && (
                     <button
                       type="button"
-                      className="ui-button ui-button-primary"
+                      className="ui-button ui-button-secondary"
                       onClick={() => setActiveScenario(scenario.id)}
                     >
                       Make active
@@ -336,6 +367,14 @@ export function CompareScenariosPage() {
           </table>
         </div>
       </section>
+
+      {scenarioBeingEdited && (
+        <ScenarioEditModal
+          scenario={scenarioBeingEdited}
+          onClose={() => setScenarioEditorId(null)}
+          onSave={handleScenarioSave}
+        />
+      )}
     </main>
   );
 }
