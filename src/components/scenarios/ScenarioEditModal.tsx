@@ -97,8 +97,8 @@ export function ScenarioEditModal({
             <p className="planner-eyebrow">Edit scenario</p>
             <h2 id="scenario-edit-title">{scenario.name}</h2>
             <p>
-              Update this scenario without leaving Compare. Changes are only saved
-              when you choose Save changes.
+              Update this scenario without leaving the current workspace. Changes
+              are only saved when you choose Save changes.
             </p>
           </div>
           <button
@@ -115,106 +115,29 @@ export function ScenarioEditModal({
           <fieldset className="scenario-edit-section">
             <legend>Timeline and pension</legend>
             <div className="scenario-edit-grid">
-              <FormField
-                id={fieldId("currentAge")}
-                label="Current age"
-                error={errors.currentAge}
-              >
+              <FormField id={fieldId("currentAge")} label="Current age" error={errors.currentAge}>
                 {(id, describedBy) => (
-                  <NumberInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={Number.isFinite(inputs.currentAge) ? inputs.currentAge : ""}
-                    min={18}
-                    max={100}
-                    suffix="years"
-                    error={Boolean(errors.currentAge)}
-                    onValueChange={(value) => updateRequired("currentAge", value)}
-                  />
+                  <NumberInput id={id} aria-describedby={describedBy} value={Number.isFinite(inputs.currentAge) ? inputs.currentAge : ""} min={18} max={100} suffix="years" error={Boolean(errors.currentAge)} onValueChange={(value) => updateRequired("currentAge", value)} />
                 )}
               </FormField>
-              <FormField
-                id={fieldId("retirementAge")}
-                label="Retirement age"
-                error={errors.retirementAge}
-              >
+              <FormField id={fieldId("retirementAge")} label="Retirement age" error={errors.retirementAge}>
                 {(id, describedBy) => (
-                  <NumberInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={
-                      Number.isFinite(inputs.retirementAge)
-                        ? inputs.retirementAge
-                        : ""
-                    }
-                    min={18}
-                    max={100}
-                    suffix="years"
-                    error={Boolean(errors.retirementAge)}
-                    onValueChange={(value) =>
-                      updateRequired("retirementAge", value)
-                    }
-                  />
+                  <NumberInput id={id} aria-describedby={describedBy} value={Number.isFinite(inputs.retirementAge) ? inputs.retirementAge : ""} min={18} max={100} suffix="years" error={Boolean(errors.retirementAge)} onValueChange={(value) => updateRequired("retirementAge", value)} />
                 )}
               </FormField>
-              <FormField
-                id={fieldId("currentPot")}
-                label="Current pension pot"
-                error={errors.currentPot}
-              >
+              <FormField id={fieldId("currentPot")} label="Current pension pot" error={errors.currentPot}>
                 {(id, describedBy) => (
-                  <CurrencyInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={Number.isFinite(inputs.currentPot) ? inputs.currentPot : ""}
-                    step={100}
-                    error={Boolean(errors.currentPot)}
-                    onValueChange={(value) => updateRequired("currentPot", value)}
-                  />
+                  <CurrencyInput id={id} aria-describedby={describedBy} value={Number.isFinite(inputs.currentPot) ? inputs.currentPot : ""} step={100} error={Boolean(errors.currentPot)} onValueChange={(value) => updateRequired("currentPot", value)} />
                 )}
               </FormField>
-              <FormField
-                id={fieldId("employeeContribution")}
-                label="Your monthly contribution"
-                error={errors.monthlyEmployeeContribution}
-              >
+              <FormField id={fieldId("employeeContribution")} label="Your monthly contribution" error={errors.monthlyEmployeeContribution}>
                 {(id, describedBy) => (
-                  <CurrencyInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={
-                      Number.isFinite(inputs.monthlyEmployeeContribution)
-                        ? inputs.monthlyEmployeeContribution
-                        : ""
-                    }
-                    step={10}
-                    error={Boolean(errors.monthlyEmployeeContribution)}
-                    onValueChange={(value) =>
-                      updateRequired("monthlyEmployeeContribution", value)
-                    }
-                  />
+                  <CurrencyInput id={id} aria-describedby={describedBy} value={Number.isFinite(inputs.monthlyEmployeeContribution) ? inputs.monthlyEmployeeContribution : ""} step={10} error={Boolean(errors.monthlyEmployeeContribution)} onValueChange={(value) => updateRequired("monthlyEmployeeContribution", value)} />
                 )}
               </FormField>
-              <FormField
-                id={fieldId("employerContribution")}
-                label="Employer monthly contribution"
-                error={errors.monthlyEmployerContribution}
-              >
+              <FormField id={fieldId("employerContribution")} label="Employer monthly contribution" error={errors.monthlyEmployerContribution}>
                 {(id, describedBy) => (
-                  <CurrencyInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={
-                      Number.isFinite(inputs.monthlyEmployerContribution)
-                        ? inputs.monthlyEmployerContribution
-                        : ""
-                    }
-                    step={10}
-                    error={Boolean(errors.monthlyEmployerContribution)}
-                    onValueChange={(value) =>
-                      updateRequired("monthlyEmployerContribution", value)
-                    }
-                  />
+                  <CurrencyInput id={id} aria-describedby={describedBy} value={Number.isFinite(inputs.monthlyEmployerContribution) ? inputs.monthlyEmployerContribution : ""} step={10} error={Boolean(errors.monthlyEmployerContribution)} onValueChange={(value) => updateRequired("monthlyEmployerContribution", value)} />
                 )}
               </FormField>
             </div>
@@ -223,83 +146,24 @@ export function ScenarioEditModal({
           <fieldset className="scenario-edit-section">
             <legend>Assumptions</legend>
             <div className="scenario-edit-grid">
-              <FormField
-                id={fieldId("annualReturn")}
-                label="Expected annual return"
-                error={errors.annualReturn}
-              >
+              <FormField id={fieldId("annualReturn")} label="Expected annual return" error={errors.annualReturn}>
                 {(id, describedBy) => (
-                  <PercentageInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={
-                      Number.isFinite(inputs.annualReturn) ? inputs.annualReturn : ""
-                    }
-                    max={20}
-                    step={0.1}
-                    error={Boolean(errors.annualReturn)}
-                    onValueChange={(value) =>
-                      updatePercentage("annualReturn", value)
-                    }
-                  />
+                  <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(inputs.annualReturn) ? inputs.annualReturn : ""} max={20} step={0.1} error={Boolean(errors.annualReturn)} onValueChange={(value) => updatePercentage("annualReturn", value)} />
                 )}
               </FormField>
-              <FormField
-                id={fieldId("annualFee")}
-                label="Annual pension fee"
-                error={errors.annualFee}
-              >
+              <FormField id={fieldId("annualFee")} label="Annual pension fee" error={errors.annualFee}>
                 {(id, describedBy) => (
-                  <PercentageInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={Number.isFinite(inputs.annualFee) ? inputs.annualFee : ""}
-                    max={5}
-                    step={0.01}
-                    decimalPlaces={4}
-                    error={Boolean(errors.annualFee)}
-                    onValueChange={(value) => updatePercentage("annualFee", value)}
-                  />
+                  <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(inputs.annualFee) ? inputs.annualFee : ""} max={5} step={0.01} decimalPlaces={4} error={Boolean(errors.annualFee)} onValueChange={(value) => updatePercentage("annualFee", value)} />
                 )}
               </FormField>
-              <FormField
-                id={fieldId("inflation")}
-                label="Expected inflation"
-                error={errors.inflation}
-              >
+              <FormField id={fieldId("inflation")} label="Expected inflation" error={errors.inflation}>
                 {(id, describedBy) => (
-                  <PercentageInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={Number.isFinite(inputs.inflation) ? inputs.inflation : ""}
-                    max={15}
-                    step={0.1}
-                    error={Boolean(errors.inflation)}
-                    onValueChange={(value) => updatePercentage("inflation", value)}
-                  />
+                  <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(inputs.inflation) ? inputs.inflation : ""} max={15} step={0.1} error={Boolean(errors.inflation)} onValueChange={(value) => updatePercentage("inflation", value)} />
                 )}
               </FormField>
-              <FormField
-                id={fieldId("contributionIncrease")}
-                label="Annual contribution increase"
-                error={errors.annualContributionIncrease}
-              >
+              <FormField id={fieldId("contributionIncrease")} label="Annual contribution increase" error={errors.annualContributionIncrease}>
                 {(id, describedBy) => (
-                  <PercentageInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={
-                      Number.isFinite(inputs.annualContributionIncrease)
-                        ? inputs.annualContributionIncrease
-                        : ""
-                    }
-                    max={20}
-                    step={0.1}
-                    error={Boolean(errors.annualContributionIncrease)}
-                    onValueChange={(value) =>
-                      updatePercentage("annualContributionIncrease", value)
-                    }
-                  />
+                  <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(inputs.annualContributionIncrease) ? inputs.annualContributionIncrease : ""} max={20} step={0.1} error={Boolean(errors.annualContributionIncrease)} onValueChange={(value) => updatePercentage("annualContributionIncrease", value)} />
                 )}
               </FormField>
             </div>
@@ -308,44 +172,14 @@ export function ScenarioEditModal({
           <fieldset className="scenario-edit-section">
             <legend>Future contribution change</legend>
             <div className="scenario-edit-grid">
-              <FormField
-                id={fieldId("extraContributionAge")}
-                label="Extra contribution age"
-                error={errors.extraContributionAge}
-                optional
-              >
+              <FormField id={fieldId("extraContributionAge")} label="Extra contribution age" error={errors.extraContributionAge} optional>
                 {(id, describedBy) => (
-                  <NumberInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={inputs.extraContributionAge ?? ""}
-                    min={inputs.currentAge}
-                    max={Math.max(inputs.currentAge, inputs.retirementAge - 1)}
-                    suffix="years"
-                    error={Boolean(errors.extraContributionAge)}
-                    onValueChange={(value) =>
-                      updateOptional("extraContributionAge", value)
-                    }
-                  />
+                  <NumberInput id={id} aria-describedby={describedBy} value={inputs.extraContributionAge ?? ""} min={inputs.currentAge} max={Math.max(inputs.currentAge, inputs.retirementAge - 1)} suffix="years" error={Boolean(errors.extraContributionAge)} onValueChange={(value) => updateOptional("extraContributionAge", value)} />
                 )}
               </FormField>
-              <FormField
-                id={fieldId("extraMonthlyContribution")}
-                label="Extra monthly contribution"
-                error={errors.extraMonthlyContribution}
-                optional
-              >
+              <FormField id={fieldId("extraMonthlyContribution")} label="Extra monthly contribution" error={errors.extraMonthlyContribution} optional>
                 {(id, describedBy) => (
-                  <CurrencyInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={inputs.extraMonthlyContribution ?? ""}
-                    step={10}
-                    error={Boolean(errors.extraMonthlyContribution)}
-                    onValueChange={(value) =>
-                      updateOptional("extraMonthlyContribution", value)
-                    }
-                  />
+                  <CurrencyInput id={id} aria-describedby={describedBy} value={inputs.extraMonthlyContribution ?? ""} step={10} error={Boolean(errors.extraMonthlyContribution)} onValueChange={(value) => updateOptional("extraMonthlyContribution", value)} />
                 )}
               </FormField>
             </div>
@@ -359,19 +193,10 @@ export function ScenarioEditModal({
               : "Scenario is ready to save."}
           </span>
           <div>
-            <button
-              type="button"
-              className="ui-button ui-button-secondary"
-              onClick={onClose}
-            >
+            <button type="button" className="ui-button ui-button-secondary" onClick={onClose}>
               Cancel
             </button>
-            <button
-              type="button"
-              className="ui-button ui-button-primary"
-              disabled={hasErrors}
-              onClick={() => onSave({ ...inputs })}
-            >
+            <button type="button" className="ui-button ui-button-primary" disabled={hasErrors} onClick={() => onSave({ ...inputs })}>
               Save changes
             </button>
           </div>
