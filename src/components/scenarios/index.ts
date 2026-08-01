@@ -1,3 +1,4 @@
+export { ScenarioChangesSummary } from "./ScenarioChangesSummary";
 export { ScenarioEditModal } from "./ScenarioEditModal";
 export { ScenarioProvider } from "./ScenarioProvider";
 export { useScenarios } from "./ScenarioContext";
