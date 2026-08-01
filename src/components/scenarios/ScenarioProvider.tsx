@@ -5,6 +5,7 @@ import {
   type PropsWithChildren,
 } from "react";
 
+import type { PensionInputs } from "../../engine/models/PensionInputs";
 import {
   createBrowserScenarioService,
   type ScenarioId,
@@ -50,6 +51,15 @@ export function ScenarioProvider({ children }: PropsWithChildren) {
     [refresh, service],
   );
 
+  const updateScenarioInputs = useCallback(
+    (id: ScenarioId, inputs: PensionInputs) => {
+      const scenario = service.updateScenarioInputs(id, inputs);
+      refresh();
+      return scenario;
+    },
+    [refresh, service],
+  );
+
   const setActiveScenario = useCallback(
     (id: ScenarioId) => {
       service.setActiveScenario(id);
@@ -81,6 +91,7 @@ export function ScenarioProvider({ children }: PropsWithChildren) {
       createScenario,
       duplicateScenario,
       renameScenario,
+      updateScenarioInputs,
       setActiveScenario,
       deleteScenario,
     }),
@@ -92,6 +103,7 @@ export function ScenarioProvider({ children }: PropsWithChildren) {
       renameScenario,
       setActiveScenario,
       state,
+      updateScenarioInputs,
     ],
   );
 
