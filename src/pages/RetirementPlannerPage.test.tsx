@@ -1,132 +1,111 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { renderWithProviders } from "../test/renderWithProviders";
 import { RetirementPlannerPage } from "./RetirementPlannerPage";
 
 describe("RetirementPlannerPage", () => {
-  it("renders the guided planner and current projection results", () => {
+  beforeEach(() => {
+    window.sessionStorage.clear();
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("renders the overview workspace and navigates between focused sections", async () => {
+    const user = userEvent.setup();
     renderWithProviders(<RetirementPlannerPage />);
 
     expect(
-      screen.getByRole("heading", {
-        name: /retirement planner/i,
-      }),
+      screen.getByRole("heading", { name: /retirement planner/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: /retirement planning workspace/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /am i on track for retirement/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /your pension details/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: /retirement plan summary/i }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByRole("heading", {
-        name: /your pension details/i,
-      }),
-    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("tab", { name: /confidence & risk/i }),
+    );
 
     expect(
-      screen.getByRole("button", {
-        name: /compare scenario/i,
-      }),
+      screen.getByRole("heading", { name: /how uncertain is the outcome/i }),
     ).toBeInTheDocument();
-
-    // Assert stable result sections rather than the dynamic outlook label,
-    // which changes with the current plan's readiness status.
     expect(
-      screen.getByRole("heading", {
-        name: /the key moments in your plan/i,
-      }),
+      screen.getByRole("heading", { name: /retirement confidence/i }),
     ).toBeInTheDocument();
+    expect(window.location.hash).toBe("#confidence");
+
+    await user.click(
+      screen.getByRole("tab", { name: /improve my plan/i }),
+    );
 
     expect(
-      screen.getByRole("heading", {
-        name: /retirement score breakdown/i,
-      }),
+      screen.getByRole("heading", { name: /what changes could improve my outlook/i }),
     ).toBeInTheDocument();
-
     expect(
-      screen.getByRole("heading", {
-        name: /recommended actions/i,
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole("heading", {
-        name: /what happens if/i,
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByRole("heading", {
-        name: /how fees affect your retirement/i,
-      }),
+      screen.getByRole("heading", { name: /recommended actions/i }),
     ).toBeInTheDocument();
   });
 
-  it("shows validation feedback and withholds projection results for invalid required inputs", async () => {
+  it("shows validation feedback, withholds results and returns to overview", async () => {
     const user = userEvent.setup();
-
     renderWithProviders(<RetirementPlannerPage />);
+
+    await user.click(
+      screen.getByRole("tab", { name: /build my pension/i }),
+    );
+    await user.click(
+      screen.getByRole("tab", { name: /overview/i }),
+    );
 
     const currentAgeInput = screen.getByRole("spinbutton", {
       name: /current age/i,
     });
-
     await user.clear(currentAgeInput);
     await user.type(currentAgeInput, "10");
 
     expect(
-      screen.getByText(
-        /current age must be between 18 and 100/i,
-      ),
+      screen.getByText(/current age must be between 18 and 100/i),
     ).toBeInTheDocument();
-
     expect(
-      screen.getByText(
-        /correct the highlighted fields to calculate your results/i,
-      ),
+      screen.getByText(/correct the highlighted fields to calculate your results/i),
     ).toBeInTheDocument();
-
     expect(
-      screen.queryByRole("heading", {
-        name: /retirement score breakdown/i,
-      }),
+      screen.queryByRole("region", { name: /retirement plan summary/i }),
     ).not.toBeInTheDocument();
-
     expect(
-      screen.queryByRole("heading", {
-        name: /how fees affect your retirement/i,
-      }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("tab", { name: /overview/i }),
+    ).toHaveAttribute("aria-selected", "true");
   });
 
   it("copies the current scenario when comparison is enabled", async () => {
     const user = userEvent.setup();
-
     renderWithProviders(<RetirementPlannerPage />);
 
     const currentAgeInput = screen.getByRole("spinbutton", {
       name: /current age/i,
     });
-
     await user.clear(currentAgeInput);
     await user.type(currentAgeInput, "52");
 
     await user.click(
-      screen.getByRole("button", {
-        name: /compare scenario/i,
-      }),
+      screen.getByRole("button", { name: /compare scenario/i }),
     );
 
-    expect(
-      document.getElementById("current-currentAge"),
-    ).toHaveValue(52);
+    expect(document.getElementById("current-currentAge")).toHaveValue(52);
 
     await user.click(
-      screen.getByRole("tab", {
-        name: /comparison plan/i,
-      }),
+      screen.getByRole("tab", { name: /comparison plan/i }),
     );
 
-    expect(
-      document.getElementById("comparison-currentAge"),
-    ).toHaveValue(52);
+    expect(document.getElementById("comparison-currentAge")).toHaveValue(52);
   });
 });
