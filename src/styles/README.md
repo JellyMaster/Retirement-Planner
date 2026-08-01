@@ -66,22 +66,26 @@ Feature styles imported by pages remain independent until their migration is com
   - plan selection, comparison editor, toggles and semantic action states.
 - `layouts/comparison-results.css`
   - outcome, goal and impact cards, comparison tables and expandable year details.
+- `layouts/chart-surfaces.css`
+  - shared chart panels, stages, dimensions, tab controls and Recharts presentation.
+- `layouts/chart-legends.css`
+  - semantic legends, swatches, line markers and responsive legend layout.
+- `layouts/milestone-cards.css`
+  - milestone grids, reached/unreached states, icon treatment and responsive cards.
 
 ### Still in `App.css`
 
-- legacy duplicates for the extracted planner, drawdown and comparison modules;
-- chart containers and chart-specific compatibility rules;
-- milestone and older isolated feature blocks;
+- legacy duplicates for the extracted planner, drawdown, comparison, chart and milestone modules;
+- older isolated summary and feature blocks;
 - miscellaneous legacy utilities and responsive overrides.
 
 ### Remaining migration order
 
-1. migrate shared chart containers, legends and chart tabs;
-2. migrate milestone and isolated summary blocks;
-3. replace remaining native legacy actions with shared button variants;
-4. remove selectors now covered by `action-intent-migrations.css` and `semantic-state-migrations.css` where explicit component variants exist;
-5. delete verified duplicate blocks from `App.css`;
-6. remove the `App.css` import when no selectors remain.
+1. migrate isolated summary, insight and status blocks still owned by `App.css`;
+2. replace remaining native legacy actions with shared button variants;
+3. remove selectors now covered by `action-intent-migrations.css` and `semantic-state-migrations.css` where explicit component variants exist;
+4. delete verified duplicate blocks from `App.css`;
+5. remove the `App.css` import when no selectors remain.
 
 ## Migration checklist
 
