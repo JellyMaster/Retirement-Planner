@@ -379,6 +379,7 @@ export function RetirementCoach({
               </details>
 
               <Button
+                variant="compare"
                 fullWidth
                 onClick={() => onApplyToComparison(action.nextInputs)}
               >
