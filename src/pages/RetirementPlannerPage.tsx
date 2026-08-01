@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { RetirementComparisonDashboard } from "../components/comparison/RetirementComparisonDashboard";
 import { GuidedPensionInputsForm } from "../components/inputs/guided";
 import { RetirementJourney } from "../components/journey";
+import { MonteCarloConfidenceDashboard } from "../components/monte-carlo";
 import { RetirementGoalsForm } from "../components/goals/RetirementGoalsForm";
 import { RetirementHealthDashboard } from "../components/goals/RetirementHealthDashboard";
 import { RetirementRecommendations } from "../components/goals/RetirementRecommendations";
@@ -28,6 +29,7 @@ import "../styles/retirement-overview.css";
 import "../styles/retirement-journey.css";
 import "../styles/retirement-score-breakdown.css";
 import "../styles/retirement-coach.css";
+import "../styles/monte-carlo-confidence.css";
 import "../styles/smart-retirement-recommendations.css";
 import { FeeImpactDashboard } from "../components/fee-impact";
 
@@ -155,6 +157,11 @@ export function RetirementPlannerPage() {
                   result={currentScenario.projection}
                   goals={retirementGoals}
                   onApplyToComparison={applyRecommendationToComparison}
+                />
+
+                <MonteCarloConfidenceDashboard
+                  inputs={inputs}
+                  goals={retirementGoals}
                 />
 
                 <RetirementJourney
