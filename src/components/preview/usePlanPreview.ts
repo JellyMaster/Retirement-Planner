@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 
+import { defaultPensionInputs } from "../../config/defaultPensionInputs";
 import type { PensionInputs } from "../../engine/models/PensionInputs";
+import { savePensionInputs } from "../../state/planStorage";
 
 export interface PlanPreviewState {
   label: string;
@@ -11,6 +13,16 @@ export interface PlanPreviewState {
 interface UsePlanPreviewOptions {
   committedInputs: PensionInputs;
   onCommit: (inputs: PensionInputs) => void;
+}
+
+function commitPlan(
+  inputs: PensionInputs,
+  onCommit: (inputs: PensionInputs) => void,
+): void {
+  const committed = { ...inputs };
+  Object.assign(defaultPensionInputs, committed);
+  savePensionInputs(committed);
+  onCommit(committed);
 }
 
 export function usePlanPreview({
@@ -42,14 +54,14 @@ export function usePlanPreview({
         return;
       }
 
-      onCommit({ ...nextInputs });
+      commitPlan(nextInputs, onCommit);
     },
     [onCommit, preview],
   );
 
   const keepPreview = useCallback(() => {
     if (!preview) return;
-    onCommit({ ...preview.previewInputs });
+    commitPlan(preview.previewInputs, onCommit);
     setPreview(null);
   }, [onCommit, preview]);
 
