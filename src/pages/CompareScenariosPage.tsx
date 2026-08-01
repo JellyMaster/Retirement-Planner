@@ -37,8 +37,8 @@ export function CompareScenariosPage() {
   const baselineScenario =
     scenarios.find((scenario) => scenario.isBaseline) ?? activeScenario;
   const [selectedScenarioIds, setSelectedScenarioIds] = useState<string[]>(() => {
-    const initial = [baselineScenario.id];
-    if (activeScenarioId !== baselineScenario.id) initial.push(activeScenarioId);
+    const initial = [activeScenarioId];
+    if (activeScenarioId !== baselineScenario.id) initial.push(baselineScenario.id);
     return initial;
   });
   const [newScenarioName, setNewScenarioName] = useState("");
@@ -48,7 +48,7 @@ export function CompareScenariosPage() {
   const [error, setError] = useState<string | null>(null);
 
   const selectedScenarios = useMemo(() => {
-    const requiredIds = [...new Set([baselineScenario.id, activeScenarioId])];
+    const requiredIds = [...new Set([activeScenarioId, baselineScenario.id])];
     const optionalIds = selectedScenarioIds.filter(
       (id) => !requiredIds.includes(id),
     );
@@ -154,7 +154,7 @@ export function CompareScenariosPage() {
   function handleMakeActive(id: string) {
     setActiveScenario(id);
     setSelectedScenarioIds((current) => [
-      ...new Set([baselineScenario.id, id, ...current]),
+      ...new Set([id, baselineScenario.id, ...current]),
     ]);
   }
 
