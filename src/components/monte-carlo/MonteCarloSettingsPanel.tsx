@@ -126,7 +126,7 @@ export function MonteCarloSettingsPanel({
           </DashboardGrid>
 
           <div className="monte-carlo-settings-actions">
-            <Button variant="secondary" size="small" onClick={onReset}>
+            <Button variant="warning" size="small" onClick={onReset}>
               Reset defaults
             </Button>
           </div>
