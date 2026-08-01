@@ -6,6 +6,7 @@ import { formatCurrency } from "../../utils/formatters";
 import { ScenarioChangesSummary } from "./ScenarioChangesSummary";
 import { ScenarioComparisonTabs } from "./ScenarioComparisonTabs";
 import { ScenarioGrowthChart } from "./ScenarioGrowthChart";
+import { ScenarioInsights } from "./ScenarioInsights";
 
 interface ScenarioIntelligencePanelProps {
   scenarios: Scenario[];
@@ -50,6 +51,12 @@ export function ScenarioIntelligencePanel({
       }
       changes={
         <ScenarioChangesSummary
+          activeScenario={activeScenario}
+          scenarios={scenarios}
+        />
+      }
+      insights={
+        <ScenarioInsights
           activeScenario={activeScenario}
           scenarios={scenarios}
         />
