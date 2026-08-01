@@ -1,7 +1,6 @@
 import type { PensionInputs } from "../engine/models/PensionInputs";
-import { loadStoredPensionInputs } from "../state/planStorage";
 
-const baseDefaultPensionInputs: PensionInputs = {
+export const defaultPensionInputs: Readonly<PensionInputs> = {
   currentAge: 25,
   retirementAge: 68,
 
@@ -10,7 +9,7 @@ const baseDefaultPensionInputs: PensionInputs = {
   monthlyEmployeeContribution: 100,
   monthlyEmployerContribution: 25,
 
-  annualContributionIncrease: 0.00,
+  annualContributionIncrease: 0,
 
   annualReturn: 0.05,
   annualFee: 0.0027,
@@ -20,5 +19,6 @@ const baseDefaultPensionInputs: PensionInputs = {
   extraMonthlyContribution: undefined,
 };
 
-export const defaultPensionInputs: PensionInputs =
-  loadStoredPensionInputs(baseDefaultPensionInputs);
+export function createDefaultPensionInputs(): PensionInputs {
+  return { ...defaultPensionInputs };
+}
