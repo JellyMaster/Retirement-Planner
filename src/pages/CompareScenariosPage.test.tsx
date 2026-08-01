@@ -20,9 +20,10 @@ function renderPage() {
 describe("CompareScenariosPage", () => {
   beforeEach(() => {
     let id = 0;
-    vi.spyOn(globalThis.crypto, "randomUUID").mockImplementation(
-      () => `00000000-0000-4000-8000-${String(++id).padStart(12, "0")}`,
-    );
+    vi.spyOn(globalThis.crypto, "randomUUID").mockImplementation(() => {
+      const value = `00000000-0000-4000-8000-${String(++id).padStart(12, "0")}`;
+      return value as `${string}-${string}-${string}-${string}-${string}`;
+    });
   });
 
   it("creates the initial baseline scenario", () => {
