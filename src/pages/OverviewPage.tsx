@@ -4,13 +4,14 @@ import { Link } from "react-router-dom";
 import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
 import { OverviewGrowthChart } from "../components/overview/OverviewGrowthChart";
 import { useScenarios } from "../components/scenarios";
-import { defaultRetirementGoals } from "../config/defaultRetirementGoals";
 import { usePensionProjection } from "../hooks/usePensionProjection";
+import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import { AppIcons } from "../icons";
 import { formatCurrency } from "../utils/formatters";
 
 export function OverviewPage() {
   const { activeScenario } = useScenarios();
+  const [retirementGoals] = useStoredRetirementGoals();
   const inputs = activeScenario.inputs;
   const scenario = usePensionProjection(inputs);
   const monthlyContribution =
@@ -20,7 +21,7 @@ export function OverviewPage() {
   const hasContributions = monthlyContribution > 0;
   const hasProjection = !scenario.hasErrors && scenario.projection.years.length > 0;
   const preparedness = hasProjection
-    ? calculateRetirementHealth(scenario.projection, defaultRetirementGoals)
+    ? calculateRetirementHealth(scenario.projection, retirementGoals)
     : null;
 
   return (
@@ -36,10 +37,17 @@ export function OverviewPage() {
         </div>
       </header>
 
-      <section className="polaris-overview-status" aria-labelledby="overview-status-title">
+      <section
+        className="polaris-overview-status"
+        aria-labelledby="overview-status-title"
+      >
         <span className="polaris-overview-status-icon" aria-hidden="true">
           <FontAwesomeIcon
-            icon={hasPensionBalance ? AppIcons.status.success : AppIcons.status.information}
+            icon={
+              hasPensionBalance
+                ? AppIcons.status.success
+                : AppIcons.status.information
+            }
           />
         </span>
         <div>
@@ -57,19 +65,28 @@ export function OverviewPage() {
         </div>
       </section>
 
-      <section className="polaris-overview-grid" aria-label="Retirement plan summary">
+      <section
+        className="polaris-overview-grid"
+        aria-label="Retirement plan summary"
+      >
         <OverviewMetric
           icon={AppIcons.concepts.pension}
           label="Current pension"
-          value={hasPensionBalance ? formatCurrency(inputs.currentPot) : "Not added"}
-          detail={hasPensionBalance ? "Current pension balance" : "Add this in My Plan"}
+          value={
+            hasPensionBalance ? formatCurrency(inputs.currentPot) : "Not added"
+          }
+          detail={
+            hasPensionBalance ? "Current pension balance" : "Add this in My Plan"
+          }
           incomplete={!hasPensionBalance}
         />
 
         <OverviewMetric
           icon={AppIcons.concepts.income}
           label="Monthly saving"
-          value={hasContributions ? formatCurrency(monthlyContribution) : "Not added"}
+          value={
+            hasContributions ? formatCurrency(monthlyContribution) : "Not added"
+          }
           detail={
             hasContributions
               ? `${formatCurrency(inputs.monthlyEmployeeContribution)} you + ${formatCurrency(inputs.monthlyEmployerContribution)} employer`
@@ -88,7 +105,11 @@ export function OverviewPage() {
         <OverviewMetric
           icon={AppIcons.concepts.projection}
           label="Projected pension"
-          value={hasProjection ? formatCurrency(scenario.projection.finalBalance.real) : "Unavailable"}
+          value={
+            hasProjection
+              ? formatCurrency(scenario.projection.finalBalance.real)
+              : "Unavailable"
+          }
           detail={
             hasProjection
               ? "Estimated value at retirement in today's money"
@@ -139,14 +160,33 @@ export function OverviewPage() {
               <strong className="polaris-overview-preparedness-label">
                 {formatPreparednessStatus(preparedness.status)}
               </strong>
-              <p>
-                The active plan is estimated to provide {formatCurrency(
-                  preparedness.estimatedAnnualIncome,
-                )} per year against the default income goal.
-              </p>
+
+              <dl className="polaris-overview-goal-summary">
+                <div>
+                  <dt>Target income</dt>
+                  <dd>{formatCurrency(retirementGoals.desiredAnnualIncome)}/year</dd>
+                </div>
+                <div>
+                  <dt>Estimated income</dt>
+                  <dd>{formatCurrency(preparedness.estimatedAnnualIncome)}/year</dd>
+                </div>
+                <div>
+                  <dt>{preparedness.annualGap >= 0 ? "Surplus" : "Income gap"}</dt>
+                  <dd>
+                    {formatCurrency(Math.abs(preparedness.annualGap))}/year
+                  </dd>
+                </div>
+              </dl>
+
+              <Link
+                className="polaris-overview-goal-link"
+                to="/plan#overview"
+              >
+                Edit retirement goal in My Plan
+              </Link>
               <small>
-                This is an illustrative score using the default retirement goals in
-                My Plan, not a guarantee or financial advice.
+                This is an illustrative planning score based on your saved goals,
+                not a guarantee or financial advice.
               </small>
             </>
           ) : (
@@ -160,13 +200,20 @@ export function OverviewPage() {
           <p className="planner-eyebrow">Next step</p>
           <h2>Keep your active plan information up to date</h2>
           <p>
-            Changes saved to the active scenario update this overview immediately
-            and are restored when you return to the application.
+            Changes saved to the active scenario and retirement goals update this
+            overview immediately and are restored when you return to the
+            application.
           </p>
         </div>
 
-        <Link className="ui-button ui-button-primary ui-button-medium" to="/plan">
-          <FontAwesomeIcon icon={AppIcons.navigation.plan} aria-hidden="true" />
+        <Link
+          className="ui-button ui-button-primary ui-button-medium"
+          to="/plan"
+        >
+          <FontAwesomeIcon
+            icon={AppIcons.navigation.plan}
+            aria-hidden="true"
+          />
           Open My Plan
         </Link>
       </section>
@@ -190,7 +237,11 @@ function OverviewMetric({
   incomplete = false,
 }: OverviewMetricProps) {
   return (
-    <article className={`polaris-overview-metric${incomplete ? " is-incomplete" : ""}`}>
+    <article
+      className={`polaris-overview-metric${
+        incomplete ? " is-incomplete" : ""
+      }`}
+    >
       <span className="polaris-overview-metric-icon" aria-hidden="true">
         <FontAwesomeIcon icon={icon} fixedWidth />
       </span>
