@@ -32,60 +32,35 @@ Feature styles imported by pages remain independent until their migration is com
 
 ### Extracted and authoritative
 
-- `layouts/app-shell.css`
-  - application frame;
-  - sticky header;
-  - product brand;
-  - primary navigation;
-  - theme toggle;
-  - responsive header behaviour.
-- `layouts/planner-page.css`
-  - planner page width and gutters;
-  - planner header and introductory copy;
-  - primary planner grids;
-  - planner section rhythm and responsive stacking.
-- `layouts/planner-controls.css`
-  - legacy panels and headings;
-  - form grids, fields and input wrappers;
-  - validation states and reset actions;
-  - legacy summary cards;
-  - guided-planner action compatibility.
-- `layouts/planner-tables.css`
-  - projection table scrolling;
-  - sticky headers and first column;
-  - numeric alignment and row interaction states.
-- `layouts/drawdown-page.css`
-  - drawdown page shell, dashboard grids and responsive layout.
-- `layouts/drawdown-controls.css`
-  - drawdown sidebar controls, money display choices, chart controls and assumptions cards.
-- `layouts/drawdown-tables.css`
-  - drawdown table controls, state rows, sticky columns and mobile year cards.
-- `layouts/comparison-workspace.css`
-  - comparison shell, toolbar, analysis grid and responsive composition.
-- `layouts/comparison-controls.css`
-  - plan selection, comparison editor, toggles and semantic action states.
-- `layouts/comparison-results.css`
-  - outcome, goal and impact cards, comparison tables and expandable year details.
-- `layouts/chart-surfaces.css`
-  - shared chart panels, stages, dimensions, tab controls and Recharts presentation.
-- `layouts/chart-legends.css`
-  - semantic legends, swatches, line markers and responsive legend layout.
-- `layouts/milestone-cards.css`
-  - milestone grids, reached/unreached states, icon treatment and responsive cards.
+- `layouts/app-shell.css`: application frame, header, brand, navigation and theme toggle.
+- `layouts/planner-page.css`: planner width, header, grids and responsive section rhythm.
+- `layouts/planner-controls.css`: legacy panels, forms, validation, summaries and guided actions.
+- `layouts/planner-tables.css`: projection table scrolling, sticky columns and numeric states.
+- `layouts/drawdown-page.css`: drawdown shell, dashboard grids and responsive layout.
+- `layouts/drawdown-controls.css`: sidebar controls, money display, chart controls and assumptions.
+- `layouts/drawdown-tables.css`: drawdown controls, state rows, sticky columns and mobile cards.
+- `layouts/comparison-workspace.css`: comparison shell, toolbar and analysis composition.
+- `layouts/comparison-controls.css`: plan selection, editor, toggles and semantic actions.
+- `layouts/comparison-results.css`: outcome cards, impact cards and comparison tables.
+- `layouts/chart-surfaces.css`: shared chart panels, dimensions, tabs and Recharts presentation.
+- `layouts/chart-legends.css`: semantic legends, swatches and responsive legend layout.
+- `layouts/milestone-cards.css`: milestone grids, states, icons and responsive cards.
+- `layouts/summary-callouts.css`: assumptions, insights, validation, empty states and callouts.
+- `layouts/legacy-actions.css`: compatibility styling for older native action classes.
 
 ### Still in `App.css`
 
-- legacy duplicates for the extracted planner, drawdown, comparison, chart and milestone modules;
-- older isolated summary and feature blocks;
-- miscellaneous legacy utilities and responsive overrides.
+- duplicate rules already covered by the authoritative modules above;
+- miscellaneous legacy utilities and isolated responsive overrides;
+- any selector not yet confirmed through visual regression checks.
 
 ### Remaining migration order
 
-1. migrate isolated summary, insight and status blocks still owned by `App.css`;
-2. replace remaining native legacy actions with shared button variants;
-3. remove selectors now covered by `action-intent-migrations.css` and `semantic-state-migrations.css` where explicit component variants exist;
-4. delete verified duplicate blocks from `App.css`;
-5. remove the `App.css` import when no selectors remain.
+1. visually verify the newly extracted summary, callout and legacy-action modules;
+2. remove obsolete selectors from `action-intent-migrations.css` and `semantic-state-migrations.css` where explicit component variants now exist;
+3. delete verified duplicate blocks from `App.css` in cohesive sections;
+4. audit remaining selectors for active usage and remove dead rules;
+5. remove the `App.css` import when no active selector depends on it.
 
 ## Migration checklist
 
