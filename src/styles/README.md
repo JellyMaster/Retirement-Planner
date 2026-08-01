@@ -48,26 +48,40 @@ Feature styles imported by pages remain independent until their migration is com
   - legacy panels and headings;
   - form grids, fields and input wrappers;
   - validation states and reset actions;
-  - legacy summary cards.
+  - legacy summary cards;
+  - guided-planner action compatibility.
 - `layouts/planner-tables.css`
   - projection table scrolling;
   - sticky headers and first column;
   - numeric alignment and row interaction states.
+- `layouts/drawdown-page.css`
+  - drawdown page shell, dashboard grids and responsive layout.
+- `layouts/drawdown-controls.css`
+  - drawdown sidebar controls, money display choices, chart controls and assumptions cards.
+- `layouts/drawdown-tables.css`
+  - drawdown table controls, state rows, sticky columns and mobile year cards.
+- `layouts/comparison-workspace.css`
+  - comparison shell, toolbar, analysis grid and responsive composition.
+- `layouts/comparison-controls.css`
+  - plan selection, comparison editor, toggles and semantic action states.
+- `layouts/comparison-results.css`
+  - outcome, goal and impact cards, comparison tables and expandable year details.
 
 ### Still in `App.css`
 
-- drawdown dashboard and editor;
-- comparison dashboard and editor;
-- charts and older isolated feature blocks;
-- duplicate planner rules awaiting deletion after visual verification.
+- legacy duplicates for the extracted planner, drawdown and comparison modules;
+- chart containers and chart-specific compatibility rules;
+- milestone and older isolated feature blocks;
+- miscellaneous legacy utilities and responsive overrides.
 
-### Recommended extraction order
+### Remaining migration order
 
-1. verify and remove duplicate planner rules from `App.css`;
-2. extract the drawdown dashboard shell;
-3. extract the comparison workspace and editor;
-4. migrate remaining charts and isolated feature blocks;
-5. delete `App.css` after its final selector has moved.
+1. migrate shared chart containers, legends and chart tabs;
+2. migrate milestone and isolated summary blocks;
+3. replace remaining native legacy actions with shared button variants;
+4. remove selectors now covered by `action-intent-migrations.css` and `semantic-state-migrations.css` where explicit component variants exist;
+5. delete verified duplicate blocks from `App.css`;
+6. remove the `App.css` import when no selectors remain.
 
 ## Migration checklist
 
