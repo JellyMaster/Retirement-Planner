@@ -1,0 +1,104 @@
+.retirement-sustainability-stack {
+  display: grid;
+  gap: var(--space-6, 1.5rem);
+}
+
+.retirement-sustainability-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-6, 1.5rem);
+  align-items: center;
+  margin-bottom: var(--space-6, 1.5rem);
+}
+
+.retirement-sustainability-ring {
+  flex: 0 0 auto;
+}
+
+.retirement-sustainability-interpretation {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-5, 1.25rem);
+  margin-top: var(--space-6, 1.5rem);
+  padding: var(--space-5, 1.25rem);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md, 0.875rem);
+  background: var(--colour-surface-secondary);
+}
+
+.retirement-sustainability-interpretation strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: var(--font-size-lg, 1.125rem);
+}
+
+.retirement-sustainability-interpretation p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.6;
+}
+
+.retirement-sustainability-interpretation-stats {
+  display: grid;
+  gap: 0.45rem;
+  align-content: start;
+  color: var(--colour-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-align: right;
+}
+
+.retirement-sustainability-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4, 1rem);
+  margin-top: var(--space-5, 1.25rem);
+}
+
+.retirement-sustainability-actions > span {
+  color: var(--colour-text-muted);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.retirement-sustainability-disclaimer {
+  margin: var(--space-5, 1.25rem) 0 0;
+  color: var(--colour-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.retirement-survival-chart {
+  width: 100%;
+  height: 360px;
+  margin-top: var(--space-5, 1.25rem);
+}
+
+@media (max-width: 800px) {
+  .retirement-sustainability-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .retirement-sustainability-ring {
+    justify-self: center;
+  }
+
+  .retirement-sustainability-interpretation,
+  .retirement-sustainability-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .retirement-sustainability-interpretation-stats,
+  .retirement-sustainability-actions > span {
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .retirement-survival-chart {
+    height: 300px;
+  }
+}

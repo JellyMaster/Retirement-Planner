@@ -26,6 +26,7 @@ import { RetirementInsights } from "../components/retirement/RetirementInsights"
 import { ProjectionAssumptions } from "../components/summary/ProjectionAssumptions";
 import { ProjectionMilestones } from "../components/summary/ProjectionMilestones";
 import { ProjectionSummary } from "../components/summary/ProjectionSummary";
+import { RetirementSustainabilityDashboard } from "../components/sustainability";
 import { Card, CardHeader, StatusBadge } from "../components/ui";
 import {
   isWorkspaceSectionId,
@@ -55,6 +56,7 @@ import "../styles/monte-carlo-confidence.css";
 import "../styles/monte-carlo-confidence-explorer.css";
 import "../styles/smart-retirement-recommendations.css";
 import "../styles/retirement-workspace.css";
+import "../styles/retirement-sustainability.css";
 
 type ChartView = "balance" | "contributions";
 
@@ -343,23 +345,11 @@ export function RetirementPlannerPage() {
 
       case "sustainability":
         return (
-          <Card padding="large">
-            <CardHeader
-              eyebrow="Retirement sustainability"
-              title="Explore how long your pension may last"
-              description="The stochastic drawdown engine is now part of the calculation foundation. The next dashboard milestone will surface lifetime survival, depletion and shortfall probabilities here."
-              icon={AppIcons.health}
-              badge={<StatusBadge tone="accent">Foundation ready</StatusBadge>}
-            />
-            <div className="workspace-sustainability-preview">
-              <p>
-                In the meantime, the drawdown planner provides deterministic pension longevity, income-shortfall and remaining-balance analysis.
-              </p>
-              <Link className="ui-button ui-button-primary ui-button-medium" to="/drawdown">
-                Open drawdown sustainability analysis
-              </Link>
-            </div>
-          </Card>
+          <RetirementSustainabilityDashboard
+            inputs={inputs}
+            projection={currentScenario.projection}
+            goals={retirementGoals}
+          />
         );
 
       case "improve":
