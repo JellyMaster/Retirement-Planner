@@ -1,0 +1,5 @@
+/* Application and dashboard layout compatibility.
+   App.css is intentionally routed through this module until its feature
+   blocks have been moved into their dedicated stylesheets. */
+
+@import "../../App.css";
