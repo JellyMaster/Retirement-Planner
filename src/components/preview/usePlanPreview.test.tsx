@@ -5,7 +5,6 @@ import {
   defaultPensionInputs,
 } from "../../config/defaultPensionInputs";
 import type { PensionInputs } from "../../engine/models/PensionInputs";
-import { PLAN_STORAGE_KEY } from "../../state/planStorage";
 import { usePlanPreview } from "./usePlanPreview";
 
 describe("usePlanPreview", () => {
@@ -21,7 +20,7 @@ describe("usePlanPreview", () => {
     };
   }
 
-  it("commits and saves an update when no preview is active", () => {
+  it("commits an update when no preview is active", () => {
     const committedInputs = createPlan();
     const onCommit = vi.fn();
     const { result } = renderHook(() =>
@@ -32,10 +31,9 @@ describe("usePlanPreview", () => {
     act(() => result.current.updateEffectiveInputs(updated));
 
     expect(onCommit).toHaveBeenCalledWith(updated);
-    expect(JSON.parse(localStorage.getItem(PLAN_STORAGE_KEY) ?? "null")).toEqual(updated);
   });
 
-  it("keeps preview changes and saves them", () => {
+  it("keeps preview changes and delegates the commit", () => {
     const committedInputs = createPlan();
     const previewInputs = createPlan({ retirementAge: 65 });
     const onCommit = vi.fn();
@@ -51,10 +49,9 @@ describe("usePlanPreview", () => {
 
     expect(result.current.isPreviewing).toBe(false);
     expect(onCommit).toHaveBeenCalledWith(previewInputs);
-    expect(JSON.parse(localStorage.getItem(PLAN_STORAGE_KEY) ?? "null")).toEqual(previewInputs);
   });
 
-  it("discards preview changes without saving or committing", () => {
+  it("discards preview changes without committing", () => {
     const committedInputs = createPlan();
     const onCommit = vi.fn();
     const { result } = renderHook(() =>
@@ -72,7 +69,6 @@ describe("usePlanPreview", () => {
     expect(result.current.isPreviewing).toBe(false);
     expect(result.current.effectiveInputs).toBe(committedInputs);
     expect(onCommit).not.toHaveBeenCalled();
-    expect(localStorage.getItem(PLAN_STORAGE_KEY)).toBeNull();
   });
 
   it("does not mutate factory defaults when a plan is committed", () => {
