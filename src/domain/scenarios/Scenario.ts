@@ -15,7 +15,7 @@ export interface Scenario {
   createdAt: string;
   updatedAt: string;
   inputs: PensionInputs;
-  drawdown: ScenarioDrawdownPreferences;
+  drawdown?: ScenarioDrawdownPreferences;
 }
 
 export interface ScenarioState {
@@ -63,6 +63,8 @@ export function duplicateScenario(
     createdAt: timestamp,
     updatedAt: timestamp,
     inputs: { ...source.inputs },
-    drawdown: { ...source.drawdown },
+    drawdown: {
+      ...(source.drawdown ?? createDefaultScenarioDrawdownPreferences()),
+    },
   };
 }
