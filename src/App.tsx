@@ -97,7 +97,10 @@ function AppContent() {
             path="/plan"
             element={<RetirementPlannerPage key={activeScenarioId} />}
           />
-          <Route path="/drawdown" element={<DrawdownPlannerPage />} />
+          <Route
+            path="/drawdown"
+            element={<DrawdownPlannerPage key={activeScenarioId} />}
+          />
           <Route path="/compare" element={<CompareScenariosPage />} />
           <Route
             path="/explore"
