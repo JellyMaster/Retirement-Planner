@@ -1,0 +1,5 @@
+/* Shared UI primitives.
+   ui-components.css remains the compatibility source while individual
+   primitives are split into this directory over subsequent migrations. */
+
+@import "../ui-components.css";
