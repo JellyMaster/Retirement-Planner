@@ -1,3 +1,4 @@
+import type { ScenarioDrawdownPreferences } from "../../../domain/scenarios";
 import type { RetirementGoals } from "../../models/RetirementGoals";
 import type { PensionInputs } from "../../models/PensionInputs";
 import type { ProjectionResult } from "../../models/ProjectionResult";
@@ -8,20 +9,24 @@ export interface CreateDrawdownInputsFromPlanOptions {
   pensionInputs: PensionInputs;
   projection: ProjectionResult;
   retirementGoals: RetirementGoals;
+  drawdown?: ScenarioDrawdownPreferences;
 }
 
 export function createDrawdownInputsFromPlan({
   pensionInputs,
   projection,
   retirementGoals,
+  drawdown,
 }: CreateDrawdownInputsFromPlanOptions): DrawdownInputs {
   const defaults = createDefaultDrawdownInputs();
 
   return {
     ...defaults,
+    ...drawdown,
     startingBalance: Math.max(0, projection.finalBalance.real),
     retirementAge: pensionInputs.retirementAge,
-    desiredAnnualIncome: retirementGoals.desiredAnnualIncome,
+    desiredAnnualIncome:
+      drawdown?.desiredAnnualIncome ?? retirementGoals.desiredAnnualIncome,
     annualStatePension: retirementGoals.includeStatePension
       ? retirementGoals.statePensionAnnualAmount
       : 0,
