@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { RetirementGoals } from "../../engine/models/RetirementGoals";
 import { AppIcons } from "../../icons";
 import { formatCurrency } from "../../utils/formatters";
+import { Button, Card, CardHeader, StatusBadge } from "../ui";
 
 interface RetirementGoalsFormProps {
   value: RetirementGoals;
@@ -36,7 +37,7 @@ export function RetirementGoalsForm({
     .join(" ");
 
   return (
-    <section className={className} aria-labelledby="retirement-goals-heading">
+    <Card className={className} padding="none" aria-labelledby="retirement-goals-heading">
       {collapsible && !isExpanded ? (
         <button
           type="button"
@@ -82,19 +83,14 @@ export function RetirementGoalsForm({
         </button>
       ) : (
         <div id="retirement-goals-editor">
-          <div className="retirement-goals-form-heading">
-            <div>
-              <p className="planner-eyebrow">Retirement goals</p>
-              <h2 id="retirement-goals-heading">Your target</h2>
-              <p className="retirement-goals-heading-copy">
-                Set the income and reserve used to assess your retirement outlook.
-              </p>
-            </div>
-
-            <span className="retirement-goals-target-icon" aria-hidden="true">
-              <FontAwesomeIcon icon={AppIcons.goals} />
-            </span>
-          </div>
+          <CardHeader
+            eyebrow="Retirement goals"
+            title="Your target"
+            titleId="retirement-goals-heading"
+            icon={AppIcons.goals}
+            description="Set the income and reserve used to assess your retirement outlook."
+            badge={<StatusBadge tone="info">Planning assumptions</StatusBadge>}
+          />
 
           <div className="retirement-goals-fields">
             <label>
@@ -173,17 +169,18 @@ export function RetirementGoalsForm({
             </p>
 
             {collapsible && (
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                size="small"
                 className="retirement-goals-done-button"
                 onClick={() => setIsExpanded(false)}
               >
                 Done
-              </button>
+              </Button>
             )}
           </div>
         </div>
       )}
-    </section>
+    </Card>
   );
 }

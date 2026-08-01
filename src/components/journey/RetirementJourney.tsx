@@ -6,6 +6,7 @@ import type { ProjectionResult } from "../../engine/models/ProjectionResult";
 import type { RetirementGoals } from "../../engine/models/RetirementGoals";
 import { AppIcons } from "../../icons";
 import { formatCurrency, formatPercentage } from "../../utils/formatters";
+import { Card, CardHeader, StatusBadge } from "../ui";
 import {
   RetirementJourneyMilestone,
   type RetirementJourneyMilestoneData,
@@ -146,25 +147,23 @@ export function RetirementJourney({
   if (!selectedMilestone) return null;
 
   return (
-    <section
+    <Card
       className="retirement-journey"
+      padding="large"
       aria-labelledby="retirement-journey-heading"
     >
-      <div className="retirement-journey-heading">
-        <div>
-          <p className="planner-eyebrow">Your retirement journey</p>
-          <h2 id="retirement-journey-heading">The key moments in your plan</h2>
-          <p>
-            Follow your plan from today to retirement and see when the assumptions
-            that shape your income take effect.
-          </p>
-        </div>
-
-        <span className="retirement-journey-duration">
-          <FontAwesomeIcon icon={AppIcons.clock} aria-hidden="true" />
-          {Math.max(0, inputs.retirementAge - inputs.currentAge)} years to retirement
-        </span>
-      </div>
+      <CardHeader
+        eyebrow="Your retirement journey"
+        title="The key moments in your plan"
+        titleId="retirement-journey-heading"
+        icon={AppIcons.calendar}
+        description="Follow your plan from today to retirement and see when the assumptions that shape your income take effect."
+        badge={
+          <StatusBadge tone="info" icon={AppIcons.clock}>
+            {Math.max(0, inputs.retirementAge - inputs.currentAge)} years to retirement
+          </StatusBadge>
+        }
+      />
 
       <ol className="retirement-journey-track">
         {milestones.map((milestone) => (
@@ -177,9 +176,11 @@ export function RetirementJourney({
         ))}
       </ol>
 
-      <div
+      <Card
         id="retirement-journey-detail"
         className={`retirement-journey-detail retirement-journey-detail-${selectedMilestone.tone}`}
+        tone="subtle"
+        padding="small"
         aria-live="polite"
       >
         <span className="retirement-journey-detail-icon" aria-hidden="true">
@@ -193,12 +194,12 @@ export function RetirementJourney({
         </div>
 
         <strong>{selectedMilestone.value}</strong>
-      </div>
+      </Card>
 
       <p className="retirement-journey-disclaimer">
         Values are shown in today's money. The journey reflects the assumptions in
         your current plan and is an illustration rather than a guarantee.
       </p>
-    </section>
+    </Card>
   );
 }

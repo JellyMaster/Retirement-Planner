@@ -2159,11 +2159,7 @@
 
 /* Retirement goals and readiness */
 .retirement-goals-form {
-  padding: 22px;
-  border: 1px solid var(--colour-border);
-  border-radius: 18px;
-  background: var(--colour-surface);
-  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
 .retirement-goals-form-compact {
@@ -2172,7 +2168,6 @@
   padding: 18px;
 }
 
-.retirement-goals-form-heading,
 .retirement-health-overview,
 .comparison-impact-heading {
   display: flex;
@@ -2181,8 +2176,6 @@
   align-items: flex-start;
 }
 
-.retirement-goals-form-heading h2 { margin: 2px 0 0; font-size: 1.05rem; }
-.retirement-goals-target-icon { font-size: 1.65rem; line-height: 1; }
 .retirement-goals-fields { display: grid; gap: 14px; margin-top: 18px; }
 .retirement-goals-fields label { display: grid; gap: 7px; font-size: .8rem; font-weight: 700; }
 .retirement-goals-fields input[type="number"] { width: 100%; min-width: 0; }
@@ -2318,7 +2311,6 @@
 }
 
 .retirement-goals-form-collapsible {
-  padding: 0;
   overflow: hidden;
 }
 

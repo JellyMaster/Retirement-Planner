@@ -11,6 +11,7 @@ import { RetirementProjectionEngine } from "../../engine/services/RetirementProj
 import { AppIcons } from "../../icons";
 import { formatCurrency } from "../../utils/formatters";
 import { calculateRetirementHealth } from "../goals/calculateRetirementHealth";
+import { Button, Card, CardHeader, DashboardGrid, StatusBadge } from "../ui";
 
 interface RetirementCoachProps {
   inputs: PensionInputs;
@@ -241,39 +242,31 @@ export function RetirementCoach({
 
   if (actions.length === 0) {
     return (
-      <section className="retirement-coach retirement-coach-complete" aria-labelledby="retirement-coach-heading">
-        <div className="retirement-coach-heading">
-          <span className="retirement-coach-heading-icon" aria-hidden="true">
-            <FontAwesomeIcon icon={AppIcons.success} />
-          </span>
-          <div>
-            <p className="planner-eyebrow">Retirement coach</p>
-            <h2 id="retirement-coach-heading">Your plan is already in a strong position</h2>
-            <p>The standard improvements tested by the coach do not materially strengthen the current illustration. Use What-if Analysis to stress-test less favourable assumptions or explore your own priorities.</p>
-          </div>
-        </div>
-      </section>
+      <Card className="retirement-coach retirement-coach-complete" tone="success" aria-labelledby="retirement-coach-heading">
+        <CardHeader
+          eyebrow="Retirement coach"
+          title="Your plan is already in a strong position"
+          titleId="retirement-coach-heading"
+          icon={AppIcons.success}
+          description="The standard improvements tested by the coach do not materially strengthen the current illustration. Use What-if Analysis to stress-test less favourable assumptions or explore your own priorities."
+          badge={<StatusBadge tone="success">Strong position</StatusBadge>}
+        />
+      </Card>
     );
   }
 
   const topAction = actions[0];
 
   return (
-    <section className="retirement-coach" aria-labelledby="retirement-coach-heading">
-      <div className="retirement-coach-heading">
-        <span className="retirement-coach-heading-icon" aria-hidden="true">
-          <FontAwesomeIcon icon={AppIcons.recommendations} />
-        </span>
-        <div>
-          <p className="planner-eyebrow">Retirement coach</p>
-          <h2 id="retirement-coach-heading">Recommended actions</h2>
-          <p>
-            These actions are ranked by their effect on your weighted planning score,
-            illustrated income and projected pension value. Your current plan is not
-            changed unless you apply an action to comparison.
-          </p>
-        </div>
-      </div>
+    <Card className="retirement-coach" aria-labelledby="retirement-coach-heading">
+      <CardHeader
+        eyebrow="Retirement coach"
+        title="Recommended actions"
+        titleId="retirement-coach-heading"
+        icon={AppIcons.recommendations}
+        description="These actions are ranked by their effect on your weighted planning score, illustrated income and projected pension value. Your current plan is not changed unless you apply an action to comparison."
+        badge={<StatusBadge tone="accent">{actions.length} actions</StatusBadge>}
+      />
 
       <div className="retirement-coach-featured">
         <div>
@@ -288,13 +281,16 @@ export function RetirementCoach({
         </div>
       </div>
 
-      <div className="retirement-coach-grid">
+      <DashboardGrid columns={2} className="retirement-coach-grid">
         {actions.map((action, index) => {
           const biggestDriver = action.improvedFactors[0];
 
           return (
-            <article
+            <Card
+              as="article"
               className={`retirement-coach-card${index === 0 ? " retirement-coach-card-featured" : ""}`}
+              tone={index === 0 ? "accent" : "subtle"}
+              interactive
               key={action.id}
             >
               <div className="retirement-coach-card-heading">
@@ -303,8 +299,10 @@ export function RetirementCoach({
                 </span>
                 <div>
                   <div className="retirement-coach-card-meta">
-                    <span>{index === 0 ? "Top action" : `Rank ${index + 1}`}</span>
-                    <span>{action.effort}</span>
+                    <StatusBadge tone={index === 0 ? "accent" : "neutral"} size="small">
+                      {index === 0 ? "Top action" : `Rank ${index + 1}`}
+                    </StatusBadge>
+                    <StatusBadge tone="info" size="small">{action.effort}</StatusBadge>
                   </div>
                   <h3>{action.title}</h3>
                   <p>{action.description}</p>
@@ -380,22 +378,22 @@ export function RetirementCoach({
                 </div>
               </details>
 
-              <button
-                type="button"
+              <Button
+                fullWidth
                 onClick={() => onApplyToComparison(action.nextInputs)}
               >
                 Apply to comparison
-              </button>
-            </article>
+              </Button>
+            </Card>
           );
         })}
-      </div>
+      </DashboardGrid>
 
       <p className="retirement-coach-disclaimer">
         Rankings use the application&apos;s illustrative weighted score and current
         assumptions. They are not personalised financial advice, a probability of
         success or a recommendation to buy or change a financial product.
       </p>
-    </section>
+    </Card>
   );
 }

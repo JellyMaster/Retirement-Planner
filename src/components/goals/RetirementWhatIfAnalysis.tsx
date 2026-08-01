@@ -10,6 +10,7 @@ import { AppIcons } from "../../icons";
 import { formatCurrency } from "../../utils/formatters";
 import { calculateRetirementHealth } from "./calculateRetirementHealth";
 import { CustomWhatIfBuilder } from "../what-if";
+import { Button, Card, CardHeader, DashboardGrid, StatusBadge } from "../ui";
 
 interface RetirementWhatIfAnalysisProps {
   inputs: PensionInputs;
@@ -151,24 +152,27 @@ export function RetirementWhatIfAnalysis({
   }, [baselineHealth, goals, inputs, result]);
 
   return (
-    <section className="retirement-what-if" aria-labelledby="retirement-what-if-heading">
-      <div className="retirement-what-if-heading">
-        <div>
-          <p className="planner-eyebrow">Explore your options</p>
-          <h2 id="retirement-what-if-heading">What happens if…</h2>
-          <p>Preview common changes without altering your current plan. Send any scenario to comparison when you want a closer look.</p>
-        </div>
+    <Card className="retirement-what-if" aria-labelledby="retirement-what-if-heading">
+      <CardHeader
+        eyebrow="Explore your options"
+        title="What happens if…"
+        titleId="retirement-what-if-heading"
+        icon={AppIcons.comparison}
+        description="Preview common changes without altering your current plan. Send any scenario to comparison when you want a closer look."
+        badge={
+          <StatusBadge tone="info">
+            Current score {baselineHealth.score}/100
+          </StatusBadge>
+        }
+      />
 
-        <div className="retirement-what-if-baseline" aria-label={`Current readiness score ${baselineHealth.score} out of 100`}>
-          <span>Current score</span>
-          <strong>{baselineHealth.score}<small>/100</small></strong>
-        </div>
-      </div>
-
-      <div className="retirement-what-if-grid">
+      <DashboardGrid columns={3} className="retirement-what-if-grid">
         {scenarioResults.map((scenario) => (
-          <article
+          <Card
+            as="article"
             className={`retirement-what-if-card retirement-what-if-card-${scenario.tone}`}
+            tone={scenario.tone === "positive" ? "success" : scenario.tone === "caution" ? "warning" : "subtle"}
+            interactive
             key={scenario.id}
           >
             <div className="retirement-what-if-card-heading">
@@ -205,12 +209,12 @@ export function RetirementWhatIfAnalysis({
               </div>
             </dl>
 
-            <button type="button" onClick={() => onApplyToComparison(scenario.nextInputs)}>
+            <Button fullWidth onClick={() => onApplyToComparison(scenario.nextInputs)}>
               Apply to comparison
-            </button>
-          </article>
+            </Button>
+          </Card>
         ))}
-      </div>
+      </DashboardGrid>
 
       <CustomWhatIfBuilder
         inputs={inputs}
@@ -222,6 +226,6 @@ export function RetirementWhatIfAnalysis({
       <p className="retirement-what-if-disclaimer">
         These are planning illustrations using your existing assumptions and retirement goals. They do not change the current plan until you choose to edit or replace it.
       </p>
-    </section>
+    </Card>
   );
 }

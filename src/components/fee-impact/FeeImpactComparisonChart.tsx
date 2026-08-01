@@ -11,6 +11,8 @@ import {
 } from "recharts";
 
 import type { FeeImpact } from "../../engine/models/FeeImpact";
+import { AppIcons } from "../../icons";
+import { Card, CardHeader } from "../ui";
 import { useChartTheme } from "../../theme/useChartTheme";
 import {
   formatCompactCurrency,
@@ -54,21 +56,18 @@ export function FeeImpactComparisonChart({
   }
 
   return (
-    <section
-      className="panel projection-chart-panel fee-impact-chart-panel"
+    <Card
+      className="projection-chart-panel fee-impact-chart-panel"
+      tone="subtle"
       aria-labelledby="fee-impact-chart-heading"
     >
-      <div className="panel-heading">
-        <h3 id="fee-impact-chart-heading">
-          Pension value with and without fees
-        </h3>
-
-        <p>
-          The shaded area shows the cumulative reduction in your projected
-          pension caused by fees and the investment growth those fees would
-          otherwise have earned.
-        </p>
-      </div>
+      <CardHeader
+        headingLevel={3}
+        title="Pension value with and without fees"
+        titleId="fee-impact-chart-heading"
+        icon={AppIcons.chart}
+        description="The shaded area shows the cumulative reduction in your projected pension caused by fees and the investment growth those fees would otherwise have earned."
+      />
 
       <div className="projection-chart fee-impact-chart">
         <ResponsiveContainer width="100%" height="100%">
@@ -202,6 +201,6 @@ export function FeeImpactComparisonChart({
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-    </section>
+    </Card>
   );
 }

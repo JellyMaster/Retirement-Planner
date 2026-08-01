@@ -2314,13 +2314,7 @@ thead .projection-sticky-age,.drawdown-projection-table thead th:first-child { z
 }
 
 .fee-impact-year{
-
-    padding:1rem;
-
-    border:1px solid var(--panel-border);
-
-    border-radius:0.75rem;
-
+    min-width:0;
 }
 
 .fee-impact-year-header{
@@ -2359,33 +2353,6 @@ thead .projection-sticky-age,.drawdown-projection-table thead th:first-child { z
 
 }
 
-.fee-impact-progress{
-
-    height:8px;
-
-    margin-top:1rem;
-
-    border-radius:999px;
-
-    overflow:hidden;
-
-    background:#ececec;
-
-}
-
-.fee-impact-progress-fill{
-
-    height:100%;
-
-    border-radius:999px;
-
-    background:linear-gradient(
-        90deg,
-        #2d7ff9,
-        #6fb1ff
-    );
-
-}
 
 .fee-impact-insights {
 
@@ -2398,21 +2365,9 @@ thead .projection-sticky-age,.drawdown-projection-table thead th:first-child { z
 }
 
 .fee-impact-insight {
-
-    display: flex;
-
-    align-items: flex-start;
-
-    gap: 1rem;
-
-    padding: 1rem;
-
-    border: 1px solid var(--panel-border);
-
-    border-radius: 0.75rem;
-
-    background: var(--panel-background);
-
+    display:flex;
+    align-items:flex-start;
+    gap:1rem;
 }
 
 .fee-impact-insight-icon {

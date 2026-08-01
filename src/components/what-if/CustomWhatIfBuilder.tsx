@@ -7,6 +7,7 @@ import { RetirementProjectionEngine } from "../../engine/services/RetirementProj
 import { formatCurrency } from "../../utils/formatters";
 import { CustomWhatIfPreview } from "./CustomWhatIfPreview";
 import { WhatIfAdjustmentField } from "./WhatIfAdjustmentField";
+import { Button, ButtonGroup, Card, SectionTitle, Stack } from "../ui";
 
 interface CustomWhatIfBuilderProps {
   inputs: PensionInputs;
@@ -138,9 +139,9 @@ export function CustomWhatIfBuilder({
   }
 
   return (
-    <section className="custom-what-if-builder" aria-labelledby="custom-what-if-heading">
-      <button
-        type="button"
+    <Card className="custom-what-if-builder" tone="subtle" padding="none" aria-labelledby="custom-what-if-heading">
+      <Button
+        variant="subtle"
         className="custom-what-if-toggle"
         aria-expanded={isOpen}
         onClick={handleToggleBuilder}
@@ -150,34 +151,36 @@ export function CustomWhatIfBuilder({
           <small>Adjust several assumptions and see the combined effect instantly.</small>
         </span>
         <span aria-hidden="true">{isOpen ? "Close" : "Build scenario"}</span>
-      </button>
+      </Button>
 
       {isOpen ? (
         <div className="custom-what-if-content">
           <div className="custom-what-if-presets">
-            <div>
-              <h3>Quick scenarios</h3>
-              <p>Start with a common planning question, then fine-tune the values.</p>
-            </div>
-            <div className="custom-what-if-preset-list">
+            <SectionTitle
+              headingLevel={3}
+              title="Quick scenarios"
+              description="Start with a common planning question, then fine-tune the values."
+            />
+            <ButtonGroup className="custom-what-if-preset-list">
               {presets.map((preset) => (
-                <button
-                  type="button"
+                <Button
+                  variant="subtle"
+                  size="small"
                   key={preset.id}
                   title={preset.description}
                   onClick={() => setScenarioInputs(preset.build(inputs))}
                 >
                   {preset.label}
-                </button>
+                </Button>
               ))}
-              <button type="button" onClick={() => setScenarioInputs({ ...inputs })}>
+              <Button variant="secondary" size="small" onClick={() => setScenarioInputs({ ...inputs })}>
                 Reset to current plan
-              </button>
-            </div>
+              </Button>
+            </ButtonGroup>
           </div>
 
           <div className="custom-what-if-layout">
-            <div className="custom-what-if-editor">
+            <Stack gap="large" className="custom-what-if-editor">
               <div className="custom-what-if-name">
                 <label htmlFor="custom-what-if-name">Scenario name</label>
                 <input
@@ -238,9 +241,9 @@ export function CustomWhatIfBuilder({
                 </span>
               </div>
 
-              <div className="custom-what-if-save-row">
-                <button type="button" onClick={saveScenario}>Save scenario</button>
-              </div>
+              <ButtonGroup align="end" className="custom-what-if-save-row">
+                <Button onClick={saveScenario}>Save scenario</Button>
+              </ButtonGroup>
 
               {savedScenarios.length > 0 ? (
                 <div className="custom-what-if-library">
@@ -248,17 +251,17 @@ export function CustomWhatIfBuilder({
                   <div>
                     {savedScenarios.map((scenario) => (
                       <article key={scenario.id}>
-                        <button type="button" onClick={() => { setScenarioName(scenario.name); setScenarioInputs({ ...scenario.inputs }); }}>
+                        <Button variant="subtle" onClick={() => { setScenarioName(scenario.name); setScenarioInputs({ ...scenario.inputs }); }}>
                           <strong>{scenario.name}</strong>
                           <small>Retire at {scenario.inputs.retirementAge} · {formatCurrency(scenario.inputs.monthlyEmployeeContribution + scenario.inputs.monthlyEmployerContribution)}/month</small>
-                        </button>
-                        <button type="button" aria-label={`Delete ${scenario.name}`} onClick={() => setSavedScenarios((current) => current.filter((item) => item.id !== scenario.id))}>×</button>
+                        </Button>
+                        <Button variant="danger" size="small" aria-label={`Delete ${scenario.name}`} onClick={() => setSavedScenarios((current) => current.filter((item) => item.id !== scenario.id))}>×</Button>
                       </article>
                     ))}
                   </div>
                 </div>
               ) : null}
-            </div>
+            </Stack>
 
             <CustomWhatIfPreview
               baselineInputs={inputs}
@@ -270,6 +273,6 @@ export function CustomWhatIfBuilder({
           </div>
         </div>
       ) : null}
-    </section>
+    </Card>
   );
 }
