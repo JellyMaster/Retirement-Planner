@@ -80,84 +80,136 @@ export class MonteCarloEngine {
   }
 
   private static simulatePath(
-    inputs: MonteCarloConfig["pensionInputs"],
-    distribution: NormalDistribution,
-    annualVolatility: number,
-    minimumAnnualReturn: number,
-    maximumAnnualReturn: number
-  ): MonteCarloSimulationPath {
-    const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
+  inputs: MonteCarloConfig["pensionInputs"],
+  distribution: NormalDistribution,
+  annualVolatility: number,
+  minimumAnnualReturn: number,
+  maximumAnnualReturn: number
+): MonteCarloSimulationPath {
+  const yearsToRetirement =
+    inputs.retirementAge - inputs.currentAge;
 
-    if (yearsToRetirement === 0) {
-      return {
-        finalNominalBalance: inputs.currentPot,
-        finalRealBalance: inputs.currentPot,
-        annualisedSampledReturn: 0,
-        yearlyNominalBalances: [],
-        yearlyRealBalances: [],
-      };
-    }
-
-    const monthlyFeeRate = convertAnnualFeeToMonthlyRate(inputs.annualFee);
-    const monthlyInflationRate = convertAnnualRateToMonthlyRate(inputs.inflation);
-    const yearlyNominalBalances: number[] = [];
-    const yearlyRealBalances: number[] = [];
-    const sampledAnnualReturns: number[] = [];
-    let currentBalance = inputs.currentPot;
-    let inflationFactor = 1;
-
-    for (let yearIndex = 0; yearIndex < yearsToRetirement; yearIndex += 1) {
-      const sampledReturn = Math.min(
-        maximumAnnualReturn,
-        Math.max(
-          minimumAnnualReturn,
-          distribution.sample(inputs.annualReturn, annualVolatility)
-        )
-      );
-      sampledAnnualReturns.push(sampledReturn);
-      const monthlyReturn = convertAnnualRateToMonthlyRate(sampledReturn);
-      const contributionIncreaseFactor = Math.pow(
-        1 + inputs.annualContributionIncrease,
-        yearIndex
-      );
-
-      for (let month = 0; month < 12; month += 1) {
-        const age = inputs.currentAge + yearIndex + month / 12;
-        const regularContribution =
-          (inputs.monthlyEmployeeContribution +
-            inputs.monthlyEmployerContribution) *
-          contributionIncreaseFactor;
-        const extraContribution =
-          inputs.extraContributionAge !== undefined &&
-          inputs.extraMonthlyContribution !== undefined &&
-          age >= inputs.extraContributionAge
-            ? inputs.extraMonthlyContribution
-            : 0;
-
-        currentBalance += regularContribution + extraContribution;
-        currentBalance += currentBalance * monthlyReturn;
-        currentBalance -= currentBalance * monthlyFeeRate;
-        inflationFactor *= 1 + monthlyInflationRate;
-      }
-
-      yearlyNominalBalances.push(currentBalance);
-      yearlyRealBalances.push(currentBalance / inflationFactor);
-    }
-
-    const compoundedReturn = sampledAnnualReturns.reduce(
-      (factor, annualReturn) => factor * (1 + annualReturn),
-      1
-    );
-
+  if (yearsToRetirement === 0) {
     return {
-      finalNominalBalance: currentBalance,
-      finalRealBalance: currentBalance / inflationFactor,
-      annualisedSampledReturn:
-        Math.pow(compoundedReturn, 1 / yearsToRetirement) - 1,
-      yearlyNominalBalances,
-      yearlyRealBalances,
+      finalNominalBalance: inputs.currentPot,
+      finalRealBalance: inputs.currentPot,
+      annualisedSampledReturn: 0,
+      yearlyNominalBalances: [],
+      yearlyRealBalances: [],
     };
   }
+
+  const monthlyFeeRate =
+    convertAnnualFeeToMonthlyRate(inputs.annualFee);
+
+  const monthlyInflationRate =
+    convertAnnualRateToMonthlyRate(inputs.inflation);
+
+  const extraContributionStartMonth =
+    inputs.extraContributionAge === undefined
+      ? undefined
+      : (inputs.extraContributionAge - inputs.currentAge) * 12;
+
+  const yearlyNominalBalances: number[] = [];
+  const yearlyRealBalances: number[] = [];
+  const sampledAnnualReturns: number[] = [];
+
+  let currentBalance = inputs.currentPot;
+  let inflationFactor = 1;
+
+  for (
+    let yearIndex = 0;
+    yearIndex < yearsToRetirement;
+    yearIndex += 1
+  ) {
+    const sampledReturn = Math.min(
+      maximumAnnualReturn,
+      Math.max(
+        minimumAnnualReturn,
+        distribution.sample(
+          inputs.annualReturn,
+          annualVolatility
+        )
+      )
+    );
+
+    sampledAnnualReturns.push(sampledReturn);
+
+    const monthlyReturn =
+      convertAnnualRateToMonthlyRate(sampledReturn);
+
+    for (let month = 0; month < 12; month += 1) {
+      const monthIndex = yearIndex * 12 + month;
+
+      const completedContributionYears =
+        Math.floor(monthIndex / 12);
+
+      const employeeContribution =
+        inputs.monthlyEmployeeContribution *
+        Math.pow(
+          1 + inputs.annualContributionIncrease,
+          completedContributionYears
+        );
+
+      const employerContribution =
+        inputs.monthlyEmployerContribution;
+
+      const extraContributionApplies =
+        extraContributionStartMonth !== undefined &&
+        inputs.extraMonthlyContribution !== undefined &&
+        monthIndex >= extraContributionStartMonth;
+
+      const extraContribution = extraContributionApplies
+        ? inputs.extraMonthlyContribution ?? 0
+        : 0;
+
+      const totalContribution =
+        employeeContribution +
+        employerContribution +
+        extraContribution;
+
+      // Growth and fees are calculated from the opening
+      // balance for the month.
+      const investmentGrowth =
+        currentBalance * monthlyReturn;
+
+      const fees =
+        currentBalance * monthlyFeeRate;
+
+      currentBalance =
+        currentBalance +
+        investmentGrowth -
+        fees +
+        totalContribution;
+
+      inflationFactor *= 1 + monthlyInflationRate;
+    }
+
+    yearlyNominalBalances.push(currentBalance);
+    yearlyRealBalances.push(
+      currentBalance / inflationFactor
+    );
+  }
+
+  const compoundedReturn = sampledAnnualReturns.reduce(
+    (factor, annualReturn) =>
+      factor * (1 + annualReturn),
+    1
+  );
+
+  return {
+    finalNominalBalance: currentBalance,
+    finalRealBalance:
+      currentBalance / inflationFactor,
+    annualisedSampledReturn:
+      Math.pow(
+        compoundedReturn,
+        1 / yearsToRetirement
+      ) - 1,
+    yearlyNominalBalances,
+    yearlyRealBalances,
+  };
+}
 
   private static calculateYearlyPercentiles(
     paths: readonly MonteCarloSimulationPath[],
