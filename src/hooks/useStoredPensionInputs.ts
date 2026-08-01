@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { defaultPensionInputs } from "../config/defaultPensionInputs";
+import { createDefaultPensionInputs } from "../config/defaultPensionInputs";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import {
   loadStoredPensionInputs,
@@ -8,10 +8,12 @@ import {
   PLAN_UPDATED_EVENT,
 } from "../state/planStorage";
 
+function loadPensionInputs(): PensionInputs {
+  return loadStoredPensionInputs(createDefaultPensionInputs());
+}
+
 export function useStoredPensionInputs(): PensionInputs {
-  const [inputs, setInputs] = useState<PensionInputs>(() =>
-    loadStoredPensionInputs(defaultPensionInputs),
-  );
+  const [inputs, setInputs] = useState<PensionInputs>(loadPensionInputs);
 
   useEffect(() => {
     function handlePlanUpdate(event: Event) {
@@ -21,7 +23,7 @@ export function useStoredPensionInputs(): PensionInputs {
 
     function handleStorage(event: StorageEvent) {
       if (event.key === PLAN_STORAGE_KEY) {
-        setInputs(loadStoredPensionInputs(defaultPensionInputs));
+        setInputs(loadPensionInputs());
       }
     }
 
