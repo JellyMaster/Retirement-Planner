@@ -38,7 +38,15 @@ describe("CompareScenariosPage", () => {
     expect(
       screen.getByRole("heading", { name: "Compare projected outcomes" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("row", { name: /projected pension pot/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("row", { name: /projected pension pot/i }),
+    ).toBeInTheDocument();
+
+    const activeHeader = screen.getByRole("columnheader", {
+      name: /baseline plan active plan/i,
+    });
+    expect(activeHeader).toHaveClass("is-active-plan");
+    expect(screen.getAllByText("Current active plan")).not.toHaveLength(0);
     expect(localStorage.getItem(SCENARIO_STORAGE_KEY)).not.toBeNull();
   });
 
@@ -57,7 +65,7 @@ describe("CompareScenariosPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("2 of 3 selected")).toBeInTheDocument();
     expect(
-      screen.getByRole("columnheader", { name: "Retire at 65" }),
+      screen.getByRole("columnheader", { name: /retire at 65 active plan/i }),
     ).toBeInTheDocument();
 
     const card = screen
@@ -67,9 +75,74 @@ describe("CompareScenariosPage", () => {
     expect(within(card as HTMLElement).getByText("Active")).toBeInTheDocument();
     expect(
       within(card as HTMLElement).getByRole("checkbox", {
-        name: "Include in comparison",
+        name: "Active plan included",
       }),
     ).toBeChecked();
+  });
+
+  it("compares values with the active plan and highlights its column", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Scenario name" }),
+      "Retire at 65",
+    );
+    await user.click(screen.getByRole("button", { name: "Create scenario" }));
+
+    const scenarioCard = screen
+      .getByRole("heading", { name: "Retire at 65" })
+      .closest("article");
+    expect(scenarioCard).not.toBeNull();
+    await user.click(
+      within(scenarioCard as HTMLElement).getByRole("button", {
+        name: "Edit scenario",
+      }),
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "Retire at 65" });
+    const retirementAge = within(dialog).getByRole("spinbutton", {
+      name: "Retirement age",
+    });
+    await user.clear(retirementAge);
+    await user.type(retirementAge, "65");
+    await user.click(
+      within(dialog).getByRole("button", { name: "Save changes" }),
+    );
+
+    const scenarioHeader = screen.getByRole("columnheader", {
+      name: /retire at 65 active plan/i,
+    });
+    expect(scenarioHeader).toHaveClass("is-active-plan");
+
+    const retirementRow = screen.getByRole("row", {
+      name: /retirement age/i,
+    });
+    expect(
+      within(retirementRow).getByText("Greater by 3 years"),
+    ).toBeInTheDocument();
+    expect(
+      within(retirementRow).getByText("Current active plan"),
+    ).toBeInTheDocument();
+
+    const baselineCard = screen
+      .getByRole("heading", { name: "Baseline Plan" })
+      .closest("article");
+    expect(baselineCard).not.toBeNull();
+    await user.click(
+      within(baselineCard as HTMLElement).getByRole("button", {
+        name: "Make active",
+      }),
+    );
+
+    expect(
+      screen.getByRole("columnheader", { name: /baseline plan active plan/i }),
+    ).toHaveClass("is-active-plan");
+    expect(
+      within(screen.getByRole("row", { name: /retirement age/i })).getByText(
+        "Less by 3 years",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("edits a scenario in a modal and refreshes its comparison", async () => {
@@ -97,12 +170,16 @@ describe("CompareScenariosPage", () => {
     });
     await user.clear(retirementAge);
     await user.type(retirementAge, "65");
-    await user.click(within(dialog).getByRole("button", { name: "Save changes" }));
+    await user.click(
+      within(dialog).getByRole("button", { name: "Save changes" }),
+    );
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(within(card as HTMLElement).getByText("Age 65")).toBeInTheDocument();
     expect(
-      screen.getByRole("row", { name: /retirement age age 68 age 65/i }),
+      within(screen.getByRole("row", { name: /retirement age/i })).getByText(
+        "Age 65",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -127,7 +204,9 @@ describe("CompareScenariosPage", () => {
     await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(within(card as HTMLElement).queryByText("£250,000")).not.toBeInTheDocument();
+    expect(
+      within(card as HTMLElement).queryByText("£250,000"),
+    ).not.toBeInTheDocument();
     expect(localStorage.getItem(PLAN_STORAGE_KEY)).toBeNull();
   });
 
@@ -149,13 +228,15 @@ describe("CompareScenariosPage", () => {
     });
     await user.clear(currentPot);
     await user.type(currentPot, "250000");
-    await user.click(within(dialog).getByRole("button", { name: "Save changes" }));
+    await user.click(
+      within(dialog).getByRole("button", { name: "Save changes" }),
+    );
 
     const saved = JSON.parse(localStorage.getItem(PLAN_STORAGE_KEY) ?? "null");
     expect(saved.currentPot).toBe(250_000);
   });
 
-  it("can remove and restore an alternative in the comparison", async () => {
+  it("can remove and restore a non-active alternative in the comparison", async () => {
     const user = userEvent.setup();
     renderPage();
 
@@ -164,6 +245,16 @@ describe("CompareScenariosPage", () => {
       "Higher Contributions",
     );
     await user.click(screen.getByRole("button", { name: "Create scenario" }));
+
+    const baselineCard = screen
+      .getByRole("heading", { name: "Baseline Plan" })
+      .closest("article");
+    expect(baselineCard).not.toBeNull();
+    await user.click(
+      within(baselineCard as HTMLElement).getByRole("button", {
+        name: "Make active",
+      }),
+    );
 
     const card = screen
       .getByRole("heading", { name: "Higher Contributions" })
