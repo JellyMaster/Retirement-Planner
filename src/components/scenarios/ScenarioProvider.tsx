@@ -1,38 +1,22 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useMemo,
-  useRef,
   useState,
   type PropsWithChildren,
 } from "react";
 
 import {
   createBrowserScenarioService,
-  type Scenario,
   type ScenarioId,
   type ScenarioState,
 } from "../../domain/scenarios";
-
-interface ScenarioContextValue extends ScenarioState {
-  activeScenario: Scenario;
-  createScenario: (name: string, sourceId?: ScenarioId) => Scenario;
-  duplicateScenario: (id: ScenarioId) => Scenario;
-  renameScenario: (id: ScenarioId, name: string) => Scenario;
-  setActiveScenario: (id: ScenarioId) => void;
-  deleteScenario: (id: ScenarioId) => void;
-}
-
-const ScenarioContext = createContext<ScenarioContextValue | null>(null);
+import {
+  ScenarioContext,
+  type ScenarioContextValue,
+} from "./ScenarioContext";
 
 export function ScenarioProvider({ children }: PropsWithChildren) {
-  const serviceRef = useRef<ReturnType<typeof createBrowserScenarioService> | null>(null);
-  if (!serviceRef.current) {
-    serviceRef.current = createBrowserScenarioService();
-  }
-
-  const service = serviceRef.current;
+  const [service] = useState(createBrowserScenarioService);
   const [state, setState] = useState<ScenarioState>(() => service.getState());
 
   const refresh = useCallback(() => {
@@ -116,12 +100,4 @@ export function ScenarioProvider({ children }: PropsWithChildren) {
       {children}
     </ScenarioContext.Provider>
   );
-}
-
-export function useScenarios(): ScenarioContextValue {
-  const context = useContext(ScenarioContext);
-  if (!context) {
-    throw new Error("useScenarios must be used inside ScenarioProvider.");
-  }
-  return context;
 }
