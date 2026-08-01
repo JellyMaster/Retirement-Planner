@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 import type { PensionInputs } from "../../engine/models/PensionInputs";
 import type {
   Scenario,
+  ScenarioDrawdownPreferences,
   ScenarioId,
   ScenarioState,
 } from "../../domain/scenarios";
@@ -13,6 +14,11 @@ export interface ScenarioContextValue extends ScenarioState {
   duplicateScenario: (id: ScenarioId) => Scenario;
   renameScenario: (id: ScenarioId, name: string) => Scenario;
   updateScenarioInputs: (id: ScenarioId, inputs: PensionInputs) => Scenario;
+  updateScenarioPlan: (
+    id: ScenarioId,
+    inputs: PensionInputs,
+    drawdown: ScenarioDrawdownPreferences,
+  ) => Scenario;
   setActiveScenario: (id: ScenarioId) => void;
   deleteScenario: (id: ScenarioId) => void;
 }
