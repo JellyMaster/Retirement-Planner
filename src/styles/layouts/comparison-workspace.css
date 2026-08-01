@@ -1,0 +1,152 @@
+/* =========================================================
+   Retirement comparison workspace
+
+   Owns the two-column comparison shell, toolbar, main analysis
+   grid and responsive composition. Loaded after App.css while
+   the legacy comparison block is retired.
+   ========================================================= */
+
+.retirement-comparison-workspace {
+  display: grid;
+  grid-template-columns: minmax(18rem, 22rem) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+  min-width: 0;
+}
+
+.retirement-comparison-workspace.comparison-workspace-collapsed {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.retirement-comparison-dashboard {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-6);
+}
+
+.comparison-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  min-width: 0;
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.comparison-toolbar > div {
+  min-width: 0;
+}
+
+.comparison-plan-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 0;
+  color: var(--colour-text-strong);
+  font-size: clamp(1.25rem, 2.5vw, 1.7rem);
+}
+
+.comparison-plan-selector-hint {
+  margin: var(--space-2) 0 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.comparison-versus {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  font-weight: 700;
+}
+
+.comparison-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 21rem);
+  gap: var(--space-6);
+  align-items: stretch;
+  min-width: 0;
+}
+
+.comparison-chart-stack {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-3);
+}
+
+.comparison-chart-stack > .panel,
+.comparison-chart-stack > section {
+  min-width: 0;
+}
+
+.comparison-chart-note {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--status-info);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--status-info-text);
+  background: var(--status-info-background);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.comparison-assumptions-panel,
+.comparison-year-details {
+  min-width: 0;
+}
+
+.comparison-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+
+.comparison-section-heading > div {
+  min-width: 0;
+}
+
+.comparison-empty-state {
+  margin: 0;
+  padding: var(--space-6);
+  border: 1px dashed var(--colour-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--colour-text-muted);
+  background: var(--colour-surface-secondary);
+  text-align: center;
+}
+
+.comparison-validation-notice {
+  margin: 0;
+}
+
+@media (max-width: 1180px) {
+  .retirement-comparison-workspace,
+  .retirement-comparison-workspace.comparison-workspace-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .comparison-main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .comparison-toolbar,
+  .comparison-section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .comparison-plan-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .comparison-versus {
+    padding-left: var(--space-2);
+  }
+}
