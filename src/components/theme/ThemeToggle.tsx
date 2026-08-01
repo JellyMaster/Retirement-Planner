@@ -4,42 +4,30 @@ import { AppIcons } from "../../icons";
 import { useTheme } from "../../theme/useTheme";
 
 export function ThemeToggle() {
-  const {
-    theme,
-    toggleTheme,
-  } = useTheme();
-
-  const isDarkMode =
-    theme === "dark";
+  const { theme, toggleTheme } = useTheme();
+  const isDarkMode = theme === "dark";
+  const actionLabel = isDarkMode
+    ? "Switch to light mode"
+    : "Switch to dark mode";
 
   return (
     <button
       type="button"
+      role="switch"
       className="theme-toggle"
       onClick={toggleTheme}
-      aria-label={
-        isDarkMode
-          ? "Switch to light mode"
-          : "Switch to dark mode"
-      }
-      aria-pressed={isDarkMode}
-      title={
-        isDarkMode
-          ? "Switch to light mode"
-          : "Switch to dark mode"
-      }
+      aria-checked={isDarkMode}
+      aria-label={actionLabel}
+      title={actionLabel}
     >
-      <span
-        aria-hidden="true"
-        className="theme-toggle__icon"
-      >
-        <FontAwesomeIcon icon={isDarkMode ? AppIcons.sun : AppIcons.moon} />
-      </span>
-
-      <span className="theme-toggle__label">
-        {isDarkMode
-          ? "Light mode"
-          : "Dark mode"}
+      <span className="theme-toggle__track" aria-hidden="true">
+        <span className="theme-toggle__track-icon theme-toggle__track-icon--light">
+          <FontAwesomeIcon icon={AppIcons.sun} />
+        </span>
+        <span className="theme-toggle__track-icon theme-toggle__track-icon--dark">
+          <FontAwesomeIcon icon={AppIcons.moon} />
+        </span>
+        <span className="theme-toggle__thumb" />
       </span>
     </button>
   );
