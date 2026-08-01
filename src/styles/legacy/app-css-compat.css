@@ -1,0 +1,9 @@
+/*
+ * Temporary compatibility boundary for legacy App.css.
+ *
+ * Do not add rules here or to App.css. Permanent styles belong in the
+ * foundations, components, layouts, themes, or utilities directories.
+ * Remove this import after the final App.css selector audit is complete.
+ */
+
+@import "../../App.css";
