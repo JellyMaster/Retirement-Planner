@@ -1,6 +1,7 @@
 .scenario-manager-page {
   display: grid;
-  gap: 2rem;
+  gap: var(--ui-space-8);
+  width: min(var(--ui-content-wide, 1400px), 100%);
 }
 
 .scenario-manager-header,
@@ -18,7 +19,7 @@
 .scenario-manager-create,
 .scenario-manager-section-heading {
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: var(--ui-space-6);
 }
 
 .scenario-manager-header > div,
@@ -26,17 +27,30 @@
   max-width: 48rem;
 }
 
+.scenario-manager-header h1,
+.scenario-manager-create h2,
+.scenario-manager-section-heading h2 {
+  margin: 0;
+}
+
+.scenario-manager-header p:not(.planner-eyebrow),
+.scenario-manager-create p:not(.planner-eyebrow) {
+  margin: var(--ui-space-2) 0 0;
+  color: var(--colour-text-muted);
+}
+
 .scenario-manager-create {
-  padding: 1.5rem;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-large);
-  background: var(--surface-raised);
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
 }
 
 .scenario-manager-create-controls {
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: var(--ui-space-3);
 }
 
 .scenario-manager-create-controls label,
@@ -49,48 +63,48 @@
 .scenario-card-rename input {
   min-width: 16rem;
   padding: 0.75rem 0.875rem;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-medium);
-  background: var(--surface-base);
-  color: var(--text-primary);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface);
+  color: var(--colour-text);
 }
 
 .scenario-manager-error {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--status-warning-border);
-  border-radius: var(--radius-medium);
-  background: var(--status-warning-surface);
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-4) var(--ui-space-5);
+  border: 1px solid var(--colour-warning, var(--colour-border));
+  border-radius: var(--ui-radius-control);
+  background: color-mix(in srgb, var(--colour-warning, #c77800) 12%, var(--colour-surface));
 }
 
 .scenario-manager-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: var(--ui-space-4);
+  margin-top: var(--ui-space-4);
 }
 
 .scenario-card {
   display: grid;
   align-content: start;
-  gap: 1.25rem;
-  padding: 1.25rem;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-large);
-  background: var(--surface-raised);
-  box-shadow: var(--shadow-small);
+  gap: var(--ui-space-5);
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
 }
 
 .scenario-card.is-active {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--accent-soft);
+  border-color: var(--colour-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--colour-primary) 20%, transparent);
 }
 
 .scenario-card-heading {
   align-items: flex-start;
-  gap: 0.875rem;
+  gap: var(--ui-space-3);
 }
 
 .scenario-card-icon {
@@ -99,14 +113,14 @@
   height: 2.5rem;
   place-items: center;
   flex: 0 0 auto;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--accent-primary);
+  border-radius: var(--ui-radius-control);
+  background: color-mix(in srgb, var(--colour-primary) 14%, transparent);
+  color: var(--colour-primary);
 }
 
 .scenario-card-title-row {
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--ui-space-2);
 }
 
 .scenario-card-title-row h3 {
@@ -114,41 +128,41 @@
 }
 
 .scenario-card-heading p {
-  margin: 0.25rem 0 0;
-  color: var(--text-secondary);
+  margin: var(--ui-space-1) 0 0;
+  color: var(--colour-text-muted);
   font-size: 0.875rem;
 }
 
 .scenario-card-badge {
   padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  background: var(--surface-muted);
-  color: var(--text-secondary);
+  border-radius: var(--ui-radius-pill);
+  background: color-mix(in srgb, var(--colour-text) 8%, transparent);
+  color: var(--colour-text-muted);
   font-size: 0.75rem;
   font-weight: 700;
 }
 
 .scenario-card-badge.is-active {
-  background: var(--accent-soft);
-  color: var(--accent-primary);
+  background: color-mix(in srgb, var(--colour-primary) 14%, transparent);
+  color: var(--colour-primary);
 }
 
 .scenario-card-metrics {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--ui-space-3);
   margin: 0;
 }
 
 .scenario-card-metrics div {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border-subtle);
+  gap: var(--ui-space-4);
+  padding-bottom: var(--ui-space-3);
+  border-bottom: 1px solid var(--colour-border);
 }
 
 .scenario-card-metrics dt {
-  color: var(--text-secondary);
+  color: var(--colour-text-muted);
 }
 
 .scenario-card-metrics dd {
@@ -158,17 +172,17 @@
 
 .scenario-card-actions {
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--ui-space-2);
 }
 
 .scenario-card-rename {
   display: grid;
-  gap: 0.5rem;
+  gap: var(--ui-space-2);
 }
 
 .scenario-card-rename > div {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--ui-space-2);
 }
 
 @media (max-width: 48rem) {
