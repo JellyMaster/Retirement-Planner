@@ -17,3 +17,8 @@ export {
   createBrowserScenarioDependencies,
 } from "./ScenarioService";
 export { createBrowserScenarioService } from "./createScenarioService";
+export {
+  createScenarioChartSeries,
+  type ScenarioChartPoint,
+  type ScenarioChartSeries,
+} from "./createScenarioChartSeries";
