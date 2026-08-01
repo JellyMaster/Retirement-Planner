@@ -120,14 +120,6 @@ export function RetirementPlannerPage() {
     discardPreview,
   } = usePlanPreview({ committedInputs: inputs, onCommit: commitActiveInputs });
 
-  useEffect(() => {
-    const scenarioInputs = { ...activeScenario.inputs };
-    setInputs(scenarioInputs);
-    setComparisonInputs(scenarioInputs);
-    setComparisonEnabled(false);
-    discardPreview();
-  }, [activeScenario.id, activeScenario.inputs, discardPreview]);
-
   const currentScenario = usePensionProjection(effectiveInputs);
   const comparisonScenario = usePensionProjection(comparisonInputs);
 
