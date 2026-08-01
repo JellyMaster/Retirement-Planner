@@ -6,12 +6,12 @@
 
 - `foundations/` contains reusable scales and global typography or motion rules.
 - `themes/` is reserved for Noel, Olivia and future theme-specific values.
-- `components/` is reserved for shared UI primitives such as buttons, cards, badges, metrics, forms and tables.
+- `components/` owns shared UI primitives and shared semantic component states.
 - `layouts/` owns application shell, planner composition, workspace and dashboard layout.
 - `utilities/` contains narrowly scoped accessibility and helper classes.
 - Existing feature files in `src/styles/` continue to own one feature each while they are migrated.
 - `App.css` is a temporary compatibility file. Do not add new feature rules to it.
-- `semantic-state-migrations.css` is the only remaining temporary semantic bridge. Move its selectors into their permanent owners before deleting it.
+- No temporary semantic migration stylesheet remains.
 
 ## Selector rules
 
@@ -24,7 +24,7 @@
 
 ## Import order
 
-The central entry point loads foundations, shared components, semantic mappings, layouts and the remaining state compatibility bridge. Within `layouts/index.css`, legacy `App.css` loads first and dedicated layout modules load afterwards. This lets an extracted module become authoritative before its duplicate legacy block is deleted.
+The central entry point loads foundations, shared components, semantic theme mappings and layouts. Within `layouts/index.css`, legacy `App.css` loads first and dedicated layout modules load afterwards. This lets an extracted module become authoritative before its duplicate legacy block is deleted.
 
 Feature styles imported by pages remain independent until their migration is complete.
 
@@ -32,6 +32,7 @@ Feature styles imported by pages remain independent until their migration is com
 
 ### Extracted and authoritative
 
+- `components/semantic-states.css`: status badges, toned cards, metric states and generic alert semantics.
 - `layouts/app-shell.css`: application frame, header, brand, navigation and theme toggle.
 - `layouts/planner-page.css`: planner width, header, grids and responsive section rhythm.
 - `layouts/planner-controls.css`: legacy panels, forms, validation, summaries and guided actions.
@@ -47,6 +48,8 @@ Feature styles imported by pages remain independent until their migration is com
 - `layouts/milestone-cards.css`: milestone grids, states, icons and responsive cards.
 - `layouts/summary-callouts.css`: assumptions, insights, validation, empty states and callouts.
 - `layouts/legacy-actions.css`: compatibility styling for older native action classes.
+- `layouts/workspace-navigation.css`: semantic workspace accents and navigation interaction states.
+- `layouts/retirement-health.css`: explicit retirement-health metric text and icon roles.
 
 ### Cleanup completed
 
@@ -56,6 +59,8 @@ Feature styles imported by pages remain independent until their migration is com
 - Scenario saving uses `variant="success"`.
 - Scenario and Monte Carlo resets use `variant="warning"`.
 - `action-intent-migrations.css` has been deleted.
+- `semantic-state-migrations.css` has been deleted.
+- The application stylesheet entry point no longer loads migration layers.
 
 ### Still in `App.css`
 
@@ -63,13 +68,13 @@ Feature styles imported by pages remain independent until their migration is com
 - miscellaneous legacy utilities and isolated responsive overrides;
 - any selector not yet confirmed through visual regression checks.
 
-### Remaining migration order
+### Remaining cleanup order
 
-1. move workspace, status and metric rules out of `semantic-state-migrations.css` into their permanent owners;
-2. delete `semantic-state-migrations.css`;
-3. delete verified duplicate blocks from `App.css` in cohesive sections;
-4. audit remaining selectors for active usage and remove dead rules;
-5. remove the `App.css` import when no active selector depends on it.
+1. delete verified duplicate blocks from `App.css` in cohesive sections;
+2. audit remaining selectors for active usage and remove dead rules;
+3. move any genuine residual selectors into permanent owners;
+4. remove the `App.css` import when no active selector depends on it;
+5. delete `App.css` or replace it with a short historical note.
 
 ## Migration checklist
 
