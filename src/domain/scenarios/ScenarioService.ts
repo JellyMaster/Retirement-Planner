@@ -30,11 +30,15 @@ function normaliseName(name: string): string {
 
 export class ScenarioService {
   private state: ScenarioState;
+  private readonly repository: ScenarioRepository;
+  private readonly dependencies: ScenarioDependencies;
 
   constructor(
-    private readonly repository: ScenarioRepository,
-    private readonly dependencies: ScenarioDependencies,
+    repository: ScenarioRepository,
+    dependencies: ScenarioDependencies,
   ) {
+    this.repository = repository;
+    this.dependencies = dependencies;
     this.state = repository.load();
   }
 
