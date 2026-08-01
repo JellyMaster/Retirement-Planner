@@ -187,7 +187,7 @@
 }
 
 .active-scenario-switcher select {
-  width: 11.5rem;
+  width: 13.5rem;
   min-width: 0;
   min-height: 40px;
   padding: 0.5rem 2rem 0.5rem 0.75rem;
@@ -199,6 +199,13 @@
   font-size: 0.84rem;
   font-weight: 700;
   text-overflow: ellipsis;
+}
+.active-scenario-switcher-label {
+  color: var(--colour-text-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+  padding-right: 10px;
 }
 
 .active-scenario-switcher select:hover {

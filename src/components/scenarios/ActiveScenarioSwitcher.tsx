@@ -5,6 +5,9 @@ export function ActiveScenarioSwitcher() {
 
   return (
     <div className="active-scenario-switcher">
+       <span className="active-scenario-switcher-label">
+    Active Plan
+  </span>
       <select
         id="active-scenario-select"
         value={activeScenarioId}
