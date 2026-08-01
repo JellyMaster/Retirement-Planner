@@ -8,6 +8,7 @@ import {
 import type { PensionInputs } from "../../engine/models/PensionInputs";
 import {
   createBrowserScenarioService,
+  type ScenarioDrawdownPreferences,
   type ScenarioId,
   type ScenarioState,
 } from "../../domain/scenarios";
@@ -60,6 +61,19 @@ export function ScenarioProvider({ children }: PropsWithChildren) {
     [refresh, service],
   );
 
+  const updateScenarioPlan = useCallback(
+    (
+      id: ScenarioId,
+      inputs: PensionInputs,
+      drawdown: ScenarioDrawdownPreferences,
+    ) => {
+      const scenario = service.updateScenarioPlan(id, inputs, drawdown);
+      refresh();
+      return scenario;
+    },
+    [refresh, service],
+  );
+
   const setActiveScenario = useCallback(
     (id: ScenarioId) => {
       service.setActiveScenario(id);
@@ -92,6 +106,7 @@ export function ScenarioProvider({ children }: PropsWithChildren) {
       duplicateScenario,
       renameScenario,
       updateScenarioInputs,
+      updateScenarioPlan,
       setActiveScenario,
       deleteScenario,
     }),
@@ -104,6 +119,7 @@ export function ScenarioProvider({ children }: PropsWithChildren) {
       setActiveScenario,
       state,
       updateScenarioInputs,
+      updateScenarioPlan,
     ],
   );
 
