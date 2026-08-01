@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-do
 
 import { ThemeToggle } from "./components/theme/ThemeToggle";
 import { SkipLink } from "./components/ui";
-import { AppIcons, type AppIcon } from "./icons/AppIcons";
+import { AppIcons, type AppIcon } from "./icons";
 import { DrawdownPlannerPage } from "./pages/DrawdownPlannerPage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { PolarisSectionPage } from "./pages/PolarisSectionPage";
