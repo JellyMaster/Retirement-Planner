@@ -31,8 +31,8 @@ function createScenario(
 describe("createScenarioInsights", () => {
   it("describes retirement, contribution and projected outcome differences", () => {
     const active = createScenario("active", "Active Plan");
-    const alternative = createScenario("alternative", "Retire at 65", {
-      retirementAge: 65,
+    const alternative = createScenario("alternative", "Retire at 60", {
+      retirementAge: 60,
       monthlyEmployeeContribution: 1_000,
     });
 
