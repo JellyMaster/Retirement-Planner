@@ -181,9 +181,7 @@
   color: var(--colour-text);
   font-weight: 700;
   text-align: right;
-}@media (max-width: 900px) {
-  .scenario-input-grid,
-  .scenario-results-grid {
+}@media (max-width: 900px) {.scenario-input-grid {
     grid-template-columns: 1fr;
   }
 }

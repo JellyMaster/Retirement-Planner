@@ -80,11 +80,7 @@
   margin-bottom: var(--space-2);
   color: var(--colour-text-strong);
   font-weight: 700;
-}
-
-.income-target-toggle,
-.chart-tabs,
-.projection-segmented-control {
+}.income-target-toggle {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-1);
@@ -92,11 +88,7 @@
   border: 1px solid var(--colour-border);
   border-radius: var(--radius-md);
   background: var(--colour-background);
-}
-
-.income-target-option,
-.chart-tab,
-.projection-segmented-control button {
+}.income-target-option {
   min-height: 2.5rem;
   padding: 0.55rem var(--space-3);
   border: 0;
@@ -118,20 +110,12 @@
 .projection-segmented-control button:hover {
   color: var(--colour-text-strong);
   background: var(--colour-surface-hover);
-}
-
-.income-target-option-active,
-.income-target-option-active:hover,
-.chart-tab-active,
-.projection-segmented-control button.is-active {
+}.income-target-option-active,
+.income-target-option-active:hover {
   color: var(--action-run-text);
   background: var(--action-run-background);
   box-shadow: var(--shadow-sm);
-}
-
-.income-target-option:focus-visible,
-.chart-tab:focus-visible,
-.projection-segmented-control button:focus-visible {
+}.income-target-option:focus-visible {
   outline: 0;
   box-shadow: 0 0 0 3px var(--action-run-focus);
 }

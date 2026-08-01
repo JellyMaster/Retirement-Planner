@@ -145,9 +145,7 @@
   .dashboard-details > summary span {
     display: none;
   }
-}@media (max-width: 600px) {
-  .drawdown-chart,
-  .dashboard-chart-stage .drawdown-chart {
+}@media (max-width: 600px) {.dashboard-chart-stage .drawdown-chart {
     height: 20rem;
   }
 }
