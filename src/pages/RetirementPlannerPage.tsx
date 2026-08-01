@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { ActionCentre } from "../components/action-centre";
 import { RetirementComparisonDashboard } from "../components/comparison/RetirementComparisonDashboard";
 import { FeeImpactDashboard } from "../components/fee-impact";
 import { RetirementGoalsForm } from "../components/goals/RetirementGoalsForm";
@@ -57,6 +58,7 @@ import "../styles/monte-carlo-confidence-explorer.css";
 import "../styles/smart-retirement-recommendations.css";
 import "../styles/retirement-workspace.css";
 import "../styles/retirement-sustainability.css";
+import "../styles/action-centre.css";
 
 type ChartView = "balance" | "contributions";
 
@@ -355,6 +357,11 @@ export function RetirementPlannerPage() {
       case "improve":
         return (
           <>
+            <ActionCentre
+              inputs={inputs}
+              goals={retirementGoals}
+              onPreviewRecommendation={applyRecommendationToComparison}
+            />
             <RetirementCoach
               inputs={inputs}
               result={currentScenario.projection}
