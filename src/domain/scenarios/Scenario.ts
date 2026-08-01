@@ -1,4 +1,8 @@
 import type { PensionInputs } from "../../engine/models/PensionInputs";
+import {
+  createDefaultScenarioDrawdownPreferences,
+  type ScenarioDrawdownPreferences,
+} from "./ScenarioDrawdownPreferences";
 
 export type ScenarioId = string;
 
@@ -11,6 +15,7 @@ export interface Scenario {
   createdAt: string;
   updatedAt: string;
   inputs: PensionInputs;
+  drawdown: ScenarioDrawdownPreferences;
 }
 
 export interface ScenarioState {
@@ -39,6 +44,7 @@ export function createBaselineScenario(
     createdAt: timestamp,
     updatedAt: timestamp,
     inputs: { ...inputs },
+    drawdown: createDefaultScenarioDrawdownPreferences(),
   };
 }
 
@@ -57,5 +63,6 @@ export function duplicateScenario(
     createdAt: timestamp,
     updatedAt: timestamp,
     inputs: { ...source.inputs },
+    drawdown: { ...source.drawdown },
   };
 }
