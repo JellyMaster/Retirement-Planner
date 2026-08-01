@@ -1,0 +1,98 @@
+/* =========================================================
+   Planner page composition
+
+   Owns page width, headers, primary grids and common planner
+   section rhythm. Loaded after App.css during migration.
+   ========================================================= */
+
+.planner-page {
+  width: min(var(--content-width-wide), 100%);
+  margin-inline: auto;
+  padding: var(--space-10) var(--space-6);
+}
+
+.planner-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.planner-header > div {
+  min-width: 0;
+}
+
+.planner-header h1 {
+  max-width: 18ch;
+  margin: var(--space-1) 0 var(--space-3);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.planner-header p:last-child {
+  max-width: 68ch;
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-lg);
+  line-height: 1.6;
+}
+
+.planner-eyebrow {
+  margin: 0;
+  color: var(--colour-accent);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.planner-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(20rem, 0.8fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.retirement-guided-input-region,
+.retirement-goals-control-region {
+  min-width: 0;
+}
+
+.retirement-guided-input-region + .retirement-goals-control-region,
+.retirement-goals-control-region + * {
+  margin-top: var(--space-5);
+}
+
+.projection-table-panel,
+.projection-chart-panel {
+  margin-top: var(--space-6);
+}
+
+@media (max-width: 900px) {
+  .planner-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .planner-page {
+    padding: var(--space-7) var(--space-4);
+  }
+
+  .planner-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
+  .planner-header h1 {
+    max-width: none;
+  }
+
+  .planner-header p:last-child {
+    font-size: var(--ui-font-size-md);
+  }
+}
