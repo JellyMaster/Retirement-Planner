@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 
+import type { PensionInputs } from "../../engine/models/PensionInputs";
 import type {
   Scenario,
   ScenarioId,
@@ -11,6 +12,7 @@ export interface ScenarioContextValue extends ScenarioState {
   createScenario: (name: string, sourceId?: ScenarioId) => Scenario;
   duplicateScenario: (id: ScenarioId) => Scenario;
   renameScenario: (id: ScenarioId, name: string) => Scenario;
+  updateScenarioInputs: (id: ScenarioId, inputs: PensionInputs) => Scenario;
   setActiveScenario: (id: ScenarioId) => void;
   deleteScenario: (id: ScenarioId) => void;
 }
