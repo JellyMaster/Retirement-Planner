@@ -1,7 +1,11 @@
 /* Application and dashboard layout compatibility.
    App.css remains available while legacy feature blocks are migrated.
-   Dedicated layout modules load afterwards and are authoritative for their
-   owned selectors, which allows duplicate legacy rules to be retired safely. */
+   Dedicated modules load afterwards and are authoritative for their owned
+   selectors, which allows duplicate legacy rules to be retired safely. */
 
 @import "../../App.css";
+
 @import "./app-shell.css";
+@import "./planner-page.css";
+@import "./planner-controls.css";
+@import "./planner-tables.css";
