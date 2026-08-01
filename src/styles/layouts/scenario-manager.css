@@ -1,0 +1,190 @@
+.scenario-manager-page {
+  display: grid;
+  gap: 2rem;
+}
+
+.scenario-manager-header,
+.scenario-manager-create,
+.scenario-manager-section-heading,
+.scenario-card-heading,
+.scenario-card-title-row,
+.scenario-card-actions,
+.scenario-manager-create-controls {
+  display: flex;
+  align-items: center;
+}
+
+.scenario-manager-header,
+.scenario-manager-create,
+.scenario-manager-section-heading {
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.scenario-manager-header > div,
+.scenario-manager-create > div:first-child {
+  max-width: 48rem;
+}
+
+.scenario-manager-create {
+  padding: 1.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-large);
+  background: var(--surface-raised);
+}
+
+.scenario-manager-create-controls {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.scenario-manager-create-controls label,
+.scenario-card-rename label {
+  width: 100%;
+  font-weight: 700;
+}
+
+.scenario-manager-create-controls input,
+.scenario-card-rename input {
+  min-width: 16rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-medium);
+  background: var(--surface-base);
+  color: var(--text-primary);
+}
+
+.scenario-manager-error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--status-warning-border);
+  border-radius: var(--radius-medium);
+  background: var(--status-warning-surface);
+}
+
+.scenario-manager-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.scenario-card {
+  display: grid;
+  align-content: start;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-large);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-small);
+}
+
+.scenario-card.is-active {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.scenario-card-heading {
+  align-items: flex-start;
+  gap: 0.875rem;
+}
+
+.scenario-card-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+}
+
+.scenario-card-title-row {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.scenario-card-title-row h3 {
+  margin: 0;
+}
+
+.scenario-card-heading p {
+  margin: 0.25rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.scenario-card-badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.scenario-card-badge.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+}
+
+.scenario-card-metrics {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.scenario-card-metrics div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.scenario-card-metrics dt {
+  color: var(--text-secondary);
+}
+
+.scenario-card-metrics dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.scenario-card-actions {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.scenario-card-rename {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.scenario-card-rename > div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 48rem) {
+  .scenario-manager-header,
+  .scenario-manager-create,
+  .scenario-manager-section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .scenario-manager-create-controls {
+    justify-content: stretch;
+  }
+
+  .scenario-manager-create-controls input,
+  .scenario-manager-create-controls button {
+    width: 100%;
+  }
+}
