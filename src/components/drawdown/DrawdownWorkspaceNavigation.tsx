@@ -21,48 +21,55 @@ interface DrawdownWorkspaceNavigationProps {
 const sections: Array<{
   id: DrawdownWorkspaceSection;
   label: string;
-  description: string;
   icon: typeof LayoutDashboard;
 }> = [
-  {
-    id: "overview",
-    label: "Overview",
-    description: "Sustainability and key outcomes",
-    icon: LayoutDashboard,
-  },
-  {
-    id: "income",
-    label: "Income",
-    description: "Income, tax and shortfalls",
-    icon: ReceiptText,
-  },
-  {
-    id: "balance",
-    label: "Pension balance",
-    description: "Portfolio value over time",
-    icon: BarChart3,
-  },
-  {
-    id: "details",
-    label: "Details",
-    description: "Year-by-year projection",
-    icon: ClipboardList,
-  },
-  {
-    id: "assumptions",
-    label: "Assumptions",
-    description: "Methodology and inputs",
-    icon: Landmark,
-  },
+  { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "income", label: "Income & tax", icon: ReceiptText },
+  { id: "balance", label: "Pension balance", icon: BarChart3 },
+  { id: "details", label: "Year-by-year", icon: ClipboardList },
+  { id: "assumptions", label: "Assumptions", icon: Landmark },
 ];
 
 export function DrawdownWorkspaceNavigation({
   value,
   onChange,
 }: DrawdownWorkspaceNavigationProps) {
+  function handleKeyDown(
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    currentIndex: number,
+  ) {
+    let nextIndex: number;
+
+    switch (event.key) {
+      case "ArrowRight":
+        nextIndex = (currentIndex + 1) % sections.length;
+        break;
+      case "ArrowLeft":
+        nextIndex = (currentIndex - 1 + sections.length) % sections.length;
+        break;
+      case "Home":
+        nextIndex = 0;
+        break;
+      case "End":
+        nextIndex = sections.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    const nextSection = sections[nextIndex];
+    onChange(nextSection.id);
+    document.getElementById(`drawdown-tab-${nextSection.id}`)?.focus();
+  }
+
   return (
-    <nav className="drawdown-workspace-navigation" aria-label="Drawdown analysis">
-      {sections.map((section) => {
+    <div
+      className="drawdown-workspace-navigation"
+      role="tablist"
+      aria-label="Drawdown analysis"
+    >
+      {sections.map((section, index) => {
         const Icon = section.icon;
         const active = value === section.id;
 
@@ -70,20 +77,24 @@ export function DrawdownWorkspaceNavigation({
           <button
             key={section.id}
             type="button"
-            className={active ? "drawdown-workspace-nav-item active" : "drawdown-workspace-nav-item"}
-            aria-current={active ? "page" : undefined}
+            id={`drawdown-tab-${section.id}`}
+            role="tab"
+            aria-selected={active}
+            aria-controls={`drawdown-${section.id}-section`}
+            tabIndex={active ? 0 : -1}
+            className={
+              active
+                ? "drawdown-workspace-nav-item active"
+                : "drawdown-workspace-nav-item"
+            }
             onClick={() => onChange(section.id)}
+            onKeyDown={(event) => handleKeyDown(event, index)}
           >
-            <span className="drawdown-workspace-nav-icon" aria-hidden="true">
-              <Icon size={18} />
-            </span>
-            <span className="drawdown-workspace-nav-copy">
-              <strong>{section.label}</strong>
-              <small>{section.description}</small>
-            </span>
+            <Icon size={17} aria-hidden="true" />
+            <span>{section.label}</span>
           </button>
         );
       })}
-    </nav>
+    </div>
   );
 }
