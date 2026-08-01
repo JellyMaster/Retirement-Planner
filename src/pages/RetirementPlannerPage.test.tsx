@@ -86,6 +86,34 @@ describe("RetirementPlannerPage", () => {
     ).toHaveAttribute("aria-selected", "true");
   });
 
+  it("previews an Action Centre recommendation and can discard it", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<RetirementPlannerPage />);
+
+    await user.click(
+      screen.getByRole("tab", { name: /improve my plan/i }),
+    );
+
+    await user.click(
+      screen.getAllByRole("button", { name: /preview plan/i })[0],
+    );
+
+    expect(
+      screen.getByRole("status", { name: /preview mode/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /keep changes/i }),
+    ).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: /discard preview/i }),
+    );
+
+    expect(
+      screen.queryByRole("status", { name: /preview mode/i }),
+    ).not.toBeInTheDocument();
+  });
+
   it("copies the current scenario when comparison is enabled", async () => {
     const user = userEvent.setup();
     renderWithProviders(<RetirementPlannerPage />);

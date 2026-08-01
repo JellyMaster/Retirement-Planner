@@ -10,7 +10,8 @@ interface ActionCardProps {
   baseline: RecommendationBaseline;
   recommendation: RetirementRecommendation;
   rank: number;
-  onPreview: (recommendation: RetirementRecommendation) => void;
+  onPreviewPlan: (recommendation: RetirementRecommendation) => void;
+  onPreviewComparison: (recommendation: RetirementRecommendation) => void;
 }
 
 const effortLabels = {
@@ -29,7 +30,8 @@ export function ActionCard({
   baseline,
   recommendation,
   rank,
-  onPreview,
+  onPreviewPlan,
+  onPreviewComparison,
 }: ActionCardProps) {
   const [expanded, setExpanded] = useState(false);
   const detailsId = useId();
@@ -73,10 +75,18 @@ export function ActionCard({
         <Button
           variant="primary"
           size="small"
-          icon={AppIcons.comparison}
-          onClick={() => onPreview(recommendation)}
+          icon={AppIcons.information}
+          onClick={() => onPreviewPlan(recommendation)}
         >
-          Preview in comparison
+          Preview plan
+        </Button>
+        <Button
+          variant="compare"
+          size="small"
+          icon={AppIcons.comparison}
+          onClick={() => onPreviewComparison(recommendation)}
+        >
+          Compare
         </Button>
       </div>
 

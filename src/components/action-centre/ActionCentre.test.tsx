@@ -12,13 +12,15 @@ describe("ActionCentre", () => {
   it("shows ranked actions, filters categories, expands details, and previews a recommendation", async () => {
     const user = userEvent.setup();
     const inputs = createTestPensionInputs();
-    const onPreviewRecommendation = vi.fn();
+    const onPreviewPlan = vi.fn();
+    const onPreviewComparison = vi.fn();
 
     render(
       <ActionCentre
         inputs={inputs}
         goals={createTestRetirementGoals()}
-        onPreviewRecommendation={onPreviewRecommendation}
+        onPreviewPlan={onPreviewPlan}
+        onPreviewComparison={onPreviewComparison}
       />,
     );
 
@@ -30,9 +32,14 @@ describe("ActionCentre", () => {
     await user.click(screen.getAllByRole("button", { name: /why this action/i })[0]);
     expect(screen.getByRole("heading", { name: /what changes/i })).toBeInTheDocument();
 
-    await user.click(screen.getAllByRole("button", { name: /preview in comparison/i })[0]);
-    expect(onPreviewRecommendation).toHaveBeenCalledTimes(1);
-    expect(onPreviewRecommendation.mock.calls[0][0]).not.toBe(inputs);
+    await user.click(screen.getAllByRole("button", { name: /preview plan/i })[0]);
+    expect(onPreviewPlan).toHaveBeenCalledTimes(1);
+    expect(onPreviewPlan.mock.calls[0][0]).toEqual(expect.any(String));
+    expect(onPreviewPlan.mock.calls[0][1]).not.toBe(inputs);
+
+    await user.click(screen.getAllByRole("button", { name: /^compare$/i })[0]);
+    expect(onPreviewComparison).toHaveBeenCalledTimes(1);
+    expect(onPreviewComparison.mock.calls[0][0]).not.toBe(inputs);
 
     await user.click(screen.getByRole("tab", { name: /retirement timing/i }));
     expect(screen.getByRole("tabpanel")).toHaveAttribute(

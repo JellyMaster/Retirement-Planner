@@ -151,3 +151,16 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.action-card__compare-button {
+  color: #ff69b4;
+}
+
+.action-card__compare-button:hover {
+  color: #ff85c2;
+}
+
+.action-card__compare-button svg {
+  color: inherit;
+}

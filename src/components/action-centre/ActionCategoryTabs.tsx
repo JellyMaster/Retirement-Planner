@@ -13,7 +13,10 @@ interface ActionCategoryTabsProps {
   counts: Record<ActionCategoryFilter, number>;
 }
 
-const tabs: Array<{ id: ActionCategoryFilter; label: string }> = [
+const tabs: Array<{
+  id: ActionCategoryFilter;
+  label: string;
+}> = [
   { id: "biggest-gains", label: "Biggest gains" },
   { id: "quick-wins", label: "Quick wins" },
   { id: "risk-reduction", label: "Risk reduction" },
@@ -26,19 +29,52 @@ export function ActionCategoryTabs({
   onChange,
   counts,
 }: ActionCategoryTabsProps) {
-  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const currentIndex = tabs.findIndex((tab) => tab.id === value);
-    let nextIndex = currentIndex;
+  function handleKeyDown(
+    event: KeyboardEvent<HTMLDivElement>,
+  ) {
+    const currentIndex = tabs.findIndex(
+      (tab) => tab.id === value,
+    );
 
-    if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabs.length;
-    else if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-    else if (event.key === "Home") nextIndex = 0;
-    else if (event.key === "End") nextIndex = tabs.length - 1;
-    else return;
+    let nextIndex: number;
+
+    switch (event.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        nextIndex =
+          (currentIndex + 1) % tabs.length;
+        break;
+
+      case "ArrowLeft":
+      case "ArrowUp":
+        nextIndex =
+          (currentIndex - 1 + tabs.length) %
+          tabs.length;
+        break;
+
+      case "Home":
+        nextIndex = 0;
+        break;
+
+      case "End":
+        nextIndex = tabs.length - 1;
+        break;
+
+      default:
+        return;
+    }
 
     event.preventDefault();
-    onChange(tabs[nextIndex].id);
-    document.getElementById(`action-category-${tabs[nextIndex].id}`)?.focus();
+
+    const nextTab = tabs[nextIndex];
+
+    onChange(nextTab.id);
+
+    document
+      .getElementById(
+        `action-category-${nextTab.id}`,
+      )
+      ?.focus();
   }
 
   return (
@@ -57,7 +93,9 @@ export function ActionCategoryTabs({
           aria-selected={value === tab.id}
           aria-controls="action-centre-results"
           tabIndex={value === tab.id ? 0 : -1}
-          className={value === tab.id ? "active" : undefined}
+          className={
+            value === tab.id ? "active" : undefined
+          }
           onClick={() => onChange(tab.id)}
         >
           <span>{tab.label}</span>

@@ -18,7 +18,8 @@ import { EmptyRecommendations } from "./EmptyRecommendations";
 interface ActionCentreProps {
   inputs: PensionInputs;
   goals: RetirementGoals;
-  onPreviewRecommendation: (inputs: PensionInputs) => void;
+  onPreviewPlan: (label: string, inputs: PensionInputs) => void;
+  onPreviewComparison: (inputs: PensionInputs) => void;
 }
 
 const categoryLabels: Record<ActionCategoryFilter, string> = {
@@ -48,7 +49,8 @@ function matchesCategory(
 export function ActionCentre({
   inputs,
   goals,
-  onPreviewRecommendation,
+  onPreviewPlan,
+  onPreviewComparison,
 }: ActionCentreProps) {
   const [category, setCategory] = useState<ActionCategoryFilter>("biggest-gains");
 
@@ -85,8 +87,12 @@ export function ActionCentre({
     matchesCategory(recommendation, category),
   );
 
-  function handlePreview(recommendation: RetirementRecommendation) {
-    onPreviewRecommendation(recommendation.inputs);
+  function handlePreviewPlan(recommendation: RetirementRecommendation) {
+    onPreviewPlan(recommendation.title, recommendation.inputs);
+  }
+
+  function handlePreviewComparison(recommendation: RetirementRecommendation) {
+    onPreviewComparison(recommendation.inputs);
   }
 
   return (
@@ -129,7 +135,8 @@ export function ActionCentre({
                 baseline={result.baseline}
                 recommendation={recommendation}
                 rank={result.recommendations.indexOf(recommendation) + 1}
-                onPreview={handlePreview}
+                onPreviewPlan={handlePreviewPlan}
+                onPreviewComparison={handlePreviewComparison}
               />
             ))}
           </div>

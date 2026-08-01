@@ -2,7 +2,12 @@ import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "subtle" | "danger";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "subtle"
+  | "compare"
+  | "danger";
 export type ButtonSize = "small" | "medium" | "large";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

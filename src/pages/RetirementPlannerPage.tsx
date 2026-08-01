@@ -11,6 +11,7 @@ import { RetirementWhatIfAnalysis } from "../components/goals/RetirementWhatIfAn
 import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
 import { GuidedPensionInputsForm } from "../components/inputs/guided";
 import { RetirementJourney } from "../components/journey";
+import { PlanPreviewBanner, usePlanPreview } from "../components/preview";
 import {
   MonteCarloConfidenceDashboard,
   MonteCarloConfidenceExplorer,
@@ -59,6 +60,8 @@ import "../styles/smart-retirement-recommendations.css";
 import "../styles/retirement-workspace.css";
 import "../styles/retirement-sustainability.css";
 import "../styles/action-centre.css";
+import "../styles/plan-preview.css";
+
 
 type ChartView = "balance" | "contributions";
 
@@ -84,29 +87,38 @@ export function RetirementPlannerPage() {
   const [chartView, setChartView] = useState<ChartView>("balance");
   const [activeSection, setActiveSection] = useState<WorkspaceSectionId>(getInitialWorkspaceSection);
 
-  const currentScenario = usePensionProjection(inputs);
+  const {
+    preview,
+    effectiveInputs,
+    startPreview,
+    updateEffectiveInputs,
+    keepPreview,
+    discardPreview,
+  } = usePlanPreview({ committedInputs: inputs, onCommit: setInputs });
+
+  const currentScenario = usePensionProjection(effectiveInputs);
   const comparisonScenario = usePensionProjection(comparisonInputs);
 
   const assumptions = useMemo(
     () => [
-      { label: "Current age", value: String(inputs.currentAge) },
-      { label: "Retirement age", value: String(inputs.retirementAge) },
-      { label: "Starting pension", value: formatCurrency(inputs.currentPot) },
+      { label: "Current age", value: String(effectiveInputs.currentAge) },
+      { label: "Retirement age", value: String(effectiveInputs.retirementAge) },
+      { label: "Starting pension", value: formatCurrency(effectiveInputs.currentPot) },
       {
         label: "Monthly contribution",
         value: formatCurrency(
-          inputs.monthlyEmployeeContribution + inputs.monthlyEmployerContribution,
+          effectiveInputs.monthlyEmployeeContribution + effectiveInputs.monthlyEmployerContribution,
         ),
       },
-      { label: "Annual return", value: formatPercentage(inputs.annualReturn) },
-      { label: "Inflation", value: formatPercentage(inputs.inflation) },
-      { label: "Annual fund fee", value: formatPercentage(inputs.annualFee) },
+      { label: "Annual return", value: formatPercentage(effectiveInputs.annualReturn) },
+      { label: "Inflation", value: formatPercentage(effectiveInputs.inflation) },
+      { label: "Annual fund fee", value: formatPercentage(effectiveInputs.annualFee) },
       {
         label: "Contribution increase",
-        value: formatPercentage(inputs.annualContributionIncrease),
+        value: formatPercentage(effectiveInputs.annualContributionIncrease),
       },
     ],
-    [inputs],
+    [effectiveInputs],
   );
 
   const summaryMetrics = useMemo(() => {
@@ -125,7 +137,7 @@ export function RetirementPlannerPage() {
     );
     const target = calculateMonteCarloTarget(retirementGoals);
     const monteCarlo = MonteCarloEngine.calculate({
-      pensionInputs: inputs,
+      pensionInputs: effectiveInputs,
       simulations: 500,
       seed: 12_345,
       annualVolatility: 0.12,
@@ -138,7 +150,7 @@ export function RetirementPlannerPage() {
       projectedPot: currentScenario.projection.finalBalance.real,
       illustratedIncome: health.estimatedAnnualIncome,
     };
-  }, [currentScenario.hasErrors, currentScenario.projection, inputs, retirementGoals]);
+  }, [currentScenario.hasErrors, currentScenario.projection, effectiveInputs, retirementGoals]);
 
   const changeWorkspaceSection = useCallback((section: WorkspaceSectionId) => {
     setActiveSection(section);
@@ -171,14 +183,30 @@ export function RetirementPlannerPage() {
     };
   }, []);
 
-  useEffect(() => {
-    if (currentScenario.hasErrors && activeSection !== "overview") {
-      changeWorkspaceSection("overview");
+const displayedWorkspaceSection =
+  currentScenario.hasErrors
+    ? "overview"
+    : activeSection;
+
+    const handleWorkspaceSectionChange = useCallback(
+  (section: WorkspaceSectionId) => {
+    if (
+      currentScenario.hasErrors &&
+      section !== "overview"
+    ) {
+      return;
     }
-  }, [activeSection, changeWorkspaceSection, currentScenario.hasErrors]);
+
+    changeWorkspaceSection(section);
+  },
+  [
+    changeWorkspaceSection,
+    currentScenario.hasErrors,
+  ],
+);
 
   function resetInputs() {
-    setInputs({ ...defaultPensionInputs });
+    updateEffectiveInputs({ ...defaultPensionInputs });
   }
 
   function resetComparisonInputs() {
@@ -186,7 +214,7 @@ export function RetirementPlannerPage() {
   }
 
   function enableComparison() {
-    setComparisonInputs({ ...inputs });
+    setComparisonInputs({ ...effectiveInputs });
     setComparisonEnabled(true);
   }
 
@@ -202,9 +230,9 @@ export function RetirementPlannerPage() {
           <section className="retirement-guided-input-region" aria-label="Build your retirement plan">
             <GuidedPensionInputsForm
               idPrefix="current"
-              value={inputs}
+              value={effectiveInputs}
               errors={currentScenario.errors}
-              onChange={setInputs}
+              onChange={updateEffectiveInputs}
               onReset={resetInputs}
             />
           </section>
@@ -225,9 +253,9 @@ export function RetirementPlannerPage() {
             <section className="retirement-guided-input-region" aria-label="Build your retirement plan">
               <GuidedPensionInputsForm
                 idPrefix="current"
-                value={inputs}
+                value={effectiveInputs}
                 errors={currentScenario.errors}
-                onChange={setInputs}
+                onChange={updateEffectiveInputs}
                 onReset={resetInputs}
               />
             </section>
@@ -240,13 +268,13 @@ export function RetirementPlannerPage() {
               />
             </section>
             <RetirementOverview
-              inputs={inputs}
+              inputs={effectiveInputs}
               result={currentScenario.projection}
               goals={retirementGoals}
               onApplyToComparison={applyRecommendationToComparison}
             />
             <RetirementHealthDashboard
-              inputs={inputs}
+              inputs={effectiveInputs}
               result={currentScenario.projection}
               goals={retirementGoals}
             />
@@ -260,7 +288,7 @@ export function RetirementPlannerPage() {
               <ProjectionSummary result={currentScenario.projection} />
             </div>
             <RetirementJourney
-              inputs={inputs}
+              inputs={effectiveInputs}
               result={currentScenario.projection}
               goals={retirementGoals}
             />
@@ -302,7 +330,7 @@ export function RetirementPlannerPage() {
                   </div>
                 )}
               </section>
-              <RetirementInsights inputs={inputs} result={currentScenario.projection} />
+              <RetirementInsights inputs={effectiveInputs} result={currentScenario.projection} />
             </div>
             <details className="retirement-dashboard-details" open>
               <summary>Projection milestones</summary>
@@ -314,10 +342,10 @@ export function RetirementPlannerPage() {
       case "confidence":
         return (
           <>
-            <MonteCarloConfidenceDashboard inputs={inputs} goals={retirementGoals} />
-            <MonteCarloConfidenceExplorer inputs={inputs} goals={retirementGoals} />
+            <MonteCarloConfidenceDashboard inputs={effectiveInputs} goals={retirementGoals} />
+            <MonteCarloConfidenceExplorer inputs={effectiveInputs} goals={retirementGoals} />
             <RetirementScoreBreakdown
-              inputs={inputs}
+              inputs={effectiveInputs}
               result={currentScenario.projection}
               goals={retirementGoals}
             />
@@ -348,7 +376,7 @@ export function RetirementPlannerPage() {
       case "sustainability":
         return (
           <RetirementSustainabilityDashboard
-            inputs={inputs}
+            inputs={effectiveInputs}
             projection={currentScenario.projection}
             goals={retirementGoals}
           />
@@ -358,24 +386,25 @@ export function RetirementPlannerPage() {
         return (
           <>
             <ActionCentre
-              inputs={inputs}
+              inputs={effectiveInputs}
               goals={retirementGoals}
-              onPreviewRecommendation={applyRecommendationToComparison}
+              onPreviewPlan={startPreview}
+              onPreviewComparison={applyRecommendationToComparison}
             />
             <RetirementCoach
-              inputs={inputs}
+              inputs={effectiveInputs}
               result={currentScenario.projection}
               goals={retirementGoals}
               onApplyToComparison={applyRecommendationToComparison}
             />
             <RetirementWhatIfAnalysis
-              inputs={inputs}
+              inputs={effectiveInputs}
               result={currentScenario.projection}
               goals={retirementGoals}
               onApplyToComparison={applyRecommendationToComparison}
             />
             <RetirementRecommendations
-              inputs={inputs}
+              inputs={effectiveInputs}
               result={currentScenario.projection}
               goals={retirementGoals}
               onApplyToComparison={applyRecommendationToComparison}
@@ -419,13 +448,23 @@ export function RetirementPlannerPage() {
         </button>
       </header>
 
+      {preview && !comparisonEnabled && (
+        <PlanPreviewBanner
+          label={preview.label}
+          baselineInputs={preview.baselineInputs}
+          previewInputs={preview.previewInputs}
+          onKeep={keepPreview}
+          onDiscard={discardPreview}
+        />
+      )}
+
       {comparisonEnabled ? (
         <ComparisonLayout
-          inputs={inputs}
+          inputs={effectiveInputs}
           comparisonInputs={comparisonInputs}
           currentScenario={currentScenario}
           comparisonScenario={comparisonScenario}
-          setInputs={setInputs}
+          setInputs={updateEffectiveInputs}
           setComparisonInputs={setComparisonInputs}
           resetInputs={resetInputs}
           resetComparisonInputs={resetComparisonInputs}
@@ -440,10 +479,10 @@ export function RetirementPlannerPage() {
               confidenceProbability={summaryMetrics.confidenceProbability}
               projectedPot={summaryMetrics.projectedPot}
               illustratedIncome={summaryMetrics.illustratedIncome}
-              retirementAge={inputs.retirementAge}
+              retirementAge={effectiveInputs.retirementAge}
             />
           )}
-          <RetirementWorkspace activeSection={activeSection} onSectionChange={changeWorkspaceSection}>
+          <RetirementWorkspace activeSection={displayedWorkspaceSection} onSectionChange={handleWorkspaceSectionChange}>
             {renderWorkspaceContent()}
           </RetirementWorkspace>
         </>

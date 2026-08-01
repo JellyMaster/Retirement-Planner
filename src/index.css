@@ -126,11 +126,19 @@
   --colour-primary-hover: #4ca8c4;
   --colour-primary-active: #3898b5;
   --colour-primary-text: #173541;
+  --colour-primary-contrast: #173541;
+  --colour-text-secondary: #244552;
 
   --colour-accent: #eeb9c1;
   --colour-accent-hover: #e5a4af;
   --colour-accent-soft: #fbe8eb;
   --colour-accent-text: #783e49;
+
+  --colour-compare: #deaf9d;
+--colour-compare-hover: #e7c1b2;
+--colour-compare-active: #c99682;
+  --colour-compare-background: rgb(217 95 159 / 12%);
+  --colour-compare-text-on-fill: #ffffff;
 
   --colour-success: #3b927c;
   --colour-success-background: #e3f5ef;
@@ -209,11 +217,19 @@
   --colour-primary-hover: #e8bdad;
   --colour-primary-active: #f0cbbb;
   --colour-primary-text: #241d1b;
+  --colour-primary-contrast: #241d1b;
+  --colour-text-secondary: #f2efed;
 
   --colour-accent: #deaf9d;
   --colour-accent-hover: #ebc0b0;
   --colour-accent-soft: #46332f;
   --colour-accent-text: #f6d4c7;
+
+  --colour-compare: #deaf9d;
+  --colour-compare-hover: #e7c1b2;
+--colour-compare-active: #c99682;
+  --colour-compare-background: rgb(255 122 200 / 14%);
+  --colour-compare-text-on-fill: #241d1b;
 
   --colour-success: #8fc3a8;
   --colour-success-background: #20352c;
