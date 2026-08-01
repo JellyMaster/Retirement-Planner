@@ -6,12 +6,14 @@ import {
   type ScenarioId,
   type ScenarioState,
 } from "./Scenario";
+import type { ScenarioDrawdownPreferences } from "./ScenarioDrawdownPreferences";
 import type { ScenarioRepository } from "./ScenarioRepository";
 
 function cloneScenario(scenario: Scenario): Scenario {
   return {
     ...scenario,
     inputs: { ...scenario.inputs },
+    drawdown: { ...scenario.drawdown },
   };
 }
 
@@ -94,6 +96,23 @@ export class ScenarioService {
       ...scenario,
       updatedAt: this.dependencies.now(),
       inputs: { ...inputs },
+    };
+
+    this.replaceScenario(updated);
+    return cloneScenario(updated);
+  }
+
+  updateScenarioPlan(
+    id: ScenarioId,
+    inputs: PensionInputs,
+    drawdown: ScenarioDrawdownPreferences,
+  ): Scenario {
+    const scenario = this.requireScenario(id);
+    const updated: Scenario = {
+      ...scenario,
+      updatedAt: this.dependencies.now(),
+      inputs: { ...inputs },
+      drawdown: { ...drawdown },
     };
 
     this.replaceScenario(updated);
