@@ -198,6 +198,81 @@
   line-height: 1.45;
 }
 
+/* Guided pension journey -------------------------------------------------
+   This component still renders legacy primary-button/secondary-button
+   classes. Scope the shared button presentation to its footer until the
+   markup is migrated to the Button component. */
+.guided-pension-actions :is(.primary-button, .secondary-button),
+.guided-pension-edit-button.secondary-button {
+  display: inline-flex;
+  min-width: 8.25rem;
+  min-height: 2.625rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.625rem var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--ui-radius-control);
+  font: inherit;
+  font-size: var(--ui-font-size-sm);
+  font-weight: 750;
+  line-height: 1.1;
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.guided-pension-actions .primary-button {
+  color: var(--action-run-text);
+  background: var(--action-run-background);
+  border-color: var(--action-run-border);
+}
+
+.guided-pension-actions .primary-button:hover:not(:disabled) {
+  color: var(--action-run-text);
+  background: var(--action-run-hover);
+  border-color: var(--action-run-hover);
+  transform: translateY(-1px);
+}
+
+.guided-pension-actions .primary-button:active:not(:disabled) {
+  background: var(--action-run-active);
+  border-color: var(--action-run-active);
+  transform: translateY(0);
+}
+
+.guided-pension-actions .secondary-button,
+.guided-pension-edit-button.secondary-button {
+  color: var(--action-neutral-text);
+  background: var(--action-neutral-background);
+  border-color: var(--action-neutral-border);
+}
+
+.guided-pension-actions .secondary-button:hover:not(:disabled),
+.guided-pension-edit-button.secondary-button:hover:not(:disabled) {
+  color: var(--action-neutral-hover);
+  background: var(--colour-surface-hover);
+  border-color: var(--action-neutral-hover);
+  transform: translateY(-1px);
+}
+
+.guided-pension-actions :is(.primary-button, .secondary-button):focus-visible,
+.guided-pension-edit-button.secondary-button:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.guided-pension-actions :is(.primary-button, .secondary-button):disabled,
+.guided-pension-actions :is(.primary-button, .secondary-button)[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
 @media (max-width: 640px) {
   .panel {
     padding: var(--space-5);
@@ -215,5 +290,14 @@
   .reset-button {
     width: 100%;
     justify-content: center;
+  }
+
+  .guided-pension-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .guided-pension-actions :is(.primary-button, .secondary-button) {
+    width: 100%;
   }
 }
