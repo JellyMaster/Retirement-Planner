@@ -15,3 +15,6 @@
 @import "./comparison-workspace.css";
 @import "./comparison-controls.css";
 @import "./comparison-results.css";
+@import "./chart-surfaces.css";
+@import "./chart-legends.css";
+@import "./milestone-cards.css";
