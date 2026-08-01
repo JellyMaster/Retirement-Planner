@@ -1,0 +1,98 @@
+.custom-what-if-builder {
+  margin-top: 18px;
+  border: 1px solid var(--colour-border);
+  border-radius: 16px;
+  background: var(--colour-surface-subtle);
+  overflow: hidden;
+}
+
+.custom-what-if-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 20px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.custom-what-if-toggle > span:first-child { display: grid; gap: 4px; }
+.custom-what-if-toggle strong { font-size: 1rem; }
+.custom-what-if-toggle small { color: var(--colour-text-muted); line-height: 1.4; }
+.custom-what-if-toggle > span:last-child { color: var(--colour-primary); font-weight: 800; white-space: nowrap; }
+
+.custom-what-if-content { padding: 0 20px 20px; border-top: 1px solid var(--colour-border); }
+.custom-what-if-presets { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 0; }
+.custom-what-if-presets h3 { margin: 0 0 4px; font-size: .95rem; }
+.custom-what-if-presets p { margin: 0; color: var(--colour-text-muted); font-size: .8rem; }
+.custom-what-if-preset-list { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.custom-what-if-preset-list button { padding: 8px 11px; border: 1px solid var(--colour-border); border-radius: 999px; color: var(--colour-text-secondary); background: var(--colour-surface); font-size: .75rem; font-weight: 750; cursor: pointer; }
+.custom-what-if-preset-list button:hover { border-color: var(--colour-primary); color: var(--colour-primary); }
+
+.custom-what-if-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(330px, .75fr); gap: 18px; align-items: start; }
+.custom-what-if-editor, .custom-what-if-preview { padding: 18px; border: 1px solid var(--colour-border); border-radius: 14px; background: var(--colour-surface); }
+.custom-what-if-name { display: grid; gap: 7px; margin-bottom: 16px; }
+.custom-what-if-name label, .custom-what-if-field label { color: var(--colour-text-secondary); font-size: .8rem; font-weight: 800; }
+.custom-what-if-name input, .custom-what-if-field input { width: 100%; min-width: 0; padding: 10px 11px; border: 1px solid var(--colour-border-strong); border-radius: 9px; color: inherit; background: var(--colour-surface); }
+.custom-what-if-name input:focus, .custom-what-if-field input:focus { outline: 0; border-color: var(--colour-primary); box-shadow: 0 0 0 3px var(--colour-focus-ring); }
+.custom-what-if-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.custom-what-if-field { display: grid; gap: 7px; padding: 12px; border: 1px solid var(--colour-border); border-radius: 11px; background: var(--colour-surface-subtle); }
+.custom-what-if-field-heading { display: flex; justify-content: space-between; gap: 12px; }
+.custom-what-if-field-heading p { margin: 3px 0 0; color: var(--colour-text-muted); font-size: .7rem; line-height: 1.35; }
+.custom-what-if-field-impact { font-size: .7rem; font-weight: 800; white-space: nowrap; }
+.custom-what-if-field-impact-positive { color: var(--colour-positive); }
+.custom-what-if-field-impact-negative { color: var(--colour-negative); }
+.custom-what-if-money-input, .custom-what-if-percent-input { display: flex; align-items: center; overflow: hidden; border: 1px solid var(--colour-border-strong); border-radius: 9px; background: var(--colour-surface); }
+.custom-what-if-money-input span { padding-left: 10px; }
+.custom-what-if-percent-input span { padding-right: 10px; }
+.custom-what-if-money-input input, .custom-what-if-percent-input input { border: 0; box-shadow: none; }
+
+.custom-what-if-smart-hint { display: flex; gap: 10px; margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: .78rem; line-height: 1.45; }
+.custom-what-if-smart-hint.positive { color: var(--colour-positive); background: color-mix(in srgb, var(--colour-positive) 8%, transparent); }
+.custom-what-if-smart-hint.negative { color: var(--colour-negative); background: color-mix(in srgb, var(--colour-negative) 8%, transparent); }
+.custom-what-if-save-row { display: flex; justify-content: flex-end; margin-top: 12px; }
+.custom-what-if-save-row button, .custom-what-if-preview > button { min-height: 40px; padding: 0 15px; border: 1px solid var(--colour-primary); border-radius: 9px; color: var(--colour-primary-contrast, #fff); background: var(--colour-primary); font-weight: 800; cursor: pointer; }
+
+.custom-what-if-library { margin-top: 16px; }
+.custom-what-if-library h3 { margin: 0 0 8px; font-size: .9rem; }
+.custom-what-if-library > div { display: grid; gap: 7px; }
+.custom-what-if-library article { display: flex; border: 1px solid var(--colour-border); border-radius: 10px; overflow: hidden; }
+.custom-what-if-library article > button:first-child { display: grid; flex: 1; gap: 2px; padding: 10px 12px; border: 0; color: inherit; background: transparent; text-align: left; cursor: pointer; }
+.custom-what-if-library article small { color: var(--colour-text-muted); }
+.custom-what-if-library article > button:last-child { width: 40px; border: 0; border-left: 1px solid var(--colour-border); color: var(--colour-negative); background: transparent; font-size: 1.2rem; cursor: pointer; }
+
+.custom-what-if-preview { position: sticky; top: 18px; }
+.custom-what-if-preview-heading { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.custom-what-if-preview-heading h3 { margin: 3px 0 0; font-size: 1rem; }
+.custom-what-if-preview-heading > span { align-self: flex-start; font-size: .75rem; font-weight: 850; white-space: nowrap; }
+.custom-what-if-preview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.custom-what-if-preview-grid article { display: grid; gap: 4px; padding: 11px; border: 1px solid var(--colour-border); border-radius: 10px; background: var(--colour-surface-subtle); }
+.custom-what-if-preview-grid span { color: var(--colour-text-muted); font-size: .68rem; font-weight: 750; }
+.custom-what-if-preview-grid strong { font-size: .95rem; }
+.custom-what-if-preview-grid small { font-size: .7rem; font-weight: 750; }
+.custom-what-if-drivers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+.custom-what-if-drivers > div { padding: 11px; border: 1px solid var(--colour-border); border-radius: 10px; }
+.custom-what-if-drivers h4 { margin: 0 0 7px; font-size: .75rem; }
+.custom-what-if-drivers ul { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
+.custom-what-if-drivers li { display: flex; justify-content: space-between; gap: 8px; font-size: .7rem; }
+.custom-what-if-drivers p { margin: 0; color: var(--colour-text-muted); font-size: .7rem; }
+.custom-what-if-preview > button { width: 100%; }
+.custom-what-if-preview .positive, .custom-what-if-drivers .positive { color: var(--colour-positive); }
+.custom-what-if-preview .negative, .custom-what-if-drivers .negative { color: var(--colour-negative); }
+
+@media (max-width: 1050px) {
+  .custom-what-if-layout { grid-template-columns: 1fr; }
+  .custom-what-if-preview { position: static; }
+}
+
+@media (max-width: 720px) {
+  .custom-what-if-presets { align-items: flex-start; flex-direction: column; }
+  .custom-what-if-preset-list { justify-content: flex-start; }
+  .custom-what-if-fields, .custom-what-if-preview-grid, .custom-what-if-drivers { grid-template-columns: 1fr; }
+  .custom-what-if-toggle { align-items: flex-start; }
+  .custom-what-if-toggle > span:last-child { display: none; }
+}

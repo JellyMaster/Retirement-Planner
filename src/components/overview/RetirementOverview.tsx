@@ -1,6 +1,8 @@
 import type { PensionInputs } from "../../engine/models/PensionInputs";
 import type { ProjectionResult } from "../../engine/models/ProjectionResult";
 import type { RetirementGoals } from "../../engine/models/RetirementGoals";
+import { AppIcons } from "../../icons";
+import { Card, CardHeader, StatusBadge, type StatusBadgeTone } from "../ui";
 import { calculateRetirementHealth } from "../goals/calculateRetirementHealth";
 import { RetirementConfidenceRing } from "./RetirementConfidenceRing";
 import { RetirementKpiGrid } from "./RetirementKpiGrid";
@@ -16,17 +18,33 @@ interface RetirementOverviewProps {
 
 type OutlookTone = "excellent" | "good" | "fair" | "needs-attention";
 
-function getOutlook(score: number): { label: string; tone: OutlookTone } {
-  if (score >= 100) return { label: "Excellent", tone: "excellent" };
-  if (score >= 90) return { label: "Good", tone: "good" };
-  if (score >= 75) return { label: "Fair", tone: "fair" };
-  return { label: "Needs attention", tone: "needs-attention" };
+interface Outlook {
+  label: string;
+  tone: OutlookTone;
+  badgeTone: StatusBadgeTone;
 }
 
-function getNarrative(
-  annualGap: number,
-  score: number,
-): string {
+function getOutlook(score: number): Outlook {
+  if (score >= 100) {
+    return { label: "Excellent", tone: "excellent", badgeTone: "success" };
+  }
+
+  if (score >= 90) {
+    return { label: "Good", tone: "good", badgeTone: "success" };
+  }
+
+  if (score >= 75) {
+    return { label: "Fair", tone: "fair", badgeTone: "warning" };
+  }
+
+  return {
+    label: "Needs attention",
+    tone: "needs-attention",
+    badgeTone: "danger",
+  };
+}
+
+function getNarrative(annualGap: number, score: number): string {
   if (annualGap >= 0) {
     return "Your current illustration covers the retirement-income target you entered. Explore the opportunities below to test how resilient that position could be.";
   }
@@ -49,19 +67,29 @@ export function RetirementOverview({
   const yearsToRetirement = Math.max(0, inputs.retirementAge - inputs.currentAge);
 
   return (
-    <section
+    <Card
       className={`retirement-overview retirement-overview-${outlook.tone}`}
+      tone="accent"
+      padding="large"
       aria-labelledby="retirement-overview-heading"
     >
       <div className="retirement-overview-hero">
-        <div className="retirement-overview-hero-copy">
-          <p className="planner-eyebrow">Your retirement outlook</p>
-          <div className="retirement-overview-title-row">
-            <h2 id="retirement-overview-heading">{outlook.label}</h2>
-            <span className="retirement-overview-status">Based on your current plan</span>
-          </div>
-          <p>{getNarrative(health.annualGap, health.score)}</p>
-        </div>
+        <CardHeader
+          className="retirement-overview-header"
+          eyebrow="Your retirement outlook"
+          title={outlook.label}
+          titleId="retirement-overview-heading"
+          description={getNarrative(health.annualGap, health.score)}
+          icon={AppIcons.health}
+          badge={
+            <StatusBadge
+              tone={outlook.badgeTone}
+              icon={health.annualGap >= 0 ? AppIcons.success : AppIcons.warning}
+            >
+              Based on your current plan
+            </StatusBadge>
+          }
+        />
 
         <RetirementConfidenceRing score={health.score} label={outlook.label} />
       </div>
@@ -87,6 +115,6 @@ export function RetirementOverview({
       <p className="retirement-overview-disclaimer">
         The income figure uses the existing 4% illustration and the State Pension amount entered in your retirement goals. It is not a guarantee or regulated financial advice.
       </p>
-    </section>
+    </Card>
   );
 }

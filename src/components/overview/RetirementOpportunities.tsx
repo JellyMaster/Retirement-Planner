@@ -9,6 +9,7 @@ import { RetirementProjectionEngine } from "../../engine/services/RetirementProj
 import { AppIcons } from "../../icons";
 import { formatCurrency } from "../../utils/formatters";
 import { calculateRetirementHealth } from "../goals/calculateRetirementHealth";
+import { Card, CardHeader, StatusBadge } from "../ui";
 
 interface RetirementOpportunitiesProps {
   inputs: PensionInputs;
@@ -102,18 +103,35 @@ export function RetirementOpportunities({
   }
 
   return (
-    <section className="retirement-overview-support-card" aria-labelledby="retirement-opportunities-heading">
-      <div className="retirement-overview-section-heading">
-        <span aria-hidden="true"><FontAwesomeIcon icon={AppIcons.recommendations} /></span>
-        <div>
-          <p className="planner-eyebrow">Biggest opportunities</p>
-          <h3 id="retirement-opportunities-heading">Changes worth exploring</h3>
-        </div>
-      </div>
+    <Card
+      className="retirement-overview-support-card"
+      tone="subtle"
+      padding="small"
+      aria-labelledby="retirement-opportunities-heading"
+    >
+      <CardHeader
+        eyebrow="Biggest opportunities"
+        title="Changes worth exploring"
+        titleId="retirement-opportunities-heading"
+        headingLevel={3}
+        icon={AppIcons.recommendations}
+        badge={
+          <StatusBadge tone="accent" size="small">
+            {opportunities.length} previews
+          </StatusBadge>
+        }
+      />
 
       <div className="retirement-overview-opportunity-list">
         {opportunities.map((opportunity) => (
-          <article key={opportunity.id}>
+          <Card
+            as="article"
+            className="retirement-overview-opportunity"
+            interactive
+            key={opportunity.id}
+            padding="small"
+            tone="default"
+          >
             <span className="retirement-overview-opportunity-icon" aria-hidden="true">
               <FontAwesomeIcon icon={opportunity.icon} />
             </span>
@@ -134,9 +152,9 @@ export function RetirementOpportunities({
             <button type="button" onClick={() => onApplyToComparison(opportunity.nextInputs)}>
               Preview
             </button>
-          </article>
+          </Card>
         ))}
       </div>
-    </section>
+    </Card>
   );
 }

@@ -5,6 +5,7 @@ import type { RetirementGoals } from "../../engine/models/RetirementGoals";
 import { AppIcons } from "../../icons";
 import { formatCurrency } from "../../utils/formatters";
 import type { RetirementHealthMetrics } from "../goals/calculateRetirementHealth";
+import { Card, CardHeader, StatusBadge } from "../ui";
 
 interface RetirementStrengthsProps {
   inputs: PensionInputs;
@@ -29,34 +30,54 @@ export function RetirementStrengths({
   }
 
   if (inputs.annualFee <= 0.0075) {
-    strengths.push("Your annual pension fee is within a relatively low range for long-term planning.");
+    strengths.push(
+      "Your annual pension fee is within a relatively low range for long-term planning.",
+    );
   }
 
   if (health.annualGap >= 0) {
-    strengths.push("Your illustrated annual retirement income currently covers the target you entered.");
+    strengths.push(
+      "Your illustrated annual retirement income currently covers the target you entered.",
+    );
   } else if (health.coverage >= 0.85) {
-    strengths.push("Your illustrated retirement income is already close to the target you entered.");
+    strengths.push(
+      "Your illustrated retirement income is already close to the target you entered.",
+    );
   }
 
   if (inputs.retirementAge - inputs.currentAge >= 10) {
-    strengths.push("Your plan still has time for contributions and investment growth to compound.");
+    strengths.push(
+      "Your plan still has time for contributions and investment growth to compound.",
+    );
   }
 
   if (goals.includeStatePension) {
-    strengths.push("Your retirement-income illustration includes the State Pension amount you entered.");
+    strengths.push(
+      "Your retirement-income illustration includes the State Pension amount you entered.",
+    );
   }
 
   const visibleStrengths = strengths.slice(0, 4);
 
   return (
-    <section className="retirement-overview-support-card" aria-labelledby="retirement-strengths-heading">
-      <div className="retirement-overview-section-heading">
-        <span aria-hidden="true"><FontAwesomeIcon icon={AppIcons.success} /></span>
-        <div>
-          <p className="planner-eyebrow">What is helping</p>
-          <h3 id="retirement-strengths-heading">Strengths in your current plan</h3>
-        </div>
-      </div>
+    <Card
+      className="retirement-overview-support-card"
+      tone="subtle"
+      padding="small"
+      aria-labelledby="retirement-strengths-heading"
+    >
+      <CardHeader
+        eyebrow="What is helping"
+        title="Strengths in your current plan"
+        titleId="retirement-strengths-heading"
+        headingLevel={3}
+        icon={AppIcons.success}
+        badge={
+          <StatusBadge tone="success" size="small">
+            {visibleStrengths.length} strengths
+          </StatusBadge>
+        }
+      />
 
       <ul className="retirement-overview-strength-list">
         {visibleStrengths.map((strength) => (
@@ -66,6 +87,6 @@ export function RetirementStrengths({
           </li>
         ))}
       </ul>
-    </section>
+    </Card>
   );
 }

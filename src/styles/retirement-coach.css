@@ -1,0 +1,339 @@
+.retirement-coach {
+  margin-top: 20px;
+  padding: 28px;
+  border: 1px solid var(--colour-border);
+  border-radius: 20px;
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.retirement-coach-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.retirement-coach-heading-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 14px;
+  color: var(--colour-primary);
+  background: color-mix(in srgb, var(--colour-primary) 12%, transparent);
+  font-size: 1.15rem;
+}
+
+.retirement-coach-heading h2 {
+  margin: 3px 0 6px;
+}
+
+.retirement-coach-heading p:last-child {
+  max-width: 790px;
+  margin: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.55;
+}
+
+.retirement-coach-featured {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+  padding: 20px 22px;
+  border: 1px solid color-mix(in srgb, var(--colour-primary) 30%, var(--colour-border));
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--colour-primary) 10%, var(--colour-surface)),
+    var(--colour-surface)
+  );
+}
+
+.retirement-coach-featured-label {
+  color: var(--colour-primary);
+  font-size: .74rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.retirement-coach-featured h3 {
+  margin: 5px 0 4px;
+  font-size: 1.18rem;
+}
+
+.retirement-coach-featured p {
+  margin: 0;
+  color: var(--colour-text-muted);
+}
+
+.retirement-coach-featured-impact {
+  display: grid;
+  min-width: 185px;
+  justify-items: end;
+  text-align: right;
+}
+
+.retirement-coach-featured-impact strong {
+  margin-top: 4px;
+  color: var(--colour-positive, #16794d);
+  font-size: 1.45rem;
+}
+
+.retirement-coach-featured-impact > span:last-child {
+  color: var(--colour-text-muted);
+  font-size: .74rem;
+}
+
+.retirement-coach-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.retirement-coach-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 20px;
+  border: 1px solid var(--colour-border);
+  border-radius: 16px;
+  background: var(--colour-surface-subtle);
+}
+
+.retirement-coach-card-featured {
+  border-color: color-mix(in srgb, var(--colour-primary) 38%, var(--colour-border));
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--colour-primary) 10%, transparent);
+}
+
+.retirement-coach-card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.retirement-coach-card-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  color: var(--colour-primary);
+  background: color-mix(in srgb, var(--colour-primary) 11%, transparent);
+}
+
+.retirement-coach-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.retirement-coach-card-meta span {
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: var(--colour-text-muted);
+  background: var(--colour-surface);
+  font-size: .66rem;
+  font-weight: 800;
+}
+
+.retirement-coach-card-meta span:first-child {
+  color: var(--colour-primary);
+  background: color-mix(in srgb, var(--colour-primary) 10%, transparent);
+}
+
+.retirement-coach-card h3 {
+  margin: 0 0 5px;
+  font-size: 1.03rem;
+}
+
+.retirement-coach-card-heading p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: .82rem;
+  line-height: 1.45;
+}
+
+.retirement-coach-stars {
+  color: #d89500;
+  font-size: .9rem;
+  letter-spacing: .04em;
+}
+
+.retirement-coach-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.retirement-coach-impact-grid > div {
+  padding: 10px;
+  border: 1px solid var(--colour-border);
+  border-radius: 11px;
+  background: var(--colour-surface);
+}
+
+.retirement-coach-impact-grid dt {
+  margin-bottom: 4px;
+  color: var(--colour-text-muted);
+  font-size: .68rem;
+  font-weight: 750;
+}
+
+.retirement-coach-impact-grid dd {
+  margin: 0;
+  font-size: .88rem;
+  font-weight: 850;
+}
+
+.retirement-coach-impact-grid dd small {
+  display: block;
+  margin-top: 2px;
+  color: inherit;
+  font-size: .66rem;
+}
+
+.retirement-coach .positive {
+  color: var(--colour-positive, #16794d);
+}
+
+.retirement-coach .negative {
+  color: var(--colour-negative, #b42318);
+}
+
+.retirement-coach-driver {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--colour-positive, #16794d);
+  border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--colour-positive, #16794d) 7%, var(--colour-surface));
+}
+
+.retirement-coach-driver span,
+.retirement-coach-driver small {
+  color: var(--colour-text-muted);
+  font-size: .68rem;
+}
+
+.retirement-coach-driver strong {
+  font-size: .82rem;
+}
+
+.retirement-coach-details {
+  margin-bottom: 14px;
+  border-top: 1px solid var(--colour-border);
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.retirement-coach-details summary {
+  padding: 11px 0;
+  color: var(--colour-primary);
+  font-size: .78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.retirement-coach-factor-lists {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding-bottom: 12px;
+}
+
+.retirement-coach-factor-lists h4 {
+  margin: 0 0 7px;
+  font-size: .74rem;
+}
+
+.retirement-coach-factor-lists ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.retirement-coach-factor-lists li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--colour-text-muted);
+  font-size: .72rem;
+}
+
+.retirement-coach-factor-lists li strong {
+  color: var(--colour-positive, #16794d);
+}
+
+.retirement-coach-factor-lists p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: .72rem;
+  line-height: 1.4;
+}
+
+.retirement-coach-card > button {
+  width: 100%;
+  min-height: 42px;
+  margin-top: auto;
+  border: 1px solid var(--colour-primary);
+  border-radius: 11px;
+  color: var(--colour-primary-contrast, #fff);
+  background: var(--colour-primary);
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.retirement-coach-card > button:hover {
+  filter: brightness(.96);
+  transform: translateY(-1px);
+}
+
+.retirement-coach-disclaimer {
+  margin: 17px 0 0;
+  color: var(--colour-text-muted);
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+.retirement-coach-complete {
+  background: color-mix(in srgb, var(--colour-positive, #16794d) 5%, var(--colour-surface));
+}
+
+@media (max-width: 900px) {
+  .retirement-coach-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .retirement-coach {
+    padding: 20px;
+  }
+
+  .retirement-coach-featured {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .retirement-coach-featured-impact {
+    min-width: 0;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .retirement-coach-impact-grid,
+  .retirement-coach-factor-lists {
+    grid-template-columns: 1fr;
+  }
+}

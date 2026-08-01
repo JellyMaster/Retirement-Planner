@@ -1,0 +1,492 @@
+/* =========================================================
+   Shared UI foundation
+   ========================================================= */
+
+.ui-card {
+  min-width: 0;
+  border: 1px solid var(--ui-card-border);
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-card-background);
+  box-shadow: var(--ui-shadow-card);
+}
+
+.ui-card-padding-none {
+  padding: 0;
+}
+
+.ui-card-padding-small {
+  padding: var(--ui-space-4);
+}
+
+.ui-card-padding-medium {
+  padding: var(--ui-space-6);
+}
+
+.ui-card-padding-large {
+  padding: var(--ui-space-8);
+}
+
+.ui-card-subtle {
+  background: var(--ui-card-background-subtle);
+  box-shadow: none;
+}
+
+.ui-card-accent {
+  border-color: var(--colour-primary);
+  background: linear-gradient(
+    145deg,
+    var(--colour-surface),
+    var(--colour-surface-secondary)
+  );
+}
+
+.ui-card-success {
+  border-color: var(--colour-success-border);
+  background: var(--colour-success-background);
+}
+
+.ui-card-warning {
+  border-color: var(--colour-warning-border);
+  background: var(--colour-warning-background);
+}
+
+.ui-card-danger {
+  border-color: var(--colour-danger-border);
+  background: var(--colour-danger-background);
+}
+
+.ui-card-interactive {
+  transition:
+    border-color var(--ui-duration-fast) var(--ui-ease-standard),
+    box-shadow var(--ui-duration-fast) var(--ui-ease-standard),
+    transform var(--ui-duration-fast) var(--ui-ease-standard);
+}
+
+.ui-card-interactive:hover {
+  border-color: var(--colour-border-strong);
+  box-shadow: var(--ui-shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.ui-card-interactive:focus-within {
+  border-color: var(--colour-primary);
+  box-shadow:
+    var(--ui-shadow-card-hover),
+    0 0 0 3px var(--focus-ring);
+}
+
+.ui-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-5);
+  margin-bottom: var(--ui-space-6);
+}
+
+.ui-card-header-main {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  gap: var(--ui-space-4);
+}
+
+.ui-card-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  color: var(--colour-primary);
+  background: var(--colour-surface-secondary);
+  font-size: 1.05rem;
+}
+
+.ui-card-header-copy {
+  min-width: 0;
+}
+
+.ui-card-header-eyebrow {
+  margin: 0 0 var(--ui-space-1);
+  color: var(--colour-primary);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ui-card-header-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--ui-space-3);
+}
+
+.ui-card-header-title {
+  margin: 0;
+  color: var(--colour-text-strong);
+  font-size: var(--ui-font-size-xl);
+  line-height: 1.25;
+}
+
+.ui-card-header-description {
+  max-width: 70ch;
+  margin-top: var(--ui-space-2);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.55;
+}
+
+.ui-card-header-description > :first-child {
+  margin-top: 0;
+}
+
+.ui-card-header-description > :last-child {
+  margin-bottom: 0;
+}
+
+.ui-card-header-action {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.ui-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  border: 1px solid transparent;
+  border-radius: var(--ui-radius-pill);
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ui-status-badge-small {
+  min-height: 24px;
+  padding: 4px 9px;
+  gap: 5px;
+  font-size: var(--ui-font-size-xs);
+}
+
+.ui-status-badge-medium {
+  min-height: 30px;
+  padding: 6px 11px;
+  gap: 6px;
+  font-size: var(--ui-font-size-sm);
+}
+
+.ui-status-badge-icon {
+  flex: 0 0 auto;
+}
+
+.ui-status-badge-neutral {
+  border-color: var(--colour-border);
+  color: var(--colour-neutral-badge-text);
+  background: var(--colour-neutral-badge);
+}
+
+.ui-status-badge-info {
+  border-color: var(--colour-border-strong);
+  color: var(--colour-primary-text);
+  background: var(--colour-surface-hover);
+}
+
+.ui-status-badge-accent {
+  border-color: var(--colour-accent);
+  color: var(--colour-accent-text);
+  background: var(--colour-accent-soft);
+}
+
+.ui-status-badge-success {
+  border-color: var(--colour-success-border);
+  color: var(--colour-success-text);
+  background: var(--colour-success-background);
+}
+
+.ui-status-badge-warning {
+  border-color: var(--colour-warning-border);
+  color: var(--colour-warning-text);
+  background: var(--colour-warning-background);
+}
+
+.ui-status-badge-danger {
+  border-color: var(--colour-danger-border);
+  color: var(--colour-danger-text);
+  background: var(--colour-danger-background);
+}
+
+@media (max-width: 640px) {
+  .ui-card-padding-medium,
+  .ui-card-padding-large {
+    padding: var(--ui-space-5);
+  }
+
+  .ui-card-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--ui-space-4);
+  }
+
+  .ui-card-header-action {
+    align-self: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-card-interactive {
+    transition: none;
+  }
+
+  .ui-card-interactive:hover {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   Shared metrics and progress
+   ========================================================= */
+
+.ui-metric-grid {
+  display: grid;
+  gap: var(--ui-space-4);
+  min-width: 0;
+}
+
+.ui-metric-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ui-metric-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ui-metric-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.ui-metric-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 148px;
+  gap: var(--ui-space-3);
+}
+
+.ui-metric-card-compact {
+  min-height: 118px;
+}
+
+.ui-metric-card-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-3);
+  color: var(--colour-text-muted);
+}
+
+.ui-metric-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  color: var(--colour-primary);
+  background: var(--colour-surface);
+}
+
+.ui-metric-card-label {
+  font-size: var(--ui-font-size-sm);
+  font-weight: 750;
+}
+
+.ui-metric-card-value {
+  overflow-wrap: anywhere;
+  color: var(--colour-text-strong);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.ui-metric-card-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--ui-space-2);
+  margin-top: auto;
+}
+
+.ui-metric-card-helper,
+.ui-metric-card-trend {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.45;
+}
+
+.ui-metric-card-positive .ui-metric-card-icon,
+.ui-metric-card-positive .ui-metric-card-trend {
+  color: var(--colour-success-text);
+}
+
+.ui-metric-card-warning .ui-metric-card-icon,
+.ui-metric-card-warning .ui-metric-card-trend {
+  color: var(--colour-warning-text);
+}
+
+.ui-metric-card-negative .ui-metric-card-icon,
+.ui-metric-card-negative .ui-metric-card-trend {
+  color: var(--colour-danger-text);
+}
+
+.ui-progress-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.ui-progress-ring-small { width: 104px; height: 104px; }
+.ui-progress-ring-medium { width: 132px; height: 132px; }
+.ui-progress-ring-large { width: 164px; height: 164px; }
+
+.ui-progress-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ui-progress-ring circle {
+  fill: none;
+  stroke-width: 10;
+}
+
+.ui-progress-ring-track {
+  stroke: var(--colour-border);
+}
+
+.ui-progress-ring-value {
+  stroke: var(--colour-primary);
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--ui-duration-slow) var(--ui-ease-standard);
+}
+
+.ui-progress-ring-success .ui-progress-ring-value { stroke: var(--colour-success); }
+.ui-progress-ring-warning .ui-progress-ring-value { stroke: var(--colour-warning); }
+.ui-progress-ring-danger .ui-progress-ring-value { stroke: var(--colour-danger); }
+.ui-progress-ring-neutral .ui-progress-ring-value { stroke: var(--colour-text-muted); }
+
+.ui-progress-ring-copy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-content: center;
+  text-align: center;
+  padding: 22%;
+}
+
+.ui-progress-ring-copy strong {
+  color: var(--colour-text-strong);
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  line-height: 1;
+}
+
+.ui-progress-ring-copy > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.ui-progress-ring-copy small,
+.ui-progress-ring-copy em {
+  flex-basis: 100%;
+  margin-top: var(--ui-space-1);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-style: normal;
+  line-height: 1.25;
+}
+
+.ui-progress-bar-group {
+  display: grid;
+  gap: var(--ui-space-2);
+}
+
+.ui-progress-bar-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+}
+
+.ui-progress-bar {
+  width: 100%;
+  height: 9px;
+  overflow: hidden;
+  border-radius: var(--ui-radius-pill);
+  background: var(--colour-border);
+}
+
+.ui-progress-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--colour-primary);
+  transition: width var(--ui-duration-slow) var(--ui-ease-standard);
+}
+
+.ui-progress-bar-success > span { background: var(--colour-success); }
+.ui-progress-bar-warning > span { background: var(--colour-warning); }
+.ui-progress-bar-danger > span { background: var(--colour-danger); }
+.ui-progress-bar-neutral > span { background: var(--colour-text-muted); }
+
+/* Keep shared primitives authoritative when legacy feature classes coexist. */
+.ui-progress-ring.retirement-overview-ring,
+.ui-progress-ring.retirement-health-score,
+.ui-progress-ring.retirement-score-summary-value {
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  text-align: initial;
+}
+
+.ui-progress-ring.retirement-overview-ring svg,
+.ui-progress-ring.retirement-health-score svg,
+.ui-progress-ring.retirement-score-summary-value svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ui-progress-bar-group.retirement-score-factor-progress {
+  display: grid;
+  height: auto;
+  overflow: visible;
+  background: transparent;
+}
+
+@media (max-width: 1000px) {
+  .ui-metric-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .ui-metric-grid-2,
+  .ui-metric-grid-3,
+  .ui-metric-grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .ui-metric-card {
+    min-height: 0;
+  }
+
+  .ui-progress-ring-large {
+    width: 140px;
+    height: 140px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-progress-ring-value,
+  .ui-progress-bar > span {
+    transition: none;
+  }
+}

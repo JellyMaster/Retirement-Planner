@@ -9,6 +9,7 @@ import { RetirementProjectionEngine } from "../../engine/services/RetirementProj
 import { AppIcons } from "../../icons";
 import { formatCurrency } from "../../utils/formatters";
 import { calculateRetirementHealth } from "./calculateRetirementHealth";
+import { CustomWhatIfBuilder } from "../what-if";
 
 interface RetirementWhatIfAnalysisProps {
   inputs: PensionInputs;
@@ -210,6 +211,13 @@ export function RetirementWhatIfAnalysis({
           </article>
         ))}
       </div>
+
+      <CustomWhatIfBuilder
+        inputs={inputs}
+        result={result}
+        goals={goals}
+        onApplyToComparison={onApplyToComparison}
+      />
 
       <p className="retirement-what-if-disclaimer">
         These are planning illustrations using your existing assumptions and retirement goals. They do not change the current plan until you choose to edit or replace it.

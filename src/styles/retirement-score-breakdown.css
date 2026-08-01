@@ -1,0 +1,302 @@
+.retirement-score-breakdown {
+  display: grid;
+  gap: 22px;
+  padding: clamp(24px, 4vw, 36px);
+  border: 1px solid var(--colour-border);
+  border-radius: 22px;
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.retirement-score-breakdown-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.retirement-score-breakdown-heading h2,
+.retirement-score-breakdown-heading p {
+  margin: 0;
+}
+
+.retirement-score-breakdown-heading h2 {
+  margin-top: 5px;
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+}
+
+.retirement-score-breakdown-heading > div:first-child > p:last-child {
+  max-width: 720px;
+  margin-top: 9px;
+  color: var(--colour-text-muted);
+  line-height: 1.55;
+}
+
+.retirement-score-mode-selector {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--colour-border);
+  border-radius: 12px;
+  background: var(--colour-surface-secondary);
+}
+
+.retirement-score-mode-selector button {
+  padding: 9px 13px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--colour-text-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.retirement-score-mode-selector button:hover,
+.retirement-score-mode-selector button:focus-visible {
+  color: var(--colour-text);
+}
+
+.retirement-score-mode-selector button:focus-visible {
+  outline: 3px solid var(--colour-focus-ring);
+  outline-offset: 2px;
+}
+
+.retirement-score-mode-selector button.active {
+  background: var(--colour-surface);
+  color: var(--colour-accent);
+  box-shadow: 0 3px 10px rgb(18 40 35 / 8%);
+}
+
+.retirement-score-summary {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid var(--colour-border);
+  border-radius: 17px;
+  background:
+    radial-gradient(circle at 8% 20%, color-mix(in srgb, var(--colour-accent) 12%, transparent), transparent 32%),
+    var(--colour-surface-secondary);
+}
+
+.retirement-score-summary-value {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.retirement-score-summary-value > span {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--colour-accent) 13%, transparent);
+  color: var(--colour-accent);
+  font-size: 1.15rem;
+}
+
+.retirement-score-summary-value small,
+.retirement-score-summary-value strong {
+  display: block;
+}
+
+.retirement-score-summary-value small {
+  color: var(--colour-text-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.retirement-score-summary-value strong {
+  margin-top: 4px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.retirement-score-summary-value strong span {
+  color: var(--colour-text-muted);
+  font-size: 0.95rem;
+}
+
+.retirement-score-summary-copy strong,
+.retirement-score-summary-copy p {
+  margin: 0;
+}
+
+.retirement-score-summary-copy strong {
+  color: var(--colour-accent);
+  font-size: 1.08rem;
+}
+
+.retirement-score-summary-copy p {
+  margin-top: 6px;
+  color: var(--colour-text-secondary);
+  line-height: 1.55;
+}
+
+.retirement-score-factor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.retirement-score-factor {
+  --score-factor-colour: var(--colour-accent);
+  display: grid;
+  gap: 13px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--colour-border);
+  border-radius: 16px;
+  background: var(--colour-surface-secondary);
+}
+
+.retirement-score-factor-strong,
+.retirement-score-factor-positive {
+  --score-factor-colour: var(--colour-positive, #23865f);
+}
+
+.retirement-score-factor-review {
+  --score-factor-colour: #b7791f;
+}
+
+.retirement-score-factor-attention {
+  --score-factor-colour: var(--colour-negative, #c54a4a);
+}
+
+.retirement-score-factor-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: start;
+}
+
+.retirement-score-factor-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--score-factor-colour) 12%, transparent);
+  color: var(--score-factor-colour);
+}
+
+.retirement-score-factor-heading h3,
+.retirement-score-factor-heading p {
+  margin: 0;
+}
+
+.retirement-score-factor-heading h3 {
+  font-size: 0.98rem;
+}
+
+.retirement-score-factor-heading p {
+  margin-top: 4px;
+  color: var(--colour-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.retirement-score-factor-heading > strong {
+  color: var(--score-factor-colour);
+  font-size: 1.35rem;
+}
+
+.retirement-score-factor-progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--colour-border) 72%, transparent);
+}
+
+.retirement-score-factor-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--score-factor-colour);
+  transition: width 350ms ease;
+}
+
+.retirement-score-factor-footer {
+  display: grid;
+  gap: 8px;
+}
+
+.retirement-score-factor-footer p {
+  margin: 0;
+  color: var(--colour-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.retirement-score-factor-footer span {
+  width: fit-content;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--score-factor-colour) 28%, var(--colour-border));
+  border-radius: 999px;
+  color: var(--score-factor-colour);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.retirement-score-method-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 13px 15px;
+  border: 1px solid var(--colour-border);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--colour-accent) 5%, var(--colour-surface-secondary));
+  color: var(--colour-text-muted);
+}
+
+.retirement-score-method-note svg {
+  margin-top: 3px;
+  color: var(--colour-accent);
+}
+
+.retirement-score-method-note p {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 860px) {
+  .retirement-score-breakdown-heading {
+    flex-direction: column;
+  }
+
+  .retirement-score-mode-selector {
+    width: 100%;
+  }
+
+  .retirement-score-mode-selector button {
+    flex: 1;
+  }
+
+  .retirement-score-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .retirement-score-factor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .retirement-score-mode-selector {
+    display: grid;
+  }
+
+  .retirement-score-summary-value {
+    align-items: flex-start;
+  }
+}

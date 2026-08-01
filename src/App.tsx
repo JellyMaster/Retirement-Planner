@@ -4,6 +4,7 @@ import { RetirementPlannerPage } from "./pages/RetirementPlannerPage";
 import { DrawdownPlannerPage } from "./pages/DrawdownPlannerPage";
 import { ThemeToggle } from "./components/theme/ThemeToggle";
 
+import "./styles/ui-components.css";
 import "./App.css";
 
 export default function App() {

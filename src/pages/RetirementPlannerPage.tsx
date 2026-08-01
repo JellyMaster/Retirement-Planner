@@ -7,7 +7,7 @@ import { RetirementGoalsForm } from "../components/goals/RetirementGoalsForm";
 import { RetirementHealthDashboard } from "../components/goals/RetirementHealthDashboard";
 import { RetirementRecommendations } from "../components/goals/RetirementRecommendations";
 import { RetirementWhatIfAnalysis } from "../components/goals/RetirementWhatIfAnalysis";
-import { RetirementOverview } from "../components/overview";
+import { RetirementCoach, RetirementOverview, RetirementScoreBreakdown } from "../components/overview";
 import { ContributionGrowthChart } from "../components/projection/ContributionGrowthChart";
 import { PensionBalanceChart } from "../components/projection/PensionBalanceChart";
 import { ProjectionTable } from "../components/projection/ProjectionTable";
@@ -23,8 +23,11 @@ import { usePensionProjection } from "../hooks/usePensionProjection";
 import { formatCurrency, formatPercentage } from "../utils/formatters";
 import "../styles/retirement-dashboard.css";
 import "../styles/retirement-what-if.css";
+import "../styles/custom-what-if-builder.css";
 import "../styles/retirement-overview.css";
 import "../styles/retirement-journey.css";
+import "../styles/retirement-score-breakdown.css";
+import "../styles/retirement-coach.css";
 import "../styles/smart-retirement-recommendations.css";
 import { FeeImpactDashboard } from "../components/fee-impact";
 
@@ -158,6 +161,19 @@ export function RetirementPlannerPage() {
                   inputs={inputs}
                   result={currentScenario.projection}
                   goals={retirementGoals}
+                />
+
+                <RetirementScoreBreakdown
+                  inputs={inputs}
+                  result={currentScenario.projection}
+                  goals={retirementGoals}
+                />
+
+                <RetirementCoach
+                  inputs={inputs}
+                  result={currentScenario.projection}
+                  goals={retirementGoals}
+                  onApplyToComparison={applyRecommendationToComparison}
                 />
 
                 <RetirementWhatIfAnalysis

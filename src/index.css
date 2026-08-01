@@ -349,3 +349,43 @@ a {
   color: var(--colour-accent-contrast);
   background: var(--colour-accent);
 }
+
+/* =========================================================
+   Shared design-system tokens
+   Keep semantic feature colours above; UI primitives use these
+   aliases for consistent spacing, shape, typography and motion.
+   ========================================================= */
+
+:root {
+  --ui-space-1: 0.25rem;
+  --ui-space-2: 0.5rem;
+  --ui-space-3: 0.75rem;
+  --ui-space-4: 1rem;
+  --ui-space-5: 1.25rem;
+  --ui-space-6: 1.5rem;
+  --ui-space-8: 2rem;
+  --ui-space-10: 2.5rem;
+  --ui-space-12: 3rem;
+
+  --ui-radius-control: 0.75rem;
+  --ui-radius-card: 1.125rem;
+  --ui-radius-panel: 1.5rem;
+  --ui-radius-pill: 999px;
+
+  --ui-font-size-xs: 0.75rem;
+  --ui-font-size-sm: 0.875rem;
+  --ui-font-size-md: 1rem;
+  --ui-font-size-lg: 1.125rem;
+  --ui-font-size-xl: clamp(1.2rem, 2vw, 1.5rem);
+  --ui-font-size-2xl: clamp(1.6rem, 3vw, 2.25rem);
+
+  --ui-duration-fast: 160ms;
+  --ui-duration-normal: 240ms;
+  --ui-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  --ui-card-background: var(--colour-surface);
+  --ui-card-background-subtle: var(--colour-surface-secondary);
+  --ui-card-border: var(--colour-border);
+  --ui-shadow-card: var(--shadow-card);
+  --ui-shadow-card-hover: var(--shadow-raised);
+}
