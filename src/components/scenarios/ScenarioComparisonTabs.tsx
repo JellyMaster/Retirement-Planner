@@ -10,20 +10,23 @@ interface ScenarioComparisonTabsProps {
   outcomes: ReactNode;
   chart: ReactNode;
   changes: ReactNode;
+  insights: ReactNode;
 }
 
-type ComparisonTab = "outcomes" | "chart" | "changes";
+type ComparisonTab = "outcomes" | "chart" | "changes" | "insights";
 
 const tabs: Array<{ id: ComparisonTab; label: string }> = [
   { id: "outcomes", label: "Outcomes" },
   { id: "chart", label: "Growth chart" },
   { id: "changes", label: "What changed" },
+  { id: "insights", label: "Insights" },
 ];
 
 export function ScenarioComparisonTabs({
   outcomes,
   chart,
   changes,
+  insights,
 }: ScenarioComparisonTabsProps) {
   const [activeTab, setActiveTab] = useState<ComparisonTab>("outcomes");
 
@@ -73,15 +76,27 @@ export function ScenarioComparisonTabs({
           hidden={activeTab !== tab.id}
           className="scenario-intelligence-content"
         >
-          {tab.id === "outcomes"
-            ? outcomes
-            : tab.id === "chart"
-              ? chart
-              : changes}
+          {getTabContent(tab.id, { outcomes, chart, changes, insights })}
         </div>
       ))}
     </section>
   );
+}
+
+function getTabContent(
+  tab: ComparisonTab,
+  content: ScenarioComparisonTabsProps,
+): ReactNode {
+  switch (tab) {
+    case "outcomes":
+      return content.outcomes;
+    case "chart":
+      return content.chart;
+    case "changes":
+      return content.changes;
+    case "insights":
+      return content.insights;
+  }
 }
 
 function handleTabKeyDown(
