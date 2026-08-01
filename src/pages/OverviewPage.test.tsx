@@ -1,18 +1,28 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { vi } from "vitest";
 
+import { useScenarios } from "../components/scenarios";
 import { createDefaultPensionInputs } from "../config/defaultPensionInputs";
+import type { Scenario, ScenarioContextValue } from "../components/scenarios";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import type { ProjectionYear } from "../engine/models/ProjectionYear";
 import { usePensionProjection } from "../hooks/usePensionProjection";
-import { useStoredPensionInputs } from "../hooks/useStoredPensionInputs";
 import { OverviewPage } from "./OverviewPage";
 
+vi.mock("../components/scenarios", async () => {
+  const actual = await vi.importActual<typeof import("../components/scenarios")>(
+    "../components/scenarios",
+  );
+  return {
+    ...actual,
+    useScenarios: vi.fn(),
+  };
+});
 vi.mock("../hooks/usePensionProjection");
-vi.mock("../hooks/useStoredPensionInputs");
 
 const mockedUsePensionProjection = vi.mocked(usePensionProjection);
-const mockedUseStoredPensionInputs = vi.mocked(useStoredPensionInputs);
+const mockedUseScenarios = vi.mocked(useScenarios);
 
 const zeroMoney = { nominal: 0, real: 0 };
 
@@ -44,6 +54,37 @@ describe("OverviewPage", () => {
     };
   }
 
+  function createScenario(
+    name = "Baseline Plan",
+    inputs = createPlan(),
+    isBaseline = true,
+  ): Scenario {
+    return {
+      id: isBaseline ? "baseline" : "alternative",
+      name,
+      colour: "accent",
+      isBaseline,
+      createdAt: "2026-08-01T12:00:00.000Z",
+      updatedAt: "2026-08-01T12:00:00.000Z",
+      inputs,
+    };
+  }
+
+  function mockActiveScenario(scenario: Scenario) {
+    const context: ScenarioContextValue = {
+      activeScenarioId: scenario.id,
+      activeScenario: scenario,
+      scenarios: [scenario],
+      createScenario: vi.fn(),
+      duplicateScenario: vi.fn(),
+      renameScenario: vi.fn(),
+      updateScenarioInputs: vi.fn(),
+      setActiveScenario: vi.fn(),
+      deleteScenario: vi.fn(),
+    };
+    mockedUseScenarios.mockReturnValue(context);
+  }
+
   function mockProjection(finalBalance = 750_000) {
     mockedUsePensionProjection.mockReturnValue({
       hasErrors: false,
@@ -70,8 +111,8 @@ describe("OverviewPage", () => {
     );
   }
 
-  it("shows the saved plan and projected pension pot", () => {
-    mockedUseStoredPensionInputs.mockReturnValue(createPlan());
+  it("shows the active baseline plan and projected pension pot", () => {
+    mockActiveScenario(createScenario());
     mockProjection(750_000);
 
     renderPage();
@@ -84,24 +125,55 @@ describe("OverviewPage", () => {
     expect(screen.getByText("Age 68")).toBeInTheDocument();
     expect(screen.getByText("£750,000")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Your baseline plan is available" }),
+      screen.getByRole("heading", { name: "Baseline Plan is available" }),
     ).toBeInTheDocument();
   });
 
+  it("shows values from a non-baseline active scenario", () => {
+    mockActiveScenario(
+      createScenario(
+        "Retire at 65",
+        createPlan({
+          retirementAge: 65,
+          currentPot: 250_000,
+          monthlyEmployeeContribution: 1_000,
+          monthlyEmployerContribution: 300,
+        }),
+        false,
+      ),
+    );
+    mockProjection(820_000);
+
+    renderPage();
+
+    expect(
+      screen.getByRole("heading", { name: "Retire at 65 is available" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("£250,000")).toBeInTheDocument();
+    expect(screen.getByText("£1,300")).toBeInTheDocument();
+    expect(screen.getByText("Age 65")).toBeInTheDocument();
+    expect(screen.getByText("£820,000")).toBeInTheDocument();
+  });
+
   it("shows incomplete guidance when no pension balance is available", () => {
-    mockedUseStoredPensionInputs.mockReturnValue(
-      createPlan({
-        currentPot: 0,
-        monthlyEmployeeContribution: 0,
-        monthlyEmployerContribution: 0,
-      }),
+    mockActiveScenario(
+      createScenario(
+        "Baseline Plan",
+        createPlan({
+          currentPot: 0,
+          monthlyEmployeeContribution: 0,
+          monthlyEmployerContribution: 0,
+        }),
+      ),
     );
     mockProjection(0);
 
     renderPage();
 
     expect(
-      screen.getByRole("heading", { name: "Add your pension details" }),
+      screen.getByRole("heading", {
+        name: "Add pension details to Baseline Plan",
+      }),
     ).toBeInTheDocument();
     expect(screen.getAllByText("Not added")).toHaveLength(2);
     expect(screen.getByText("Add this in My Plan")).toBeInTheDocument();
@@ -111,7 +183,7 @@ describe("OverviewPage", () => {
   });
 
   it("shows an unavailable projection when inputs contain errors", () => {
-    mockedUseStoredPensionInputs.mockReturnValue(createPlan());
+    mockActiveScenario(createScenario());
     mockedUsePensionProjection.mockReturnValue({
       hasErrors: true,
       errors: {
