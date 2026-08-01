@@ -154,7 +154,9 @@ function cloneScenario(scenario: Scenario): Scenario {
   return {
     ...scenario,
     inputs: { ...scenario.inputs },
-    drawdown: { ...scenario.drawdown },
+    drawdown: {
+      ...(scenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
+    },
   };
 }
 
