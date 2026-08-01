@@ -42,7 +42,8 @@
 }
 
 .scenario-intelligence-content > .scenario-comparison,
-.scenario-intelligence-content > .scenario-changes-summary {
+.scenario-intelligence-content > .scenario-changes-summary,
+.scenario-intelligence-content > .scenario-insights {
   padding: 0;
   border: 0;
   box-shadow: none;
@@ -107,12 +108,87 @@
   height: 24rem;
 }
 
-.scenario-growth-empty {
+.scenario-growth-empty,
+.scenario-insights-empty {
   padding: var(--ui-space-8);
   border: 1px dashed var(--colour-border);
   border-radius: var(--ui-radius-control);
   color: var(--colour-text-muted);
   text-align: center;
+}
+
+.scenario-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--ui-space-4);
+}
+
+.scenario-insight-group {
+  padding: var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.scenario-insight-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  margin-bottom: var(--ui-space-3);
+}
+
+.scenario-insight-group-heading h4 {
+  margin: 0;
+  color: var(--colour-text);
+}
+
+.scenario-insight-group-heading span,
+.scenario-insight-importance {
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--ui-radius-pill);
+  background: var(--colour-surface-tertiary);
+  color: var(--colour-text-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.scenario-insight-list {
+  display: grid;
+  gap: var(--ui-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scenario-insight {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-3);
+  border-left: 3px solid var(--colour-border);
+  background: var(--colour-surface);
+}
+
+.scenario-insight.is-high {
+  border-left-color: var(--colour-primary);
+}
+
+.scenario-insight.is-medium {
+  border-left-color: color-mix(in srgb, var(--colour-primary) 55%, var(--colour-border));
+}
+
+.scenario-insight strong,
+.scenario-insight p {
+  margin: 0;
+}
+
+.scenario-insight p {
+  margin-top: var(--ui-space-1);
+  color: var(--colour-text-muted);
+  line-height: 1.5;
 }
 
 @media (max-width: 48rem) {
@@ -126,5 +202,13 @@
 
   .scenario-growth-canvas {
     height: 19rem;
+  }
+
+  .scenario-insight {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-insight-importance {
+    justify-self: start;
   }
 }
