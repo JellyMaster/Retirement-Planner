@@ -1,0 +1,284 @@
+/* =========================================================
+   Retirement comparison results
+   ========================================================= */
+
+.comparison-outcome-banner,
+.comparison-goal-progress,
+.comparison-impact-summary,
+.comparison-trade-off-panel,
+.comparison-timeline {
+  min-width: 0;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.comparison-outcome-banner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+  padding: var(--space-5) var(--space-6);
+  border-color: var(--status-info-border);
+  background: var(--status-info-background);
+}
+
+.comparison-outcome-icon {
+  display: inline-flex;
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  color: var(--status-info-text);
+  background: color-mix(in srgb, var(--status-info) 14%, var(--colour-surface));
+}
+
+.comparison-outcome-banner strong {
+  color: var(--status-info-text);
+}
+
+.comparison-outcome-banner p {
+  margin: var(--space-1) 0 0;
+  color: var(--colour-text-secondary);
+  line-height: 1.55;
+}
+
+.comparison-goal-progress,
+.comparison-impact-summary,
+.comparison-timeline {
+  padding: var(--space-6);
+}
+
+.comparison-impact-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.comparison-impact-heading > div {
+  min-width: 0;
+}
+
+.comparison-impact-heading h2 {
+  margin: var(--space-1) 0 0;
+  color: var(--colour-text-strong);
+}
+
+.comparison-impact-heading > p {
+  max-width: 42ch;
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.comparison-goal-grid,
+.comparison-impact-grid,
+.scenario-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.comparison-goal-grid {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.comparison-goal-card,
+.comparison-impact-card,
+.scenario-summary-card {
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.comparison-goal-card-baseline,
+.scenario-summary-card:first-child {
+  border-top: 3px solid var(--colour-chart-primary);
+}
+
+.comparison-goal-card-alternative,
+.scenario-summary-card:last-child {
+  border-top: 3px solid var(--colour-chart-secondary);
+}
+
+.comparison-goal-difference {
+  display: grid;
+  min-width: 8rem;
+  place-content: center;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  color: var(--colour-text-muted);
+  background: var(--colour-surface-secondary);
+  text-align: center;
+}
+
+.comparison-goal-difference.positive {
+  color: var(--status-good-text);
+  background: var(--status-good-background);
+  border-color: var(--status-good-border);
+}
+
+.comparison-goal-difference.negative {
+  color: var(--status-danger-text);
+  background: var(--status-danger-background);
+  border-color: var(--status-danger-border);
+}
+
+.comparison-goal-difference span,
+.comparison-goal-difference small {
+  font-size: var(--ui-font-size-xs);
+}
+
+.comparison-goal-difference strong {
+  font-size: var(--ui-font-size-xl);
+}
+
+.comparison-trade-off-panel {
+  padding: var(--space-5);
+}
+
+.comparison-trade-off-panel h2,
+.comparison-trade-off-panel h3 {
+  margin-top: 0;
+  color: var(--colour-text-strong);
+}
+
+.comparison-table-scroll,
+.comparison-year-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.comparison-assumptions-table,
+.comparison-year-table {
+  width: 100%;
+  min-width: 46rem;
+  border-spacing: 0;
+}
+
+.comparison-assumptions-table th,
+.comparison-assumptions-table td,
+.comparison-year-table th,
+.comparison-year-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--colour-table-border, var(--colour-border));
+  color: var(--colour-text-secondary);
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.comparison-assumptions-table thead th,
+.comparison-year-table thead th {
+  color: var(--colour-text-muted);
+  background: var(--colour-table-header, var(--colour-surface-secondary));
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.comparison-assumptions-table th:first-child,
+.comparison-assumptions-table td:first-child,
+.comparison-year-table th:first-child,
+.comparison-year-table td:first-child {
+  text-align: left;
+}
+
+.comparison-assumptions-table tbody th,
+.comparison-year-table tbody th {
+  color: var(--colour-text-strong);
+  font-weight: 750;
+}
+
+.comparison-assumptions-table tbody tr:hover,
+.comparison-year-table tbody tr:hover {
+  background: var(--colour-table-hover, var(--colour-surface-secondary));
+}
+
+.comparison-row-unchanged {
+  opacity: 0.68;
+}
+
+.comparison-row-unchanged:hover {
+  opacity: 1;
+}
+
+.comparison-year-details {
+  overflow: hidden;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.comparison-year-details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  color: var(--colour-text-strong);
+  cursor: pointer;
+  font-weight: 800;
+  list-style: none;
+}
+
+.comparison-year-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.comparison-year-details > summary::after {
+  content: "+";
+  color: var(--action-analyse);
+  font-size: 1.25rem;
+}
+
+.comparison-year-details[open] > summary::after {
+  content: "−";
+}
+
+@media (max-width: 900px) {
+  .comparison-goal-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .comparison-goal-difference {
+    min-width: 0;
+  }
+
+  .comparison-impact-heading {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 700px) {
+  .comparison-goal-progress,
+  .comparison-impact-summary,
+  .comparison-timeline {
+    padding: var(--space-5);
+  }
+
+  .comparison-goal-grid,
+  .comparison-impact-grid,
+  .scenario-results-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .comparison-outcome-banner {
+    padding: var(--space-4);
+  }
+}
