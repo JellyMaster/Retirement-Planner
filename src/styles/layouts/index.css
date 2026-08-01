@@ -12,3 +12,6 @@
 @import "./drawdown-page.css";
 @import "./drawdown-controls.css";
 @import "./drawdown-tables.css";
+@import "./comparison-workspace.css";
+@import "./comparison-controls.css";
+@import "./comparison-results.css";
