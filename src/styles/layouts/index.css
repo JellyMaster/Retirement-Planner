@@ -1,5 +1,7 @@
 /* Application and dashboard layout compatibility.
-   App.css is intentionally routed through this module until its feature
-   blocks have been moved into their dedicated stylesheets. */
+   App.css remains available while legacy feature blocks are migrated.
+   Dedicated layout modules load afterwards and are authoritative for their
+   owned selectors, which allows duplicate legacy rules to be retired safely. */
 
 @import "../../App.css";
+@import "./app-shell.css";
