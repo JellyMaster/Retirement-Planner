@@ -5,8 +5,7 @@
  * 1. foundations establish reusable values and global behaviour;
  * 2. shared UI primitives define component defaults;
  * 3. themes map semantic intent onto Noel and Olivia;
- * 4. layouts provide application-level compatibility;
- * 5. the remaining scoped state migration bridges older feature markup.
+ * 4. layouts provide application-level compatibility.
  */
 
 @import "./foundations/tokens.css";
@@ -17,5 +16,3 @@
 @import "./components/index.css";
 @import "./themes/index.css";
 @import "./layouts/index.css";
-
-@import "./semantic-state-migrations.css";
