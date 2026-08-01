@@ -78,7 +78,7 @@
 
 @media (max-width: 640px) {
   .planner-page {
-    padding: var(--space-7) var(--space-4);
+    padding: var(--space-8) var(--space-4);
   }
 
   .planner-header {
