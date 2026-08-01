@@ -4,9 +4,9 @@
  * Import order is intentional:
  * 1. foundations establish reusable values and global behaviour;
  * 2. shared UI primitives define component defaults;
- * 3. semantic layers map intent and status onto the active theme;
- * 4. the legacy application stylesheet remains last while feature rules
- *    are migrated into dedicated modules.
+ * 3. themes map semantic intent onto Noel and Olivia;
+ * 4. layouts provide application-level compatibility;
+ * 5. scoped migrations temporarily bridge older feature markup.
  */
 
 @import "./foundations/tokens.css";
@@ -14,10 +14,9 @@
 @import "./foundations/motion.css";
 @import "./utilities/accessibility.css";
 
-@import "./ui-components.css";
-@import "./semantic-colours.css";
+@import "./components/index.css";
+@import "./themes/index.css";
+@import "./layouts/index.css";
+
 @import "./action-intent-migrations.css";
 @import "./semantic-state-migrations.css";
-
-/* Temporary compatibility entry point. Reduce this file feature by feature. */
-@import "../App.css";
