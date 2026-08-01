@@ -7,6 +7,8 @@ export type ButtonVariant =
   | "secondary"
   | "subtle"
   | "compare"
+  | "success"
+  | "warning"
   | "danger";
 export type ButtonSize = "small" | "medium" | "large";
 
