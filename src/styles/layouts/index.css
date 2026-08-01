@@ -5,6 +5,7 @@
 @import "../legacy/app-css-compat.css";
 
 @import "./app-shell.css";
+@import "./polaris-section-page.css";
 @import "./planner-page.css";
 @import "./planner-controls.css";
 @import "./planner-tables.css";
