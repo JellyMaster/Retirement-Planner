@@ -7,7 +7,7 @@
 
 .panel {
   min-width: 0;
-  padding: var(--space-7);
+  padding: var(--space-8);
   border: 1px solid var(--colour-border);
   border-radius: var(--radius-lg);
   background: var(--colour-surface);
@@ -68,9 +68,9 @@
   border-radius: var(--radius-sm);
   background: var(--colour-input-background, var(--colour-surface));
   transition:
-    border-color var(--motion-fast) var(--motion-ease-standard),
-    background-color var(--motion-fast) var(--motion-ease-standard),
-    box-shadow var(--motion-fast) var(--motion-ease-standard);
+    border-color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
 }
 
 .input-wrapper:hover {
@@ -147,9 +147,9 @@
   font-size: var(--ui-font-size-sm);
   font-weight: 700;
   transition:
-    border-color var(--motion-fast) var(--motion-ease-standard),
-    background-color var(--motion-fast) var(--motion-ease-standard),
-    color var(--motion-fast) var(--motion-ease-standard);
+    border-color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
 }
 
 .reset-button:hover {
