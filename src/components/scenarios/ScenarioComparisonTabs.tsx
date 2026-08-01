@@ -89,34 +89,29 @@ function handleTabKeyDown(
   current: ComparisonTab,
   setActive: (tab: ComparisonTab) => void,
 ) {
- const currentIndex = tabs.findIndex((tab) => tab.id === current);
+  const currentIndex = tabs.findIndex((tab) => tab.id === current);
+  let nextIndex: number;
 
-let nextIndex: number;
+  switch (event.key) {
+    case "ArrowRight":
+      nextIndex = (currentIndex + 1) % tabs.length;
+      break;
+    case "ArrowLeft":
+      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      break;
+    case "Home":
+      nextIndex = 0;
+      break;
+    case "End":
+      nextIndex = tabs.length - 1;
+      break;
+    default:
+      return;
+  }
 
-switch (event.key) {
-  case "ArrowRight":
-    nextIndex = (currentIndex + 1) % tabs.length;
-    break;
+  event.preventDefault();
 
-  case "ArrowLeft":
-    nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-    break;
-
-  case "Home":
-    nextIndex = 0;
-    break;
-
-  case "End":
-    nextIndex = tabs.length - 1;
-    break;
-
-  default:
-    return;
-}
-
-event.preventDefault();
-
-const next = tabs[nextIndex];
-setActive(next.id);
-document.getElementById(`scenario-tab-${next.id}`)?.focus();
+  const next = tabs[nextIndex];
+  setActive(next.id);
+  document.getElementById(`scenario-tab-${next.id}`)?.focus();
 }
