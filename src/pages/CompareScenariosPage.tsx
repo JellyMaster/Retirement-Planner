@@ -41,11 +41,10 @@ export function CompareScenariosPage() {
   const [error, setError] = useState<string | null>(null);
 
   const selectedScenarios = useMemo(() => {
-    const requiredIds = [...new Set([activeScenarioId, baselineScenario.id])];
     const optionalIds = selectedScenarioIds.filter(
-      (id) => !requiredIds.includes(id),
+      (id) => id !== activeScenarioId,
     );
-    const ids = [...requiredIds, ...optionalIds].slice(
+    const ids = [activeScenarioId, ...optionalIds].slice(
       0,
       MAX_COMPARED_SCENARIOS,
     );
@@ -53,7 +52,7 @@ export function CompareScenariosPage() {
     return ids
       .map((id) => scenarios.find((scenario) => scenario.id === id))
       .filter((scenario) => scenario !== undefined);
-  }, [activeScenarioId, baselineScenario.id, scenarios, selectedScenarioIds]);
+  }, [activeScenarioId, scenarios, selectedScenarioIds]);
 
   const scenarioBeingEdited = scenarios.find(
     (scenario) => scenario.id === scenarioEditorId,
@@ -136,13 +135,11 @@ export function CompareScenariosPage() {
 
   function handleMakeActive(id: string) {
     setActiveScenario(id);
-    setSelectedScenarioIds((current) => [
-      ...new Set([id, baselineScenario.id, ...current]),
-    ]);
+    setSelectedScenarioIds((current) => [...new Set([id, ...current])]);
   }
 
   function toggleComparison(id: string) {
-    if (id === baselineScenario.id || id === activeScenarioId) return;
+    if (id === activeScenarioId) return;
 
     setSelectedScenarioIds((current) => {
       if (current.includes(id)) {
@@ -300,17 +297,16 @@ export function CompareScenariosPage() {
                     type="checkbox"
                     checked={isSelected}
                     disabled={
-                      scenario.isBaseline ||
                       isActive ||
                       (!isSelected &&
                         selectedScenarios.length >= MAX_COMPARED_SCENARIOS)
                     }
                     onChange={() => toggleComparison(scenario.id)}
                   />
-                  {scenario.isBaseline
-                    ? "Always included"
-                    : isActive
-                      ? "Active plan included"
+                  {isActive
+                    ? "Active plan included"
+                    : scenario.isBaseline
+                      ? "Include baseline in comparison"
                       : "Include in comparison"}
                 </label>
 
