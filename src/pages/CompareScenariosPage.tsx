@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
 import {
-  ScenarioChangesSummary,
   ScenarioEditModal,
+  ScenarioIntelligencePanel,
   useScenarios,
 } from "../components/scenarios";
 import { calculateScenarioSummary } from "../domain/scenarios/calculateScenarioSummary";
@@ -14,14 +14,6 @@ import { savePensionInputs } from "../state/planStorage";
 import { formatCurrency } from "../utils/formatters";
 
 const MAX_COMPARED_SCENARIOS = 3;
-
-type ScenarioSummary = ReturnType<typeof calculateScenarioSummary>;
-type ComparisonDirection = "greater" | "less" | "same";
-
-interface ComparisonIndicator {
-  direction: ComparisonDirection;
-  label: string;
-}
 
 export function CompareScenariosPage() {
   const {
@@ -67,19 +59,9 @@ export function CompareScenariosPage() {
     (scenario) => scenario.id === scenarioEditorId,
   );
 
-  const summaries = useMemo(
-    () => selectedScenarios.map(calculateScenarioSummary),
-    [selectedScenarios],
-  );
-  const activeSummary = useMemo(
-    () => calculateScenarioSummary(activeScenario),
-    [activeScenario],
-  );
-
   function handleCreateScenario() {
     try {
-      const name = newScenarioName.trim() || "New Scenario";
-      const scenario = createScenario(name);
+      const scenario = createScenario(newScenarioName.trim() || "New Scenario");
       setSelectedScenarioIds((current) =>
         current.length < MAX_COMPARED_SCENARIOS
           ? [...new Set([...current, scenario.id])]
@@ -398,135 +380,10 @@ export function CompareScenariosPage() {
         </div>
       </section>
 
-      <ScenarioChangesSummary
+      <ScenarioIntelligencePanel
         activeScenario={activeScenario}
         scenarios={selectedScenarios}
       />
-
-      <section
-        className="scenario-comparison"
-        aria-labelledby="scenario-comparison-title"
-      >
-        <div className="scenario-manager-section-heading">
-          <div>
-            <p className="planner-eyebrow">Scenario intelligence</p>
-            <h2 id="scenario-comparison-title">Compare projected outcomes</h2>
-          </div>
-          <span>Compared with the active plan · values in today&apos;s money</span>
-        </div>
-
-        <div className="scenario-comparison-table-wrap">
-          <table className="scenario-comparison-table">
-            <thead>
-              <tr>
-                <th scope="col">Metric</th>
-                {summaries.map((summary) => {
-                  const isActive = summary.scenario.id === activeScenarioId;
-                  return (
-                    <th
-                      scope="col"
-                      key={summary.scenario.id}
-                      className={isActive ? "is-active-plan" : undefined}
-                    >
-                      <span>{summary.scenario.name}</span>
-                      {isActive && (
-                        <span className="scenario-comparison-active-badge">
-                          Active plan
-                        </span>
-                      )}
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              <ComparisonRow
-                label="Retirement age"
-                summaries={summaries}
-                activeScenarioId={activeScenarioId}
-                value={(summary) =>
-                  `Age ${summary.scenario.inputs.retirementAge}`
-                }
-                indicator={(summary) =>
-                  createNumberIndicator(
-                    summary.scenario.inputs.retirementAge,
-                    activeSummary.scenario.inputs.retirementAge,
-                    " years",
-                  )
-                }
-              />
-              <ComparisonRow
-                label="Monthly saving"
-                summaries={summaries}
-                activeScenarioId={activeScenarioId}
-                value={(summary) =>
-                  formatCurrency(summary.monthlyContribution)
-                }
-                indicator={(summary) =>
-                  createCurrencyIndicator(
-                    summary.monthlyContribution,
-                    activeSummary.monthlyContribution,
-                  )
-                }
-              />
-              <ComparisonRow
-                label="Projected pension pot"
-                summaries={summaries}
-                activeScenarioId={activeScenarioId}
-                value={(summary) =>
-                  formatOptionalCurrency(summary.projectedPot)
-                }
-                indicator={(summary) =>
-                  createOptionalCurrencyIndicator(
-                    summary.projectedPot,
-                    activeSummary.projectedPot,
-                  )
-                }
-              />
-              <ComparisonRow
-                label="Total contributions"
-                summaries={summaries}
-                activeScenarioId={activeScenarioId}
-                value={(summary) =>
-                  formatOptionalCurrency(summary.totalContributions)
-                }
-                indicator={(summary) =>
-                  createOptionalCurrencyIndicator(
-                    summary.totalContributions,
-                    activeSummary.totalContributions,
-                  )
-                }
-              />
-              <ComparisonRow
-                label="Investment growth"
-                summaries={summaries}
-                activeScenarioId={activeScenarioId}
-                value={(summary) =>
-                  formatOptionalCurrency(summary.investmentGrowth)
-                }
-                indicator={(summary) =>
-                  createOptionalCurrencyIndicator(
-                    summary.investmentGrowth,
-                    activeSummary.investmentGrowth,
-                  )
-                }
-              />
-              <ComparisonRow
-                label="Total fees"
-                summaries={summaries}
-                activeScenarioId={activeScenarioId}
-                value={(summary) => formatOptionalCurrency(summary.totalFees)}
-                indicator={(summary) =>
-                  createOptionalCurrencyIndicator(
-                    summary.totalFees,
-                    activeSummary.totalFees,
-                  )
-                }
-              />
-            </tbody>
-          </table>
-        </div>
-      </section>
 
       {scenarioBeingEdited && (
         <ScenarioEditModal
@@ -537,106 +394,4 @@ export function CompareScenariosPage() {
       )}
     </main>
   );
-}
-
-interface ComparisonRowProps {
-  label: string;
-  summaries: ScenarioSummary[];
-  activeScenarioId: string;
-  value: (summary: ScenarioSummary) => string;
-  indicator: (summary: ScenarioSummary) => ComparisonIndicator | null;
-}
-
-function ComparisonRow({
-  label,
-  summaries,
-  activeScenarioId,
-  value,
-  indicator,
-}: ComparisonRowProps) {
-  return (
-    <tr>
-      <th scope="row">{label}</th>
-      {summaries.map((summary) => {
-        const isActive = summary.scenario.id === activeScenarioId;
-        const comparison = isActive ? null : indicator(summary);
-
-        return (
-          <td
-            key={summary.scenario.id}
-            className={isActive ? "is-active-plan" : undefined}
-          >
-            <strong>{value(summary)}</strong>
-            {isActive ? (
-              <span className="scenario-comparison-reference">
-                Current active plan
-              </span>
-            ) : (
-              comparison && (
-                <span
-                  className={`scenario-comparison-indicator is-${comparison.direction}`}
-                >
-                  <span aria-hidden="true">
-                    {comparison.direction === "greater"
-                      ? "↑"
-                      : comparison.direction === "less"
-                        ? "↓"
-                        : "="}
-                  </span>{" "}
-                  {comparison.label}
-                </span>
-              )
-            )}
-          </td>
-        );
-      })}
-    </tr>
-  );
-}
-
-function formatOptionalCurrency(value: number | null): string {
-  return value === null ? "Unavailable" : formatCurrency(value);
-}
-
-function createOptionalCurrencyIndicator(
-  value: number | null,
-  activeValue: number | null,
-): ComparisonIndicator | null {
-  if (value === null || activeValue === null) return null;
-  return createCurrencyIndicator(value, activeValue);
-}
-
-function createCurrencyIndicator(
-  value: number,
-  activeValue: number,
-): ComparisonIndicator {
-  const difference = value - activeValue;
-  if (Math.abs(difference) < 0.5) {
-    return { direction: "same", label: "Same as active plan" };
-  }
-
-  return {
-    direction: difference > 0 ? "greater" : "less",
-    label: `${difference > 0 ? "Greater" : "Less"} by ${formatCurrency(
-      Math.abs(difference),
-    )}`,
-  };
-}
-
-function createNumberIndicator(
-  value: number,
-  activeValue: number,
-  suffix = "",
-): ComparisonIndicator {
-  const difference = value - activeValue;
-  if (difference === 0) {
-    return { direction: "same", label: "Same as active plan" };
-  }
-
-  return {
-    direction: difference > 0 ? "greater" : "less",
-    label: `${difference > 0 ? "Greater" : "Less"} by ${Math.abs(
-      difference,
-    )}${suffix}`,
-  };
 }
