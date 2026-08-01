@@ -283,18 +283,13 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--colour-border);
   border-radius: var(--ui-radius-control);
   color: var(--colour-primary);
-  background: var(--colour-surface-secondary);
-  font-size: 1.05rem;
-  
+  background: var(--colour-surface);
 }
-
-
-
 
 .ui-metric-card-label {
   font-size: var(--ui-font-size-sm);
@@ -552,26 +547,25 @@
 }
 
 .ui-button-compare {
-  background: var(--colour-surface-secondary);
-  border: 1px solid var(--colour-border-strong);
   color: var(--colour-compare);
+  background: var(--colour-compare-background);
+  border-color: var(--colour-compare);
 }
 
 .ui-button-compare:hover:not(:disabled) {
-  background: var(--colour-surface-hover);
-  border-color: var(--colour-compare);
-  color: var(--colour-compare-hover);
+  color: var(--colour-compare-text-on-fill);
+  background: var(--colour-compare-hover);
+  border-color: var(--colour-compare-hover);
 }
 
 .ui-button-compare:active:not(:disabled) {
-  background: var(--colour-surface);
-  border-color: var(--colour-compare);
-  color: var(--colour-compare-hover);
+  color: var(--colour-compare-text-on-fill);
+  background: var(--colour-compare-active);
+  border-color: var(--colour-compare-active);
 }
 
 .ui-button-compare:focus-visible {
-  outline: 2px solid var(--colour-compare);
-  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--colour-compare-background);
 }
 
 .ui-button-danger {
@@ -708,4 +702,25 @@
   }
 }
 
+.ui-metric-card-icon {
+   display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  color: var(--colour-primary);
+  background: var(--colour-surface);
+  font-size: 1.05rem;
+}
 
+.ui-metric-card-icon .svg-inline--fa {
+  position: static;
+  display: inline-flex !important;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  transform: none;
+}

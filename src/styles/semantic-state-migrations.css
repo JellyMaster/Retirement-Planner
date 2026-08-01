@@ -209,9 +209,8 @@
   }
 }
 
-
 .ui-metric-card-icon {
-  display: inline-flex;
+   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
@@ -220,11 +219,15 @@
   border: 1px solid var(--colour-border);
   border-radius: var(--ui-radius-control);
   color: var(--colour-primary);
-  background: var(--colour-surface-secondary);
+  background: var(--colour-surface);
   font-size: 1.05rem;
-  
 }
 
-
-
-
+.ui-metric-card-icon .svg-inline--fa {
+  position: static;
+  display: block !important;
+  width: 1rem ;
+  height: 1rem ;
+  margin: 0;
+  transform: none;
+}
