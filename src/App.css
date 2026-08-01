@@ -7,10 +7,6 @@
   padding: 48px 24px;
 }
 
-.table-scroll {
-  overflow-x: auto;
-}
-
 .input-sections {
   display: grid;
   gap: 30px;
@@ -1211,21 +1207,4 @@ thead .projection-sticky-age,.drawdown-projection-table thead th:first-child { z
 /* Global accessibility and mobile hardening */
 html {
   scroll-padding-top: 1rem;
-}
-
-body {
-  overflow-x: hidden;
-}
-
-img,
-svg,
-canvas {
-  max-width: 100%;
-}@media (max-width: 640px) {
-
-  .table-scroll,
-  .comparison-table-scroll,
-  .drawdown-table-scroll {
-    -webkit-overflow-scrolling: touch;
-  }
 }

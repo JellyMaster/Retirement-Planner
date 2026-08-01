@@ -50,33 +50,6 @@
   align-items: stretch;
 }
 
-.dashboard-chart-panel,
-.dashboard-insights {
-  min-width: 0;
-  padding: var(--space-5);
-}
-
-.dashboard-chart-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  margin-bottom: var(--space-2);
-}
-
-.dashboard-chart-toolbar h2,
-.dashboard-panel-heading h2 {
-  margin: 0;
-  font-size: var(--ui-font-size-lg);
-}
-
-.dashboard-chart-stage > .panel {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  box-shadow: none;
-}
-
 .dashboard-chart-stage > .panel .panel-heading {
   display: none;
 }
@@ -90,15 +63,6 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-6);
   margin-top: var(--space-6);
-}
-
-.drawdown-chart-panel {
-  min-width: 0;
-}
-
-.drawdown-chart {
-  width: 100%;
-  height: 24.375rem;
 }
 
 .dashboard-details {
@@ -150,25 +114,15 @@
 .dashboard-details .projection-table-panel,
 .dashboard-details .drawdown-assumptions-panel {
   margin: 0;
-}
-
-@media (max-width: 1200px) {
+}@media (max-width: 1200px) {
   .dashboard-main-grid {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .dashboard-insights .insights-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 1050px) {
+}@media (max-width: 1050px) {
   .drawdown-charts-grid {
     grid-template-columns: minmax(0, 1fr);
   }
-}
-
-@media (max-width: 900px) {
+}@media (max-width: 900px) {
   .drawdown-dashboard-page .dashboard-header {
     align-items: stretch;
     flex-direction: column;
@@ -183,28 +137,15 @@
     max-height: none;
     overflow: visible;
   }
-}
-
-@media (max-width: 680px) {
+}@media (max-width: 680px) {
   .dashboard-main-grid {
     display: block;
-  }
-
-  .dashboard-insights {
-    margin-top: var(--space-5);
-  }
-
-  .dashboard-chart-toolbar {
-    align-items: stretch;
-    flex-direction: column;
   }
 
   .dashboard-details > summary span {
     display: none;
   }
-}
-
-@media (max-width: 600px) {
+}@media (max-width: 600px) {
   .drawdown-chart,
   .dashboard-chart-stage .drawdown-chart {
     height: 20rem;
