@@ -1,0 +1,210 @@
+/* =========================================================
+   Semantic workspace and information-state migrations
+
+   This layer gives workspace navigation, badges and shared
+   metrics a consistent intent-based colour language while the
+   underlying Noel and Olivia palettes remain theme-specific.
+   ========================================================= */
+
+/* Workspace navigation --------------------------------------------------- */
+.workspace-navigation-item {
+  --workspace-section-accent: var(--workspace-overview);
+  --workspace-section-soft: color-mix(
+    in srgb,
+    var(--workspace-section-accent) 12%,
+    var(--colour-surface)
+  );
+}
+
+.workspace-navigation-item[data-workspace-section="overview"] {
+  --workspace-section-accent: var(--workspace-overview);
+}
+
+.workspace-navigation-item[data-workspace-section="growth"] {
+  --workspace-section-accent: var(--workspace-growth);
+}
+
+.workspace-navigation-item[data-workspace-section="confidence"] {
+  --workspace-section-accent: var(--workspace-confidence);
+}
+
+.workspace-navigation-item[data-workspace-section="income"] {
+  --workspace-section-accent: var(--workspace-income);
+}
+
+.workspace-navigation-item[data-workspace-section="sustainability"] {
+  --workspace-section-accent: var(--workspace-sustainability);
+}
+
+.workspace-navigation-item[data-workspace-section="improve"] {
+  --workspace-section-accent: var(--workspace-improve);
+}
+
+.workspace-navigation-item[data-workspace-section="details"] {
+  --workspace-section-accent: var(--workspace-assumptions);
+}
+
+.workspace-navigation-item .workspace-navigation-icon {
+  color: var(--workspace-section-accent);
+  background: var(--workspace-section-soft);
+  transition:
+    color var(--ui-duration-fast) var(--ui-ease-standard),
+    background-color var(--ui-duration-fast) var(--ui-ease-standard),
+    transform var(--ui-duration-fast) var(--ui-ease-standard);
+}
+
+.workspace-navigation-item:hover {
+  background: var(--workspace-section-soft);
+}
+
+.workspace-navigation-item:hover .workspace-navigation-icon {
+  transform: translateY(-1px);
+}
+
+.workspace-navigation-item.active {
+  color: var(--colour-text-strong);
+  background: var(--workspace-section-soft);
+  box-shadow: inset 3px 0 0 var(--workspace-section-accent);
+}
+
+.workspace-navigation-item.active .workspace-navigation-icon {
+  color: var(--workspace-section-accent);
+  background: color-mix(
+    in srgb,
+    var(--workspace-section-accent) 20%,
+    var(--colour-surface)
+  );
+}
+
+.workspace-navigation-item:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px color-mix(
+    in srgb,
+    var(--workspace-section-accent) 28%,
+    transparent
+  );
+}
+
+/* Shared status badges --------------------------------------------------- */
+.ui-status-badge-info {
+  color: var(--status-info-text);
+  background: var(--status-info-background);
+  border-color: var(--status-info-border);
+}
+
+.ui-status-badge-success {
+  color: var(--status-good-text);
+  background: var(--status-good-background);
+  border-color: var(--status-good-border);
+}
+
+.ui-status-badge-warning {
+  color: var(--status-warning-text);
+  background: var(--status-warning-background);
+  border-color: var(--status-warning-border);
+}
+
+.ui-status-badge-danger {
+  color: var(--status-danger-text);
+  background: var(--status-danger-background);
+  border-color: var(--status-danger-border);
+}
+
+/* Shared cards and metric states ---------------------------------------- */
+.ui-card-success {
+  background: var(--status-good-background);
+  border-color: var(--status-good-border);
+}
+
+.ui-card-warning {
+  background: var(--status-warning-background);
+  border-color: var(--status-warning-border);
+}
+
+.ui-card-danger {
+  background: var(--status-danger-background);
+  border-color: var(--status-danger-border);
+}
+
+.ui-metric-card-positive .ui-metric-card-icon,
+.ui-metric-card-positive .ui-metric-card-trend {
+  color: var(--status-good-text);
+}
+
+.ui-metric-card-warning .ui-metric-card-icon,
+.ui-metric-card-warning .ui-metric-card-trend {
+  color: var(--status-warning-text);
+}
+
+.ui-metric-card-negative .ui-metric-card-icon,
+.ui-metric-card-negative .ui-metric-card-trend {
+  color: var(--status-danger-text);
+}
+
+.workspace-summary-metric-positive .workspace-summary-metric-icon {
+  color: var(--status-good);
+  background: var(--status-good-background);
+}
+
+.workspace-summary-metric-warning .workspace-summary-metric-icon {
+  color: var(--status-warning);
+  background: var(--status-warning-background);
+}
+
+.workspace-summary-metric-negative .workspace-summary-metric-icon {
+  color: var(--status-danger);
+  background: var(--status-danger-background);
+}
+
+/* Common alert-like states ---------------------------------------------- */
+[role="alert"] {
+  --alert-accent: var(--status-danger);
+  --alert-background: var(--status-danger-background);
+  --alert-border: var(--status-danger-border);
+  --alert-text: var(--status-danger-text);
+}
+
+[role="alert"].success,
+[role="alert"].positive,
+[role="alert"][data-tone="success"] {
+  --alert-accent: var(--status-good);
+  --alert-background: var(--status-good-background);
+  --alert-border: var(--status-good-border);
+  --alert-text: var(--status-good-text);
+}
+
+[role="alert"].warning,
+[role="alert"][data-tone="warning"] {
+  --alert-accent: var(--status-warning);
+  --alert-background: var(--status-warning-background);
+  --alert-border: var(--status-warning-border);
+  --alert-text: var(--status-warning-text);
+}
+
+[role="alert"].info,
+[role="alert"][data-tone="info"] {
+  --alert-accent: var(--status-info);
+  --alert-background: var(--status-info-background);
+  --alert-border: var(--status-info-border);
+  --alert-text: var(--status-info-text);
+}
+
+.planner-error,
+.projection-error,
+.validation-summary,
+.form-error-summary {
+  color: var(--status-danger-text);
+  background: var(--status-danger-background);
+  border-color: var(--status-danger-border);
+  box-shadow: inset 3px 0 0 var(--status-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-navigation-item .workspace-navigation-icon {
+    transition: none;
+  }
+
+  .workspace-navigation-item:hover .workspace-navigation-icon {
+    transform: none;
+  }
+}
