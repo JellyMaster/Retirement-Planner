@@ -5,6 +5,7 @@ import { ThemeToggle } from "./components/theme/ThemeToggle";
 import { SkipLink } from "./components/ui";
 import { AppIcons, type AppIcon } from "./icons/AppIcons";
 import { DrawdownPlannerPage } from "./pages/DrawdownPlannerPage";
+import { OverviewPage } from "./pages/OverviewPage";
 import { PolarisSectionPage } from "./pages/PolarisSectionPage";
 import { RetirementPlannerPage } from "./pages/RetirementPlannerPage";
 
@@ -71,17 +72,7 @@ export default function App() {
 
         <div id="app-main-content" className="app-main-content" tabIndex={-1}>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <PolarisSectionPage
-                  eyebrow="Project Polaris"
-                  title="Your retirement overview"
-                  description="See what you have, where your plan is heading, whether you are on track and which actions deserve your attention next."
-                  primaryAction={{ label: "Review my plan", to: "/plan" }}
-                />
-              }
-            />
+            <Route path="/" element={<OverviewPage />} />
             <Route path="/plan" element={<RetirementPlannerPage />} />
             <Route path="/drawdown" element={<DrawdownPlannerPage />} />
             <Route
