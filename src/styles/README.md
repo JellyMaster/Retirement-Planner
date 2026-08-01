@@ -29,18 +29,34 @@ The central entry point loads foundations, shared components, semantic theme map
 
 Feature styles imported by pages remain independent until their migration is complete.
 
-## CSS audit
+## CSS audit and pruning
 
-Run:
+Run the audit with:
 
 ```bash
 npm run audit:css
 ```
 
-The audit reports:
+Preview the safe `App.css` removal set with:
 
-- selectors defined in more than one CSS file;
-- class selectors that do not appear literally in TypeScript, JavaScript or HTML source.
+```bash
+npm run prune:app-css
+```
+
+Apply that removal set with:
+
+```bash
+npm run prune:app-css:write
+```
+
+The pruning command removes a rule only when every selector in that rule is already declared by one of the approved permanent planner, drawdown, comparison, chart, legend, milestone, summary or action modules. Mixed selector groups and unowned residual rules remain in `App.css`.
+
+After applying a pruning pass, always run:
+
+```bash
+npm run audit:css
+npm run verify
+```
 
 The unused-class report is advisory because dynamically constructed class names can create false positives. Review candidates before deleting them.
 
@@ -79,21 +95,24 @@ The unused-class report is advisory because dynamically constructed class names 
 - The application stylesheet entry point no longer loads migration layers.
 - The remaining `App.css` dependency is isolated behind `legacy/app-css-compat.css`.
 - `npm run audit:css` provides duplicate-selector and possible-unused-selector reports.
+- `npm run prune:app-css` provides a dry-run removal report.
+- `npm run prune:app-css:write` applies only confirmed duplicate-rule removals.
 
 ### Still in `App.css`
 
-- duplicate rules already covered by the authoritative modules above;
+- duplicate rules waiting for the controlled pruning command;
 - miscellaneous legacy utilities and isolated responsive overrides;
 - any selector not yet confirmed through visual regression checks.
 
 ### Remaining cleanup order
 
-1. run `npm run audit:css` and capture the duplicate-selector report;
-2. delete verified duplicate blocks from `App.css` in cohesive sections;
-3. audit remaining selectors for active usage and remove dead rules;
-4. move any genuine residual selectors into permanent owners;
-5. remove `legacy/app-css-compat.css` when no active selector depends on it;
-6. delete `App.css` or replace it with a short historical note.
+1. preview the removal set with `npm run prune:app-css`;
+2. apply it with `npm run prune:app-css:write`;
+3. run `npm run audit:css` and `npm run verify`;
+4. audit remaining selectors for active usage and remove dead rules;
+5. move genuine residual selectors into permanent owners;
+6. remove `legacy/app-css-compat.css` when no active selector depends on it;
+7. delete `App.css` or replace it with a short historical note.
 
 ## Migration checklist
 
