@@ -1,13 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
+import { useScenarios } from "../components/scenarios";
 import { usePensionProjection } from "../hooks/usePensionProjection";
-import { useStoredPensionInputs } from "../hooks/useStoredPensionInputs";
 import { AppIcons } from "../icons";
 import { formatCurrency } from "../utils/formatters";
 
 export function OverviewPage() {
-  const inputs = useStoredPensionInputs();
+  const { activeScenario } = useScenarios();
+  const inputs = activeScenario.inputs;
   const scenario = usePensionProjection(inputs);
   const monthlyContribution =
     inputs.monthlyEmployeeContribution + inputs.monthlyEmployerContribution;
@@ -23,14 +24,14 @@ export function OverviewPage() {
           <p className="planner-eyebrow">Overview</p>
           <h1>Your retirement at a glance</h1>
           <p>
-            See the key information currently available for your plan and where
-            more detail would improve the projection.
+            See the key information currently available for your active plan and
+            where more detail would improve the projection.
           </p>
         </div>
 
         <Link className="ui-button ui-button-primary" to="/plan">
           <FontAwesomeIcon icon={AppIcons.navigation.plan} aria-hidden="true" />
-          Review my plan
+          Review active plan
         </Link>
       </header>
 
@@ -41,14 +42,16 @@ export function OverviewPage() {
           />
         </span>
         <div>
-          <p className="planner-eyebrow">Plan status</p>
+          <p className="planner-eyebrow">Active plan</p>
           <h2 id="overview-status-title">
-            {hasPensionBalance ? "Your baseline plan is available" : "Add your pension details"}
+            {hasPensionBalance
+              ? `${activeScenario.name} is available`
+              : `Add pension details to ${activeScenario.name}`}
           </h2>
           <p>
             {hasPensionBalance
-              ? "The figures below are based on the information currently held in My Plan."
-              : "Your contribution assumptions are available, but adding your current pension balance will make this overview more useful."}
+              ? `The figures below are based on the inputs saved in ${activeScenario.name}.`
+              : "Contribution assumptions are available, but adding a current pension balance will make this overview more useful."}
           </p>
         </div>
       </section>
@@ -97,10 +100,10 @@ export function OverviewPage() {
       <section className="polaris-overview-next-step">
         <div>
           <p className="planner-eyebrow">Next step</p>
-          <h2>Keep your plan information up to date</h2>
+          <h2>Keep your active plan information up to date</h2>
           <p>
-            Changes saved in My Plan now update this overview immediately and are
-            restored when you return to the application.
+            Changes saved to the active scenario update this overview immediately
+            and are restored when you return to the application.
           </p>
         </div>
 
