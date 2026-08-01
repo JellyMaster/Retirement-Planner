@@ -1,7 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
 
-import { ScenarioProvider } from "./components/scenarios";
+import {
+  ActiveScenarioSwitcher,
+  ScenarioProvider,
+} from "./components/scenarios";
 import { ThemeToggle } from "./components/theme/ThemeToggle";
 import { SkipLink } from "./components/ui";
 import { AppIcons, type AppIcon } from "./icons";
@@ -68,6 +71,7 @@ export default function App() {
               </nav>
 
               <div className="app-header-actions">
+                <ActiveScenarioSwitcher />
                 <ThemeToggle />
               </div>
             </div>
