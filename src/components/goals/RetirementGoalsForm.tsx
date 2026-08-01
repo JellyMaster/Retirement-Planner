@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import type { RetirementGoals } from "../../engine/models/RetirementGoals";
 import { AppIcons } from "../../icons";
+import { saveRetirementGoals } from "../../state/retirementGoalsStorage";
 import { formatCurrency } from "../../utils/formatters";
 import { Button, Card, CardHeader, StatusBadge } from "../ui";
 
@@ -23,8 +24,13 @@ export function RetirementGoalsForm({
 }: RetirementGoalsFormProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded || !collapsible);
 
-  function update<K extends keyof RetirementGoals>(key: K, nextValue: RetirementGoals[K]) {
-    onChange({ ...value, [key]: nextValue });
+  function update<K extends keyof RetirementGoals>(
+    key: K,
+    nextValue: RetirementGoals[K],
+  ) {
+    const nextGoals = { ...value, [key]: nextValue };
+    saveRetirementGoals(nextGoals);
+    onChange(nextGoals);
   }
 
   const className = [
@@ -37,7 +43,11 @@ export function RetirementGoalsForm({
     .join(" ");
 
   return (
-    <Card className={className} padding="none" aria-labelledby="retirement-goals-heading">
+    <Card
+      className={className}
+      padding="none"
+      aria-labelledby="retirement-goals-heading"
+    >
       {collapsible && !isExpanded ? (
         <button
           type="button"
@@ -94,7 +104,9 @@ export function RetirementGoalsForm({
 
           <div className="retirement-goals-fields">
             <div className="retirement-goals-field">
-              <label htmlFor="retirement-goals-income">Desired annual income</label>
+              <label htmlFor="retirement-goals-income">
+                Desired annual income
+              </label>
               <div className="retirement-goals-money-input">
                 <span aria-hidden="true">£</span>
                 <input
@@ -103,13 +115,17 @@ export function RetirementGoalsForm({
                   min="0"
                   step="500"
                   value={value.desiredAnnualIncome}
-                  onChange={(event) => update("desiredAnnualIncome", Number(event.target.value))}
+                  onChange={(event) =>
+                    update("desiredAnnualIncome", Number(event.target.value))
+                  }
                 />
               </div>
             </div>
 
             <div className="retirement-goals-field">
-              <label htmlFor="retirement-goals-reserve">Emergency reserve</label>
+              <label htmlFor="retirement-goals-reserve">
+                Emergency reserve
+              </label>
               <div className="retirement-goals-money-input">
                 <span aria-hidden="true">£</span>
                 <input
@@ -118,7 +134,9 @@ export function RetirementGoalsForm({
                   min="0"
                   step="1000"
                   value={value.emergencyReserve}
-                  onChange={(event) => update("emergencyReserve", Number(event.target.value))}
+                  onChange={(event) =>
+                    update("emergencyReserve", Number(event.target.value))
+                  }
                 />
               </div>
             </div>
@@ -127,7 +145,9 @@ export function RetirementGoalsForm({
               <input
                 type="checkbox"
                 checked={value.includeStatePension}
-                onChange={(event) => update("includeStatePension", event.target.checked)}
+                onChange={(event) =>
+                  update("includeStatePension", event.target.checked)
+                }
               />
               <span>Include State Pension</span>
             </label>
@@ -135,7 +155,9 @@ export function RetirementGoalsForm({
             {value.includeStatePension && (
               <div className="retirement-goals-state-grid">
                 <div className="retirement-goals-field">
-                  <label htmlFor="retirement-goals-state-pension">Annual amount</label>
+                  <label htmlFor="retirement-goals-state-pension">
+                    Annual amount
+                  </label>
                   <div className="retirement-goals-money-input">
                     <span aria-hidden="true">£</span>
                     <input
@@ -145,21 +167,28 @@ export function RetirementGoalsForm({
                       step="100"
                       value={value.statePensionAnnualAmount}
                       onChange={(event) =>
-                        update("statePensionAnnualAmount", Number(event.target.value))
+                        update(
+                          "statePensionAnnualAmount",
+                          Number(event.target.value),
+                        )
                       }
                     />
                   </div>
                 </div>
 
                 <div className="retirement-goals-field">
-                  <label htmlFor="retirement-goals-state-pension-age">Starts at age</label>
+                  <label htmlFor="retirement-goals-state-pension-age">
+                    Starts at age
+                  </label>
                   <input
                     id="retirement-goals-state-pension-age"
                     type="number"
                     min="55"
                     max="80"
                     value={value.statePensionAge}
-                    onChange={(event) => update("statePensionAge", Number(event.target.value))}
+                    onChange={(event) =>
+                      update("statePensionAge", Number(event.target.value))
+                    }
                   />
                 </div>
               </div>
@@ -168,8 +197,8 @@ export function RetirementGoalsForm({
 
           <div className="retirement-goals-footer">
             <p className="retirement-goals-help">
-              Targets are shown in today&apos;s money. The health score is a planning indicator,
-              not a probability or guarantee.
+              Targets are shown in today&apos;s money. The health score is a
+              planning indicator, not a probability or guarantee.
             </p>
 
             {collapsible && (
