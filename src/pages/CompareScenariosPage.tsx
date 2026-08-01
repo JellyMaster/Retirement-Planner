@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
 import {
+  ScenarioChangesSummary,
   ScenarioEditModal,
   useScenarios,
 } from "../components/scenarios";
@@ -396,6 +397,11 @@ export function CompareScenariosPage() {
           })}
         </div>
       </section>
+
+      <ScenarioChangesSummary
+        activeScenario={activeScenario}
+        scenarios={selectedScenarios}
+      />
 
       <section
         className="scenario-comparison"
