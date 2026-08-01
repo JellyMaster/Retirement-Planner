@@ -4,8 +4,10 @@ import type { RetirementGoals } from "../../engine/models/RetirementGoals";
 import type { RetirementScoreFactor } from "../../engine/models/RetirementScoreBreakdown";
 import { calculateWeightedRetirementScore } from "../../engine/retirement-health/calculateWeightedRetirementScore";
 import { RetirementProjectionEngine } from "../../engine/services/RetirementProjectionEngine";
+import { AppIcons } from "../../icons";
 import { formatCurrency } from "../../utils/formatters";
 import { calculateRetirementHealth } from "../goals/calculateRetirementHealth";
+import { Button } from "../ui";
 
 interface CustomWhatIfPreviewProps {
   baselineInputs: PensionInputs;
@@ -145,9 +147,14 @@ export function CustomWhatIfPreview({
         </div>
       </div>
 
-      <button type="button" onClick={() => onApplyToComparison(scenarioInputs)}>
+      <Button
+        variant="compare"
+        icon={AppIcons.comparison}
+        fullWidth
+        onClick={() => onApplyToComparison(scenarioInputs)}
+      >
         Apply to comparison
-      </button>
+      </Button>
     </aside>
   );
 }
