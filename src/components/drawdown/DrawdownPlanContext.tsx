@@ -1,16 +1,19 @@
-import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
+import { AppIcons } from "../../icons";
 import { formatCurrency, formatPercentage } from "../../utils/formatters";
 
 interface DrawdownPlanContextProps {
   activePlanName: string;
   value: DrawdownInputs;
+  onEdit: () => void;
 }
 
 export function DrawdownPlanContext({
   activePlanName,
   value,
+  onEdit,
 }: DrawdownPlanContextProps) {
   return (
     <section
@@ -20,15 +23,23 @@ export function DrawdownPlanContext({
       <div className="drawdown-plan-context-heading">
         <div>
           <p className="panel-eyebrow">From your active plan</p>
-          <h2 id="drawdown-plan-context-title">{activePlanName}</h2>
+          <div className="drawdown-plan-context-title-row">
+            <h2 id="drawdown-plan-context-title">{activePlanName}</h2>
+            <button
+              type="button"
+              className="drawdown-plan-context-edit"
+              aria-label={`Edit ${activePlanName}`}
+              title="Edit active plan"
+              onClick={onEdit}
+            >
+              <FontAwesomeIcon icon={AppIcons.edit} aria-hidden="true" />
+            </button>
+          </div>
           <p>
-            These values are controlled by My Plan and are used as the starting
+            These values come from the active plan and are used as the starting
             point for this income projection.
           </p>
         </div>
-        <Link className="ui-button ui-button-secondary ui-button-small" to="/plan">
-          Open My Plan
-        </Link>
       </div>
 
       <dl className="drawdown-plan-context-grid">
