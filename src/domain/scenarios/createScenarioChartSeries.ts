@@ -30,6 +30,8 @@ export function createScenarioChartSeries(
       scenario.inputs,
     ).projection;
 
+    if (projection.years.length === 0) return [];
+
     return [
       {
         scenarioId: scenario.id,
