@@ -49,7 +49,8 @@ describe("createScenarioInsights", () => {
   it("reports when an alternative overtakes the active plan", () => {
     const active = createScenario("active", "Active Plan");
     const alternative = createScenario("alternative", "Higher Contributions", {
-      monthlyEmployeeContribution: 1_200,
+      currentPot: 100_000,
+      monthlyEmployeeContribution: 5_000,
     });
 
     const [group] = createScenarioInsights([active, alternative], active);
