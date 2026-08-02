@@ -44,8 +44,14 @@ type PercentageField =
   | "inflation"
   | "annualContributionIncrease";
 
-function hasDrawdownErrors(value: ScenarioDrawdownPreferences): boolean {
+function hasDrawdownErrors(
+  value: ScenarioDrawdownPreferences,
+  retirementAge: number,
+): boolean {
   return (
+    !Number.isFinite(value.planningAge) ||
+    value.planningAge <= retirementAge ||
+    value.planningAge > 120 ||
     !Number.isFinite(value.withdrawalRate) ||
     value.withdrawalRate < 0 ||
     value.withdrawalRate > 1 ||
@@ -69,8 +75,10 @@ export function ScenarioEditModal({
   }));
   const errors = useMemo(() => validatePensionInputs(inputs), [inputs]);
   const hasErrors = useMemo(
-    () => hasPensionInputErrors(errors) || hasDrawdownErrors(drawdown),
-    [drawdown, errors],
+    () =>
+      hasPensionInputErrors(errors) ||
+      hasDrawdownErrors(drawdown, inputs.retirementAge),
+    [drawdown, errors, inputs.retirementAge],
   );
 
   useEffect(() => {
@@ -213,6 +221,7 @@ export function ScenarioEditModal({
 
           <ScenarioDrawdownFields
             idPrefix={fieldId("drawdown")}
+            retirementAge={inputs.retirementAge}
             value={drawdown}
             onChange={setDrawdown}
           />
