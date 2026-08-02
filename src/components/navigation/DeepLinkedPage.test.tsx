@@ -1,63 +1,91 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { useState } from "react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter, useLocation } from "react-router-dom";
+import { describe, expect, it } from "vitest";
 
-import { ConnectedJourneyLinks } from "./ConnectedJourneyLinks";
-import { DeepLinkedPage } from "./DeepLinkedPage";
+import {
+  DrawdownWorkspaceNavigation,
+  type DrawdownWorkspaceSection,
+} from "../drawdown/DrawdownWorkspaceNavigation";
+import {
+  ExperimentLauncher,
+  type ExperimentId,
+} from "../what-if/ExperimentLauncher";
 
-describe("connected journey navigation", () => {
-  it("activates the requested What If experiment", async () => {
-    const onSelect = vi.fn();
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
-      callback(0);
-      return 1;
-    });
+describe("query-owned workspace navigation", () => {
+  it("opens and records the requested What If experiment", async () => {
+    const user = userEvent.setup();
 
     render(
       <MemoryRouter initialEntries={["/what-if?experiment=fees"]}>
-        <DeepLinkedPage kind="what-if">
-          <button type="button" onClick={onSelect}>Lower fees</button>
-        </DeepLinkedPage>
+        <ExperimentHarness />
       </MemoryRouter>,
     );
 
-    await waitFor(() => expect(onSelect).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Lower fees/i })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      ),
+    );
+
+    await user.click(screen.getByRole("button", { name: /Inflation/i }));
+    expect(screen.getByTestId("location")).toHaveTextContent(
+      "/what-if?experiment=inflation",
+    );
   });
 
-  it("targets and navigates a connected recommendation link", async () => {
+  it("opens and records the requested Drawdown tab", async () => {
+    const user = userEvent.setup();
+
     render(
-      <MemoryRouter initialEntries={["/guidance"]}>
-        <ConnectedJourneyLinks />
-        <a href="/what-if">Explore lower fees</a>
-        <LocationValue />
+      <MemoryRouter initialEntries={["/drawdown?tab=balance"]}>
+        <DrawdownHarness />
       </MemoryRouter>,
     );
 
-    const link = screen.getByRole("link", { name: "Explore lower fees" });
     await waitFor(() =>
-      expect(link).toHaveAttribute("href", "/what-if?experiment=fees"),
+      expect(screen.getByRole("tab", { name: "Balance" })).toHaveAttribute(
+        "aria-selected",
+        "true",
+      ),
     );
 
-    act(() => fireEvent.click(link));
+    await user.click(screen.getByRole("tab", { name: "Timeline" }));
     expect(screen.getByTestId("location")).toHaveTextContent(
-      "/what-if?experiment=fees",
+      "/drawdown?tab=timeline",
     );
   });
 });
 
+function ExperimentHarness() {
+  const [active, setActive] = useState<ExperimentId>("retirement-age");
+  return (
+    <>
+      <ExperimentLauncher activeExperiment={active} onSelect={setActive} />
+      <LocationValue />
+    </>
+  );
+}
+
+function DrawdownHarness() {
+  const [active, setActive] =
+    useState<DrawdownWorkspaceSection>("overview");
+  return (
+    <>
+      <DrawdownWorkspaceNavigation value={active} onChange={setActive} />
+      <LocationValue />
+    </>
+  );
+}
+
 function LocationValue() {
   const location = useLocation();
   return (
-    <Routes>
-      <Route
-        path="*"
-        element={
-          <output data-testid="location">
-            {location.pathname}
-            {location.search}
-          </output>
-        }
-      />
-    </Routes>
+    <output data-testid="location">
+      {location.pathname}
+      {location.search}
+    </output>
   );
 }
