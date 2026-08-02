@@ -1,22 +1,12 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
-import { ScenarioProvider } from "../components/scenarios";
-import { ThemeProvider } from "../theme/ThemeProvider";
+import { renderWithAppProviders } from "../test/renderWithAppProviders";
 import { ExplorePage } from "./ExplorePage";
 
 function renderPage() {
-  return render(
-    <MemoryRouter>
-      <ThemeProvider>
-        <ScenarioProvider>
-          <ExplorePage />
-        </ScenarioProvider>
-      </ThemeProvider>
-    </MemoryRouter>,
-  );
+  return renderWithAppProviders(<ExplorePage />);
 }
 
 describe("ExplorePage", () => {
