@@ -10,6 +10,9 @@ export interface ScenarioDrawdownPreferences {
   desiredAnnualIncome: number;
   incomeTargetMode: IncomeTargetMode;
   taxFreeCash: number;
+  includeStatePension?: boolean;
+  statePensionAnnualAmount?: number;
+  statePensionAge?: number;
 }
 
 export function createDefaultScenarioDrawdownPreferences(
