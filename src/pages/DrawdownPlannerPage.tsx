@@ -105,10 +105,7 @@ export function DrawdownPlannerPage() {
             <h2 id="drawdown-results-title">Review the outcome</h2>
             <p>Move between the views below to explore the complete projection.</p>
           </div>
-          <CompactMoneyDisplaySelector
-            value={displayMode}
-            onChange={setDisplayMode}
-          />
+          <MoneyDisplayToggle value={displayMode} onChange={setDisplayMode} />
         </div>
 
         <div className="drawdown-outcome-toolbar">
@@ -116,18 +113,6 @@ export function DrawdownPlannerPage() {
             value={activeSection}
             onChange={setActiveSection}
           />
-          <div className="money-display-status" role="status">
-            {displayMode === "today" ? (
-              <PoundSterling size={16} aria-hidden="true" />
-            ) : (
-              <TrendingUp size={16} aria-hidden="true" />
-            )}
-            <span>
-              {displayMode === "today"
-                ? "Today’s purchasing power"
-                : "Projected future pounds"}
-            </span>
-          </div>
         </div>
 
         <section className="drawdown-workspace-content" aria-live="polite">
@@ -225,51 +210,51 @@ function SectionHeading({
   );
 }
 
-interface MoneyDisplaySelectorProps {
+interface MoneyDisplayToggleProps {
   value: MoneyDisplayMode;
   onChange: (value: MoneyDisplayMode) => void;
 }
 
-function CompactMoneyDisplaySelector({
-  value,
-  onChange,
-}: MoneyDisplaySelectorProps) {
+function MoneyDisplayToggle({ value, onChange }: MoneyDisplayToggleProps) {
+  const showingToday = value === "today";
+  const nextValue: MoneyDisplayMode = showingToday ? "nominal" : "today";
+
   return (
-    <div className="money-display-compact">
-      <div className="money-display-compact-heading">
-        <span>Display values as</span>
-        <details className="money-display-tooltip">
-          <summary aria-label="Explain today’s money and future money">
-            <Info size={16} aria-hidden="true" />
-          </summary>
-          <div className="money-display-tooltip-panel">
-            <strong>Today&apos;s money</strong>
-            <p>Removes inflation so figures use today&apos;s purchasing power.</p>
-            <strong>Future money</strong>
-            <p>Shows the projected pound amount in each future year.</p>
-          </div>
-        </details>
-      </div>
-      <div className="money-display-compact-options" role="group" aria-label="Money display basis">
-        <button
-          type="button"
-          aria-pressed={value === "today"}
-          className={value === "today" ? "is-active" : undefined}
-          onClick={() => onChange("today")}
-        >
-          <PoundSterling size={15} aria-hidden="true" />
-          Today’s money
-        </button>
-        <button
-          type="button"
-          aria-pressed={value === "nominal"}
-          className={value === "nominal" ? "is-active" : undefined}
-          onClick={() => onChange("nominal")}
-        >
-          <TrendingUp size={15} aria-hidden="true" />
-          Future money
-        </button>
-      </div>
+    <div className="money-display-toggle-group">
+      <span className="money-display-toggle-label">Display values</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={!showingToday}
+        aria-label={`Display values as ${
+          showingToday ? "today's money" : "future money"
+        }. Switch to ${showingToday ? "future money" : "today's money"}.`}
+        className="money-display-toggle"
+        onClick={() => onChange(nextValue)}
+      >
+        <span className="money-display-toggle-icon" aria-hidden="true">
+          {showingToday ? <PoundSterling size={16} /> : <TrendingUp size={16} />}
+        </span>
+        <span>{showingToday ? "Today’s money" : "Future money"}</span>
+        <span className="money-display-toggle-track" aria-hidden="true">
+          <span className="money-display-toggle-thumb" />
+        </span>
+      </button>
+      <details className="money-display-tooltip">
+        <summary aria-label="Explain today’s money and future money">
+          <Info size={16} aria-hidden="true" />
+        </summary>
+        <div className="money-display-tooltip-panel">
+          <strong>Today&apos;s money</strong>
+          <p>
+            Removes inflation so figures are shown using today&apos;s purchasing
+            power.
+          </p>
+          <strong>Future money</strong>
+          <p>Shows the projected pound amount in each future year.</p>
+          <small>The projection is unchanged; only the display basis changes.</small>
+        </div>
+      </details>
     </div>
   );
 }
