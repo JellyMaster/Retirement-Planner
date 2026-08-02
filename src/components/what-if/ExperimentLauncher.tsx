@@ -37,7 +37,7 @@ const experiments = [
     title: "Spend more",
     description: "Explore a different retirement-income target.",
     icon: AppIcons.money,
-    available: false,
+    available: true,
   },
   {
     id: "fees" as const,
