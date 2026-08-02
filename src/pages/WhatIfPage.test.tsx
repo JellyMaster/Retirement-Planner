@@ -237,9 +237,8 @@ describe("WhatIfPage", () => {
         extraMonthlyContribution: 500,
       }),
     );
-    expect(
-      screen.getByText(/will be added from age 52 until retirement at age 65/i),
-    ).toBeInTheDocument();
+    expect(ageSlider).toHaveAttribute("aria-valuetext", "Starts at age 52");
+    expect(screen.getByText("Start age: 52")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
   });
 
