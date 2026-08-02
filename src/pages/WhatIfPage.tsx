@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { RetirementComparisonDashboard } from "../components/comparison/RetirementComparisonDashboard";
 import { useScenarios } from "../components/scenarios";
-import { createDefaultPensionInputs } from "../config/defaultPensionInputs";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
@@ -23,13 +22,6 @@ export function WhatIfPage() {
     ...activeScenario.inputs,
   }));
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    const nextInputs = { ...activeScenario.inputs };
-    setBaselineInputs(nextInputs);
-    setAlternativeInputs(nextInputs);
-    setSaveMessage(null);
-  }, [activeScenario.id, activeScenario.inputs]);
 
   const baselineScenario = usePensionProjection(baselineInputs);
   const alternativeScenario = usePensionProjection(alternativeInputs);
@@ -63,9 +55,7 @@ export function WhatIfPage() {
     updateScenarioPlan(
       scenario.id,
       { ...alternativeInputs },
-      {
-        ...activeScenario.drawdown,
-      },
+      { ...activeScenario.drawdown },
     );
     setSaveMessage(`${name} has been saved and is ready to compare.`);
   }
