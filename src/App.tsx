@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
 
-import { ConnectedJourneyLinks } from "./components/navigation/ConnectedJourneyLinks";
 import { DeepLinkedPage } from "./components/navigation/DeepLinkedPage";
 import { TabKeyboardNavigation } from "./components/navigation/TabKeyboardNavigation";
 import {
@@ -55,7 +54,6 @@ function AppContent() {
   return (
     <div className="app-shell">
       <SkipLink />
-      <ConnectedJourneyLinks />
       <TabKeyboardNavigation />
 
       <header className="app-header">
@@ -128,11 +126,7 @@ function AppContent() {
           />
           <Route
             path="/explore"
-            element={
-              <DeepLinkedPage kind="explore">
-                <ExplorePage key={activeScenarioId} />
-              </DeepLinkedPage>
-            }
+            element={<ExplorePage key={activeScenarioId} />}
           />
           <Route
             path="/guidance"
