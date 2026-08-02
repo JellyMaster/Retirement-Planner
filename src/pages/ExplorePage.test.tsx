@@ -4,14 +4,17 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
 import { ScenarioProvider } from "../components/scenarios";
+import { ThemeProvider } from "../theme/ThemeProvider";
 import { ExplorePage } from "./ExplorePage";
 
 function renderPage() {
   return render(
     <MemoryRouter>
-      <ScenarioProvider>
-        <ExplorePage />
-      </ScenarioProvider>
+      <ThemeProvider>
+        <ScenarioProvider>
+          <ExplorePage />
+        </ScenarioProvider>
+      </ThemeProvider>
     </MemoryRouter>,
   );
 }
