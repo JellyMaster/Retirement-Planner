@@ -1,4 +1,5 @@
 import type {
+  DrawdownSpendingPhase,
   IncomeTargetMode,
   WithdrawalStrategy,
 } from "../../engine/drawdown/models/DrawdownInputs";
@@ -9,6 +10,7 @@ export interface ScenarioDrawdownPreferences {
   withdrawalRate: number;
   desiredAnnualIncome: number;
   incomeTargetMode: IncomeTargetMode;
+  spendingPhases?: DrawdownSpendingPhase[];
   taxFreeCash: number;
   includeStatePension?: boolean;
   statePensionAnnualAmount?: number;
