@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
+import { SequenceReturnsLesson } from "../components/explore/SequenceReturnsLesson";
 import { useScenarios } from "../components/scenarios";
-import { AppIcons, type AppIcon } from "../icons";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
+import { AppIcons, type AppIcon } from "../icons";
 import { formatCurrency, formatPercentage } from "../utils/formatters";
 
 interface ExploreCard {
@@ -14,7 +15,6 @@ interface ExploreCard {
   icon: AppIcon;
   actionLabel?: string;
   to?: string;
-  status?: string;
 }
 
 export function ExplorePage() {
@@ -31,6 +31,10 @@ export function ExplorePage() {
     inputs.monthlyEmployeeContribution + inputs.monthlyEmployerContribution;
   const desiredIncome =
     drawdown?.desiredAnnualIncome ?? retirementGoals.desiredAnnualIncome;
+  const retirementLength = Math.max(
+    10,
+    (drawdown?.planningAge ?? 95) - inputs.retirementAge,
+  );
 
   const personalisedInsights: ExploreCard[] = [
     {
@@ -75,17 +79,9 @@ export function ExplorePage() {
 
   const riskDemonstrations: ExploreCard[] = [
     {
-      title: "Sequence of returns",
-      description:
-        "Two pensions can receive the same average return but finish differently when poor years happen early in retirement.",
-      insight: "Featured demonstration · interactive model coming next",
-      icon: AppIcons.growth,
-      status: "Next to build",
-    },
-    {
       title: "Retiring during a downturn",
       description:
-        "Stress-test a one-off market fall and see how the timing changes the projected retirement outcome.",
+        "Stress-test a one-off market fall and see how its timing changes the projected retirement outcome.",
       insight: `The active plan currently projects ${formatCurrency(projectedPension)} at retirement.`,
       icon: AppIcons.warning,
       actionLabel: "Open market downturn",
@@ -106,7 +102,7 @@ export function ExplorePage() {
         "Understand why the end age matters and how extra retirement years can place pressure on withdrawals.",
       insight: `The income plan currently runs to age ${drawdown?.planningAge ?? 95}.`,
       icon: AppIcons.health,
-      actionLabel: "Review drawdown",
+      actionLabel: "Review Drawdown",
       to: "/drawdown",
     },
   ];
@@ -137,12 +133,31 @@ export function ExplorePage() {
         cards={personalisedInsights}
       />
 
+      <section className="explore-section" aria-labelledby="explore-sequence-title">
+        <div className="explore-section-heading">
+          <div>
+            <p className="planner-eyebrow">Featured demonstration</p>
+            <h2 id="explore-sequence-title">See sequence-of-returns risk using your plan</h2>
+            <p>
+              Isolate the effect of return order with two journeys that receive
+              the same annual returns and the same average return.
+            </p>
+          </div>
+        </div>
+        <SequenceReturnsLesson
+          startingBalance={projectedPension}
+          annualWithdrawal={desiredIncome}
+          retirementAge={inputs.retirementAge}
+          durationYears={retirementLength}
+          normalReturn={Math.max(-0.25, inputs.annualReturn - inputs.annualFee)}
+        />
+      </section>
+
       <ExploreSection
-        eyebrow="See the risk"
+        eyebrow="More ways to see the risk"
         title="Demonstrate what averages can hide"
-        description="Use stress tests and visual explanations to understand outcomes that a single straight-line projection cannot show."
+        description="Use existing stress tests and retirement views to explore other risks around the active plan."
         cards={riskDemonstrations}
-        featuredFirst
       />
 
       <section className="explore-section" aria-labelledby="explore-essentials-title">
@@ -159,9 +174,9 @@ export function ExplorePage() {
             icon={AppIcons.money}
             summary="Why taking cash reduces the pension left to provide income."
           >
-            Up to the applicable allowance may usually be taken tax free, but the
-            amount withdrawn no longer remains invested to support later income.
-            Polaris illustrates both the cash selected and the pension remaining.
+            Tax-free cash no longer remains invested to support later retirement
+            income. Polaris therefore shows both the cash selected and the pension
+            remaining for drawdown.
           </Essential>
           <Essential
             title="Gross versus net income"
@@ -187,8 +202,8 @@ export function ExplorePage() {
             summary="How returns, inflation and fees shape a deterministic illustration."
           >
             Assumptions are not forecasts. They provide a consistent basis for
-            comparing decisions, while What If? and Drawdown stress tests show how
-            different conditions could change the result.
+            comparing decisions, while stress tests show how different conditions
+            could change the result.
           </Essential>
         </div>
       </section>
@@ -216,13 +231,11 @@ function ExploreSection({
   title,
   description,
   cards,
-  featuredFirst = false,
 }: {
   eyebrow: string;
   title: string;
   description: string;
   cards: ExploreCard[];
-  featuredFirst?: boolean;
 }) {
   const sectionId = `explore-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
@@ -234,27 +247,21 @@ function ExploreSection({
           <p>{description}</p>
         </div>
       </div>
-      <div className={featuredFirst ? "explore-card-grid has-featured" : "explore-card-grid"}>
-        {cards.map((card, index) => (
-          <article
-            key={card.title}
-            className={featuredFirst && index === 0 ? "explore-card is-featured" : "explore-card"}
-          >
+      <div className="explore-card-grid">
+        {cards.map((card) => (
+          <article key={card.title} className="explore-card">
             <span className="explore-card-icon" aria-hidden="true">
               <FontAwesomeIcon icon={card.icon} fixedWidth />
             </span>
             <div className="explore-card-copy">
-              {card.status && <small className="explore-card-status">{card.status}</small>}
               <h3>{card.title}</h3>
               <p>{card.description}</p>
               {card.insight && <strong>{card.insight}</strong>}
             </div>
-            {card.to && card.actionLabel ? (
+            {card.to && card.actionLabel && (
               <Link to={card.to} className="explore-card-action">
                 {card.actionLabel}
               </Link>
-            ) : (
-              <span className="explore-card-action is-disabled">Interactive lesson coming next</span>
             )}
           </article>
         ))}
