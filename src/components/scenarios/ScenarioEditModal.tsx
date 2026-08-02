@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import {
+  createDefaultScenarioDrawdownPreferences,
+  type Scenario,
+  type ScenarioDrawdownPreferences,
+} from "../../domain/scenarios";
 import type { PensionInputs } from "../../engine/models/PensionInputs";
-import type { Scenario } from "../../domain/scenarios";
 import { AppIcons } from "../../icons";
 import {
   hasPensionInputErrors,
@@ -14,11 +18,15 @@ import {
   NumberInput,
   PercentageInput,
 } from "../forms";
+import { ScenarioDrawdownFields } from "./ScenarioDrawdownFields";
 
 interface ScenarioEditModalProps {
   scenario: Scenario;
   onClose: () => void;
-  onSave: (inputs: PensionInputs) => void;
+  onSave: (
+    inputs: PensionInputs,
+    drawdown: ScenarioDrawdownPreferences,
+  ) => void;
 }
 
 type RequiredNumberField =
@@ -36,6 +44,18 @@ type PercentageField =
   | "inflation"
   | "annualContributionIncrease";
 
+function hasDrawdownErrors(value: ScenarioDrawdownPreferences): boolean {
+  return (
+    !Number.isFinite(value.withdrawalRate) ||
+    value.withdrawalRate < 0 ||
+    value.withdrawalRate > 1 ||
+    !Number.isFinite(value.desiredAnnualIncome) ||
+    value.desiredAnnualIncome < 0 ||
+    !Number.isFinite(value.taxFreeCash) ||
+    value.taxFreeCash < 0
+  );
+}
+
 export function ScenarioEditModal({
   scenario,
   onClose,
@@ -44,8 +64,14 @@ export function ScenarioEditModal({
   const [inputs, setInputs] = useState<PensionInputs>(() => ({
     ...scenario.inputs,
   }));
+  const [drawdown, setDrawdown] = useState<ScenarioDrawdownPreferences>(() => ({
+    ...(scenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
+  }));
   const errors = useMemo(() => validatePensionInputs(inputs), [inputs]);
-  const hasErrors = useMemo(() => hasPensionInputErrors(errors), [errors]);
+  const hasErrors = useMemo(
+    () => hasPensionInputErrors(errors) || hasDrawdownErrors(drawdown),
+    [drawdown, errors],
+  );
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -94,17 +120,17 @@ export function ScenarioEditModal({
       >
         <header className="scenario-edit-header">
           <div>
-            <p className="planner-eyebrow">Edit scenario</p>
+            <p className="planner-eyebrow">Edit plan</p>
             <h2 id="scenario-edit-title">{scenario.name}</h2>
             <p>
-              Update this scenario without leaving the current workspace. Changes
-              are only saved when you choose Save changes.
+              Update accumulation assumptions and how this plan will provide
+              retirement income. Changes are saved together.
             </p>
           </div>
           <button
             type="button"
             className="scenario-edit-close"
-            aria-label="Close scenario editor"
+            aria-label="Close plan editor"
             onClick={onClose}
           >
             <FontAwesomeIcon icon={AppIcons.minus} aria-hidden="true" />
@@ -184,19 +210,30 @@ export function ScenarioEditModal({
               </FormField>
             </div>
           </fieldset>
+
+          <ScenarioDrawdownFields
+            idPrefix={fieldId("drawdown")}
+            value={drawdown}
+            onChange={setDrawdown}
+          />
         </div>
 
         <footer className="scenario-edit-actions">
           <span role="status">
             {hasErrors
               ? "Correct the highlighted fields before saving."
-              : "Scenario is ready to save."}
+              : "Plan is ready to save."}
           </span>
           <div>
             <button type="button" className="ui-button ui-button-secondary" onClick={onClose}>
               Cancel
             </button>
-            <button type="button" className="ui-button ui-button-primary" disabled={hasErrors} onClick={() => onSave({ ...inputs })}>
+            <button
+              type="button"
+              className="ui-button ui-button-primary"
+              disabled={hasErrors}
+              onClick={() => onSave({ ...inputs }, { ...drawdown })}
+            >
               Save changes
             </button>
           </div>
