@@ -96,6 +96,47 @@
   overflow-wrap: anywhere;
 }
 
+.drawdown-choice-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 1fr) auto;
+  align-items: center;
+  gap: var(--ui-space-5);
+  padding: var(--ui-space-4) var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.drawdown-choice-summary h2,
+.drawdown-choice-summary p {
+  margin: 0;
+}
+
+.drawdown-choice-summary p:not(.panel-eyebrow) {
+  margin-top: var(--ui-space-1);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-choice-summary dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-3);
+  margin: 0;
+}
+
+.drawdown-choice-summary dt {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+}
+
+.drawdown-choice-summary dd {
+  margin: var(--ui-space-1) 0 0;
+  font-weight: 800;
+}
+
 .drawdown-editor-panel-compact {
   margin: 0;
 }
@@ -118,10 +159,19 @@
   .drawdown-plan-context-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .drawdown-choice-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .drawdown-choice-summary .ui-button {
+    justify-self: start;
+  }
 }
 
 @media (max-width: 700px) {
-  .drawdown-editor-panel-compact .withdrawal-strategy-grid {
+  .drawdown-editor-panel-compact .withdrawal-strategy-grid,
+  .drawdown-choice-summary dl {
     grid-template-columns: 1fr;
   }
 }
@@ -133,6 +183,10 @@
 
   .drawdown-plan-context-grid {
     grid-template-columns: 1fr;
+  }
+
+  .drawdown-choice-summary .ui-button {
+    width: 100%;
   }
 }
 
