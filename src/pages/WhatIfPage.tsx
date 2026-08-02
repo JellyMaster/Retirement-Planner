@@ -131,6 +131,19 @@ function WhatIfWorkspace({
     setSaveMessage(null);
   }
 
+  function changeExtraContributionAge(age: number) {
+    setAlternativeInputs((current) => ({
+      ...current,
+      extraContributionAge: Math.min(
+        Math.max(current.currentAge, Math.round(age)),
+        current.retirementAge - 1,
+      ),
+      extraMonthlyContribution:
+        current.extraMonthlyContribution ?? baselineExtraContribution || 250,
+    }));
+    setSaveMessage(null);
+  }
+
   function resetExperiment() {
     setAlternativeInputs({ ...activeScenario.inputs });
     setSaveMessage(null);
@@ -218,6 +231,7 @@ function WhatIfWorkspace({
           }
           employerContribution={alternativeInputs.monthlyEmployerContribution}
           baselineExtraContribution={baselineExtraContribution}
+          baselineExtraContributionAge={baselineExtraContributionAge}
           extraContribution={
             alternativeInputs.extraMonthlyContribution ??
             (baselineExtraContribution || 250)
@@ -241,6 +255,7 @@ function WhatIfWorkspace({
           onEmployerContributionChange={changeEmployerContribution}
           onExtraContributionEnabledChange={changeExtraContributionEnabled}
           onExtraContributionChange={changeExtraContribution}
+          onExtraContributionAgeChange={changeExtraContributionAge}
           onReset={resetExperiment}
           onSave={saveExperiment}
         />
