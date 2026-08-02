@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -19,10 +19,7 @@ function renderPage() {
 }
 
 function getScenarioCard(name: string): HTMLElement {
-  const scenarioList = screen.getByRole("region", {
-    name: "Choose plans to compare",
-  });
-  const heading = within(scenarioList).getByRole("heading", { name });
+  const heading = screen.getByRole("heading", { name, hidden: true });
   const card = heading.closest("article");
 
   if (!card) {
@@ -30,6 +27,36 @@ function getScenarioCard(name: string): HTMLElement {
   }
 
   return card;
+}
+
+async function openScenarioLibrary(user: UserEvent) {
+  const summary = screen.getByText("Manage scenarios").closest("summary");
+  const details = summary?.closest("details");
+
+  if (!summary || !details) {
+    throw new Error("Could not find the scenario library disclosure.");
+  }
+
+  if (!details.open) await user.click(summary);
+}
+
+async function createScenario(user: UserEvent, name: string) {
+  const summary = screen.getByText("Create another scenario").closest("summary");
+  if (!summary) throw new Error("Could not find the create scenario disclosure.");
+
+  await user.click(summary);
+  await user.type(
+    screen.getByRole("textbox", { name: "Scenario name" }),
+    name,
+  );
+  await user.click(screen.getByRole("button", { name: "Create scenario" }));
+  await openScenarioLibrary(user);
+}
+
+async function openMoreActions(user: UserEvent, card: HTMLElement) {
+  const summary = within(card).getByText("More actions").closest("summary");
+  if (!summary) throw new Error("Could not find scenario actions.");
+  await user.click(summary);
 }
 
 describe("CompareScenariosPage", () => {
@@ -44,13 +71,9 @@ describe("CompareScenariosPage", () => {
   it("creates the initial baseline scenario and comparison table", () => {
     renderPage();
 
-    expect(
-      within(
-        screen.getByRole("region", { name: "Choose plans to compare" }),
-      ).getByRole("heading", { name: "Baseline Plan" }),
-    ).toBeInTheDocument();
+    expect(getScenarioCard("Baseline Plan")).toBeInTheDocument();
     expect(screen.getByText("Baseline")).toBeInTheDocument();
-    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getAllByText("Active").length).toBeGreaterThan(0);
     expect(
       screen.getByRole("heading", { name: "Compare selected plans" }),
     ).toBeInTheDocument();
@@ -71,15 +94,11 @@ describe("CompareScenariosPage", () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.type(
-      screen.getByRole("textbox", { name: "Scenario name" }),
-      "Retire at 65",
-    );
-    await user.click(screen.getByRole("button", { name: "Create scenario" }));
+    await createScenario(user, "Retire at 65");
 
     const card = getScenarioCard("Retire at 65");
     expect(card).toBeInTheDocument();
-    expect(screen.getByText("2 of 3 selected")).toBeInTheDocument();
+    expect(screen.getByText("2 of 3")).toBeInTheDocument();
     expect(
       screen.getByRole("columnheader", {
         name: /retire at 65\s*active plan/i,
@@ -97,17 +116,11 @@ describe("CompareScenariosPage", () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.type(
-      screen.getByRole("textbox", { name: "Scenario name" }),
-      "Retire at 65",
-    );
-    await user.click(screen.getByRole("button", { name: "Create scenario" }));
+    await createScenario(user, "Retire at 65");
 
     const scenarioCard = getScenarioCard("Retire at 65");
     await user.click(
-      within(scenarioCard).getByRole("button", {
-        name: "Edit scenario",
-      }),
+      within(scenarioCard).getByRole("button", { name: "Edit scenario" }),
     );
 
     const dialog = screen.getByRole("dialog", { name: "Retire at 65" });
@@ -120,26 +133,19 @@ describe("CompareScenariosPage", () => {
       within(dialog).getByRole("button", { name: "Save changes" }),
     );
 
-    const scenarioHeader = screen.getByRole("columnheader", {
-      name: /retire at 65\s*active plan/i,
-    });
-    expect(scenarioHeader).toHaveClass("is-active-plan");
+    expect(
+      screen.getByRole("columnheader", {
+        name: /retire at 65\s*active plan/i,
+      }),
+    ).toHaveClass("is-active-plan");
 
-    const retirementRow = screen.getByRole("row", {
-      name: /retirement age/i,
-    });
-    expect(
-      within(retirementRow).getByText("Greater by 3 years"),
-    ).toBeInTheDocument();
-    expect(
-      within(retirementRow).getByText("Current active plan"),
-    ).toBeInTheDocument();
+    const retirementRow = screen.getByRole("row", { name: /retirement age/i });
+    expect(within(retirementRow).getByText("Greater by 3 years")).toBeInTheDocument();
+    expect(within(retirementRow).getByText("Current active plan")).toBeInTheDocument();
 
     const baselineCard = getScenarioCard("Baseline Plan");
     await user.click(
-      within(baselineCard).getByRole("button", {
-        name: "Make active",
-      }),
+      within(baselineCard).getByRole("button", { name: "Make active" }),
     );
 
     expect(
@@ -158,16 +164,10 @@ describe("CompareScenariosPage", () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.type(
-      screen.getByRole("textbox", { name: "Scenario name" }),
-      "Retire at 65",
-    );
-    await user.click(screen.getByRole("button", { name: "Create scenario" }));
+    await createScenario(user, "Retire at 65");
 
     const card = getScenarioCard("Retire at 65");
-    await user.click(
-      within(card).getByRole("button", { name: "Edit scenario" }),
-    );
+    await user.click(within(card).getByRole("button", { name: "Edit scenario" }));
 
     const dialog = screen.getByRole("dialog", { name: "Retire at 65" });
     const retirementAge = within(dialog).getByRole("spinbutton", {
@@ -175,9 +175,7 @@ describe("CompareScenariosPage", () => {
     });
     await user.clear(retirementAge);
     await user.type(retirementAge, "65");
-    await user.click(
-      within(dialog).getByRole("button", { name: "Save changes" }),
-    );
+    await user.click(within(dialog).getByRole("button", { name: "Save changes" }));
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(within(card).getByText("Age 65")).toBeInTheDocument();
@@ -193,9 +191,7 @@ describe("CompareScenariosPage", () => {
     renderPage();
 
     const card = getScenarioCard("Baseline Plan");
-    await user.click(
-      within(card).getByRole("button", { name: "Edit scenario" }),
-    );
+    await user.click(within(card).getByRole("button", { name: "Edit scenario" }));
     const dialog = screen.getByRole("dialog", { name: "Baseline Plan" });
     const currentPot = within(dialog).getByRole("spinbutton", {
       name: "Current pension pot",
@@ -214,18 +210,14 @@ describe("CompareScenariosPage", () => {
     renderPage();
 
     const card = getScenarioCard("Baseline Plan");
-    await user.click(
-      within(card).getByRole("button", { name: "Edit scenario" }),
-    );
+    await user.click(within(card).getByRole("button", { name: "Edit scenario" }));
     const dialog = screen.getByRole("dialog", { name: "Baseline Plan" });
     const currentPot = within(dialog).getByRole("spinbutton", {
       name: "Current pension pot",
     });
     await user.clear(currentPot);
     await user.type(currentPot, "250000");
-    await user.click(
-      within(dialog).getByRole("button", { name: "Save changes" }),
-    );
+    await user.click(within(dialog).getByRole("button", { name: "Save changes" }));
 
     const saved = JSON.parse(localStorage.getItem(PLAN_STORAGE_KEY) ?? "null");
     expect(saved.currentPot).toBe(250_000);
@@ -235,32 +227,28 @@ describe("CompareScenariosPage", () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.type(
-      screen.getByRole("textbox", { name: "Scenario name" }),
-      "Higher Contributions",
-    );
-    await user.click(screen.getByRole("button", { name: "Create scenario" }));
+    await createScenario(user, "Higher Contributions");
 
     const baselineCard = getScenarioCard("Baseline Plan");
     await user.click(
-      within(baselineCard).getByRole("button", {
-        name: "Make active",
-      }),
+      within(baselineCard).getByRole("button", { name: "Make active" }),
     );
 
     const card = getScenarioCard("Higher Contributions");
     const checkbox = within(card).getByRole("checkbox", {
-      name: "Include in comparison",
+      name: "Included in comparison",
     });
 
     await user.click(checkbox);
-    expect(screen.getByText("1 of 3 selected")).toBeInTheDocument();
+    expect(screen.getByText("1 of 3")).toBeInTheDocument();
     expect(
       screen.queryByRole("columnheader", { name: "Higher Contributions" }),
     ).not.toBeInTheDocument();
 
-    await user.click(checkbox);
-    expect(screen.getByText("2 of 3 selected")).toBeInTheDocument();
+    await user.click(
+      within(card).getByRole("checkbox", { name: "Include in comparison" }),
+    );
+    expect(screen.getByText("2 of 3")).toBeInTheDocument();
     expect(
       screen.getByRole("columnheader", { name: "Higher Contributions" }),
     ).toBeInTheDocument();
@@ -271,35 +259,29 @@ describe("CompareScenariosPage", () => {
     renderPage();
 
     const baselineCard = getScenarioCard("Baseline Plan");
-    await user.click(
-      within(baselineCard).getByRole("button", {
-        name: "Duplicate",
-      }),
-    );
+    await openMoreActions(user, baselineCard);
+    await user.click(within(baselineCard).getByRole("button", { name: "Duplicate" }));
 
     const copyCard = getScenarioCard("Baseline Plan Copy");
-    await user.click(
-      within(copyCard).getByRole("button", { name: "Rename" }),
-    );
+    await openMoreActions(user, copyCard);
+    await user.click(within(copyCard).getByRole("button", { name: "Rename" }));
     const renameInput = within(copyCard).getByRole("textbox", {
       name: "Scenario name",
     });
     await user.clear(renameInput);
     await user.type(renameInput, "Higher Contributions");
-    await user.click(
-      within(copyCard).getByRole("button", { name: "Save" }),
-    );
+    await user.click(within(copyCard).getByRole("button", { name: "Save" }));
 
     const renamedCard = getScenarioCard("Higher Contributions");
-    await user.click(
-      within(renamedCard).getByRole("button", { name: "Delete" }),
-    );
+    await openMoreActions(user, renamedCard);
+    await user.click(within(renamedCard).getByRole("button", { name: "Delete" }));
 
     expect(
-      within(
-        screen.getByRole("region", { name: "Choose plans to compare" }),
-      ).queryByRole("heading", { name: "Higher Contributions" }),
+      screen.queryByRole("heading", {
+        name: "Higher Contributions",
+        hidden: true,
+      }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText("1 of 3 selected")).toBeInTheDocument();
+    expect(screen.getByText("1 of 3")).toBeInTheDocument();
   });
 });
