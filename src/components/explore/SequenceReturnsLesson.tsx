@@ -39,8 +39,8 @@ export function SequenceReturnsLesson({
 }: SequenceReturnsLessonProps) {
   const defaults = useMemo(
     () => ({
-      startingBalance: Math.max(0, Math.round(startingBalance)),
-      annualWithdrawal: Math.max(0, Math.round(annualWithdrawal)),
+      startingBalance: Math.max(100_000, Math.min(2_000_000, Math.round(startingBalance))),
+      annualWithdrawal: Math.max(0, Math.min(100_000, Math.round(annualWithdrawal))),
       durationYears: Math.max(10, Math.min(45, Math.round(durationYears))),
       shockPercentage: 0.25,
     }),
@@ -65,9 +65,13 @@ export function SequenceReturnsLesson({
     [balance, normalReturn, retirementAge, shock, withdrawal, years],
   );
 
+  const middleIndex = Math.floor((years - 1) / 2);
+  const middleAge = retirementAge + middleIndex;
+  const lateAge = retirementAge + years - 1;
   const chartData = comparison.earlyLoss.years.map((earlyYear, index) => ({
     age: earlyYear.age,
     earlyLossBalance: earlyYear.closingBalance,
+    midLossBalance: comparison.midLoss.years[index]?.closingBalance ?? 0,
     lateLossBalance: comparison.lateLoss.years[index]?.closingBalance ?? 0,
   }));
   const difference = comparison.endingBalanceDifference;
@@ -87,9 +91,9 @@ export function SequenceReturnsLesson({
           <p className="planner-eyebrow">Interactive lesson</p>
           <h2 id="sequence-returns-title">Same returns. Different retirement outcome.</h2>
           <p>
-            Both journeys use exactly the same annual returns. Only their order
-            changes, showing why losses near the start of retirement can be more
-            damaging while withdrawals continue.
+            All three journeys use exactly the same annual returns. Only the year
+            of the market fall changes, showing how early, middle and late losses
+            interact differently with ongoing pension withdrawals.
           </p>
         </div>
         <span className="sequence-returns-average">
@@ -142,14 +146,23 @@ export function SequenceReturnsLesson({
 
       <div className="sequence-returns-outcomes">
         <JourneyCard
+          journeyLabel="Journey A"
           title="Early market loss"
           subtitle={`The ${Math.round(shock * 100)}% fall happens at age ${retirementAge}.`}
           journey={comparison.earlyLoss}
           tone="warning"
         />
         <JourneyCard
+          journeyLabel="Journey B"
+          title="Mid-retirement market loss"
+          subtitle={`The same fall happens halfway through retirement at age ${middleAge}.`}
+          journey={comparison.midLoss}
+          tone="neutral"
+        />
+        <JourneyCard
+          journeyLabel="Journey C"
           title="Late market loss"
-          subtitle={`The same fall happens at age ${retirementAge + years - 1}.`}
+          subtitle={`The same fall happens at age ${lateAge}.`}
           journey={comparison.lateLoss}
           tone="positive"
         />
@@ -158,15 +171,16 @@ export function SequenceReturnsLesson({
       <section className="sequence-returns-chart-panel" aria-labelledby="sequence-chart-title">
         <div>
           <p className="planner-eyebrow">Balance comparison</p>
-          <h3 id="sequence-chart-title">Watch the two journeys separate</h3>
+          <h3 id="sequence-chart-title">Watch the three journeys separate</h3>
           <p>
-            The return values and average are identical. Withdrawals made after
-            the early fall leave less invested to participate in the recovery.
+            The return values, average and compounded return are identical. The
+            midpoint journey shows how the effect usually sits between an early
+            shock and one that arrives near the end of the plan.
           </p>
         </div>
         <div className="sequence-returns-chart">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 16, right: 24, bottom: 8, left: 8 }}>
+            <LineChart data={chartData} margin={{ top: 20, right: 24, bottom: 8, left: 8 }}>
               <CartesianGrid stroke={chartColours.grid} strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="age" tickLine={false} axisLine={false} tick={{ fill: chartColours.text }} />
               <YAxis
@@ -183,7 +197,10 @@ export function SequenceReturnsLesson({
                   borderRadius: "0.5rem",
                   color: chartColours.tooltipText,
                 }}
-                formatter={(value, name) => [formatCurrency(Number(value ?? 0)), name]}
+                formatter={(value, name) => {
+                  const rawValue = Array.isArray(value) ? value[0] : value;
+                  return [formatCurrency(Number(rawValue ?? 0)), name];
+                }}
                 labelFormatter={(age) => `Age ${String(age)}`}
               />
               <Legend />
@@ -194,7 +211,13 @@ export function SequenceReturnsLesson({
                 label={{ value: "Early fall", fill: chartColours.text, position: "insideTopLeft" }}
               />
               <ReferenceLine
-                x={retirementAge + years - 1}
+                x={middleAge}
+                stroke={chartColours.secondary}
+                strokeDasharray="4 4"
+                label={{ value: "Mid fall", fill: chartColours.text, position: "insideTop" }}
+              />
+              <ReferenceLine
+                x={lateAge}
                 stroke={chartColours.tertiary}
                 strokeDasharray="4 4"
                 label={{ value: "Late fall", fill: chartColours.text, position: "insideTopRight" }}
@@ -204,6 +227,14 @@ export function SequenceReturnsLesson({
                 dataKey="earlyLossBalance"
                 name="Early market loss"
                 stroke={chartColours.fees}
+                strokeWidth={3}
+                dot={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="midLossBalance"
+                name="Mid-retirement loss"
+                stroke={chartColours.secondary}
                 strokeWidth={3}
                 dot={false}
               />
@@ -226,19 +257,21 @@ export function SequenceReturnsLesson({
           <h3>Withdrawals turn temporary losses into a lasting difference</h3>
           <p>
             After an early fall, the same cash withdrawal represents a larger
-            share of the remaining pension. Investments are sold while values are
-            depressed, so fewer units remain when positive returns arrive later.
+            share of the remaining pension. A fall in the middle has less time to
+            recover than an early shock, but it also happens after fewer years of
+            withdrawals than a late shock. This places its outcome between the two
+            extremes in typical examples.
           </p>
         </div>
         <div className="sequence-returns-difference">
-          <small>Difference caused by return order</small>
+          <small>Range caused by return timing</small>
           <strong>{formatCurrency(Math.abs(difference))}</strong>
           <span>
             {difference > 0
-              ? "more remains when the loss happens later"
+              ? "between the early-loss and late-loss outcomes"
               : difference < 0
-                ? "more remains when the loss happens earlier"
-                : "both journeys finish at the same value"}
+                ? "between the late-loss and early-loss outcomes"
+                : "all three journeys finish at the same value"}
           </span>
         </div>
       </div>
@@ -252,7 +285,7 @@ export function SequenceReturnsLesson({
           <button type="button" onClick={() => setWithdrawal(Math.max(0, withdrawal - 5_000))}>
             Spend £5,000 less
           </button>
-          <button type="button" onClick={() => setBalance(balance + 50_000)}>
+          <button type="button" onClick={() => setBalance(Math.min(2_000_000, balance + 50_000))}>
             Start with £50,000 more
           </button>
           <button type="button" onClick={() => setShock(Math.max(0.1, shock - 0.05))}>
@@ -307,20 +340,22 @@ function RangeControl({
 }
 
 function JourneyCard({
+  journeyLabel,
   title,
   subtitle,
   journey,
   tone,
 }: {
+  journeyLabel: string;
   title: string;
   subtitle: string;
   journey: SequenceReturnsJourney;
-  tone: "warning" | "positive";
+  tone: "warning" | "neutral" | "positive";
 }) {
   return (
     <article className={`sequence-journey-card is-${tone}`}>
       <div>
-        <small>{tone === "warning" ? "Journey A" : "Journey B"}</small>
+        <small>{journeyLabel}</small>
         <h3>{title}</h3>
         <p>{subtitle}</p>
       </div>
