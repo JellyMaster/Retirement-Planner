@@ -51,7 +51,7 @@ const experiments = [
     title: "Investment returns",
     description: "Test a more cautious or optimistic growth assumption.",
     icon: AppIcons.growth,
-    available: false,
+    available: true,
   },
   {
     id: "inflation" as const,
