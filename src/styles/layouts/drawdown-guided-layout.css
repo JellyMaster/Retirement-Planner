@@ -21,39 +21,102 @@
   gap: var(--ui-space-5);
 }
 
-.drawdown-guided-section-heading h2 {
+.drawdown-guided-section-heading h2,
+.drawdown-guided-section-heading p {
   margin: 0;
 }
 
-.drawdown-guided-section-heading > p {
+.drawdown-guided-section-heading > p,
+.drawdown-outcome-heading > div > p:last-child {
   max-width: 58ch;
-  margin: 0;
+  margin-top: var(--ui-space-1);
   color: var(--colour-text-muted);
-  text-align: right;
-}
-
-.drawdown-income-setup .drawdown-editor-panel {
-  margin: 0;
-}
-
-.drawdown-income-setup .drawdown-editor-heading {
-  padding-bottom: var(--ui-space-4);
-}
-
-.drawdown-income-setup .drawdown-editor-section {
-  margin: 0;
-}
-
-.drawdown-income-setup .drawdown-editor-title-group > div > p:last-child {
-  max-width: 70ch;
 }
 
 .drawdown-results-workspace {
   padding-top: var(--ui-space-2);
 }
 
-.drawdown-results-workspace .money-display-status {
+.drawdown-outcome-heading {
+  align-items: center;
+}
+
+.drawdown-outcome-toolbar {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+}
+
+.drawdown-outcome-toolbar .drawdown-workspace-navigation {
+  flex: 1 1 auto;
+}
+
+.drawdown-outcome-toolbar .money-display-status {
+  flex: 0 0 auto;
   margin: 0;
+  white-space: nowrap;
+}
+
+.money-display-compact {
+  display: grid;
+  flex: 0 0 auto;
+  gap: var(--ui-space-1);
+}
+
+.money-display-compact-heading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ui-space-1);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+}
+
+.money-display-compact-options {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.money-display-compact-options button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-1);
+  padding: 0.45rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: calc(var(--ui-radius-control) - 3px);
+  background: transparent;
+  color: var(--colour-text-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.money-display-compact-options button:hover {
+  background: var(--colour-surface);
+  color: var(--colour-text);
+}
+
+.money-display-compact-options button.is-active,
+.money-display-compact-options button[aria-pressed="true"] {
+  border-color: var(--colour-primary);
+  background: var(--colour-primary);
+  color: var(--colour-primary-text);
+}
+
+.money-display-compact-options button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--colour-primary) 38%, transparent);
+  outline-offset: 2px;
 }
 
 .drawdown-workspace-navigation {
@@ -75,7 +138,7 @@
 .drawdown-workspace-nav-item {
   display: inline-flex;
   min-height: 42px;
-  flex: 0 0 auto;
+  flex: 1 0 auto;
   align-items: center;
   justify-content: center;
   gap: var(--ui-space-2);
@@ -126,15 +189,38 @@
   outline: none;
 }
 
+@media (max-width: 1050px) {
+  .drawdown-outcome-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .drawdown-outcome-toolbar .money-display-status {
+    align-self: flex-start;
+  }
+}
+
 @media (max-width: 900px) {
   .drawdown-guided-section-heading {
     align-items: flex-start;
     flex-direction: column;
-    gap: var(--ui-space-2);
+    gap: var(--ui-space-3);
   }
 
-  .drawdown-guided-section-heading > p {
-    text-align: left;
+  .money-display-compact {
+    width: 100%;
+  }
+
+  .money-display-compact-heading {
+    justify-content: flex-start;
+  }
+
+  .money-display-compact-options {
+    width: 100%;
+  }
+
+  .money-display-compact-options button {
+    flex: 1;
   }
 }
 
@@ -144,16 +230,22 @@
   }
 
   .drawdown-workspace-nav-item {
+    flex: 0 0 auto;
     padding-inline: var(--ui-space-3);
   }
 
   .drawdown-workspace-nav-item svg {
     display: none;
   }
+
+  .money-display-compact-options button {
+    padding-inline: var(--ui-space-2);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .drawdown-workspace-nav-item {
+  .drawdown-workspace-nav-item,
+  .money-display-compact-options button {
     transition: none;
   }
 }
