@@ -124,7 +124,7 @@ describe("OverviewPage", () => {
       screen.getByRole("heading", { name: "Your retirement story" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Overview · Baseline Plan")).toBeInTheDocument();
-    expect(screen.getByText("Age 68")).toBeInTheDocument();
+    expect(screen.getAllByText("Age 68").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("£750,000")).toBeInTheDocument();
     expect(screen.getByText("You have already built")).toBeInTheDocument();
     expect(screen.getByText("You are adding")).toBeInTheDocument();
@@ -137,8 +137,16 @@ describe("OverviewPage", () => {
         name: "Projected pension growth by age in today's money",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Target coverage")).toBeInTheDocument();
-    expect(screen.getByText("State Pension")).toBeInTheDocument();
+    expect(
+      screen.getByRole("progressbar", { name: "Retirement target coverage" }),
+    ).toHaveAttribute("aria-valuenow");
+    expect(
+      screen.getByRole("heading", { name: "The key moments in this plan" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("State Pension").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Your next milestone")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: /Progress towards/ })).toBeInTheDocument();
+    expect(screen.getByText("Did you know?")).toBeInTheDocument();
     expect(
       screen.getByText(
         `${defaultRetirementGoals.statePensionAnnualAmount.toLocaleString(
@@ -168,6 +176,7 @@ describe("OverviewPage", () => {
     renderPage();
 
     expect(screen.getByText("Not included in this plan")).toBeInTheDocument();
+    expect(screen.queryByText("State Pension", { selector: "strong" })).not.toBeInTheDocument();
   });
 
   it("uses the non-baseline active scenario in the story", () => {
@@ -188,7 +197,7 @@ describe("OverviewPage", () => {
     renderPage();
 
     expect(screen.getByText("Overview · Retire at 65")).toBeInTheDocument();
-    expect(screen.getByText("Age 65")).toBeInTheDocument();
+    expect(screen.getAllByText("Age 65").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("£820,000")).toBeInTheDocument();
     expect(screen.getByText(/£250,000 in the pension included/)).toBeInTheDocument();
     expect(screen.getByText(/£1,300 each month/)).toBeInTheDocument();
@@ -251,5 +260,6 @@ describe("OverviewPage", () => {
       screen.getByText("Complete the active plan to calculate an income illustration."),
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Complete My Plan" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Complete the projection" })).toBeInTheDocument();
   });
 });
