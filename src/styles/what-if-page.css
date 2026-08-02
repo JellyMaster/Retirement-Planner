@@ -1,0 +1,100 @@
+.what-if-page {
+  display: grid;
+  gap: var(--space-6);
+  width: min(var(--content-width-wide, 1680px), 100%);
+}
+
+.what-if-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.what-if-header > div {
+  max-width: 760px;
+}
+
+.what-if-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.what-if-summary > div {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-4) var(--space-5);
+  border-right: 1px solid var(--colour-border);
+}
+
+.what-if-summary > div:last-child {
+  border-right: 0;
+}
+
+.what-if-summary span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.what-if-summary strong {
+  overflow-wrap: anywhere;
+  color: var(--colour-text-strong);
+  font-size: clamp(1rem, 2vw, 1.35rem);
+}
+
+.what-if-save-message {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--status-good-border);
+  border-radius: var(--radius-md);
+  color: var(--status-good-text);
+  background: var(--status-good-background);
+}
+
+@media (max-width: 1000px) {
+  .what-if-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .what-if-summary > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .what-if-summary > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--colour-border);
+  }
+}
+
+@media (max-width: 700px) {
+  .what-if-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .what-if-header .ui-button {
+    width: 100%;
+  }
+
+  .what-if-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .what-if-summary > div,
+  .what-if-summary > div:nth-child(2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--colour-border);
+  }
+
+  .what-if-summary > div:last-child {
+    border-bottom: 0;
+  }
+}
