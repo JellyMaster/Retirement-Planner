@@ -30,7 +30,7 @@ const experiments = [
     title: "Save more",
     description: "Test a different monthly pension contribution.",
     icon: AppIcons.plus,
-    available: false,
+    available: true,
   },
   {
     id: "spending" as const,
@@ -81,10 +81,7 @@ export function ExperimentLauncher({
   onSelect,
 }: ExperimentLauncherProps) {
   return (
-    <section
-      className="what-if-launcher"
-      aria-labelledby="what-if-launcher-title"
-    >
+    <section className="what-if-launcher" aria-labelledby="what-if-launcher-title">
       <div className="what-if-section-heading">
         <div>
           <p className="planner-eyebrow">Choose a decision</p>
@@ -117,7 +114,11 @@ export function ExperimentLauncher({
                 <small>{experiment.description}</small>
               </span>
               <span className="what-if-experiment-status">
-                {experiment.available ? (isActive ? "Selected" : "Explore") : "Coming next"}
+                {experiment.available
+                  ? isActive
+                    ? "Selected"
+                    : "Explore"
+                  : "Coming next"}
               </span>
             </button>
           );
