@@ -99,7 +99,10 @@ export function DrawdownRetirementChapters({
             <RetirementChapterCard key={`${chapter.title}-${chapter.startAge}`} chapter={chapter} />
           ))}
         </div>
-        <Link className="drawdown-chapter-action" to="/what-if">
+        <Link
+          className="drawdown-chapter-action"
+          to="/what-if?experiment=spending"
+        >
           Could you spend more during active retirement? Explore it in What If?
         </Link>
       </div>
