@@ -24,8 +24,8 @@ interface DrawdownBalanceChartProps {
   depletionAge: number | null;
   inflationRate: number;
   displayMode: MoneyDisplayMode;
-  spendingPhases?: DrawdownSpendingPhase[];
-  statePensionAge?: number;
+  spendingPhases: DrawdownSpendingPhase[] | undefined;
+  statePensionAge: number | undefined;
 }
 
 interface ChartDataPoint {
@@ -39,13 +39,14 @@ export function DrawdownBalanceChart({
   depletionAge,
   inflationRate,
   displayMode,
-  spendingPhases = [],
+  spendingPhases,
   statePensionAge,
 }: DrawdownBalanceChartProps) {
   const chartColours = useChartTheme();
 
   if (years.length === 0) return null;
 
+  const chapters = spendingPhases ?? [];
   const displayYears = getDisplayYears(years, inflationRate, displayMode);
   const chartData: ChartDataPoint[] = displayYears.map((year) => ({
     age: year.age,
@@ -86,7 +87,7 @@ export function DrawdownBalanceChart({
             {statePensionAge !== undefined && (
               <ReferenceLine x={statePensionAge} stroke={chartColours.tertiary} strokeDasharray="4 4" label={{ value: "State Pension", position: "insideTopRight", fill: chartColours.text }} />
             )}
-            {spendingPhases.slice(1).map((phase) => (
+            {chapters.slice(1).map((phase) => (
               <ReferenceLine key={`${phase.label}-${phase.startAge}`} x={phase.startAge} stroke={chartColours.secondary} strokeDasharray="3 5" label={{ value: phase.label, position: "insideTopLeft", fill: chartColours.text }} />
             ))}
             {depletionAge !== null && (
