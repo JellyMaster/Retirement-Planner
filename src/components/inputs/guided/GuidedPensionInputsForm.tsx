@@ -95,10 +95,17 @@ export function GuidedPensionInputsForm({
         errors.extraContributionAge,
         errors.extraMonthlyContribution,
       ].filter(Boolean).length,
-      income: 0,
-      review: Object.values(errors).filter(Boolean).length,
+      income:
+        drawdown.planningAge <= value.retirementAge || drawdown.planningAge > 120
+          ? 1
+          : 0,
+      review:
+        Object.values(errors).filter(Boolean).length +
+        (drawdown.planningAge <= value.retirementAge || drawdown.planningAge > 120
+          ? 1
+          : 0),
     }),
-    [errors],
+    [drawdown.planningAge, errors, value.retirementAge],
   );
 
   function fieldId(name: string) {
@@ -142,7 +149,7 @@ export function GuidedPensionInputsForm({
 
   function continueForward() {
     const errorsForStep = stepErrors[activeStep];
-    if (activeStep !== "changes" && activeStep !== "income" && activeStep !== "review" && errorsForStep > 0) {
+    if (activeStep !== "changes" && activeStep !== "review" && errorsForStep > 0) {
       return;
     }
     const next = steps[Math.min(activeIndex + 1, steps.length - 1)];
@@ -334,6 +341,7 @@ export function GuidedPensionInputsForm({
           >
             <ScenarioDrawdownFields
               idPrefix={fieldId("drawdown")}
+              retirementAge={value.retirementAge}
               value={drawdown}
               onChange={updateDrawdown}
             />
@@ -362,6 +370,7 @@ export function GuidedPensionInputsForm({
                 <ReviewRow label="Extra monthly" value={value.extraMonthlyContribution ? formatCurrency(value.extraMonthlyContribution) : "Not added"} />
               </ReviewGroup>
               <ReviewGroup title="Retirement income" icon={AppIcons.money} onEdit={() => goToStep("income")}>
+                <ReviewRow label="Plan to age" value={String(drawdown.planningAge)} />
                 <ReviewRow
                   label="Approach"
                   value={drawdown.withdrawalStrategy === "target-income" ? "Target annual income" : "Percentage withdrawal"}
@@ -389,7 +398,7 @@ export function GuidedPensionInputsForm({
           Back
         </button>
         {activeStep !== "review" ? (
-          <button type="button" className="primary-button" onClick={continueForward} aria-disabled={activeStep !== "changes" && activeStep !== "income" && stepErrors[activeStep] > 0}>
+          <button type="button" className="primary-button" onClick={continueForward} aria-disabled={activeStep !== "changes" && stepErrors[activeStep] > 0}>
             {activeStep === "income" ? "Review plan" : "Continue"}
           </button>
         ) : (
