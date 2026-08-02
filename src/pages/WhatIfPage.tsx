@@ -42,6 +42,14 @@ function WhatIfWorkspace({
   const [retirementGoals] = useStoredRetirementGoals();
   const [activeExperiment, setActiveExperiment] =
     useState<ExperimentId>("retirement-age");
+  const baselineExtraContribution =
+    activeScenario.inputs.extraMonthlyContribution ?? 0;
+  const [includeExtraContributions, setIncludeExtraContributions] = useState(
+    baselineExtraContribution > 0,
+  );
+  const [extraMonthlyContribution, setExtraMonthlyContribution] = useState(
+    baselineExtraContribution,
+  );
   const [alternativeInputs, setAlternativeInputs] = useState<PensionInputs>(() => ({
     ...activeScenario.inputs,
   }));
@@ -59,14 +67,51 @@ function WhatIfWorkspace({
     activeScenario.drawdown?.planningAge ??
     createDefaultScenarioDrawdownPreferences().planningAge;
 
-  function changeRetirementAge(retirementAge: number) {
+  function rebuildExperiment(
+    retirementAge: number,
+    includeExtra: boolean,
+    extraAmount: number,
+  ) {
     setAlternativeInputs(
-      createRetirementAgeExperimentInputs(activeScenario.inputs, retirementAge),
+      createRetirementAgeExperimentInputs(
+        activeScenario.inputs,
+        retirementAge,
+        includeExtra,
+        extraAmount,
+      ),
     );
     setSaveMessage(null);
   }
 
+  function changeRetirementAge(retirementAge: number) {
+    rebuildExperiment(
+      retirementAge,
+      includeExtraContributions,
+      extraMonthlyContribution,
+    );
+  }
+
+  function changeExtraContributionEnabled(enabled: boolean) {
+    setIncludeExtraContributions(enabled);
+    rebuildExperiment(
+      alternativeInputs.retirementAge,
+      enabled,
+      extraMonthlyContribution,
+    );
+  }
+
+  function changeExtraMonthlyContribution(amount: number) {
+    setExtraMonthlyContribution(amount);
+    rebuildExperiment(
+      alternativeInputs.retirementAge,
+      includeExtraContributions,
+      amount,
+    );
+  }
+
   function resetExperiment() {
+    setIncludeExtraContributions(baselineExtraContribution > 0);
+    setExtraMonthlyContribution(baselineExtraContribution);
     setAlternativeInputs({ ...activeScenario.inputs });
     setSaveMessage(null);
   }
@@ -102,7 +147,7 @@ function WhatIfWorkspace({
           </p>
         </div>
         <div className="what-if-header-mark" aria-hidden="true">
-          <FontAwesomeIcon icon={AppIcons.lightbulb} />
+          <FontAwesomeIcon icon={AppIcons.lightbulb} fixedWidth />
         </div>
       </header>
 
@@ -125,9 +170,14 @@ function WhatIfWorkspace({
           annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
           baselinePreparedness={baselineHealth?.score ?? 0}
           preparedness={alternativeHealth?.score ?? 0}
+          includeExtraContributions={includeExtraContributions}
+          extraMonthlyContribution={extraMonthlyContribution}
+          baselineExtraMonthlyContribution={baselineExtraContribution}
           canSave={!alternativeScenario.hasErrors}
           saveMessage={saveMessage}
           onRetirementAgeChange={changeRetirementAge}
+          onExtraContributionEnabledChange={changeExtraContributionEnabled}
+          onExtraMonthlyContributionChange={changeExtraMonthlyContribution}
           onReset={resetExperiment}
           onSave={saveExperiment}
         />
@@ -139,21 +189,28 @@ function WhatIfWorkspace({
 function createRetirementAgeExperimentInputs(
   baselineInputs: PensionInputs,
   retirementAge: number,
+  includeExtraContributions: boolean,
+  extraMonthlyContribution: number,
 ): PensionInputs {
   const nextInputs: PensionInputs = {
     ...baselineInputs,
     retirementAge,
   };
 
-  // A future contribution increase cannot occur after the experimental
-  // retirement date. Exclude that schedule from this temporary alternative
-  // rather than invalidating the entire projection.
+  delete nextInputs.extraContributionAge;
+  delete nextInputs.extraMonthlyContribution;
+
   if (
-    nextInputs.extraContributionAge !== undefined &&
-    nextInputs.extraContributionAge >= retirementAge
+    includeExtraContributions &&
+    extraMonthlyContribution > 0 &&
+    retirementAge > baselineInputs.currentAge
   ) {
-    delete nextInputs.extraContributionAge;
-    delete nextInputs.extraMonthlyContribution;
+    const savedStartAge = baselineInputs.extraContributionAge;
+    nextInputs.extraContributionAge =
+      savedStartAge !== undefined && savedStartAge < retirementAge
+        ? savedStartAge
+        : baselineInputs.currentAge;
+    nextInputs.extraMonthlyContribution = extraMonthlyContribution;
   }
 
   return nextInputs;
