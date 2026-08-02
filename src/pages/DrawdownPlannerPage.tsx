@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, Info, PoundSterling, TrendingUp } from "lucide-react";
+import { Info, PoundSterling, TrendingUp } from "lucide-react";
 
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
 import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
@@ -40,6 +40,12 @@ export function DrawdownPlannerPage() {
   const { activeScenario, updateScenarioPlan } = useScenarios();
   const [retirementGoals] = useStoredRetirementGoals();
   const [isEditingPlan, setIsEditingPlan] = useState(false);
+  const [displayMode, setDisplayMode] = useState<MoneyDisplayMode>(
+    getInitialMoneyDisplayMode,
+  );
+  const [activeSection, setActiveSection] =
+    useState<DrawdownWorkspaceSection>("overview");
+
   const pensionProjection = usePensionProjection(activeScenario.inputs);
   const inputs = useMemo(
     () =>
@@ -61,11 +67,6 @@ export function DrawdownPlannerPage() {
     () => (validation.isValid ? drawdownEngine.calculate(inputs) : null),
     [inputs, validation.isValid],
   );
-  const [displayMode, setDisplayMode] = useState<MoneyDisplayMode>(
-    getInitialMoneyDisplayMode,
-  );
-  const [activeSection, setActiveSection] =
-    useState<DrawdownWorkspaceSection>("overview");
 
   useEffect(() => {
     window.localStorage.setItem(MONEY_DISPLAY_STORAGE_KEY, displayMode);
@@ -90,8 +91,6 @@ export function DrawdownPlannerPage() {
             selected in My Plan.
           </p>
         </div>
-
-        <MoneyDisplaySelector value={displayMode} onChange={setDisplayMode} />
       </header>
 
       <DrawdownPlanContext
@@ -106,31 +105,36 @@ export function DrawdownPlannerPage() {
       />
 
       <section className="drawdown-results-workspace" aria-labelledby="drawdown-results-title">
-        <div className="drawdown-guided-section-heading">
+        <div className="drawdown-guided-section-heading drawdown-outcome-heading">
           <div>
             <p className="panel-eyebrow">Retirement outcome</p>
             <h2 id="drawdown-results-title">Review the outcome</h2>
+            <p>Move between the views below to explore the complete projection.</p>
           </div>
-          <p>Start with the overview, then explore income, tax and balance detail.</p>
+          <CompactMoneyDisplaySelector
+            value={displayMode}
+            onChange={setDisplayMode}
+          />
         </div>
 
-        <div className="money-display-status" role="status">
-          {displayMode === "today" ? (
-            <PoundSterling size={16} aria-hidden="true" />
-          ) : (
-            <TrendingUp size={16} aria-hidden="true" />
-          )}
-          <span>
-            {displayMode === "today"
-              ? "Figures shown in today’s purchasing power"
-              : "Figures shown in projected future pounds"}
-          </span>
+        <div className="drawdown-outcome-toolbar">
+          <DrawdownWorkspaceNavigation
+            value={activeSection}
+            onChange={setActiveSection}
+          />
+          <div className="money-display-status" role="status">
+            {displayMode === "today" ? (
+              <PoundSterling size={16} aria-hidden="true" />
+            ) : (
+              <TrendingUp size={16} aria-hidden="true" />
+            )}
+            <span>
+              {displayMode === "today"
+                ? "Today’s purchasing power"
+                : "Projected future pounds"}
+            </span>
+          </div>
         </div>
-
-        <DrawdownWorkspaceNavigation
-          value={activeSection}
-          onChange={setActiveSection}
-        />
 
         <section className="drawdown-workspace-content" aria-live="polite">
           {result ? (
@@ -142,161 +146,53 @@ export function DrawdownPlannerPage() {
               />
 
               {activeSection === "overview" && (
-                <div
-                  className="drawdown-workspace-section"
-                  id="drawdown-overview-section"
-                  role="tabpanel"
-                  aria-labelledby="drawdown-tab-overview"
-                  tabIndex={0}
-                >
-                  <div className="drawdown-section-heading">
-                    <div>
-                      <p className="panel-eyebrow">Retirement outlook</p>
-                      <h2>Can this plan support your retirement?</h2>
-                    </div>
-                    <p>
-                      Review sustainability first, followed by the important
-                      milestones and risks across the plan.
-                    </p>
-                  </div>
-                  <DrawdownSustainabilityDashboard
-                    inputs={inputs}
-                    result={result}
-                    inflationRate={inputs.inflationRate}
-                    displayMode={displayMode}
-                  />
-                  <DrawdownRetirementTimeline
-                    inputs={inputs}
-                    result={result}
-                    inflationRate={inputs.inflationRate}
-                    displayMode={displayMode}
-                  />
+                <div className="drawdown-workspace-section" id="drawdown-overview-section" role="tabpanel" aria-labelledby="drawdown-tab-overview" tabIndex={0}>
+                  <SectionHeading eyebrow="Retirement outlook" title="Can this plan support your retirement?" description="Review sustainability first, followed by the important milestones and risks across the plan." />
+                  <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+                  <DrawdownRetirementTimeline inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   <DrawdownInsights result={result} />
                 </div>
               )}
 
               {activeSection === "income" && (
-                <div
-                  className="drawdown-workspace-section"
-                  id="drawdown-income-section"
-                  role="tabpanel"
-                  aria-labelledby="drawdown-tab-income"
-                  tabIndex={0}
-                >
-                  <div className="drawdown-section-heading">
-                    <div>
-                      <p className="panel-eyebrow">Income and tax</p>
-                      <h2>How does retirement income change over time?</h2>
-                    </div>
-                    <p>
-                      Review pension withdrawals, State Pension, tax and any
-                      modelled income gaps.
-                    </p>
-                  </div>
+                <div className="drawdown-workspace-section" id="drawdown-income-section" role="tabpanel" aria-labelledby="drawdown-tab-income" tabIndex={0}>
+                  <SectionHeading eyebrow="Income and tax" title="How does retirement income change over time?" description="Review pension withdrawals, State Pension, tax and any modelled income gaps." />
                   <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
                     <div className="dashboard-chart-stage">
-                      <DrawdownIncomeChart
-                        years={result.years}
-                        inflationRate={inputs.inflationRate}
-                        displayMode={displayMode}
-                      />
+                      <DrawdownIncomeChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                     </div>
                   </section>
-                  <DrawdownSummary
-                    result={result}
-                    inflationRate={inputs.inflationRate}
-                    displayMode={displayMode}
-                  />
+                  <DrawdownSummary result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                 </div>
               )}
 
               {activeSection === "balance" && (
-                <div
-                  className="drawdown-workspace-section"
-                  id="drawdown-balance-section"
-                  role="tabpanel"
-                  aria-labelledby="drawdown-tab-balance"
-                  tabIndex={0}
-                >
-                  <div className="drawdown-section-heading">
-                    <div>
-                      <p className="panel-eyebrow">Pension balance</p>
-                      <h2>How does the pension change through retirement?</h2>
-                    </div>
-                    <p>
-                      See the effect of withdrawals, investment growth, fees and
-                      any eventual depletion.
-                    </p>
-                  </div>
+                <div className="drawdown-workspace-section" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
+                  <SectionHeading eyebrow="Pension balance" title="How does the pension change through retirement?" description="See the effect of withdrawals, investment growth, fees and any eventual depletion." />
                   <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
                     <div className="dashboard-chart-stage">
-                      <DrawdownBalanceChart
-                        years={result.years}
-                        depletionAge={result.depletionAge}
-                        inflationRate={inputs.inflationRate}
-                        displayMode={displayMode}
-                      />
+                      <DrawdownBalanceChart years={result.years} depletionAge={result.depletionAge} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                     </div>
                   </section>
                 </div>
               )}
 
               {activeSection === "details" && (
-                <div
-                  className="drawdown-workspace-section"
-                  id="drawdown-details-section"
-                  role="tabpanel"
-                  aria-labelledby="drawdown-tab-details"
-                  tabIndex={0}
-                >
-                  <div className="drawdown-section-heading">
-                    <div>
-                      <p className="panel-eyebrow">Year-by-year details</p>
-                      <h2>Inspect the full drawdown projection</h2>
-                    </div>
-                    <p>
-                      Trace income, tax, growth, fees and closing balances for
-                      every retirement year.
-                    </p>
-                  </div>
-                  <DrawdownProjectionTable
-                    years={result.years}
-                    inflationRate={inputs.inflationRate}
-                    displayMode={displayMode}
-                  />
+                <div className="drawdown-workspace-section" id="drawdown-details-section" role="tabpanel" aria-labelledby="drawdown-tab-details" tabIndex={0}>
+                  <SectionHeading eyebrow="Year-by-year details" title="Inspect the full drawdown projection" description="Trace income, tax, growth, fees and closing balances for every retirement year." />
+                  <DrawdownProjectionTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                 </div>
               )}
 
               {activeSection === "assumptions" && (
-                <div
-                  className="drawdown-workspace-section"
-                  id="drawdown-assumptions-section"
-                  role="tabpanel"
-                  aria-labelledby="drawdown-tab-assumptions"
-                  tabIndex={0}
-                >
-                  <div className="drawdown-section-heading">
-                    <div>
-                      <p className="panel-eyebrow">Calculation basis</p>
-                      <h2>Review the assumptions behind the projection</h2>
-                    </div>
-                    <p>
-                      Understand the methodology, money basis and plan values
-                      used by the deterministic model.
-                    </p>
-                  </div>
-                  <DrawdownAssumptionsPanel
-                    inputs={inputs}
-                    displayMode={displayMode}
-                  />
+                <div className="drawdown-workspace-section" id="drawdown-assumptions-section" role="tabpanel" aria-labelledby="drawdown-tab-assumptions" tabIndex={0}>
+                  <SectionHeading eyebrow="Calculation basis" title="Review the assumptions behind the projection" description="Understand the methodology, money basis and plan values used by the deterministic model." />
+                  <DrawdownAssumptionsPanel inputs={inputs} displayMode={displayMode} />
                 </div>
               )}
             </>
           ) : (
-            <section
-              className="panel retirement-dashboard-empty-state"
-              aria-live="polite"
-            >
+            <section className="panel retirement-dashboard-empty-state" aria-live="polite">
               <h2>Review the retirement-income settings</h2>
               <p>Edit the active plan to correct the saved drawdown choices.</p>
             </section>
@@ -315,86 +211,71 @@ export function DrawdownPlannerPage() {
   );
 }
 
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="drawdown-section-heading">
+      <div>
+        <p className="panel-eyebrow">{eyebrow}</p>
+        <h2>{title}</h2>
+      </div>
+      <p>{description}</p>
+    </div>
+  );
+}
+
 interface MoneyDisplaySelectorProps {
   value: MoneyDisplayMode;
   onChange: (value: MoneyDisplayMode) => void;
 }
 
-function MoneyDisplaySelector({ value, onChange }: MoneyDisplaySelectorProps) {
+function CompactMoneyDisplaySelector({
+  value,
+  onChange,
+}: MoneyDisplaySelectorProps) {
   return (
-    <section className="money-display-selector" aria-labelledby="money-display-title">
-      <div className="money-display-heading">
-        <div>
-          <p className="money-display-kicker">Display values as</p>
-          <h2 id="money-display-title">Choose your money view</h2>
-        </div>
+    <div className="money-display-compact">
+      <div className="money-display-compact-heading">
+        <span>Display values as</span>
         <details className="money-display-tooltip">
           <summary aria-label="Explain today’s money and future money">
-            <Info size={17} aria-hidden="true" />
+            <Info size={16} aria-hidden="true" />
           </summary>
           <div className="money-display-tooltip-panel">
-            <strong>Today&apos;s Money (recommended)</strong>
-            <p>
-              Removes inflation so every figure is shown in today&apos;s purchasing
-              power.
-            </p>
-            <strong>Future Money</strong>
-            <p>Shows projected pound amounts for each future year.</p>
-            <small>The projection does not change—only its display basis.</small>
+            <strong>Today&apos;s money</strong>
+            <p>Removes inflation so figures use today&apos;s purchasing power.</p>
+            <strong>Future money</strong>
+            <p>Shows the projected pound amount in each future year.</p>
           </div>
         </details>
       </div>
-
-      <div className="money-display-options" role="group" aria-label="Money display basis">
+      <div className="money-display-compact-options" role="group" aria-label="Money display basis">
         <button
           type="button"
-          className={`money-display-card${
-            value === "today" ? " money-display-card-active" : ""
-          }`}
           aria-pressed={value === "today"}
+          className={value === "today" ? "is-active" : undefined}
           onClick={() => onChange("today")}
         >
-          <span className="money-display-card-topline">
-            <span className="money-display-icon money-display-icon-today">
-              <PoundSterling size={20} aria-hidden="true" />
-            </span>
-            <span className="money-display-recommended">Recommended</span>
-          </span>
-          <span className="money-display-card-title">Today&apos;s Money</span>
-          <span className="money-display-card-copy">
-            Buying power in today&apos;s pounds.
-          </span>
-          {value === "today" && (
-            <span className="money-display-selected">
-              <Check size={14} aria-hidden="true" /> Selected
-            </span>
-          )}
+          <PoundSterling size={15} aria-hidden="true" />
+          Today’s money
         </button>
-
         <button
           type="button"
-          className={`money-display-card${
-            value === "nominal" ? " money-display-card-active" : ""
-          }`}
           aria-pressed={value === "nominal"}
+          className={value === "nominal" ? "is-active" : undefined}
           onClick={() => onChange("nominal")}
         >
-          <span className="money-display-card-topline">
-            <span className="money-display-icon money-display-icon-future">
-              <TrendingUp size={20} aria-hidden="true" />
-            </span>
-          </span>
-          <span className="money-display-card-title">Future Money</span>
-          <span className="money-display-card-copy">
-            Projected pound amounts in each year.
-          </span>
-          {value === "nominal" && (
-            <span className="money-display-selected">
-              <Check size={14} aria-hidden="true" /> Selected
-            </span>
-          )}
+          <TrendingUp size={15} aria-hidden="true" />
+          Future money
         </button>
       </div>
-    </section>
+    </div>
   );
 }
