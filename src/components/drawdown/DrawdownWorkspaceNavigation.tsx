@@ -1,5 +1,5 @@
 import { useEffect, type KeyboardEvent } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useInRouterContext, useSearchParams } from "react-router-dom";
 
 export type DrawdownWorkspaceSection =
   | "overview"
@@ -25,7 +25,17 @@ const sections: Array<{
   { id: "assumptions", queryValue: "assumptions", label: "Assumptions" },
 ];
 
-export function DrawdownWorkspaceNavigation({
+export function DrawdownWorkspaceNavigation(
+  props: DrawdownWorkspaceNavigationProps,
+) {
+  return useInRouterContext() ? (
+    <RoutedDrawdownWorkspaceNavigation {...props} />
+  ) : (
+    <DrawdownWorkspaceNavigationContent {...props} />
+  );
+}
+
+function RoutedDrawdownWorkspaceNavigation({
   value,
   onChange,
 }: DrawdownWorkspaceNavigationProps) {
@@ -46,6 +56,18 @@ export function DrawdownWorkspaceNavigation({
     onChange(section);
   }
 
+  return (
+    <DrawdownWorkspaceNavigationContent
+      value={value}
+      onChange={selectSection}
+    />
+  );
+}
+
+function DrawdownWorkspaceNavigationContent({
+  value,
+  onChange,
+}: DrawdownWorkspaceNavigationProps) {
   function handleKeyDown(
     event: KeyboardEvent<HTMLButtonElement>,
     currentIndex: number,
@@ -72,7 +94,7 @@ export function DrawdownWorkspaceNavigation({
     event.preventDefault();
     const nextSection = sections[nextIndex];
     if (!nextSection) return;
-    selectSection(nextSection.id);
+    onChange(nextSection.id);
     document.getElementById(`drawdown-tab-${nextSection.id}`)?.focus();
   }
 
@@ -99,7 +121,7 @@ export function DrawdownWorkspaceNavigation({
                 ? "drawdown-workspace-nav-item active"
                 : "drawdown-workspace-nav-item"
             }
-            onClick={() => selectSection(section.id)}
+            onClick={() => onChange(section.id)}
             onKeyDown={(event) => handleKeyDown(event, index)}
           >
             {section.label}
