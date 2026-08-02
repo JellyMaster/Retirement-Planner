@@ -152,8 +152,8 @@ function createRetirementAgeExperimentInputs(
     nextInputs.extraContributionAge !== undefined &&
     nextInputs.extraContributionAge >= retirementAge
   ) {
-    nextInputs.extraContributionAge = undefined;
-    nextInputs.extraMonthlyContribution = undefined;
+    delete nextInputs.extraContributionAge;
+    delete nextInputs.extraMonthlyContribution;
   }
 
   return nextInputs;
