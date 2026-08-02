@@ -37,12 +37,16 @@ describe("LocalScenarioRepository", () => {
         createdAt: "2026-08-01T20:00:00.000Z",
         updatedAt: "2026-08-01T20:00:00.000Z",
         inputs: defaults,
+        drawdown: expect.objectContaining({
+          withdrawalStrategy: "target-income",
+          withdrawalRate: 0.04,
+        }),
       }),
     ]);
 
     expect(JSON.parse(localStorage.getItem(SCENARIO_STORAGE_KEY) ?? "")).toEqual(
       expect.objectContaining({
-        version: 1,
+        version: 2,
         activeScenarioId: "baseline-id",
       }),
     );
@@ -67,10 +71,13 @@ describe("LocalScenarioRepository", () => {
     const state = repository.load();
 
     expect(state.scenarios[0].inputs).toEqual(savedInputs);
+    expect(state.scenarios[0].drawdown).toEqual(
+      expect.objectContaining({ withdrawalStrategy: "target-income" }),
+    );
     expect(localStorage.getItem(SCENARIO_STORAGE_KEY)).not.toBeNull();
   });
 
-  it("restores an existing versioned scenario state", () => {
+  it("restores and upgrades an existing version-one scenario state", () => {
     const defaults = createDefaultPensionInputs();
     localStorage.setItem(
       SCENARIO_STORAGE_KEY,
@@ -111,6 +118,13 @@ describe("LocalScenarioRepository", () => {
     expect(state.activeScenarioId).toBe("early");
     expect(state.scenarios).toHaveLength(2);
     expect(state.scenarios[1].inputs.retirementAge).toBe(65);
+    expect(state.scenarios[1].drawdown).toEqual(
+      expect.objectContaining({
+        withdrawalStrategy: "target-income",
+        desiredAnnualIncome: 30_000,
+      }),
+    );
+    expect(JSON.parse(localStorage.getItem(SCENARIO_STORAGE_KEY) ?? "").version).toBe(2);
   });
 
   it("replaces malformed scenario data with a valid baseline", () => {
