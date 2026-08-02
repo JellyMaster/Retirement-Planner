@@ -70,6 +70,8 @@ describe("WhatIfPage", () => {
       currentAge: 47,
       retirementAge: 65,
       currentPot: 200_000,
+      extraContributionAge: 56,
+      extraMonthlyContribution: 500,
     };
 
     mockedUseScenarios.mockReturnValue({
@@ -134,6 +136,23 @@ describe("WhatIfPage", () => {
     ).toBeInTheDocument();
     expect(screen.getAllByText("-£100,000")).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
+  });
+
+  it("removes a contribution change that begins on or after retirement", () => {
+    render(<WhatIfPage />);
+
+    fireEvent.change(
+      screen.getByRole("slider", { name: "Experimental retirement age" }),
+      { target: { value: "56" } },
+    );
+
+    const experimentalCall = mockedUsePensionProjection.mock.calls.find(
+      ([projectionInputs]) => projectionInputs.retirementAge === 56,
+    );
+
+    expect(experimentalCall).toBeDefined();
+    expect(experimentalCall?.[0]).not.toHaveProperty("extraContributionAge");
+    expect(experimentalCall?.[0]).not.toHaveProperty("extraMonthlyContribution");
   });
 
   it("resets the temporary experiment", async () => {
