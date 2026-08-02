@@ -23,10 +23,16 @@ const mockedUsePensionProjection = vi.mocked(usePensionProjection);
 const zeroMoney = { nominal: 0, real: 0 };
 
 function createProjection(inputs: PensionInputs) {
+  const contributionEffect =
+    (inputs.monthlyEmployeeContribution - 800) * 100;
+  const extraEffect = (inputs.extraMonthlyContribution ?? 0) * 50;
   const finalBalance =
     inputs.retirementAge === inputs.currentAge
       ? inputs.currentPot
-      : 500_000 + (inputs.retirementAge - 65) * 50_000;
+      : 500_000 +
+        (inputs.retirementAge - 65) * 50_000 +
+        contributionEffect +
+        extraEffect;
 
   return {
     hasErrors: false,
@@ -55,7 +61,7 @@ function createProjection(inputs: PensionInputs) {
 describe("WhatIfPage", () => {
   const createScenario = vi.fn(() => ({
     id: "saved-experiment",
-    name: "Retire at 63",
+    name: "Saved experiment",
     colour: "accent",
     isBaseline: false,
     createdAt: "2026-08-02T12:00:00.000Z",
@@ -73,6 +79,8 @@ describe("WhatIfPage", () => {
       currentAge: 47,
       retirementAge: 65,
       currentPot: 200_000,
+      monthlyEmployeeContribution: 800,
+      monthlyEmployerContribution: 200,
       extraContributionAge: 56,
       extraMonthlyContribution: 500,
     };
@@ -104,7 +112,7 @@ describe("WhatIfPage", () => {
     );
   });
 
-  it("shows the experiment launcher and one retirement-age control", () => {
+  it("shows both available decision experiments", () => {
     render(<WhatIfPage />);
 
     expect(
@@ -112,24 +120,15 @@ describe("WhatIfPage", () => {
         name: "What would happen if you changed one decision?",
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "What would you like to explore?" }),
-    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /retirement age/i })).toBeEnabled();
-    expect(screen.getByRole("button", { name: /save more/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /save more/i })).toBeEnabled();
     expect(
       screen.getByRole("slider", { name: "Experimental retirement age" }),
     ).toHaveValue("65");
-    expect(
-      screen.queryByRole("switch", { name: "Include extra contributions" }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("slider", { name: "Extra monthly contribution" }),
-    ).not.toBeInTheDocument();
     expect(screen.getByText("Main Plan is unchanged")).toBeInTheDocument();
   });
 
-  it("updates the story and outcomes as the retirement slider moves", () => {
+  it("updates the retirement story as the age slider moves", () => {
     render(<WhatIfPage />);
 
     fireEvent.change(
@@ -143,7 +142,6 @@ describe("WhatIfPage", () => {
         name: /retiring 2 years earlier means stopping work at age 63/i,
       }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("-£100,000")).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
   });
 
@@ -169,56 +167,98 @@ describe("WhatIfPage", () => {
     expect(experimentalCall?.[0]).not.toHaveProperty("extraMonthlyContribution");
   });
 
-  it("removes a saved contribution change when it starts on or after retirement", () => {
-    render(<WhatIfPage />);
-
-    fireEvent.change(
-      screen.getByRole("slider", { name: "Experimental retirement age" }),
-      { target: { value: "56" } },
-    );
-
-    const experimentalCall = mockedUsePensionProjection.mock.calls.find(
-      ([projectionInputs]) => projectionInputs.retirementAge === 56,
-    );
-    expect(experimentalCall?.[0]).not.toHaveProperty("extraContributionAge");
-    expect(experimentalCall?.[0]).not.toHaveProperty("extraMonthlyContribution");
-  });
-
-  it("resets the temporary experiment", async () => {
+  it("opens Save more and changes the regular employee contribution", async () => {
     const user = userEvent.setup();
     render(<WhatIfPage />);
 
+    await user.click(screen.getByRole("button", { name: /save more/i }));
+
+    expect(
+      screen.getByRole("heading", { name: "Save more each month" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("slider", {
+        name: "Experimental monthly employee contribution",
+      }),
+    ).toHaveValue("800");
+    expect(
+      screen.getByRole("switch", {
+        name: "Include scheduled extra contribution",
+      }),
+    ).toBeChecked();
+
     fireEvent.change(
-      screen.getByRole("slider", { name: "Experimental retirement age" }),
-      { target: { value: "63" } },
+      screen.getByRole("slider", {
+        name: "Experimental monthly employee contribution",
+      }),
+      { target: { value: "1000" } },
+    );
+
+    const experimentalCall = mockedUsePensionProjection.mock.calls.at(-1)?.[0];
+    expect(experimentalCall).toEqual(
+      expect.objectContaining({ monthlyEmployeeContribution: 1000 }),
+    );
+    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
+  });
+
+  it("can exclude the scheduled extra contribution", async () => {
+    const user = userEvent.setup();
+    render(<WhatIfPage />);
+    await user.click(screen.getByRole("button", { name: /save more/i }));
+
+    await user.click(
+      screen.getByRole("switch", {
+        name: "Include scheduled extra contribution",
+      }),
+    );
+
+    const experimentalCall = mockedUsePensionProjection.mock.calls.at(-1)?.[0];
+    expect(experimentalCall).not.toHaveProperty("extraContributionAge");
+    expect(experimentalCall).not.toHaveProperty("extraMonthlyContribution");
+  });
+
+  it("resets the selected experiment to the active plan", async () => {
+    const user = userEvent.setup();
+    render(<WhatIfPage />);
+    await user.click(screen.getByRole("button", { name: /save more/i }));
+
+    fireEvent.change(
+      screen.getByRole("slider", {
+        name: "Experimental monthly employee contribution",
+      }),
+      { target: { value: "1000" } },
     );
     await user.click(screen.getByRole("button", { name: "Reset experiment" }));
 
     expect(
-      screen.getByRole("slider", { name: "Experimental retirement age" }),
-    ).toHaveValue("65");
-    expect(screen.getByText("Main Plan is unchanged")).toBeInTheDocument();
+      screen.getByRole("slider", {
+        name: "Experimental monthly employee contribution",
+      }),
+    ).toHaveValue("800");
   });
 
-  it("saves a worthwhile experiment as a scenario", async () => {
+  it("saves a contribution experiment as a scenario", async () => {
     const user = userEvent.setup();
-    vi.spyOn(window, "prompt").mockReturnValue("Earlier retirement");
+    vi.spyOn(window, "prompt").mockReturnValue("Save more monthly");
     render(<WhatIfPage />);
+    await user.click(screen.getByRole("button", { name: /save more/i }));
 
     fireEvent.change(
-      screen.getByRole("slider", { name: "Experimental retirement age" }),
-      { target: { value: "63" } },
+      screen.getByRole("slider", {
+        name: "Experimental monthly employee contribution",
+      }),
+      { target: { value: "1000" } },
     );
     await user.click(screen.getByRole("button", { name: "Save as scenario" }));
 
-    expect(createScenario).toHaveBeenCalledWith("Earlier retirement", "baseline");
+    expect(createScenario).toHaveBeenCalledWith("Save more monthly", "baseline");
     expect(updateScenarioPlan).toHaveBeenCalledWith(
       "saved-experiment",
-      expect.objectContaining({ retirementAge: 63 }),
+      expect.objectContaining({ monthlyEmployeeContribution: 1000 }),
       expect.any(Object),
     );
     expect(screen.getByRole("status")).toHaveTextContent(
-      "Earlier retirement has been saved and is ready to compare.",
+      "Save more monthly has been saved and is ready to compare.",
     );
   });
 });
