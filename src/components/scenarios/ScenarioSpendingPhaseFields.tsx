@@ -9,7 +9,7 @@ interface ScenarioSpendingPhaseFieldsProps {
   onChange: (value: ScenarioDrawdownPreferences) => void;
 }
 
-const phaseLabels = ["Active years", "Slower years", "Later life"] as const;
+const phaseLabels = ["Active retirement", "Settled retirement", "Later life"] as const;
 
 export function ScenarioSpendingPhaseFields({
   idPrefix,
@@ -58,10 +58,11 @@ export function ScenarioSpendingPhaseFields({
 
   return (
     <fieldset className="scenario-edit-section scenario-spending-phases">
-      <legend>Retirement spending phases</legend>
+      <legend>Retirement chapters</legend>
       <p className="scenario-edit-section-copy">
         Model a higher income during active retirement, followed by lower targets
-        in slower and later life. Leave this off to use one annual target throughout.
+        during settled retirement and later life. Leave this off to use one annual
+        target throughout.
       </p>
 
       <label className="retirement-goals-checkbox">
@@ -86,7 +87,7 @@ export function ScenarioSpendingPhaseFields({
             return (
               <section key={phase.label} className="scenario-spending-phase-card">
                 <div>
-                  <span>Phase {index + 1}</span>
+                  <span>Chapter {index + 1}</span>
                   <h3>{phase.label}</h3>
                 </div>
                 <div className="scenario-edit-grid">
@@ -95,7 +96,7 @@ export function ScenarioSpendingPhaseFields({
                     label="Starts at age"
                     hint={
                       index === 0
-                        ? "The first phase begins at retirement."
+                        ? "The first chapter begins at retirement."
                         : `Must be after age ${phases[index - 1].startAge}.`
                     }
                   >
