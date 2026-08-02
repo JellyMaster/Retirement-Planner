@@ -91,12 +91,18 @@
   line-height: 1.45;
 }
 
+.scenario-tax-free-cash-input-row {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .scenario-tax-free-cash-actions {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  align-self: end;
-  padding-bottom: var(--space-1);
+  white-space: nowrap;
 }
 
 .scenario-tax-free-cash-summary {
@@ -148,6 +154,10 @@
   }
 
   .scenario-tax-free-cash-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-tax-free-cash-input-row {
     grid-template-columns: 1fr;
   }
 
