@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 import type { ExperimentId } from "../ExperimentLauncher";
 import { AppIcons } from "../../../icons";
@@ -19,6 +20,13 @@ interface ExperimentInsightsProps {
   downturnAge?: number;
   hasChanged: boolean;
   onSelectExperiment: (experiment: ExperimentId) => void;
+}
+
+interface TimelineMarker {
+  key: string;
+  age: number;
+  label: string;
+  icon: IconDefinition;
 }
 
 const nextExperiment: Record<ExperimentId, ExperimentId> = {
@@ -89,6 +97,12 @@ export function ExperimentInsights({
     },
   ].sort((left, right) => right.magnitude - left.magnitude);
   const next = nextExperiment[activeExperiment];
+  const timelineOptionalProps = {
+    ...(extraContributionAge !== undefined ? { extraContributionAge } : {}),
+    ...(activeExperiment === "market-downturn" && downturnAge !== undefined
+      ? { downturnAge }
+      : {}),
+  };
 
   return (
     <section className="what-if-insights" aria-labelledby="decision-summary-title">
@@ -168,8 +182,7 @@ export function ExperimentInsights({
         currentAge={currentAge}
         retirementAge={retirementAge}
         statePensionAge={statePensionAge}
-        extraContributionAge={extraContributionAge}
-        downturnAge={activeExperiment === "market-downturn" ? downturnAge : undefined}
+        {...timelineOptionalProps}
       />
 
       <article className="what-if-next-card">
@@ -226,22 +239,36 @@ function ExperimentTimeline({
   extraContributionAge?: number;
   downturnAge?: number;
 }) {
-  const ages = [currentAge, retirementAge, statePensionAge, extraContributionAge, downturnAge]
-    .filter((age): age is number => age !== undefined);
+  const ages = [currentAge, retirementAge, statePensionAge];
+  if (extraContributionAge !== undefined) ages.push(extraContributionAge);
+  if (downturnAge !== undefined) ages.push(downturnAge);
+
   const minimum = Math.min(...ages);
   const maximum = Math.max(...ages, minimum + 1);
   const position = (age: number) => `${((age - minimum) / (maximum - minimum)) * 100}%`;
-  const markers = [
+  const markers: TimelineMarker[] = [
     { key: "today", age: currentAge, label: "Today", icon: AppIcons.user },
-    extraContributionAge !== undefined
-      ? { key: "extra", age: extraContributionAge, label: "Extra saving", icon: AppIcons.plus }
-      : null,
-    downturnAge !== undefined
-      ? { key: "downturn", age: downturnAge, label: "Market fall", icon: AppIcons.warning }
-      : null,
     { key: "retirement", age: retirementAge, label: "Retire", icon: AppIcons.retirement },
     { key: "state", age: statePensionAge, label: "State Pension", icon: AppIcons.pension },
-  ].filter((marker): marker is NonNullable<typeof marker> => marker !== null);
+  ];
+
+  if (extraContributionAge !== undefined) {
+    markers.push({
+      key: "extra",
+      age: extraContributionAge,
+      label: "Extra saving",
+      icon: AppIcons.plus,
+    });
+  }
+  if (downturnAge !== undefined) {
+    markers.push({
+      key: "downturn",
+      age: downturnAge,
+      label: "Market fall",
+      icon: AppIcons.warning,
+    });
+  }
+  markers.sort((left, right) => left.age - right.age);
 
   return (
     <article className="what-if-timeline-panel">
@@ -257,7 +284,9 @@ function ExperimentTimeline({
             className="what-if-timeline-marker"
             style={{ left: position(marker.age) }}
           >
-            <span aria-hidden="true"><FontAwesomeIcon icon={marker.icon} /></span>
+            <span aria-hidden="true">
+              <FontAwesomeIcon icon={marker.icon} />
+            </span>
             <strong>{marker.age}</strong>
             <small>{marker.label}</small>
           </div>
@@ -291,11 +320,39 @@ function getHealth(score: number) {
 
 function getSensitivity(...changes: number[]) {
   const largest = Math.max(...changes.map(Math.abs));
-  if (largest >= 0.25) return { level: 5, label: "Very high", description: "This lever materially changes the retirement outcome." };
-  if (largest >= 0.15) return { level: 4, label: "High", description: "This lever has a strong effect on the plan." };
-  if (largest >= 0.08) return { level: 3, label: "Moderate", description: "This lever produces a noticeable change." };
-  if (largest >= 0.03) return { level: 2, label: "Low", description: "This lever moves the plan, but less than the major decisions." };
-  return { level: 1, label: "Very low", description: "This lever has only a small effect under the current assumptions." };
+  if (largest >= 0.25) {
+    return {
+      level: 5,
+      label: "Very high",
+      description: "This lever materially changes the retirement outcome.",
+    };
+  }
+  if (largest >= 0.15) {
+    return {
+      level: 4,
+      label: "High",
+      description: "This lever has a strong effect on the plan.",
+    };
+  }
+  if (largest >= 0.08) {
+    return {
+      level: 3,
+      label: "Moderate",
+      description: "This lever produces a noticeable change.",
+    };
+  }
+  if (largest >= 0.03) {
+    return {
+      level: 2,
+      label: "Low",
+      description: "This lever moves the plan, but less than the major decisions.",
+    };
+  }
+  return {
+    level: 1,
+    label: "Very low",
+    description: "This lever has only a small effect under the current assumptions.",
+  };
 }
 
 function relativeChange(change: number, baseline: number): number {
