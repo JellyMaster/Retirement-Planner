@@ -53,6 +53,7 @@ describe("ActiveScenarioSwitcher", () => {
       duplicateScenario: vi.fn(),
       renameScenario: vi.fn(),
       updateScenarioInputs: vi.fn(),
+      updateScenarioPlan: vi.fn(),
       setActiveScenario,
       deleteScenario: vi.fn(),
     });
@@ -61,8 +62,12 @@ describe("ActiveScenarioSwitcher", () => {
 
     const select = screen.getByRole("combobox", { name: "Active plan" });
     expect(select).toHaveValue("baseline");
-    expect(screen.getByRole("option", { name: "Baseline Plan · Baseline" })).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Retire at 65" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "Baseline Plan · Baseline" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "Retire at 65" }),
+    ).toBeInTheDocument();
 
     await user.selectOptions(select, "alternative");
 
