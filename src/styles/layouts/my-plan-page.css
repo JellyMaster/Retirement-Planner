@@ -16,7 +16,8 @@
 
 .my-plan-header h1,
 .my-plan-context h2,
-.my-plan-snapshot h2 {
+.my-plan-snapshot h2,
+.my-plan-snapshot h3 {
   margin: 0;
 }
 
@@ -40,12 +41,18 @@
 }
 
 .my-plan-context {
-  justify-content: flex-start;
   border-left: 4px solid var(--colour-primary);
 }
 
 .my-plan-context.is-baseline {
   border-left-color: var(--colour-positive, #16845b);
+}
+
+.my-plan-context-main {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--ui-space-4);
 }
 
 .my-plan-context-icon {
@@ -59,8 +66,64 @@
   color: var(--colour-primary);
 }
 
+.my-plan-completeness {
+  display: grid;
+  flex: 0 0 auto;
+  min-width: 12rem;
+  gap: 0.15rem;
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.my-plan-completeness > span,
+.my-plan-completeness > small {
+  color: var(--colour-text-muted);
+}
+
+.my-plan-completeness > span {
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.my-plan-completeness > strong {
+  color: var(--colour-positive, #16845b);
+  font-size: 1.05rem;
+}
+
+.my-plan-completeness.needs-attention > strong {
+  color: var(--colour-negative, #c2414b);
+}
+
+.my-plan-completeness > small {
+  line-height: 1.35;
+}
+
 .my-plan-editor-region {
   min-width: 0;
+}
+
+.my-plan-source-note {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: color-mix(in srgb, var(--colour-primary) 4%, var(--colour-surface));
+  color: var(--colour-text-muted);
+}
+
+.my-plan-source-note svg {
+  flex: 0 0 auto;
+  color: var(--colour-primary);
+}
+
+.my-plan-source-note p {
+  margin: 0;
+  line-height: 1.5;
 }
 
 .my-plan-snapshot {
@@ -78,9 +141,28 @@
   font-weight: 700;
 }
 
+.my-plan-snapshot-group {
+  display: grid;
+  gap: var(--ui-space-3);
+}
+
+.my-plan-snapshot-group + .my-plan-snapshot-group {
+  padding-top: var(--ui-space-4);
+  border-top: 1px solid var(--colour-border);
+}
+
+.my-plan-snapshot-group-heading {
+  display: grid;
+  gap: var(--ui-space-1);
+}
+
+.my-plan-snapshot-group-heading .planner-eyebrow {
+  margin: 0;
+}
+
 .my-plan-snapshot-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--ui-space-3);
 }
 
@@ -91,6 +173,11 @@
   padding: var(--ui-space-4);
   border-radius: var(--ui-radius-control);
   background: var(--colour-surface-secondary);
+}
+
+.my-plan-snapshot-grid.is-outcome .my-plan-snapshot-metric {
+  border-bottom: 3px solid var(--colour-primary);
+  background: color-mix(in srgb, var(--colour-primary) 4%, var(--colour-surface-secondary));
 }
 
 .my-plan-snapshot-metric > span,
@@ -142,9 +229,14 @@
   color: var(--colour-text-muted);
 }
 
-@media (max-width: 1050px) {
-  .my-plan-snapshot-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 900px) {
+  .my-plan-context {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .my-plan-completeness {
+    min-width: 0;
   }
 }
 
@@ -167,7 +259,8 @@
 }
 
 @media (max-width: 560px) {
-  .my-plan-context {
+  .my-plan-context-main,
+  .my-plan-source-note {
     align-items: flex-start;
   }
 
