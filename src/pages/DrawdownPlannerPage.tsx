@@ -3,7 +3,6 @@ import { Info, PoundSterling, TrendingUp } from "lucide-react";
 
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
 import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
-import { DrawdownChoiceSummary } from "../components/drawdown/DrawdownChoiceSummary";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
@@ -95,11 +94,6 @@ export function DrawdownPlannerPage() {
 
       <DrawdownPlanContext
         activePlanName={activeScenario.name}
-        value={inputs}
-        onEdit={() => setIsEditingPlan(true)}
-      />
-
-      <DrawdownChoiceSummary
         value={inputs}
         onEdit={() => setIsEditingPlan(true)}
       />
