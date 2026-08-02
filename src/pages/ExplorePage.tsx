@@ -56,7 +56,7 @@ export function ExplorePage() {
       description:
         "A small annual charge is applied repeatedly, so its long-term cost can be larger than the percentage initially suggests.",
       insight: `The active plan uses an annual fee of ${formatPercentage(inputs.annualFee)}.`,
-      icon: AppIcons.settings,
+      icon: AppIcons.fees,
       actionLabel: "Explore lower fees",
       to: "/what-if",
     },
@@ -67,7 +67,7 @@ export function ExplorePage() {
       insight: retirementGoals.includeStatePension
         ? `${formatCurrency(retirementGoals.statePensionAnnualAmount)} a year from age ${retirementGoals.statePensionAge}.`
         : "State Pension is not currently included in the plan.",
-      icon: AppIcons.institution,
+      icon: AppIcons.pension,
       actionLabel: "Explore State Pension",
       to: "/what-if",
     },
@@ -165,7 +165,7 @@ export function ExplorePage() {
           </Essential>
           <Essential
             title="Gross versus net income"
-            icon={AppIcons.income}
+            icon={AppIcons.concepts.income}
             summary="The difference between income before tax and money available to spend."
           >
             A gross target describes total taxable income. A net target describes
@@ -174,7 +174,7 @@ export function ExplorePage() {
           </Essential>
           <Essential
             title="Withdrawal rates"
-            icon={AppIcons.percentage}
+            icon={AppIcons.fees}
             summary="Why a percentage approach changes as the pension balance changes."
           >
             A percentage withdrawal takes a share of the remaining pension each
