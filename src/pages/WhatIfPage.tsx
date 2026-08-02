@@ -60,7 +60,9 @@ function WhatIfWorkspace({
     createDefaultScenarioDrawdownPreferences().planningAge;
 
   function changeRetirementAge(retirementAge: number) {
-    setAlternativeInputs((current) => ({ ...current, retirementAge }));
+    setAlternativeInputs(
+      createRetirementAgeExperimentInputs(activeScenario.inputs, retirementAge),
+    );
     setSaveMessage(null);
   }
 
@@ -132,4 +134,27 @@ function WhatIfWorkspace({
       )}
     </main>
   );
+}
+
+function createRetirementAgeExperimentInputs(
+  baselineInputs: PensionInputs,
+  retirementAge: number,
+): PensionInputs {
+  const nextInputs: PensionInputs = {
+    ...baselineInputs,
+    retirementAge,
+  };
+
+  // A future contribution increase cannot occur after the experimental
+  // retirement date. Exclude that schedule from this temporary alternative
+  // rather than invalidating the entire projection.
+  if (
+    nextInputs.extraContributionAge !== undefined &&
+    nextInputs.extraContributionAge >= retirementAge
+  ) {
+    nextInputs.extraContributionAge = undefined;
+    nextInputs.extraMonthlyContribution = undefined;
+  }
+
+  return nextInputs;
 }
