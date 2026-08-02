@@ -5,9 +5,9 @@ import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumpt
 import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
-import { DrawdownOutcomeStory } from "../components/drawdown/DrawdownOutcomeStory";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
+import { DrawdownRetirementJourney } from "../components/drawdown/DrawdownRetirementJourney";
 import { DrawdownRetirementTimeline } from "../components/drawdown/DrawdownRetirementTimeline";
 import { DrawdownSummary } from "../components/drawdown/DrawdownSummary";
 import { DrawdownSummaryRibbon } from "../components/drawdown/DrawdownSummaryRibbon";
@@ -127,8 +127,8 @@ export function DrawdownPlannerPage() {
 
               {activeSection === "overview" && (
                 <div className="drawdown-workspace-section" id="drawdown-overview-section" role="tabpanel" aria-labelledby="drawdown-tab-overview" tabIndex={0}>
-                  <SectionHeading eyebrow="Retirement outlook" title="Can this plan support your retirement?" description="Start with the plain-English conclusion, then review sustainability, milestones and the risks that shape it." />
-                  <DrawdownOutcomeStory inputs={inputs} result={result} displayMode={displayMode} />
+                  <SectionHeading eyebrow="Retirement outlook" title="What could retirement look like?" description="Follow the retirement journey first, then review the sustainability measures and risks behind it." />
+                  <DrawdownRetirementJourney inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   <DrawdownRetirementTimeline inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   <DrawdownInsights result={result} />
