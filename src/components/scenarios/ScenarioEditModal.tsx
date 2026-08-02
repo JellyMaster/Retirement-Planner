@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
@@ -44,6 +44,15 @@ type PercentageField =
   | "inflation"
   | "annualContributionIncrease";
 
+const FOCUSABLE_SELECTOR = [
+  "button:not([disabled])",
+  "[href]",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
 function hasDrawdownErrors(
   value: ScenarioDrawdownPreferences,
   retirementAge: number,
@@ -78,6 +87,7 @@ export function ScenarioEditModal({
   onClose,
   onSave,
 }: ScenarioEditModalProps) {
+  const modalRef = useRef<HTMLElement>(null);
   const [inputs, setInputs] = useState<PensionInputs>(() => ({
     ...scenario.inputs,
   }));
@@ -93,12 +103,58 @@ export function ScenarioEditModal({
   );
 
   useEffect(() => {
+    const opener =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      const firstFocusable =
+        modalRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+      (firstFocusable ?? modalRef.current)?.focus();
+    });
+
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (event.key !== "Tab" || !modalRef.current) return;
+
+      const focusable = Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter((element) => element.getAttribute("aria-hidden") !== "true");
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        modalRef.current.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && (active === first || !modalRef.current.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
 
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      opener?.focus();
+    };
   }, [onClose]);
 
   function updateRequired(field: RequiredNumberField, value: number | undefined) {
@@ -132,10 +188,12 @@ export function ScenarioEditModal({
       }}
     >
       <section
+        ref={modalRef}
         className="scenario-edit-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="scenario-edit-title"
+        tabIndex={-1}
       >
         <header className="scenario-edit-header">
           <div>
