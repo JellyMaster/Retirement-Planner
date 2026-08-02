@@ -37,8 +37,16 @@ describe("StatePensionExperiment", () => {
   it("shows the saved amount and start age", () => {
     renderExperiment();
 
-    expect(screen.getByText("£11,500/year")).toBeInTheDocument();
-    expect(screen.getByText("Age 67")).toBeInTheDocument();
+    expect(
+      screen.getByRole("slider", {
+        name: "Experimental annual State Pension amount",
+      }),
+    ).toHaveAttribute("aria-valuetext", "£11,500 per year");
+    expect(
+      screen.getByRole("slider", {
+        name: "Experimental State Pension start age",
+      }),
+    ).toHaveAttribute("aria-valuetext", "Starts at age 67");
     expect(
       screen.getByRole("switch", {
         name: "Include State Pension in experiment",
