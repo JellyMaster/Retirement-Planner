@@ -18,8 +18,8 @@ const sections: Array<{
 }> = [
   { id: "overview", label: "Overview" },
   { id: "income", label: "Income" },
-  { id: "balance", label: "Pension balance" },
-  { id: "details", label: "Year-by-year" },
+  { id: "balance", label: "Balance" },
+  { id: "details", label: "Timeline" },
   { id: "assumptions", label: "Assumptions" },
 ];
 
