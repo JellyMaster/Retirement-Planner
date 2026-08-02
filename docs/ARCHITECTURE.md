@@ -1,139 +1,386 @@
-# Retirement Planner Architecture
+# 🏗️ Polaris Retirement Planner Architecture
 
-This document describes the high-level architecture of the application.
+> **Version 1.0.0**
 
 ---
 
 # Overview
 
-The application is intentionally divided into independent calculation engines and presentation components.
+Polaris Retirement Planner is a modern single-page application (SPA) built with **React**, **TypeScript**, and **Vite**.
+
+The application is designed around a central philosophy:
+
+> **Every page should work from the currently active retirement plan while allowing users to safely explore alternatives through scenarios.**
+
+The architecture emphasises:
+
+- Separation of concerns
+- Reusable components
+- Predictable state management
+- Strong typing
+- Testability
+- Accessibility
+- Extensibility
+
+This document describes how the application is organised and provides guidance for future development.
+
+---
+
+# High Level Architecture
 
 ```
-                 UI
-
-                 │
-
-        Retirement Planner Page
-
-                 │
-
- ┌───────────────┼─────────────────┐
-
- Guided Form   Dashboards      Charts
-
-                 │
-
-         Projection Engine
-
-                 │
-
-     Drawdown & Comparison
-
-                 │
-
-         Shared Utilities
+                         Polaris
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+     Presentation        Application          Domain
+        Layer              Layer              Layer
+        │                    │                    │
+ Components            Contexts/Hooks      Financial Logic
+        │                    │                    │
+        └────────────── Shared Models ───────────┘
+                             │
+                        Scenario Engine
+                             │
+                      Projection Services
 ```
 
 ---
 
-# Projection Engine
+# Architectural Principles
 
-Responsibilities
+Polaris follows several key principles.
 
-- Pension growth
-- Contributions
-- Salary growth
-- Inflation
-- Fees
-- Retirement projections
+## 1. Single Source of Truth
 
-Output
+Every calculation begins with the currently active retirement plan.
 
-- Year-by-year projection
-- Retirement summary
-- Projection charts
-- Fee analysis
+Pages should never maintain independent copies of planning data.
 
----
+Instead:
 
-# Drawdown Engine
+```
+Scenario
+        ↓
 
-Responsibilities
+Projection Service
 
-- Retirement withdrawals
-- State Pension
-- Income tax
-- Sustainable withdrawals
-- Pension depletion
-- Income shortfall
+        ↓
 
-Output
+Calculated Results
 
-- Drawdown projection
-- Income analysis
-- Retirement sustainability
+        ↓
+
+User Interface
+```
 
 ---
 
-# Retirement Health
+## 2. Immutable Planning
 
-Calculates an overall retirement health score.
+Planning data should be treated as immutable.
 
-Factors include
+Pages request updates.
+
+Contexts apply changes.
+
+Services perform calculations.
+
+Components render results.
+
+---
+
+## 3. Separation of Concerns
+
+The application separates responsibilities into clear layers.
+
+### Pages
+
+Responsible for:
+
+- User workflows
+- Layout
+- Navigation
+- Page composition
+
+Pages should avoid containing financial calculations.
+
+---
+
+### Components
+
+Responsible for:
+
+- Reusable UI
+- User interaction
+- Presentation
+
+Components should remain reusable wherever possible.
+
+---
+
+### Contexts
+
+Responsible for:
+
+- Shared application state
+- Active scenario
+- Theme
+- Global settings
+
+Contexts should never perform financial calculations directly.
+
+---
+
+### Domain
+
+Responsible for:
+
+- Financial models
+- Projection structures
+- Retirement assumptions
+- Drawdown models
+
+Domain code should remain framework independent.
+
+---
+
+### Services
+
+Responsible for:
+
+- Pension projections
+- Drawdown calculations
+- Scenario comparison
+- Planning analysis
+
+Services are the application's calculation engine.
+
+---
+
+# Folder Structure
+
+```
+src/
+
+components/
+contexts/
+domain/
+hooks/
+pages/
+services/
+styles/
+test/
+theme/
+utils/
+```
+
+---
+
+# Application Layers
+
+## Presentation Layer
+
+Contains:
+
+- Pages
+- Components
+- Icons
+- Charts
+- Forms
+
+Purpose:
+
+Display information.
+
+No financial logic.
+
+---
+
+## State Layer
+
+Contains:
+
+- ScenarioProvider
+- ThemeProvider
+- Shared contexts
+
+Purpose:
+
+Manage application state.
+
+---
+
+## Domain Layer
+
+Contains:
+
+- Retirement plan models
+- Scenario models
+- Drawdown models
+- Projection models
+
+Purpose:
+
+Represent business data.
+
+---
+
+## Service Layer
+
+Contains:
+
+Projection services.
+
+Examples:
+
+- Pension projections
+- Drawdown calculations
+- Scenario comparison
+
+Purpose:
+
+Business calculations.
+
+---
+
+# Page Responsibilities
+
+## Overview
+
+Provides a summary of the active plan.
+
+Shows:
 
 - Retirement readiness
-- Contribution levels
-- Fund adequacy
-- Investment assumptions
-- Drawdown sustainability
-
-Produces
-
-- Health score
-- Risks
-- Strengths
-- Recommendations
+- Plan health
+- Key metrics
+- Quick navigation
 
 ---
 
-# Comparison Engine
+## My Plan
 
-Allows users to compare multiple retirement plans.
+Responsible for editing.
 
-Supports
+Owns:
 
-- Side-by-side comparisons
-- Retirement health comparison
-- Projection comparison
-- Drawdown comparison
+- Guided planner
+- Retirement assumptions
+- Retirement income
+- State Pension
+- Tax-Free Cash
 
 ---
 
-# User Interface
+## What If?
 
-Current workflow
+Responsible for experimentation.
 
-Guided Retirement Planner
+Never changes the active plan directly.
 
-↓
+Instead:
 
-Projection Engine
-
-↓
-
-Retirement Overview
+```
+Plan
 
 ↓
 
-Retirement Health
+Experiment
 
 ↓
 
-What If Analysis
+Preview
 
 ↓
 
-Recommendations
+Save Scenario
+```
+
+---
+
+## Compare
+
+Responsible for analysing multiple plans.
+
+No editing occurs here.
+
+---
+
+## Drawdown
+
+Responsible for retirement income modelling.
+
+Uses:
+
+- Active scenario
+- Retirement chapters
+- Drawdown preferences
+
+---
+
+## Explore
+
+Educational content.
+
+Uses live data from the active plan.
+
+No editing.
+
+---
+
+## Guidance
+
+Provides personalised recommendations.
+
+Uses:
+
+- Active plan
+- Projection analysis
+- Planning heuristics
+
+---
+
+# Scenario Architecture
+
+```
+Baseline Plan
+
+        │
+
+        ├────────────── Scenario A
+
+        ├────────────── Scenario B
+
+        ├────────────── Scenario C
+
+        └────────────── Active Scenario
+```
+
+Every scenario contains a complete retirement plan.
+
+Scenarios are isolated.
+
+Users may compare them without affecting one another.
+
+---
+
+# Projection Flow
+
+```
+Scenario
+
+↓
+
+Projection Request
+
+↓
+
+Calculation Service
+
+↓
+
+Projection Result
 
 ↓
 
@@ -141,45 +388,240 @@ Charts
 
 ↓
 
-Projection Tables
+Summary Cards
+
+↓
+
+Guidance
+```
+
+Every page follows this flow.
 
 ---
 
-# Shared Components
+# Navigation
 
-Reusable form library
+Navigation is page based.
 
-- FormSection
-- FormField
-- CurrencyInput
-- PercentageInput
-- NumberInput
-- ToggleSwitch
+```
+Overview
 
-Shared icons
+↓
 
-- Font Awesome Pro
-- Central icon library
+My Plan
+
+↓
+
+What If?
+
+↓
+
+Compare
+
+↓
+
+Drawdown
+
+↓
+
+Explore
+
+↓
+
+Guidance
+```
+
+Connected journeys allow pages to deep-link into specific sections.
 
 ---
 
-# Testing
+# State Management
 
-The project uses
+Shared state currently includes:
 
-- Vitest
-- TypeScript
-- ESLint
+- Active scenario
+- Available scenarios
+- Theme
+- User preferences
 
-Core engines are tested independently from the UI.
+Future versions may introduce:
+
+- Local persistence
+- Cloud synchronisation
+
+without changing page architecture.
 
 ---
 
-# Design Principles
+# Styling
 
-- Strong typing
-- Modular architecture
-- Reusable components
-- Separation of UI and calculation logic
-- Testable business logic
-- Responsive design
+Styling follows a component-first approach.
+
+Goals:
+
+- Responsive layouts
+- Consistent spacing
+- Accessible colours
+- Dark mode support
+
+---
+
+# Accessibility
+
+Version 1.0 includes:
+
+- Keyboard navigation
+- Accessible dialogs
+- Screen reader support
+- Focus management
+- Tab navigation
+- Reduced motion support
+
+Accessibility is considered a core architectural requirement.
+
+---
+
+# Testing Strategy
+
+Testing occurs at several levels.
+
+## Unit Tests
+
+Components
+
+Services
+
+Utilities
+
+---
+
+## Integration Tests
+
+Pages
+
+Navigation
+
+Contexts
+
+---
+
+## User Journey Tests
+
+Planning
+
+Scenario creation
+
+Comparison
+
+Drawdown
+
+Guidance
+
+---
+
+# Future Architecture
+
+Version 1.1
+
+Visual Intelligence
+
+- Rich charts
+- Shared timeline
+- Improved analytics
+
+---
+
+Version 1.2
+
+Persistence Layer
+
+Introduce repository abstractions.
+
+```
+UI
+
+↓
+
+Repository
+
+↓
+
+Storage
+```
+
+Initially local storage.
+
+Later database.
+
+---
+
+Version 2.0
+
+Cloud Platform
+
+```
+Client
+
+↓
+
+REST / API
+
+↓
+
+Authentication
+
+↓
+
+Cloud Database
+
+↓
+
+Backup
+
+↓
+
+Analytics
+```
+
+This architecture has intentionally been designed so these capabilities can be introduced with minimal impact on the presentation layer.
+
+---
+
+# Design Philosophy
+
+Polaris favours:
+
+- Simple interfaces
+- Powerful calculations
+- Incremental planning
+- Explainable outcomes
+
+Every feature should answer one question clearly before introducing additional complexity.
+
+---
+
+# Guiding Principle
+
+> **Retirement planning should help people understand their future, not overwhelm them with calculations.**
+
+This philosophy should guide every architectural decision made after Version 1.0.
+
+---
+
+# Version History
+
+| Version | Status |
+|----------|--------|
+| 1.0.0 | Current Stable |
+| 1.1 | Planned |
+| 2.0 | Vision |
+
+---
+
+**Polaris Retirement Planner**
+
+Architecture Documentation
+
+Version 1.0.0
+
+August 2026
