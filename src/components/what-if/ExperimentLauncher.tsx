@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSearchParams } from "react-router-dom";
 
 import { AppIcons } from "../../icons";
 
@@ -74,12 +76,31 @@ const experiments = [
     icon: AppIcons.warning,
     available: true,
   },
-];
+] as const;
+
+const experimentIds = new Set<ExperimentId>(
+  experiments.map((experiment) => experiment.id),
+);
 
 export function ExperimentLauncher({
   activeExperiment,
   onSelect,
 }: ExperimentLauncherProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedExperiment = parseExperiment(searchParams.get("experiment"));
+
+  useEffect(() => {
+    if (!requestedExperiment || requestedExperiment === activeExperiment) return;
+    onSelect(requestedExperiment);
+  }, [activeExperiment, onSelect, requestedExperiment]);
+
+  function selectExperiment(experiment: ExperimentId) {
+    const next = new URLSearchParams(searchParams);
+    next.set("experiment", experiment);
+    setSearchParams(next, { replace: true });
+    onSelect(experiment);
+  }
+
   return (
     <section className="what-if-launcher" aria-labelledby="what-if-launcher-title">
       <div className="what-if-section-heading">
@@ -104,7 +125,7 @@ export function ExperimentLauncher({
               className={`what-if-experiment-card${isActive ? " is-active" : ""}`}
               aria-pressed={isActive}
               disabled={!experiment.available}
-              onClick={() => onSelect(experiment.id)}
+              onClick={() => selectExperiment(experiment.id)}
             >
               <span className="what-if-experiment-icon" aria-hidden="true">
                 <FontAwesomeIcon icon={experiment.icon} fixedWidth />
@@ -126,4 +147,10 @@ export function ExperimentLauncher({
       </div>
     </section>
   );
+}
+
+function parseExperiment(value: string | null): ExperimentId | null {
+  return value && experimentIds.has(value as ExperimentId)
+    ? (value as ExperimentId)
+    : null;
 }
