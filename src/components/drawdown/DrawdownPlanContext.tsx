@@ -43,7 +43,38 @@ export function DrawdownPlanContext({
       </div>
 
       <div className="drawdown-plan-context-sections">
+       
+
         <section
+          className="drawdown-plan-details-summary"
+          aria-labelledby="drawdown-plan-details-title"
+        >
+          <h3 id="drawdown-plan-details-title">Plan values and assumptions</h3>
+          <dl className="drawdown-plan-context-grid">
+            <ContextValue
+              label="Pension at retirement"
+              value={formatCurrency(value.startingBalance)}
+            />
+            <ContextValue
+              label="Retirement age"
+              value={`Age ${value.retirementAge}`}
+            />
+            <ContextValue label="Plan runs to" value={`Age ${value.endAge}`} />
+            <ContextValue
+              label="Expected return"
+              value={formatPercentage(value.annualReturn)}
+            />
+            <ContextValue
+              label="Inflation"
+              value={formatPercentage(value.inflationRate)}
+            />
+            <ContextValue
+              label="Annual fee"
+              value={formatPercentage(value.annualFee)}
+            />
+          </dl>
+        </section>
+         <section
           className="drawdown-income-strategy-summary"
           aria-labelledby="drawdown-income-strategy-title"
         >
@@ -137,36 +168,6 @@ export function DrawdownPlanContext({
               </strong>
             </div>
           )}
-        </section>
-
-        <section
-          className="drawdown-plan-details-summary"
-          aria-labelledby="drawdown-plan-details-title"
-        >
-          <h3 id="drawdown-plan-details-title">Plan values and assumptions</h3>
-          <dl className="drawdown-plan-context-grid">
-            <ContextValue
-              label="Pension at retirement"
-              value={formatCurrency(value.startingBalance)}
-            />
-            <ContextValue
-              label="Retirement age"
-              value={`Age ${value.retirementAge}`}
-            />
-            <ContextValue label="Plan runs to" value={`Age ${value.endAge}`} />
-            <ContextValue
-              label="Expected return"
-              value={formatPercentage(value.annualReturn)}
-            />
-            <ContextValue
-              label="Inflation"
-              value={formatPercentage(value.inflationRate)}
-            />
-            <ContextValue
-              label="Annual fee"
-              value={formatPercentage(value.annualFee)}
-            />
-          </dl>
         </section>
       </div>
     </section>
