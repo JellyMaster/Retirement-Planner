@@ -58,7 +58,7 @@ const experiments = [
     title: "Inflation",
     description: "See how purchasing power changes the outcome.",
     icon: AppIcons.chart,
-    available: false,
+    available: true,
   },
   {
     id: "state-pension" as const,
