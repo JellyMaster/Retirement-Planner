@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-do
 
 import { ConnectedJourneyLinks } from "./components/navigation/ConnectedJourneyLinks";
 import { DeepLinkedPage } from "./components/navigation/DeepLinkedPage";
+import { TabKeyboardNavigation } from "./components/navigation/TabKeyboardNavigation";
 import {
   ActiveScenarioSwitcher,
   ScenarioProvider,
@@ -55,6 +56,7 @@ function AppContent() {
     <div className="app-shell">
       <SkipLink />
       <ConnectedJourneyLinks />
+      <TabKeyboardNavigation />
 
       <header className="app-header">
         <div className="app-header-inner">
