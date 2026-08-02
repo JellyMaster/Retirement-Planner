@@ -1,4 +1,5 @@
 import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
+import { useStoredRetirementGoals } from "../../hooks/useStoredRetirementGoals";
 import {
   CurrencyInput,
   FormField,
@@ -19,11 +20,28 @@ export function ScenarioDrawdownFields({
   value,
   onChange,
 }: ScenarioDrawdownFieldsProps) {
+  const [retirementGoals, setRetirementGoals] = useStoredRetirementGoals();
+
   function update<K extends keyof ScenarioDrawdownPreferences>(
     field: K,
     nextValue: ScenarioDrawdownPreferences[K],
   ) {
-    onChange({ ...value, [field]: nextValue });
+    const next = { ...value, [field]: nextValue };
+    onChange(next);
+
+    if (field === "desiredAnnualIncome") {
+      setRetirementGoals({
+        ...retirementGoals,
+        desiredAnnualIncome: nextValue as number,
+      });
+    }
+  }
+
+  function updateRetirementGoal<K extends keyof typeof retirementGoals>(
+    field: K,
+    nextValue: (typeof retirementGoals)[K],
+  ) {
+    setRetirementGoals({ ...retirementGoals, [field]: nextValue });
   }
 
   const planningAgeError =
@@ -37,8 +55,8 @@ export function ScenarioDrawdownFields({
     <fieldset className="scenario-edit-section">
       <legend>Retirement income</legend>
       <p className="scenario-edit-section-copy">
-        Choose how this plan will be used in Drawdown. These settings travel with
-        the scenario and can be changed later.
+        Choose how this plan will provide retirement income, including whether
+        State Pension should contribute to the plan.
       </p>
 
       <div
@@ -142,6 +160,7 @@ export function ScenarioDrawdownFields({
                   ? "Desired net annual income"
                   : "Desired gross annual income"
               }
+              hint="This target is also used by the preparedness and confidence calculations."
             >
               {(id, describedBy) => (
                 <CurrencyInput
@@ -197,6 +216,76 @@ export function ScenarioDrawdownFields({
           )}
         </FormField>
       </div>
+
+      <section
+        className="scenario-edit-subsection scenario-state-pension-section"
+        aria-labelledby={`${idPrefix}-state-pension-heading`}
+      >
+        <div>
+          <h3 id={`${idPrefix}-state-pension-heading`}>State Pension</h3>
+          <p>
+            Include an expected State Pension so the income model can reduce the
+            amount needed from the private pension once it starts.
+          </p>
+        </div>
+
+        <label className="retirement-goals-checkbox">
+          <input
+            type="checkbox"
+            checked={retirementGoals.includeStatePension}
+            onChange={(event) =>
+              updateRetirementGoal("includeStatePension", event.target.checked)
+            }
+          />
+          <span>Include State Pension in this retirement plan</span>
+        </label>
+
+        {retirementGoals.includeStatePension && (
+          <div className="scenario-edit-grid">
+            <FormField
+              id={`${idPrefix}-statePensionAnnualAmount`}
+              label="Expected annual State Pension"
+              hint="Enter the annual amount in today's money."
+            >
+              {(id, describedBy) => (
+                <CurrencyInput
+                  id={id}
+                  aria-describedby={describedBy}
+                  value={retirementGoals.statePensionAnnualAmount}
+                  min={0}
+                  step={100}
+                  onValueChange={(nextValue) =>
+                    updateRetirementGoal(
+                      "statePensionAnnualAmount",
+                      nextValue ?? 0,
+                    )
+                  }
+                />
+              )}
+            </FormField>
+
+            <FormField
+              id={`${idPrefix}-statePensionAge`}
+              label="State Pension starts at age"
+              hint="The age when the State Pension begins in the projection."
+            >
+              {(id, describedBy) => (
+                <NumberInput
+                  id={id}
+                  aria-describedby={describedBy}
+                  value={retirementGoals.statePensionAge}
+                  min={55}
+                  max={80}
+                  suffix="years"
+                  onValueChange={(nextValue) =>
+                    updateRetirementGoal("statePensionAge", nextValue ?? 67)
+                  }
+                />
+              )}
+            </FormField>
+          </div>
+        )}
+      </section>
     </fieldset>
   );
 }
