@@ -1,0 +1,182 @@
+.drawdown-income-waterfall,
+.drawdown-balance-story {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+}
+
+.drawdown-income-waterfall > header,
+.drawdown-balance-story > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.drawdown-income-waterfall h3,
+.drawdown-balance-story h3,
+.drawdown-balance-periods h4 {
+  margin: 0;
+}
+
+.drawdown-income-waterfall header p:not(.panel-eyebrow),
+.drawdown-balance-story header p:not(.panel-eyebrow) {
+  max-width: 66ch;
+  margin: var(--space-2) 0 0;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.drawdown-income-waterfall > header > span,
+.drawdown-balance-story > header > span {
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.drawdown-waterfall-grid,
+.drawdown-balance-metrics,
+.drawdown-balance-periods {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.drawdown-waterfall-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.drawdown-waterfall-grid > article,
+.drawdown-balance-metrics > article,
+.drawdown-balance-periods > article {
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-waterfall-grid > article {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.drawdown-waterfall-card-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.drawdown-waterfall-card-heading > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drawdown-waterfall-card-heading span,
+.drawdown-waterfall-card-heading small,
+.drawdown-waterfall-grid dt,
+.drawdown-balance-metrics span,
+.drawdown-balance-metrics small,
+.drawdown-balance-periods span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-waterfall-card-heading small {
+  color: var(--colour-negative);
+  font-weight: 800;
+}
+
+.drawdown-waterfall-bar {
+  display: flex;
+  min-height: 0.8rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--colour-border);
+}
+
+.drawdown-waterfall-bar .is-private {
+  background: var(--colour-primary);
+}
+
+.drawdown-waterfall-bar .is-state {
+  background: var(--colour-positive, #16845b);
+}
+
+.drawdown-waterfall-grid dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+}
+
+.drawdown-waterfall-grid dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.drawdown-waterfall-grid dd {
+  margin: 0;
+  font-weight: 800;
+}
+
+.drawdown-balance-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.drawdown-balance-metrics > article {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.drawdown-balance-metrics strong {
+  font-size: 1.15rem;
+}
+
+.drawdown-balance-periods {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.drawdown-balance-periods > article {
+  padding: var(--space-4);
+}
+
+.drawdown-balance-periods h4 {
+  margin-top: var(--space-2);
+}
+
+.drawdown-balance-periods p {
+  margin: var(--space-2) 0 0;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 1000px) {
+  .drawdown-balance-metrics,
+  .drawdown-balance-periods {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .drawdown-income-waterfall > header,
+  .drawdown-balance-story > header,
+  .drawdown-waterfall-card-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .drawdown-waterfall-grid,
+  .drawdown-balance-metrics,
+  .drawdown-balance-periods,
+  .drawdown-waterfall-grid dl {
+    grid-template-columns: 1fr;
+  }
+}
