@@ -11,6 +11,7 @@ import { SkipLink } from "./components/ui";
 import { AppIcons, type AppIcon } from "./icons";
 import { CompareScenariosPage } from "./pages/CompareScenariosPage";
 import { DrawdownPlannerPage } from "./pages/DrawdownPlannerPage";
+import { ExplorePage } from "./pages/ExplorePage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { PolarisSectionPage } from "./pages/PolarisSectionPage";
 import { RetirementPlannerPage } from "./pages/RetirementPlannerPage";
@@ -110,13 +111,7 @@ function AppContent() {
           />
           <Route
             path="/explore"
-            element={
-              <PolarisSectionPage
-                eyebrow="Explore"
-                title="Dig deeper into your retirement"
-                description="Access probability modelling, goal exploration, fees, tax and other specialist planning tools."
-              />
-            }
+            element={<ExplorePage key={activeScenarioId} />}
           />
           <Route
             path="/guidance"
