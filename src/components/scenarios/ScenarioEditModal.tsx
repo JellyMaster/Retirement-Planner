@@ -19,6 +19,7 @@ import {
   PercentageInput,
 } from "../forms";
 import { ScenarioDrawdownFields } from "./ScenarioDrawdownFields";
+import { ScenarioSpendingPhaseFields } from "./ScenarioSpendingPhaseFields";
 
 interface ScenarioEditModalProps {
   scenario: Scenario;
@@ -48,6 +49,16 @@ function hasDrawdownErrors(
   value: ScenarioDrawdownPreferences,
   retirementAge: number,
 ): boolean {
+  const invalidPhases = value.spendingPhases?.some(
+    (phase, index, phases) =>
+      !Number.isInteger(phase.startAge) ||
+      phase.startAge < retirementAge ||
+      phase.startAge >= value.planningAge ||
+      !Number.isFinite(phase.annualIncome) ||
+      phase.annualIncome < 0 ||
+      (index > 0 && phase.startAge <= phases[index - 1].startAge),
+  );
+
   return (
     !Number.isFinite(value.planningAge) ||
     value.planningAge <= retirementAge ||
@@ -58,7 +69,8 @@ function hasDrawdownErrors(
     !Number.isFinite(value.desiredAnnualIncome) ||
     value.desiredAnnualIncome < 0 ||
     !Number.isFinite(value.taxFreeCash) ||
-    value.taxFreeCash < 0
+    value.taxFreeCash < 0 ||
+    invalidPhases === true
   );
 }
 
@@ -225,6 +237,15 @@ export function ScenarioEditModal({
             value={drawdown}
             onChange={setDrawdown}
           />
+
+          {drawdown.withdrawalStrategy === "target-income" && (
+            <ScenarioSpendingPhaseFields
+              idPrefix={fieldId("spending-phases")}
+              retirementAge={inputs.retirementAge}
+              value={drawdown}
+              onChange={setDrawdown}
+            />
+          )}
         </div>
 
         <footer className="scenario-edit-actions">
