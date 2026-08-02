@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import type { Scenario } from "../../domain/scenarios";
 import { calculateScenarioSummary } from "../../domain/scenarios/calculateScenarioSummary";
-import { AppIcons } from "../../icons";
+import { AppIcons, type AppIcon } from "../../icons";
 import { formatCurrency } from "../../utils/formatters";
 
 interface ScenarioDecisionSummaryProps {
@@ -60,7 +60,9 @@ export function ScenarioDecisionSummary({
           label="Largest projected pension"
           scenarioName={highestPot?.scenario.name ?? "Unavailable"}
           value={
-            highestPot ? formatCurrency(highestPot.projectedPot) : "No valid projection"
+            highestPot
+              ? formatCurrency(highestPot.projectedPot)
+              : "No valid projection"
           }
           isActive={highestPot?.scenario.id === activeScenario.id}
         />
@@ -88,11 +90,16 @@ export function ScenarioDecisionSummary({
         />
       </div>
 
-      <section className="scenario-tradeoffs" aria-labelledby="scenario-tradeoffs-title">
+      <section
+        className="scenario-tradeoffs"
+        aria-labelledby="scenario-tradeoffs-title"
+      >
         <div className="scenario-manager-section-heading">
           <div>
             <p className="planner-eyebrow">Trade-offs</p>
-            <h3 id="scenario-tradeoffs-title">What changes versus the active plan</h3>
+            <h3 id="scenario-tradeoffs-title">
+              What changes versus the active plan
+            </h3>
           </div>
           <span>{activeScenario.name} is the reference</span>
         </div>
@@ -124,7 +131,7 @@ function RankingCard({
   value,
   isActive,
 }: {
-  icon: Parameters<typeof FontAwesomeIcon>[0]["icon"];
+  icon: AppIcon;
   label: string;
   scenarioName: string;
   value: string;
@@ -177,17 +184,39 @@ function TradeoffCard({
         <TradeoffRow
           label="Retirement timing"
           value={formatAgeDifference(retirementDifference)}
-          tone={retirementDifference < 0 ? "positive" : retirementDifference > 0 ? "negative" : "neutral"}
+          tone={
+            retirementDifference < 0
+              ? "positive"
+              : retirementDifference > 0
+                ? "negative"
+                : "neutral"
+          }
         />
         <TradeoffRow
           label="Projected pension"
-          value={potDifference === null ? "Unavailable" : formatSignedCurrency(potDifference)}
-          tone={potDifference === null || potDifference === 0 ? "neutral" : potDifference > 0 ? "positive" : "negative"}
+          value={
+            potDifference === null
+              ? "Unavailable"
+              : formatSignedCurrency(potDifference)
+          }
+          tone={
+            potDifference === null || potDifference === 0
+              ? "neutral"
+              : potDifference > 0
+                ? "positive"
+                : "negative"
+          }
         />
         <TradeoffRow
           label="Monthly saving"
           value={`${formatSignedCurrency(savingDifference)}/month`}
-          tone={savingDifference === 0 ? "neutral" : savingDifference < 0 ? "positive" : "negative"}
+          tone={
+            savingDifference === 0
+              ? "neutral"
+              : savingDifference < 0
+                ? "positive"
+                : "negative"
+          }
         />
       </dl>
     </article>
