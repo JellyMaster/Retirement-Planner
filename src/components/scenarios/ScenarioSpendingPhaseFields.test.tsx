@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -71,10 +71,9 @@ describe("ScenarioSpendingPhaseFields", () => {
       .closest("section");
     if (!laterLifeCard) throw new Error("Later-life phase card not found.");
 
-    const income = laterLifeCard.querySelector<HTMLInputElement>(
-      'input[type="number"]:not(:disabled):last-of-type',
-    );
-    if (!income) throw new Error("Later-life income input not found.");
+    const income = within(laterLifeCard).getByRole("spinbutton", {
+      name: "Annual income target",
+    });
 
     await user.clear(income);
     await user.type(income, "30000");
