@@ -149,7 +149,7 @@ function AppContent() {
         <button
           type="button"
           className="app-navigation-backdrop"
-          aria-label="Close navigation"
+          aria-label="Dismiss navigation menu"
           onClick={() => setIsNavigationOpen(false)}
         />
       )}
