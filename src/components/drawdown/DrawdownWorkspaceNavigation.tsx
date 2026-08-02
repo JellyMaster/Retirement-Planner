@@ -22,13 +22,39 @@ interface DrawdownWorkspaceNavigationProps {
 const sections: Array<{
   id: DrawdownWorkspaceSection;
   label: string;
+  shortLabel: string;
   icon: typeof LayoutDashboard;
 }> = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "income", label: "Income & tax", icon: ReceiptText },
-  { id: "balance", label: "Pension balance", icon: BarChart3 },
-  { id: "details", label: "Year-by-year", icon: ClipboardList },
-  { id: "assumptions", label: "Assumptions", icon: Landmark },
+  {
+    id: "overview",
+    label: "Overview",
+    shortLabel: "Outcome",
+    icon: LayoutDashboard,
+  },
+  {
+    id: "income",
+    label: "Income & tax",
+    shortLabel: "Income",
+    icon: ReceiptText,
+  },
+  {
+    id: "balance",
+    label: "Pension balance",
+    shortLabel: "Balance",
+    icon: BarChart3,
+  },
+  {
+    id: "details",
+    label: "Year-by-year",
+    shortLabel: "Details",
+    icon: ClipboardList,
+  },
+  {
+    id: "assumptions",
+    label: "Assumptions",
+    shortLabel: "Basis",
+    icon: Landmark,
+  },
 ];
 
 export function DrawdownWorkspaceNavigation({
@@ -91,8 +117,15 @@ export function DrawdownWorkspaceNavigation({
             onClick={() => onChange(section.id)}
             onKeyDown={(event) => handleKeyDown(event, index)}
           >
-            <Icon size={17} aria-hidden="true" />
-            <span>{section.label}</span>
+            <span className="drawdown-workspace-nav-marker" aria-hidden="true">
+              {index + 1}
+            </span>
+            <span className="drawdown-workspace-nav-copy">
+              <small>View {index + 1}</small>
+              <strong>{section.shortLabel}</strong>
+            </span>
+            <Icon className="drawdown-workspace-nav-icon" size={17} aria-hidden="true" />
+            <span className="visually-hidden">{section.label}</span>
           </button>
         );
       })}
