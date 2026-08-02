@@ -4,6 +4,7 @@ import {
   ComposedChart,
   Legend,
   Line,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -11,6 +12,7 @@ import {
 } from "recharts";
 
 import type { DrawdownYear } from "../../engine/drawdown";
+import type { DrawdownSpendingPhase } from "../../engine/drawdown/models/DrawdownInputs";
 import { useChartTheme } from "../../theme/useChartTheme";
 import { getDisplayYears, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import {
@@ -22,6 +24,8 @@ interface DrawdownIncomeChartProps {
   years: DrawdownYear[];
   inflationRate: number;
   displayMode: MoneyDisplayMode;
+  spendingPhases?: DrawdownSpendingPhase[];
+  statePensionAge?: number;
 }
 
 interface ChartDataPoint {
@@ -33,12 +37,16 @@ interface ChartDataPoint {
   desiredIncome: number;
 }
 
-export function DrawdownIncomeChart({ years, inflationRate, displayMode }: DrawdownIncomeChartProps) {
+export function DrawdownIncomeChart({
+  years,
+  inflationRate,
+  displayMode,
+  spendingPhases = [],
+  statePensionAge,
+}: DrawdownIncomeChartProps) {
   const chartColours = useChartTheme();
 
-  if (years.length === 0) {
-    return null;
-  }
+  if (years.length === 0) return null;
 
   const displayYears = getDisplayYears(years, inflationRate, displayMode);
   const chartData: ChartDataPoint[] = displayYears.map((year) => ({
@@ -53,107 +61,45 @@ export function DrawdownIncomeChart({ years, inflationRate, displayMode }: Drawd
   return (
     <section className="panel drawdown-chart-panel">
       <div className="panel-heading">
-        <h2>Retirement income and tax</h2>
+        <h2>Income through retirement</h2>
         <p>
-          Gross income sources are stacked. The lines show income tax, net
-          spendable income and the selected annual income target. Values are shown in {displayMode === "today" ? "today&apos;s money" : "future money"}.
+          See how income from your pension, State Pension and tax change through
+          each retirement chapter. Values are shown in {displayMode === "today" ? "today&apos;s money" : "future money"}.
         </p>
       </div>
 
       <div className="drawdown-chart">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart
-            data={chartData}
-            margin={{ top: 10, right: 20, bottom: 10, left: 10 }}
-          >
-            <CartesianGrid
-              stroke={chartColours.grid}
-              strokeDasharray="3 3"
-              vertical={false}
-            />
-
-            <XAxis
-              dataKey="age"
-              tickLine={false}
-              tick={{ fill: chartColours.text }}
-              axisLine={false}
-              label={{
-                value: "Age",
-                position: "insideBottom",
-                offset: -5,
-                fill: chartColours.text,
-              }}
-            />
-
-            <YAxis
-              tickLine={false}
-              tick={{ fill: chartColours.text }}
-              axisLine={false}
-              width={85}
-              tickFormatter={formatCompactCurrency}
-            />
-
+          <ComposedChart data={chartData} margin={{ top: 28, right: 20, bottom: 10, left: 10 }}>
+            <CartesianGrid stroke={chartColours.grid} strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="age" tickLine={false} tick={{ fill: chartColours.text }} axisLine={false} label={{ value: "Age", position: "insideBottom", offset: -5, fill: chartColours.text }} />
+            <YAxis tickLine={false} tick={{ fill: chartColours.text }} axisLine={false} width={85} tickFormatter={formatCompactCurrency} />
             <Tooltip
               cursor={{ fill: chartColours.cursor }}
-              contentStyle={{
-                backgroundColor: chartColours.tooltipBackground,
-                border: `1px solid ${chartColours.tooltipBorder}`,
-                borderRadius: "0.5rem",
-                color: chartColours.tooltipText,
-              }}
+              contentStyle={{ backgroundColor: chartColours.tooltipBackground, border: `1px solid ${chartColours.tooltipBorder}`, borderRadius: "0.5rem", color: chartColours.tooltipText }}
               labelStyle={{ color: chartColours.tooltipText }}
               itemStyle={{ color: chartColours.tooltipText }}
               formatter={(value, name) => {
                 const rawValue = Array.isArray(value) ? value[0] : value;
                 const numericValue = Number(rawValue ?? 0);
-
-                return [
-                  formatCurrency(Number.isFinite(numericValue) ? numericValue : 0),
-                  name,
-                ];
+                return [formatCurrency(Number.isFinite(numericValue) ? numericValue : 0), name];
               }}
               labelFormatter={(age) => `Age ${String(age)}`}
             />
-
             <Legend wrapperStyle={{ color: chartColours.text }} />
 
-            <Bar
-              dataKey="statePensionIncome"
-              name="State Pension"
-              stackId="gross-income"
-              fill={chartColours.tertiary}
-            />
-            <Bar
-              dataKey="pensionWithdrawal"
-              name="Pension withdrawal"
-              stackId="gross-income"
-              fill={chartColours.primary}
-            />
-            <Line
-              type="monotone"
-              dataKey="netIncome"
-              name="Net income"
-              stroke={chartColours.secondary}
-              strokeWidth={3}
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="incomeTax"
-              name="Income tax"
-              stroke={chartColours.fees}
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="desiredIncome"
-              name={years[0]?.incomeTargetMode === "net" ? "Net target" : "Gross target"}
-              stroke={chartColours.text}
-              strokeDasharray="6 4"
-              strokeWidth={2}
-              dot={false}
-            />
+            {statePensionAge !== undefined && (
+              <ReferenceLine x={statePensionAge} stroke={chartColours.tertiary} strokeDasharray="4 4" label={{ value: "State Pension", position: "insideTopRight", fill: chartColours.text }} />
+            )}
+            {spendingPhases.slice(1).map((phase) => (
+              <ReferenceLine key={`${phase.label}-${phase.startAge}`} x={phase.startAge} stroke={chartColours.secondary} strokeDasharray="3 5" label={{ value: phase.label, position: "insideTopLeft", fill: chartColours.text }} />
+            ))}
+
+            <Bar dataKey="statePensionIncome" name="State Pension" stackId="gross-income" fill={chartColours.tertiary} />
+            <Bar dataKey="pensionWithdrawal" name="Income from your pension" stackId="gross-income" fill={chartColours.primary} />
+            <Line type="monotone" dataKey="netIncome" name="Net income" stroke={chartColours.secondary} strokeWidth={3} dot={false} />
+            <Line type="monotone" dataKey="incomeTax" name="Income tax" stroke={chartColours.fees} strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="desiredIncome" name={years[0]?.incomeTargetMode === "net" ? "Net target" : "Gross target"} stroke={chartColours.text} strokeDasharray="6 4" strokeWidth={2} dot={false} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
