@@ -19,7 +19,6 @@ import {
   PercentageInput,
 } from "../forms";
 import { ScenarioDrawdownFields } from "./ScenarioDrawdownFields";
-import { ScenarioSpendingPhaseFields } from "./ScenarioSpendingPhaseFields";
 
 interface ScenarioEditModalProps {
   scenario: Scenario;
@@ -237,15 +236,6 @@ export function ScenarioEditModal({
             value={drawdown}
             onChange={setDrawdown}
           />
-
-          {drawdown.withdrawalStrategy === "target-income" && (
-            <ScenarioSpendingPhaseFields
-              idPrefix={fieldId("spending-phases")}
-              retirementAge={inputs.retirementAge}
-              value={drawdown}
-              onChange={setDrawdown}
-            />
-          )}
         </div>
 
         <footer className="scenario-edit-actions">
