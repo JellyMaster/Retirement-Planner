@@ -139,7 +139,7 @@ function WhatIfWorkspace({
         current.retirementAge - 1,
       ),
       extraMonthlyContribution:
-        current.extraMonthlyContribution ?? baselineExtraContribution || 250,
+        current.extraMonthlyContribution ?? (baselineExtraContribution || 250),
     }));
     setSaveMessage(null);
   }
