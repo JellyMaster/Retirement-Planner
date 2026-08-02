@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { createDefaultScenarioDrawdownPreferences } from "../../domain/scenarios";
+import {
+  createDefaultScenarioDrawdownPreferences,
+  type ScenarioDrawdownPreferences,
+} from "../../domain/scenarios";
 import { ScenarioSpendingPhaseFields } from "./ScenarioSpendingPhaseFields";
 
 describe("ScenarioSpendingPhaseFields", () => {
@@ -47,7 +51,7 @@ describe("ScenarioSpendingPhaseFields", () => {
   it("passes a changed later-life income target back to the plan", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const value = {
+    const initialValue: ScenarioDrawdownPreferences = {
       ...createDefaultScenarioDrawdownPreferences(40_000),
       planningAge: 95,
       spendingPhases: [
@@ -57,14 +61,25 @@ describe("ScenarioSpendingPhaseFields", () => {
       ],
     };
 
-    render(
-      <ScenarioSpendingPhaseFields
-        idPrefix="phases"
-        retirementAge={65}
-        value={value}
-        onChange={onChange}
-      />,
-    );
+    function ControlledFields() {
+      const [value, setValue] = useState(initialValue);
+
+      function handleChange(nextValue: ScenarioDrawdownPreferences) {
+        setValue(nextValue);
+        onChange(nextValue);
+      }
+
+      return (
+        <ScenarioSpendingPhaseFields
+          idPrefix="phases"
+          retirementAge={65}
+          value={value}
+          onChange={handleChange}
+        />
+      );
+    }
+
+    render(<ControlledFields />);
 
     const laterLifeCard = screen
       .getByRole("heading", { name: "Later life" })
@@ -78,6 +93,7 @@ describe("ScenarioSpendingPhaseFields", () => {
     await user.clear(income);
     await user.type(income, "30000");
 
+    expect(income).toHaveValue(30_000);
     expect(onChange).toHaveBeenLastCalledWith(
       expect.objectContaining({
         spendingPhases: expect.arrayContaining([
