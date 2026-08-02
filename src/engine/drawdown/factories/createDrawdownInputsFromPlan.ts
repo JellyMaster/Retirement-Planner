@@ -19,6 +19,9 @@ export function createDrawdownInputsFromPlan({
   drawdown,
 }: CreateDrawdownInputsFromPlanOptions): DrawdownInputs {
   const defaults = createDefaultDrawdownInputs();
+  const spendingPhases = drawdown?.spendingPhases
+    ?.filter((phase) => phase.startAge >= pensionInputs.retirementAge)
+    .sort((left, right) => left.startAge - right.startAge);
 
   return {
     ...defaults,
@@ -31,6 +34,7 @@ export function createDrawdownInputsFromPlan({
     desiredAnnualIncome:
       drawdown?.desiredAnnualIncome ?? retirementGoals.desiredAnnualIncome,
     incomeTargetMode: drawdown?.incomeTargetMode ?? defaults.incomeTargetMode,
+    ...(spendingPhases?.length ? { spendingPhases } : {}),
     taxFreeCash: drawdown?.taxFreeCash ?? defaults.taxFreeCash,
     annualStatePension: retirementGoals.includeStatePension
       ? retirementGoals.statePensionAnnualAmount
