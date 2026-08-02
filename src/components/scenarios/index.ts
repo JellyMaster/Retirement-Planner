@@ -1,6 +1,7 @@
 export { ActiveScenarioSwitcher } from "./ActiveScenarioSwitcher";
 export { ScenarioChangesSummary } from "./ScenarioChangesSummary";
 export { ScenarioComparisonTabs } from "./ScenarioComparisonTabs";
+export { ScenarioDrawdownFields } from "./ScenarioDrawdownFields";
 export { ScenarioEditModal } from "./ScenarioEditModal";
 export { ScenarioGrowthChart } from "./ScenarioGrowthChart";
 export { ScenarioInsights } from "./ScenarioInsights";
