@@ -44,9 +44,12 @@ export function validateDrawdownInputs(
     errors.endAge = "End age must be later than retirement age.";
   }
 
-
-  if (inputs.withdrawalStrategy !== "target-income" && inputs.withdrawalStrategy !== "percentage") {
-    errors.withdrawalStrategy = "Withdrawal strategy must be target income or percentage.";
+  if (
+    inputs.withdrawalStrategy !== "target-income" &&
+    inputs.withdrawalStrategy !== "percentage"
+  ) {
+    errors.withdrawalStrategy =
+      "Withdrawal strategy must be target income or percentage.";
   }
 
   if (
@@ -67,6 +70,27 @@ export function validateDrawdownInputs(
 
   if (inputs.incomeTargetMode !== "gross" && inputs.incomeTargetMode !== "net") {
     errors.incomeTargetMode = "Income target must be gross or net.";
+  }
+
+  if (inputs.spendingPhases !== undefined) {
+    const sorted = [...inputs.spendingPhases].sort(
+      (left, right) => left.startAge - right.startAge,
+    );
+    const hasInvalidPhase = sorted.some(
+      (phase, index) =>
+        !Number.isInteger(phase.startAge) ||
+        phase.startAge < inputs.retirementAge ||
+        phase.startAge >= inputs.endAge ||
+        !isFiniteNumber(phase.annualIncome) ||
+        phase.annualIncome < 0 ||
+        phase.label.trim().length === 0 ||
+        (index > 0 && sorted[index - 1].startAge === phase.startAge),
+    );
+
+    if (hasInvalidPhase) {
+      errors.spendingPhases =
+        "Spending phases must use unique whole ages within retirement and non-negative income targets.";
+    }
   }
 
   if (
