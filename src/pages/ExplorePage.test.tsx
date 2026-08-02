@@ -36,7 +36,7 @@ describe("ExplorePage", () => {
 
     expect(
       screen.getByRole("link", { name: "Explore retirement age" }),
-    ).toHaveAttribute("href", "/what-if");
+    ).toHaveAttribute("href", "/what-if?experiment=retirement-age");
 
     const nextStepHeading = screen.getByRole("heading", {
       name: "Turn understanding into a decision",
@@ -47,7 +47,7 @@ describe("ExplorePage", () => {
       within(nextStepSection as HTMLElement).getByRole("link", {
         name: "Review Drawdown",
       }),
-    ).toHaveAttribute("href", "/drawdown");
+    ).toHaveAttribute("href", "/drawdown?tab=overview");
 
     await user.click(screen.getByText("Gross versus net income"));
     expect(
