@@ -34,9 +34,7 @@ export function GuidancePage() {
   const pensionProjection = usePensionProjection(activeScenario.inputs);
   const drawdown =
     activeScenario.drawdown ??
-    createDefaultScenarioDrawdownPreferences(
-      retirementGoals.desiredAnnualIncome,
-    );
+    createDefaultScenarioDrawdownPreferences(retirementGoals.desiredAnnualIncome);
 
   const drawdownInputs = useMemo(
     () =>
@@ -46,12 +44,7 @@ export function GuidancePage() {
         retirementGoals,
         drawdown,
       }),
-    [
-      activeScenario.inputs,
-      drawdown,
-      pensionProjection.projection,
-      retirementGoals,
-    ],
+    [activeScenario.inputs, drawdown, pensionProjection.projection, retirementGoals],
   );
   const drawdownValidation = useMemo(
     () => validateDrawdownInputs(drawdownInputs),
@@ -84,14 +77,13 @@ export function GuidancePage() {
         "One or more saved income settings cannot currently produce a complete retirement illustration.",
       evidence: "The Drawdown projection is waiting for valid plan values.",
       actionLabel: "Review My Plan",
-      to: "/plan",
+      to: "/plan?step=income&section=income-target",
       icon: AppIcons.warning,
       tone: "attention",
     });
   } else if (drawdownResult) {
     const firstShortfallAge =
-      drawdownResult.firstNetIncomeShortfallAge ??
-      drawdownResult.firstShortfallAge;
+      drawdownResult.firstNetIncomeShortfallAge ?? drawdownResult.firstShortfallAge;
 
     if (firstShortfallAge !== null) {
       attentionItems.push({
@@ -101,7 +93,7 @@ export function GuidancePage() {
           "The illustration shows a point where available retirement income falls below the saved target.",
         evidence: `The first illustrated shortfall begins at age ${firstShortfallAge}.`,
         actionLabel: "Review the income journey",
-        to: "/drawdown",
+        to: "/drawdown?tab=income",
         icon: AppIcons.status.warning,
         tone: "attention",
       });
@@ -115,7 +107,7 @@ export function GuidancePage() {
           "Later retirement income may depend more heavily on State Pension or a lower spending target.",
         evidence: `The pension reaches £0 at age ${drawdownResult.depletionAge}, before age ${drawdownInputs.endAge}.`,
         actionLabel: "Explore the pension balance",
-        to: "/drawdown",
+        to: "/drawdown?tab=balance",
         icon: AppIcons.wallet,
         tone: "attention",
       });
@@ -130,7 +122,7 @@ export function GuidancePage() {
         "Leaving it out can overstate the amount that needs to come from the private pension after State Pension age.",
       evidence: "The current retirement-income plan uses private pension income only.",
       actionLabel: "Add State Pension",
-      to: "/plan",
+      to: "/plan?step=income&section=state-pension",
       icon: AppIcons.pension,
       tone: "attention",
     });
@@ -144,7 +136,7 @@ export function GuidancePage() {
         "Active, settled and later-life retirement chapters can be more realistic than one flat income target.",
       evidence: `${formatCurrency(drawdown.desiredAnnualIncome)} is currently used throughout retirement.`,
       actionLabel: "Set retirement chapters",
-      to: "/plan",
+      to: "/plan?step=income&section=retirement-chapters",
       icon: AppIcons.calendar,
       tone: "opportunity",
     });
@@ -154,11 +146,10 @@ export function GuidancePage() {
     opportunityItems.push({
       id: "fees",
       title: "Test whether lower fees change the outcome",
-      description:
-        "Annual charges compound over the years before and during retirement.",
+      description: "Annual charges compound over the years before and during retirement.",
       evidence: `The active plan uses an annual fee of ${formatPercentage(activeScenario.inputs.annualFee)}.`,
       actionLabel: "Explore lower fees",
-      to: "/what-if",
+      to: "/what-if?experiment=fees",
       icon: AppIcons.fees,
       tone: "opportunity",
     });
@@ -171,7 +162,7 @@ export function GuidancePage() {
       "The order of investment returns can affect retirement even when the long-term average is unchanged.",
     evidence: "Explore compares early, midpoint and late market falls using the same returns.",
     actionLabel: "Open the interactive lesson",
-    to: "/explore",
+    to: "/explore?lesson=sequence-returns",
     icon: AppIcons.growth,
     tone: "opportunity",
   });
@@ -206,15 +197,13 @@ export function GuidancePage() {
             "The deterministic illustration supports the selected income through the planning horizon. The useful next step is to test conditions the straight-line projection cannot show.",
           evidence: `The plan finishes at age ${drawdownInputs.endAge} with ${formatCurrency(drawdownResult?.finalBalance ?? 0)} remaining.`,
           actionLabel: "Explore retirement risk",
-          to: "/explore",
+          to: "/explore?lesson=sequence-returns",
           icon: AppIcons.success,
           tone: "positive",
         }
       : opportunityItems[0]);
 
-  const remainingAttention = attentionItems.filter(
-    (item) => item.id !== primaryItem.id,
-  );
+  const remainingAttention = attentionItems.filter((item) => item.id !== primaryItem.id);
   const remainingOpportunities = opportunityItems.filter(
     (item) => item.id !== primaryItem.id,
   );
@@ -267,18 +256,9 @@ export function GuidancePage() {
           </p>
         </div>
         <div className="guidance-header-summary" aria-label="Guidance summary">
-          <span>
-            <small>Needs attention</small>
-            <strong>{attentionItems.length}</strong>
-          </span>
-          <span>
-            <small>Worth exploring</small>
-            <strong>{opportunityItems.length}</strong>
-          </span>
-          <span>
-            <small>Active plan</small>
-            <strong>{activeScenario.name}</strong>
-          </span>
+          <span><small>Needs attention</small><strong>{attentionItems.length}</strong></span>
+          <span><small>Worth exploring</small><strong>{opportunityItems.length}</strong></span>
+          <span><small>Active plan</small><strong>{activeScenario.name}</strong></span>
         </div>
       </header>
 
@@ -330,9 +310,7 @@ export function GuidancePage() {
         <div className="guidance-check-grid">
           {checks.map((check) => (
             <article key={check.label} className="guidance-check-card">
-              <span aria-hidden="true">
-                <FontAwesomeIcon icon={AppIcons.check} />
-              </span>
+              <span aria-hidden="true"><FontAwesomeIcon icon={AppIcons.check} /></span>
               <div>
                 <small>{check.label}</small>
                 <strong>{check.value}</strong>
