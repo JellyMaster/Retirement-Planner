@@ -25,8 +25,12 @@ export interface ScenarioContextValue extends ScenarioState {
 
 export const ScenarioContext = createContext<ScenarioContextValue | null>(null);
 
+export function useOptionalScenarios(): ScenarioContextValue | null {
+  return useContext(ScenarioContext);
+}
+
 export function useScenarios(): ScenarioContextValue {
-  const context = useContext(ScenarioContext);
+  const context = useOptionalScenarios();
   if (!context) {
     throw new Error("useScenarios must be used inside ScenarioProvider.");
   }
