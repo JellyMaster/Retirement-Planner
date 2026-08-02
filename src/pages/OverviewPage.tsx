@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -7,10 +8,14 @@ import {
 } from "../components/goals/calculateRetirementHealth";
 import { OverviewGrowthChart } from "../components/overview/OverviewGrowthChart";
 import { useScenarios } from "../components/scenarios";
+import type { ProjectionResult } from "../engine/models/ProjectionResult";
+import type { RetirementGoals } from "../engine/models/RetirementGoals";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import { AppIcons } from "../icons";
 import { formatCurrency } from "../utils/formatters";
+
+const MILESTONE_INTERVAL = 50_000;
 
 export function OverviewPage() {
   const { activeScenario } = useScenarios();
@@ -25,6 +30,10 @@ export function OverviewPage() {
   const hasProjection = !scenario.hasErrors && scenario.projection.years.length > 0;
   const preparedness = hasProjection
     ? calculateRetirementHealth(scenario.projection, retirementGoals)
+    : null;
+  const planningAge = activeScenario.drawdown?.planningAge ?? 95;
+  const milestone = hasProjection
+    ? createNextMilestone(inputs.currentPot, scenario.projection)
     : null;
 
   const story = createOverviewStory({
@@ -61,13 +70,39 @@ export function OverviewPage() {
           <p className="planner-eyebrow">Your outlook</p>
           <h2 id="overview-story-title">{story.title}</h2>
           <p>{story.description}</p>
+          {preparedness && (
+            <p className="polaris-overview-story-income">
+              <span>Illustrated annual income</span>
+              <strong>{formatCurrency(preparedness.estimatedAnnualIncome)}</strong>
+              <small>
+                {preparedness.annualGap >= 0 ? "above" : "below"} your target by{" "}
+                {formatCurrency(Math.abs(preparedness.annualGap))} a year
+              </small>
+            </p>
+          )}
         </div>
 
         {preparedness ? (
-          <div className="polaris-overview-story-score">
-            <span>Target coverage</span>
-            <strong>{preparedness.score}%</strong>
-            <small>{formatPreparednessStatus(preparedness.status)}</small>
+          <div
+            className="polaris-overview-story-score"
+            style={{ "--overview-score": preparedness.score } as CSSProperties}
+          >
+            <div
+              className="polaris-overview-score-ring"
+              role="progressbar"
+              aria-label="Retirement target coverage"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={preparedness.score}
+            >
+              <span>
+                <strong>{preparedness.score}%</strong>
+                <small>coverage</small>
+              </span>
+            </div>
+            <strong className="polaris-overview-score-label">
+              {formatPreparednessStatus(preparedness.status)}
+            </strong>
           </div>
         ) : (
           <span className="polaris-overview-story-icon" aria-hidden="true">
@@ -107,6 +142,13 @@ export function OverviewPage() {
           incomplete={!preparedness}
         />
       </section>
+
+      <RetirementTimeline
+        currentAge={inputs.currentAge}
+        retirementAge={inputs.retirementAge}
+        planningAge={planningAge}
+        goals={retirementGoals}
+      />
 
       <section className="polaris-overview-main-story" aria-label="Retirement outlook details">
         <article className="polaris-overview-chart-panel">
@@ -175,6 +217,15 @@ export function OverviewPage() {
         </article>
       </section>
 
+      <section className="polaris-overview-progress-row" aria-label="Plan progress and insight">
+        <MilestoneCard milestone={milestone} />
+        <InsightCard
+          projection={scenario.projection}
+          employerContribution={inputs.monthlyEmployerContribution}
+          hasProjection={hasProjection}
+        />
+      </section>
+
       <section className="polaris-overview-next-action">
         <div>
           <p className="planner-eyebrow">A useful next move</p>
@@ -209,6 +260,65 @@ function OverviewFact({ label, value, detail, incomplete = false }: OverviewFact
   );
 }
 
+function RetirementTimeline({
+  currentAge,
+  retirementAge,
+  planningAge,
+  goals,
+}: {
+  currentAge: number;
+  retirementAge: number;
+  planningAge: number;
+  goals: RetirementGoals;
+}) {
+  const events = [
+    { age: currentAge, label: "Today", detail: "Your plan starts here" },
+    ...(goals.includeStatePension
+      ? [
+          {
+            age: goals.statePensionAge,
+            label: "State Pension",
+            detail: `${formatCurrency(goals.statePensionAnnualAmount)} a year begins`,
+          },
+        ]
+      : []),
+    {
+      age: retirementAge,
+      label: "Retirement",
+      detail: "Regular pension contributions stop",
+    },
+    {
+      age: Math.max(planningAge, retirementAge + 1),
+      label: "Plan horizon",
+      detail: "Income projection is modelled to this age",
+    },
+  ].sort((left, right) => left.age - right.age);
+
+  return (
+    <section className="polaris-overview-timeline" aria-labelledby="overview-timeline-title">
+      <div className="polaris-overview-section-heading">
+        <div>
+          <p className="planner-eyebrow">Your timeline</p>
+          <h2 id="overview-timeline-title">The key moments in this plan</h2>
+        </div>
+        <p>See when income sources and retirement milestones enter the story.</p>
+      </div>
+      <ol>
+        {events.map((event, index) => (
+          <li key={`${event.label}-${event.age}`}>
+            <span className="polaris-overview-timeline-marker" aria-hidden="true">
+              {index + 1}
+            </span>
+            <span className="polaris-overview-timeline-age">Age {event.age}</span>
+            <strong>{event.label}</strong>
+            <small>{event.detail}</small>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 function StoryPoint({
   icon,
   title,
@@ -231,6 +341,120 @@ function StoryPoint({
       </div>
     </div>
   );
+}
+
+interface Milestone {
+  target: number;
+  age: number;
+  yearsAway: number;
+  progress: number;
+}
+
+function MilestoneCard({ milestone }: { milestone: Milestone | null }) {
+  return (
+    <article className="polaris-overview-milestone">
+      <p className="planner-eyebrow">Your next milestone</p>
+      {milestone ? (
+        <>
+          <h2>{formatCurrency(milestone.target)} pension</h2>
+          <p>
+            The current projection first reaches this level around age {milestone.age},
+            approximately {milestone.yearsAway} {milestone.yearsAway === 1 ? "year" : "years"} away.
+          </p>
+          <div
+            className="polaris-overview-milestone-progress"
+            role="progressbar"
+            aria-label={`Progress towards ${formatCurrency(milestone.target)}`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={milestone.progress}
+          >
+            <span style={{ width: `${milestone.progress}%` }} />
+          </div>
+        </>
+      ) : (
+        <>
+          <h2>Complete the projection</h2>
+          <p>A future pension milestone will appear when the plan has valid growth data.</p>
+        </>
+      )}
+    </article>
+  );
+}
+
+function InsightCard({
+  projection,
+  employerContribution,
+  hasProjection,
+}: {
+  projection: ProjectionResult;
+  employerContribution: number;
+  hasProjection: boolean;
+}) {
+  const growth = projection.totalInvestmentGrowth.real;
+  const finalBalance = projection.finalBalance.real;
+  const growthShare = finalBalance > 0 ? Math.round((growth / finalBalance) * 100) : 0;
+
+  return (
+    <article className="polaris-overview-insight">
+      <p className="planner-eyebrow">Did you know?</p>
+      {hasProjection && growth > 0 ? (
+        <>
+          <h2>Investment growth does a meaningful share of the work</h2>
+          <p>
+            Around {growthShare}% of the projected retirement pension comes from
+            illustrated investment growth rather than the money paid in.
+          </p>
+        </>
+      ) : employerContribution > 0 ? (
+        <>
+          <h2>Your employer is building the plan with you</h2>
+          <p>
+            Employer contributions add {formatCurrency(employerContribution * 12)}
+            each year before any investment growth is applied.
+          </p>
+        </>
+      ) : (
+        <>
+          <h2>Small details can materially change the story</h2>
+          <p>Add contributions and valid assumptions to reveal the main drivers of this plan.</p>
+        </>
+      )}
+    </article>
+  );
+}
+
+function createNextMilestone(
+  currentPot: number,
+  projection: ProjectionResult,
+): Milestone | null {
+  const safeCurrentPot = Math.max(0, currentPot);
+  const target =
+    Math.floor(safeCurrentPot / MILESTONE_INTERVAL) * MILESTONE_INTERVAL +
+    MILESTONE_INTERVAL;
+  const matchingYear = projection.years.find(
+    (year) => year.closingBalance.real >= target,
+  );
+
+  if (!matchingYear) return null;
+
+  const previousTarget = Math.max(0, target - MILESTONE_INTERVAL);
+  const progress = Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(
+        ((safeCurrentPot - previousTarget) / (target - previousTarget)) * 100,
+      ),
+    ),
+  );
+
+  return {
+    target,
+    age: matchingYear.age,
+    yearsAway: Math.max(0, matchingYear.age - projection.years[0].age + 1),
+    progress,
+  };
 }
 
 function createOverviewStory({
@@ -296,7 +520,7 @@ function createMeaningHeading(preparedness: RetirementHealthMetrics | null): str
 
 function createIncomeDescription(
   preparedness: RetirementHealthMetrics | null,
-  goals: ReturnType<typeof useStoredRetirementGoals>[0],
+  goals: RetirementGoals,
 ): string {
   if (!preparedness) return "Complete the active plan to calculate an income illustration.";
 
