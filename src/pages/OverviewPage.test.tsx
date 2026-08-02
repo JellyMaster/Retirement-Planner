@@ -28,7 +28,6 @@ vi.mock("../hooks/usePensionProjection");
 
 const mockedUsePensionProjection = vi.mocked(usePensionProjection);
 const mockedUseScenarios = vi.mocked(useScenarios);
-
 const zeroMoney = { nominal: 0, real: 0 };
 
 function createProjectionYear(finalBalance: number): ProjectionYear {
@@ -39,10 +38,7 @@ function createProjectionYear(finalBalance: number): ProjectionYear {
     contributions: zeroMoney,
     investmentGrowth: zeroMoney,
     fees: zeroMoney,
-    closingBalance: {
-      nominal: finalBalance,
-      real: finalBalance,
-    },
+    closingBalance: { nominal: finalBalance, real: finalBalance },
   };
 }
 
@@ -101,10 +97,7 @@ describe("OverviewPage", () => {
       errors: {},
       projection: {
         years: [createProjectionYear(finalBalance)],
-        finalBalance: {
-          nominal: finalBalance,
-          real: finalBalance,
-        },
+        finalBalance: { nominal: finalBalance, real: finalBalance },
         totalContributions: zeroMoney,
         totalInvestmentGrowth: zeroMoney,
         totalFees: zeroMoney,
@@ -121,37 +114,30 @@ describe("OverviewPage", () => {
     );
   }
 
-  it("shows the active plan, growth chart and preparedness", () => {
+  it("tells the active plan story without duplicating navigation", () => {
     mockActiveScenario(createScenario());
     mockProjection(750_000);
 
     renderPage();
 
     expect(
-      screen.getByRole("heading", { name: "Your retirement at a glance" }),
+      screen.getByRole("heading", { name: "Your retirement story" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("£194,421")).toBeInTheDocument();
-    expect(screen.getByText("£1,126")).toBeInTheDocument();
+    expect(screen.getByText("Overview · Baseline Plan")).toBeInTheDocument();
     expect(screen.getByText("Age 68")).toBeInTheDocument();
     expect(screen.getByText("£750,000")).toBeInTheDocument();
+    expect(screen.getByText("You have already built")).toBeInTheDocument();
+    expect(screen.getByText("You are adding")).toBeInTheDocument();
+    expect(screen.getByText("Your income picture")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Baseline Plan is available" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Pension growth over time" }),
+      screen.getByRole("heading", { name: "How your pension could grow" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("img", {
         name: "Projected pension growth by age in today's money",
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "How prepared is this plan?" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("progressbar", { name: "Retirement preparedness" }),
-    ).toHaveAttribute("aria-valuenow");
-
+    expect(screen.getByText("Target coverage")).toBeInTheDocument();
     expect(screen.getByText("State Pension")).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -161,17 +147,10 @@ describe("OverviewPage", () => {
         )}/year from age ${defaultRetirementGoals.statePensionAge}`,
       ),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("link", { name: "Review active plan" }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("link", {
-        name: "Edit retirement goal in My Plan",
-      }),
-    ).not.toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "Open My Plan" })).toHaveLength(1);
-    expect(screen.getByRole("link", { name: "Open My Plan" })).toHaveClass(
-      "ui-button-primary",
+    expect(screen.getByRole("link", { name: "Explore a What If?" })).toHaveAttribute(
+      "href",
+      "/what-if",
     );
   });
 
@@ -188,12 +167,10 @@ describe("OverviewPage", () => {
 
     renderPage();
 
-    const statePension = screen.getByText("State Pension").closest("div");
-    expect(statePension).not.toBeNull();
-    expect(statePension).toHaveTextContent("Not included");
+    expect(screen.getByText("Not included in this plan")).toBeInTheDocument();
   });
 
-  it("shows values from a non-baseline active scenario", () => {
+  it("uses the non-baseline active scenario in the story", () => {
     mockActiveScenario(
       createScenario(
         "Retire at 65",
@@ -210,16 +187,14 @@ describe("OverviewPage", () => {
 
     renderPage();
 
-    expect(
-      screen.getByRole("heading", { name: "Retire at 65 is available" }),
-    ).toBeInTheDocument();
-    expect(screen.getByText("£250,000")).toBeInTheDocument();
-    expect(screen.getByText("£1,300")).toBeInTheDocument();
+    expect(screen.getByText("Overview · Retire at 65")).toBeInTheDocument();
     expect(screen.getByText("Age 65")).toBeInTheDocument();
     expect(screen.getByText("£820,000")).toBeInTheDocument();
+    expect(screen.getByText(/£250,000 in the pension included/)).toBeInTheDocument();
+    expect(screen.getByText(/£1,300 each month/)).toBeInTheDocument();
   });
 
-  it("shows incomplete guidance when no pension balance is available", () => {
+  it("guides the user to complete an incomplete plan", () => {
     mockActiveScenario(
       createScenario(
         "Baseline Plan",
@@ -236,17 +211,20 @@ describe("OverviewPage", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Add pension details to Baseline Plan",
+        name: "Baseline Plan needs a little more information",
       }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("Not added")).toHaveLength(2);
-    expect(screen.getByText("Add this in My Plan")).toBeInTheDocument();
+    expect(screen.getByText("No current pension balance has been added yet.")).toBeInTheDocument();
     expect(
-      screen.getByText("Add employee and employer contributions"),
+      screen.getByText("No regular employee or employer contributions have been added."),
     ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Complete My Plan" })).toHaveAttribute(
+      "href",
+      "/plan",
+    );
   });
 
-  it("shows unavailable chart and preparedness guidance for invalid inputs", () => {
+  it("shows unavailable story guidance for invalid inputs", () => {
     mockActiveScenario(createScenario());
     mockedUsePensionProjection.mockReturnValue({
       hasErrors: true,
@@ -265,15 +243,13 @@ describe("OverviewPage", () => {
 
     renderPage();
 
-    expect(screen.getByText("Unavailable")).toBeInTheDocument();
-    expect(
-      screen.getByText("Review the plan inputs to calculate a projection"),
-    ).toBeInTheDocument();
+    expect(screen.getAllByText("Unavailable")).toHaveLength(2);
     expect(
       screen.getByText("Add valid plan inputs to see pension growth over time."),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Correct the active plan inputs to calculate preparedness."),
+      screen.getByText("Complete the active plan to calculate an income illustration."),
     ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Complete My Plan" })).toBeInTheDocument();
   });
 });
