@@ -1,11 +1,17 @@
 import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
+import { usePensionProjection } from "../../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../../hooks/useStoredRetirementGoals";
+import { formatCurrency } from "../../utils/formatters";
 import {
   CurrencyInput,
   FormField,
   NumberInput,
   PercentageInput,
 } from "../forms";
+import { useScenarios } from "./ScenarioContext";
+
+const STANDARD_LUMP_SUM_ALLOWANCE = 268_275;
+const TAX_FREE_CASH_RATE = 0.25;
 
 interface ScenarioDrawdownFieldsProps {
   idPrefix: string;
@@ -20,7 +26,20 @@ export function ScenarioDrawdownFields({
   value,
   onChange,
 }: ScenarioDrawdownFieldsProps) {
+  const { activeScenario } = useScenarios();
   const [retirementGoals, setRetirementGoals] = useStoredRetirementGoals();
+  const activeProjection = usePensionProjection(activeScenario.inputs);
+  const projectedPensionAtRetirement = activeProjection.hasErrors
+    ? 0
+    : Math.max(0, activeProjection.projection.finalBalance.real);
+  const maximumTaxFreeCash = Math.min(
+    projectedPensionAtRetirement * TAX_FREE_CASH_RATE,
+    STANDARD_LUMP_SUM_ALLOWANCE,
+  );
+  const pensionRemainingAfterCash = Math.max(
+    0,
+    projectedPensionAtRetirement - value.taxFreeCash,
+  );
 
   function update<K extends keyof ScenarioDrawdownPreferences>(
     field: K,
@@ -50,6 +69,11 @@ export function ScenarioDrawdownFields({
       : value.planningAge > 120
         ? "Planning age must be 120 or below."
         : undefined;
+
+  const taxFreeCashError =
+    value.taxFreeCash > maximumTaxFreeCash
+      ? `Enter no more than the illustrated maximum of ${formatCurrency(maximumTaxFreeCash)}.`
+      : undefined;
 
   return (
     <fieldset className="scenario-edit-section">
@@ -196,26 +220,104 @@ export function ScenarioDrawdownFields({
             )}
           </FormField>
         )}
-
-        <FormField
-          id={`${idPrefix}-taxFreeCash`}
-          label="Tax-free cash at retirement"
-          optional
-        >
-          {(id, describedBy) => (
-            <CurrencyInput
-              id={id}
-              aria-describedby={describedBy}
-              value={value.taxFreeCash}
-              min={0}
-              step={1_000}
-              onValueChange={(nextValue) =>
-                update("taxFreeCash", nextValue ?? 0)
-              }
-            />
-          )}
-        </FormField>
       </div>
+
+      <section
+        className="scenario-edit-subsection scenario-tax-free-cash-section"
+        aria-labelledby={`${idPrefix}-tax-free-cash-heading`}
+      >
+        <div className="scenario-tax-free-cash-heading">
+          <div>
+            <h3 id={`${idPrefix}-tax-free-cash-heading`}>
+              Tax-free cash at retirement
+            </h3>
+            <p>
+              Choose any amount from £0 up to the illustrated maximum. Taking
+              cash reduces the pension left to provide retirement income.
+            </p>
+          </div>
+          <div className="scenario-tax-free-cash-limit">
+            <span>Illustrated maximum</span>
+            <strong>{formatCurrency(maximumTaxFreeCash)}</strong>
+            <small>
+              25% of the projected pension, capped at the standard £268,275
+              lump-sum allowance.
+            </small>
+          </div>
+        </div>
+
+        <div className="scenario-edit-grid">
+          <FormField
+            id={`${idPrefix}-taxFreeCash`}
+            label="Tax-free cash amount"
+            hint={`Enter an amount up to ${formatCurrency(maximumTaxFreeCash)}.`}
+            error={taxFreeCashError}
+            optional
+          >
+            {(id, describedBy) => (
+              <CurrencyInput
+                id={id}
+                aria-describedby={describedBy}
+                value={value.taxFreeCash}
+                min={0}
+                max={maximumTaxFreeCash}
+                step={1_000}
+                error={Boolean(taxFreeCashError)}
+                onValueChange={(nextValue) =>
+                  update(
+                    "taxFreeCash",
+                    Math.min(
+                      Math.max(0, nextValue ?? 0),
+                      maximumTaxFreeCash,
+                    ),
+                  )
+                }
+              />
+            )}
+          </FormField>
+
+          <div className="scenario-tax-free-cash-actions">
+            <button
+              type="button"
+              className="ui-button ui-button-secondary ui-button-small"
+              disabled={maximumTaxFreeCash <= 0}
+              onClick={() => update("taxFreeCash", maximumTaxFreeCash)}
+            >
+              Use maximum
+            </button>
+            <button
+              type="button"
+              className="comparison-text-button"
+              disabled={value.taxFreeCash === 0}
+              onClick={() => update("taxFreeCash", 0)}
+            >
+              Take no cash
+            </button>
+          </div>
+        </div>
+
+        <dl className="scenario-tax-free-cash-summary">
+          <div>
+            <dt>Projected pension at retirement</dt>
+            <dd>{formatCurrency(projectedPensionAtRetirement)}</dd>
+          </div>
+          <div>
+            <dt>Tax-free cash selected</dt>
+            <dd>{formatCurrency(value.taxFreeCash)}</dd>
+          </div>
+          <div>
+            <dt>Pension remaining for income</dt>
+            <dd>{formatCurrency(pensionRemainingAfterCash)}</dd>
+          </div>
+        </dl>
+
+        <p className="scenario-tax-free-cash-note">
+          This uses the standard 2026/27 UK lump-sum allowance and assumes none
+          has already been used. A protected allowance or previous tax-free
+          withdrawals can change your personal limit, so confirm it with your
+          pension provider.
+        </p>
+      </section>
 
       <section
         className="scenario-edit-subsection scenario-state-pension-section"
