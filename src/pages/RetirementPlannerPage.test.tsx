@@ -8,63 +8,59 @@ import { RetirementPlannerPage } from "./RetirementPlannerPage";
 describe("RetirementPlannerPage", () => {
   beforeEach(() => {
     window.sessionStorage.clear();
-    window.history.replaceState(null, "", "/");
+    window.history.replaceState(null, "", "/plan");
   });
 
-  it("renders the overview workspace and navigates between focused sections", async () => {
-    const user = userEvent.setup();
+  it("presents one guided editor and a live plan snapshot", () => {
     renderWithProviders(<RetirementPlannerPage />);
 
     expect(
-      screen.getByRole("heading", { name: /retirement planner/i }),
+      screen.getByRole("heading", { name: "Build your retirement plan" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("navigation", { name: /retirement planning workspace/i }),
+      screen.getByRole("region", { name: "Edit retirement plan" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: /am i on track for retirement/i }),
+      screen.getByRole("heading", { name: "Your pension details" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: /your pension details/i }),
+      screen.getByRole("heading", { name: "What the current choices produce" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("region", { name: /retirement plan summary/i }),
+      screen.getByLabelText("Retirement plan summary"),
     ).toBeInTheDocument();
 
-    await user.click(
-      screen.getByRole("tab", { name: /confidence & risk/i }),
+    expect(screen.getByText("Time to retirement")).toBeInTheDocument();
+    expect(screen.getByText("Monthly contributions")).toBeInTheDocument();
+    expect(screen.getByText("Projected pension")).toBeInTheDocument();
+    expect(screen.getByText("Estimated annual income")).toBeInTheDocument();
+
+    expect(screen.getByRole("link", { name: "View overview" })).toHaveAttribute(
+      "href",
+      "/",
+    );
+    expect(
+      screen.getByRole("link", { name: "Explore a What If?" }),
+    ).toHaveAttribute("href", "/what-if");
+    expect(screen.getByRole("link", { name: "Review drawdown" })).toHaveAttribute(
+      "href",
+      "/drawdown",
     );
 
     expect(
-      screen.getByRole("heading", { name: /how uncertain is the outcome/i }),
-    ).toBeInTheDocument();
+      screen.queryByRole("navigation", { name: /retirement planning workspace/i }),
+    ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: /retirement confidence/i }),
-    ).toBeInTheDocument();
-    expect(window.location.hash).toBe("#confidence");
-
-    await user.click(
-      screen.getByRole("tab", { name: /improve my plan/i }),
-    );
-
+      screen.queryByRole("heading", { name: /how uncertain is the outcome/i }),
+    ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: /what changes could improve my outlook/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /recommended actions/i }),
-    ).toBeInTheDocument();
+      screen.queryByRole("heading", { name: /recommended actions/i }),
+    ).not.toBeInTheDocument();
   });
 
-  it("shows validation feedback, withholds results and returns to overview", async () => {
+  it("shows validation guidance instead of the live metrics", async () => {
     const user = userEvent.setup();
     renderWithProviders(<RetirementPlannerPage />);
-
-    await user.click(
-      screen.getByRole("tab", { name: /build my pension/i }),
-    );
-    await user.click(
-      screen.getByRole("tab", { name: /overview/i }),
-    );
 
     const currentAgeInput = screen.getByRole("spinbutton", {
       name: /current age/i,
@@ -75,44 +71,11 @@ describe("RetirementPlannerPage", () => {
     expect(
       screen.getByText(/current age must be between 18 and 100/i),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/correct the highlighted fields to calculate your results/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("region", { name: /retirement plan summary/i }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("tab", { name: /overview/i }),
-    ).toHaveAttribute("aria-selected", "true");
-  });
-
-  it("previews an Action Centre recommendation and can discard it", async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<RetirementPlannerPage />);
-
-    await user.click(
-      screen.getByRole("tab", { name: /improve my plan/i }),
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "The plan needs attention",
     );
-
-    await user.click(
-      screen.getAllByRole("button", { name: /preview plan/i })[0],
-    );
-
     expect(
-      screen.getByRole("status", { name: /preview mode/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /keep changes/i }),
-    ).toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole("button", { name: /discard preview/i }),
-    );
-
-    expect(
-      screen.queryByRole("status", { name: /preview mode/i }),
+      screen.queryByLabelText("Retirement plan summary"),
     ).not.toBeInTheDocument();
   });
-
- 
 });
