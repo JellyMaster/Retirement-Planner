@@ -65,7 +65,7 @@ const experiments = [
     title: "State Pension",
     description: "Explore its amount, timing and contribution to income.",
     icon: AppIcons.pension,
-    available: false,
+    available: true,
   },
   {
     id: "market-downturn" as const,
