@@ -1,5 +1,4 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import App from "./App";
@@ -12,35 +11,38 @@ describe("responsive application navigation", () => {
   });
 
   it("opens, closes with Escape and closes after navigation", async () => {
-    const user = userEvent.setup();
-
     render(
       <ThemeProvider>
         <App />
       </ThemeProvider>,
     );
 
-    const toggle = screen.getByRole("button", { name: "Open navigation" });
+    // jsdom does not evaluate responsive CSS media queries. The mobile toggle is
+    // therefore hidden by the desktop stylesheet, even though it is present and
+    // its state behaviour can still be tested directly.
+    const toggle = document.querySelector<HTMLButtonElement>(
+      ".app-navigation-toggle",
+    );
+
+    expect(toggle).not.toBeNull();
+    expect(toggle).toHaveAttribute("aria-label", "Open navigation");
     expect(toggle).toHaveAttribute("aria-expanded", "false");
 
-    await user.click(toggle);
-    expect(
-      screen.getByRole("button", { name: "Close navigation" }),
-    ).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(toggle as HTMLButtonElement);
+    expect(toggle).toHaveAttribute("aria-label", "Close navigation");
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
 
-    await user.keyboard("{Escape}");
-    expect(
-      screen.getByRole("button", { name: "Open navigation" }),
-    ).toHaveAttribute("aria-expanded", "false");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(toggle).toHaveAttribute("aria-label", "Open navigation");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
 
-    await user.click(screen.getByRole("button", { name: "Open navigation" }));
-    await user.click(screen.getByRole("link", { name: "Guidance" }));
+    fireEvent.click(toggle as HTMLButtonElement);
+    fireEvent.click(screen.getByRole("link", { name: "Guidance" }));
 
+    expect(toggle).toHaveAttribute("aria-label", "Open navigation");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
     expect(
-      screen.getByRole("button", { name: "Open navigation" }),
-    ).toHaveAttribute("aria-expanded", "false");
-    expect(
-      screen.getByRole("heading", { name: "Know what to review next" }),
+      await screen.findByRole("heading", { name: "Know what to review next" }),
     ).toBeInTheDocument();
   });
 });
