@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useSearchParams } from "react-router-dom";
+import { useInRouterContext, useSearchParams } from "react-router-dom";
 
 import { AppIcons } from "../../icons";
 
@@ -82,7 +82,15 @@ const experimentIds = new Set<ExperimentId>(
   experiments.map((experiment) => experiment.id),
 );
 
-export function ExperimentLauncher({
+export function ExperimentLauncher(props: ExperimentLauncherProps) {
+  return useInRouterContext() ? (
+    <RoutedExperimentLauncher {...props} />
+  ) : (
+    <ExperimentLauncherContent {...props} />
+  );
+}
+
+function RoutedExperimentLauncher({
   activeExperiment,
   onSelect,
 }: ExperimentLauncherProps) {
@@ -101,6 +109,18 @@ export function ExperimentLauncher({
     onSelect(experiment);
   }
 
+  return (
+    <ExperimentLauncherContent
+      activeExperiment={activeExperiment}
+      onSelect={selectExperiment}
+    />
+  );
+}
+
+function ExperimentLauncherContent({
+  activeExperiment,
+  onSelect,
+}: ExperimentLauncherProps) {
   return (
     <section className="what-if-launcher" aria-labelledby="what-if-launcher-title">
       <div className="what-if-section-heading">
@@ -125,7 +145,7 @@ export function ExperimentLauncher({
               className={`what-if-experiment-card${isActive ? " is-active" : ""}`}
               aria-pressed={isActive}
               disabled={!experiment.available}
-              onClick={() => selectExperiment(experiment.id)}
+              onClick={() => onSelect(experiment.id)}
             >
               <span className="what-if-experiment-icon" aria-hidden="true">
                 <FontAwesomeIcon icon={experiment.icon} fixedWidth />
