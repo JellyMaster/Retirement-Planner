@@ -11,7 +11,7 @@ describe("RetirementPlannerPage route selection", () => {
 
   it("opens the requested retirement-income section", async () => {
     vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
-      callback(0);
+      window.setTimeout(() => callback(0), 0);
       return 1;
     });
 
