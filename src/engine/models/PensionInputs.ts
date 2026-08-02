@@ -20,4 +20,8 @@ export interface PensionInputs {
   annualFee: number;
 
   inflation: number;
+
+  marketDownturnAge?: number;
+
+  marketDownturnPercentage?: number;
 }
