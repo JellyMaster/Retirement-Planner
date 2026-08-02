@@ -95,7 +95,7 @@
 
 .sequence-returns-outcomes {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--ui-space-4);
 }
 
@@ -110,6 +110,10 @@
 
 .sequence-journey-card.is-warning {
   border-top: 4px solid var(--colour-warning, #c77800);
+}
+
+.sequence-journey-card.is-neutral {
+  border-top: 4px solid var(--colour-secondary, var(--colour-text-muted));
 }
 
 .sequence-journey-card.is-positive {
@@ -203,7 +207,8 @@
 }
 
 @media (max-width: 70rem) {
-  .sequence-returns-controls {
+  .sequence-returns-controls,
+  .sequence-returns-outcomes {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
