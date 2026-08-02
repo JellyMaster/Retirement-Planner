@@ -10,6 +10,7 @@ import {
 } from "../components/what-if/ExperimentLauncher";
 import { FeeExperiment } from "../components/what-if/FeeExperiment";
 import { RetirementAgeExperiment } from "../components/what-if/RetirementAgeExperiment";
+import { ReturnExperiment } from "../components/what-if/ReturnExperiment";
 import { SpendingExperiment } from "../components/what-if/SpendingExperiment";
 import {
   createDefaultScenarioDrawdownPreferences,
@@ -41,23 +42,15 @@ interface WhatIfWorkspaceProps {
   updateScenarioPlan: ReturnType<typeof useScenarios>["updateScenarioPlan"];
 }
 
-function WhatIfWorkspace({
-  activeScenario,
-  createScenario,
-  updateScenarioPlan,
-}: WhatIfWorkspaceProps) {
+function WhatIfWorkspace({ activeScenario, createScenario, updateScenarioPlan }: WhatIfWorkspaceProps) {
   const [retirementGoals] = useStoredRetirementGoals();
   const baselineDrawdown =
     activeScenario.drawdown ??
     createDefaultScenarioDrawdownPreferences(retirementGoals.desiredAnnualIncome);
 
-  const [activeExperiment, setActiveExperiment] =
-    useState<ExperimentId>("retirement-age");
-  const [alternativeInputs, setAlternativeInputs] = useState<PensionInputs>(() => ({
-    ...activeScenario.inputs,
-  }));
-  const [alternativeDrawdown, setAlternativeDrawdown] =
-    useState<ScenarioDrawdownPreferences>(() => ({ ...baselineDrawdown }));
+  const [activeExperiment, setActiveExperiment] = useState<ExperimentId>("retirement-age");
+  const [alternativeInputs, setAlternativeInputs] = useState<PensionInputs>(() => ({ ...activeScenario.inputs }));
+  const [alternativeDrawdown, setAlternativeDrawdown] = useState<ScenarioDrawdownPreferences>(() => ({ ...baselineDrawdown }));
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const baselineScenario = usePensionProjection(activeScenario.inputs);
@@ -75,14 +68,10 @@ function WhatIfWorkspace({
         desiredAnnualIncome: alternativeDrawdown.desiredAnnualIncome,
       });
   const planningAge = baselineDrawdown.planningAge;
-  const baselineExtraContribution =
-    activeScenario.inputs.extraMonthlyContribution ?? 0;
+  const baselineExtraContribution = activeScenario.inputs.extraMonthlyContribution ?? 0;
   const baselineExtraContributionAge =
     activeScenario.inputs.extraContributionAge ??
-    Math.min(
-      activeScenario.inputs.retirementAge - 1,
-      activeScenario.inputs.currentAge + 1,
-    );
+    Math.min(activeScenario.inputs.retirementAge - 1, activeScenario.inputs.currentAge + 1);
 
   function selectExperiment(experiment: ExperimentId) {
     setActiveExperiment(experiment);
@@ -92,25 +81,17 @@ function WhatIfWorkspace({
   }
 
   function changeRetirementAge(retirementAge: number) {
-    setAlternativeInputs(
-      createRetirementAgeExperimentInputs(activeScenario.inputs, retirementAge),
-    );
+    setAlternativeInputs(createRetirementAgeExperimentInputs(activeScenario.inputs, retirementAge));
     setSaveMessage(null);
   }
 
   function changeEmployeeContribution(amount: number) {
-    setAlternativeInputs((current) => ({
-      ...current,
-      monthlyEmployeeContribution: Math.max(0, amount),
-    }));
+    setAlternativeInputs((current) => ({ ...current, monthlyEmployeeContribution: Math.max(0, amount) }));
     setSaveMessage(null);
   }
 
   function changeEmployerContribution(amount: number) {
-    setAlternativeInputs((current) => ({
-      ...current,
-      monthlyEmployerContribution: Math.max(0, amount),
-    }));
+    setAlternativeInputs((current) => ({ ...current, monthlyEmployerContribution: Math.max(0, amount) }));
     setSaveMessage(null);
   }
 
@@ -122,7 +103,6 @@ function WhatIfWorkspace({
         delete next.extraMonthlyContribution;
         return next;
       }
-
       next.extraContributionAge = Math.min(
         baselineExtraContributionAge,
         Math.max(next.currentAge, next.retirementAge - 1),
@@ -138,10 +118,7 @@ function WhatIfWorkspace({
       ...current,
       extraContributionAge:
         current.extraContributionAge ??
-        Math.min(
-          baselineExtraContributionAge,
-          Math.max(current.currentAge, current.retirementAge - 1),
-        ),
+        Math.min(baselineExtraContributionAge, Math.max(current.currentAge, current.retirementAge - 1)),
       extraMonthlyContribution: amount,
     }));
     setSaveMessage(null);
@@ -150,28 +127,26 @@ function WhatIfWorkspace({
   function changeExtraContributionAge(age: number) {
     setAlternativeInputs((current) => ({
       ...current,
-      extraContributionAge: Math.min(
-        Math.max(current.currentAge, Math.round(age)),
-        current.retirementAge - 1,
-      ),
-      extraMonthlyContribution:
-        current.extraMonthlyContribution ?? (baselineExtraContribution || 250),
+      extraContributionAge: Math.min(Math.max(current.currentAge, Math.round(age)), current.retirementAge - 1),
+      extraMonthlyContribution: current.extraMonthlyContribution ?? (baselineExtraContribution || 250),
     }));
     setSaveMessage(null);
   }
 
   function changeTargetIncome(amount: number) {
-    setAlternativeDrawdown((current) => ({
-      ...current,
-      desiredAnnualIncome: Math.max(0, Math.round(amount)),
-    }));
+    setAlternativeDrawdown((current) => ({ ...current, desiredAnnualIncome: Math.max(0, Math.round(amount)) }));
     setSaveMessage(null);
   }
 
   function changeAnnualFee(fee: number) {
+    setAlternativeInputs((current) => ({ ...current, annualFee: Math.min(0.02, Math.max(0, fee)) }));
+    setSaveMessage(null);
+  }
+
+  function changeAnnualReturn(annualReturn: number) {
     setAlternativeInputs((current) => ({
       ...current,
-      annualFee: Math.min(0.02, Math.max(0, fee)),
+      annualReturn: Math.min(0.12, Math.max(0, annualReturn)),
     }));
     setSaveMessage(null);
   }
@@ -187,26 +162,26 @@ function WhatIfWorkspace({
 
     const suggestedName =
       activeExperiment === "contributions"
-        ? `Save ${Math.round(
-            alternativeInputs.monthlyEmployeeContribution +
-              alternativeInputs.monthlyEmployerContribution,
-          )} monthly`
+        ? `Save ${Math.round(alternativeInputs.monthlyEmployeeContribution + alternativeInputs.monthlyEmployerContribution)} monthly`
         : activeExperiment === "spending"
           ? `Spend ${Math.round(alternativeDrawdown.desiredAnnualIncome)} yearly`
           : activeExperiment === "fees"
             ? `Fees ${(alternativeInputs.annualFee * 100).toFixed(2)} percent`
-            : `Retire at ${alternativeInputs.retirementAge}`;
+            : activeExperiment === "returns"
+              ? `Return ${(alternativeInputs.annualReturn * 100).toFixed(1)} percent`
+              : `Retire at ${alternativeInputs.retirementAge}`;
     const name = window.prompt("Name this scenario", suggestedName)?.trim();
     if (!name) return;
 
     const scenario = createScenario(name, activeScenario.id);
-    updateScenarioPlan(
-      scenario.id,
-      { ...alternativeInputs },
-      { ...alternativeDrawdown },
-    );
+    updateScenarioPlan(scenario.id, { ...alternativeInputs }, { ...alternativeDrawdown });
     setSaveMessage(`${name} has been saved and is ready to compare.`);
   }
+
+  const yearsToRetirement = Math.max(
+    0,
+    activeScenario.inputs.retirementAge - activeScenario.inputs.currentAge,
+  );
 
   return (
     <main className="planner-page what-if-page">
@@ -224,10 +199,7 @@ function WhatIfWorkspace({
         </div>
       </header>
 
-      <ExperimentLauncher
-        activeExperiment={activeExperiment}
-        onSelect={selectExperiment}
-      />
+      <ExperimentLauncher activeExperiment={activeExperiment} onSelect={selectExperiment} />
 
       {activeExperiment === "retirement-age" && (
         <RetirementAgeExperiment
@@ -264,10 +236,7 @@ function WhatIfWorkspace({
           baselineExtraContributionAge={baselineExtraContributionAge}
           extraContribution={alternativeInputs.extraMonthlyContribution ?? (baselineExtraContribution || 250)}
           extraContributionAge={alternativeInputs.extraContributionAge ?? baselineExtraContributionAge}
-          includeExtraContribution={
-            alternativeInputs.extraContributionAge !== undefined &&
-            alternativeInputs.extraMonthlyContribution !== undefined
-          }
+          includeExtraContribution={alternativeInputs.extraContributionAge !== undefined && alternativeInputs.extraMonthlyContribution !== undefined}
           baselineProjectedPension={baselineScenario.projection.finalBalance.real}
           projectedPension={alternativeScenario.projection.finalBalance.real}
           baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
@@ -308,10 +277,7 @@ function WhatIfWorkspace({
           activePlanName={activeScenario.name}
           baselineFee={activeScenario.inputs.annualFee}
           fee={alternativeInputs.annualFee}
-          yearsToRetirement={Math.max(
-            0,
-            activeScenario.inputs.retirementAge - activeScenario.inputs.currentAge,
-          )}
+          yearsToRetirement={yearsToRetirement}
           baselineTotalFees={baselineScenario.projection.totalFees.real}
           totalFees={alternativeScenario.projection.totalFees.real}
           baselineProjectedPension={baselineScenario.projection.finalBalance.real}
@@ -327,6 +293,28 @@ function WhatIfWorkspace({
           onSave={saveExperiment}
         />
       )}
+
+      {activeExperiment === "returns" && (
+        <ReturnExperiment
+          activePlanName={activeScenario.name}
+          baselineReturn={activeScenario.inputs.annualReturn}
+          annualReturn={alternativeInputs.annualReturn}
+          yearsToRetirement={yearsToRetirement}
+          baselineGrowth={baselineScenario.projection.totalInvestmentGrowth.real}
+          growth={alternativeScenario.projection.totalInvestmentGrowth.real}
+          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+          projectedPension={alternativeScenario.projection.finalBalance.real}
+          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+          baselinePreparedness={baselineHealth?.score ?? 0}
+          preparedness={alternativeHealth?.score ?? 0}
+          canSave={!alternativeScenario.hasErrors}
+          saveMessage={saveMessage}
+          onReturnChange={changeAnnualReturn}
+          onReset={resetExperiment}
+          onSave={saveExperiment}
+        />
+      )}
     </main>
   );
 }
@@ -335,10 +323,7 @@ function createRetirementAgeExperimentInputs(
   baselineInputs: PensionInputs,
   retirementAge: number,
 ): PensionInputs {
-  const nextInputs: PensionInputs = {
-    ...baselineInputs,
-    retirementAge,
-  };
+  const nextInputs: PensionInputs = { ...baselineInputs, retirementAge };
 
   if (
     nextInputs.extraContributionAge !== undefined &&
