@@ -10,6 +10,7 @@ import {
 } from "../components/what-if/ExperimentLauncher";
 import { FeeExperiment } from "../components/what-if/FeeExperiment";
 import { InflationExperiment } from "../components/what-if/InflationExperiment";
+import { MarketDownturnExperiment } from "../components/what-if/MarketDownturnExperiment";
 import { RetirementAgeExperiment } from "../components/what-if/RetirementAgeExperiment";
 import { ReturnExperiment } from "../components/what-if/ReturnExperiment";
 import { SpendingExperiment } from "../components/what-if/SpendingExperiment";
@@ -55,7 +56,8 @@ function WhatIfWorkspace({
   const baselineStateIncluded =
     baselineDrawdown.includeStatePension ?? retirementGoals.includeStatePension;
   const baselineStateAmount =
-    baselineDrawdown.statePensionAnnualAmount ?? retirementGoals.statePensionAnnualAmount;
+    baselineDrawdown.statePensionAnnualAmount ??
+    retirementGoals.statePensionAnnualAmount;
   const baselineStateAge =
     baselineDrawdown.statePensionAge ?? retirementGoals.statePensionAge;
 
@@ -109,6 +111,17 @@ function WhatIfWorkspace({
       activeScenario.inputs.retirementAge - 1,
       activeScenario.inputs.currentAge + 1,
     );
+  const defaultDownturnAge = Math.min(
+    activeScenario.inputs.retirementAge,
+    activeScenario.inputs.currentAge + 5,
+  );
+  const downturnAge =
+    alternativeInputs.marketDownturnAge ?? defaultDownturnAge;
+  const downturnPercentage =
+    alternativeInputs.marketDownturnPercentage ?? 0;
+  const balanceAtDownturn =
+    baselineScenario.projection.years.find((year) => year.age >= downturnAge)
+      ?.closingBalance.real ?? activeScenario.inputs.currentPot;
 
   function selectExperiment(experiment: ExperimentId) {
     setActiveExperiment(experiment);
@@ -243,6 +256,34 @@ function WhatIfWorkspace({
         Math.max(activeScenario.inputs.retirementAge, Math.round(statePensionAge)),
       ),
     }));
+    setSaveMessage(null);
+  }
+
+  function changeDownturnAge(age: number) {
+    setAlternativeInputs((current) => ({
+      ...current,
+      marketDownturnAge: Math.min(
+        current.retirementAge,
+        Math.max(current.currentAge, Math.round(age)),
+      ),
+      marketDownturnPercentage: current.marketDownturnPercentage ?? 0.2,
+    }));
+    setSaveMessage(null);
+  }
+
+  function changeDownturnPercentage(percentage: number) {
+    setAlternativeInputs((current) => {
+      const next = {
+        ...current,
+        marketDownturnAge: current.marketDownturnAge ?? defaultDownturnAge,
+        marketDownturnPercentage: Math.min(0.5, Math.max(0, percentage)),
+      };
+      if (next.marketDownturnPercentage === 0) {
+        delete next.marketDownturnPercentage;
+        delete next.marketDownturnAge;
+      }
+      return next;
+    });
     setSaveMessage(null);
   }
 
@@ -452,6 +493,29 @@ function WhatIfWorkspace({
           onSave={saveExperiment}
         />
       )}
+
+      {activeExperiment === "market-downturn" && (
+        <MarketDownturnExperiment
+          activePlanName={activeScenario.name}
+          currentAge={activeScenario.inputs.currentAge}
+          retirementAge={activeScenario.inputs.retirementAge}
+          downturnAge={downturnAge}
+          downturnPercentage={downturnPercentage}
+          balanceAtDownturn={balanceAtDownturn}
+          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+          projectedPension={alternativeScenario.projection.finalBalance.real}
+          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+          baselinePreparedness={baselineHealth?.score ?? 0}
+          preparedness={alternativeHealth?.score ?? 0}
+          canSave={!alternativeScenario.hasErrors}
+          saveMessage={saveMessage}
+          onAgeChange={changeDownturnAge}
+          onPercentageChange={changeDownturnPercentage}
+          onReset={resetExperiment}
+          onSave={saveExperiment}
+        />
+      )}
     </main>
   );
 }
@@ -466,12 +530,25 @@ function createSuggestedName(
   if (experiment === "contributions") {
     return `Save ${Math.round(inputs.monthlyEmployeeContribution + inputs.monthlyEmployerContribution)} monthly`;
   }
-  if (experiment === "spending") return `Spend ${Math.round(drawdown.desiredAnnualIncome)} yearly`;
-  if (experiment === "fees") return `Fees ${(inputs.annualFee * 100).toFixed(2)} percent`;
-  if (experiment === "returns") return `Return ${(inputs.annualReturn * 100).toFixed(1)} percent`;
-  if (experiment === "inflation") return `Inflation ${(inputs.inflation * 100).toFixed(1)} percent`;
+  if (experiment === "spending") {
+    return `Spend ${Math.round(drawdown.desiredAnnualIncome)} yearly`;
+  }
+  if (experiment === "fees") {
+    return `Fees ${(inputs.annualFee * 100).toFixed(2)} percent`;
+  }
+  if (experiment === "returns") {
+    return `Return ${(inputs.annualReturn * 100).toFixed(1)} percent`;
+  }
+  if (experiment === "inflation") {
+    return `Inflation ${(inputs.inflation * 100).toFixed(1)} percent`;
+  }
   if (experiment === "state-pension") {
-    return stateIncluded ? `State Pension from ${stateAge}` : "Without State Pension";
+    return stateIncluded
+      ? `State Pension from ${stateAge}`
+      : "Without State Pension";
+  }
+  if (experiment === "market-downturn") {
+    return `${Math.round((inputs.marketDownturnPercentage ?? 0) * 100)} percent fall at ${inputs.marketDownturnAge ?? inputs.currentAge}`;
   }
   return `Retire at ${inputs.retirementAge}`;
 }
@@ -487,6 +564,12 @@ function createRetirementAgeExperimentInputs(
   ) {
     delete nextInputs.extraContributionAge;
     delete nextInputs.extraMonthlyContribution;
+  }
+  if (
+    nextInputs.marketDownturnAge !== undefined &&
+    nextInputs.marketDownturnAge > retirementAge
+  ) {
+    nextInputs.marketDownturnAge = retirementAge;
   }
   return nextInputs;
 }
