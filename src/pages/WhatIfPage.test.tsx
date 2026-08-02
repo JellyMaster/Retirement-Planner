@@ -132,7 +132,7 @@ describe("WhatIfPage", () => {
         name: /retiring 2 years earlier means stopping work at age 63/i,
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("-£100,000")).toBeInTheDocument();
+    expect(screen.getAllByText("-£100,000")).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
   });
 
