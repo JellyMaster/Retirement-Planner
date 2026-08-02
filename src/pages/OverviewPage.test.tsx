@@ -203,7 +203,7 @@ describe("OverviewPage", () => {
     expect(screen.getByText(/£1,300 each month/)).toBeInTheDocument();
   });
 
-  it("guides the user to complete an incomplete plan", () => {
+  it("guides the user when an incomplete plan still has a structural projection", () => {
     mockActiveScenario(
       createScenario(
         "Baseline Plan",
@@ -227,9 +227,13 @@ describe("OverviewPage", () => {
     expect(
       screen.getByText("No regular employee or employer contributions have been added."),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Complete My Plan" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Open My Plan" })).toHaveAttribute(
       "href",
       "/plan",
+    );
+    expect(screen.getByRole("link", { name: "Explore a What If?" })).toHaveAttribute(
+      "href",
+      "/what-if",
     );
   });
 
