@@ -1,6 +1,12 @@
 export type IncomeTargetMode = "gross" | "net";
 export type WithdrawalStrategy = "target-income" | "percentage";
 
+export interface DrawdownSpendingPhase {
+  startAge: number;
+  annualIncome: number;
+  label: string;
+}
+
 export interface DrawdownInputs {
   startingBalance: number;
   retirementAge: number;
@@ -9,6 +15,7 @@ export interface DrawdownInputs {
   withdrawalRate: number;
   desiredAnnualIncome: number;
   incomeTargetMode: IncomeTargetMode;
+  spendingPhases?: DrawdownSpendingPhase[];
   annualStatePension: number;
   statePensionAge: number;
   annualReturn: number;
