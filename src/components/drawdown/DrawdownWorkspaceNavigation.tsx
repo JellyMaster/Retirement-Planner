@@ -1,11 +1,4 @@
 import type { KeyboardEvent } from "react";
-import {
-  BarChart3,
-  ClipboardList,
-  Landmark,
-  LayoutDashboard,
-  ReceiptText,
-} from "lucide-react";
 
 export type DrawdownWorkspaceSection =
   | "overview"
@@ -22,39 +15,12 @@ interface DrawdownWorkspaceNavigationProps {
 const sections: Array<{
   id: DrawdownWorkspaceSection;
   label: string;
-  shortLabel: string;
-  icon: typeof LayoutDashboard;
 }> = [
-  {
-    id: "overview",
-    label: "Overview",
-    shortLabel: "Outcome",
-    icon: LayoutDashboard,
-  },
-  {
-    id: "income",
-    label: "Income & tax",
-    shortLabel: "Income",
-    icon: ReceiptText,
-  },
-  {
-    id: "balance",
-    label: "Pension balance",
-    shortLabel: "Balance",
-    icon: BarChart3,
-  },
-  {
-    id: "details",
-    label: "Year-by-year",
-    shortLabel: "Details",
-    icon: ClipboardList,
-  },
-  {
-    id: "assumptions",
-    label: "Assumptions",
-    shortLabel: "Basis",
-    icon: Landmark,
-  },
+  { id: "overview", label: "Overview" },
+  { id: "income", label: "Income & tax" },
+  { id: "balance", label: "Pension balance" },
+  { id: "details", label: "Year-by-year" },
+  { id: "assumptions", label: "Assumptions" },
 ];
 
 export function DrawdownWorkspaceNavigation({
@@ -97,7 +63,6 @@ export function DrawdownWorkspaceNavigation({
       aria-label="Drawdown analysis"
     >
       {sections.map((section, index) => {
-        const Icon = section.icon;
         const active = value === section.id;
 
         return (
@@ -117,15 +82,7 @@ export function DrawdownWorkspaceNavigation({
             onClick={() => onChange(section.id)}
             onKeyDown={(event) => handleKeyDown(event, index)}
           >
-            <span className="drawdown-workspace-nav-marker" aria-hidden="true">
-              {index + 1}
-            </span>
-            <span className="drawdown-workspace-nav-copy">
-              <small>View {index + 1}</small>
-              <strong>{section.shortLabel}</strong>
-            </span>
-            <Icon className="drawdown-workspace-nav-icon" size={17} aria-hidden="true" />
-            <span className="visually-hidden">{section.label}</span>
+            {section.label}
           </button>
         );
       })}
