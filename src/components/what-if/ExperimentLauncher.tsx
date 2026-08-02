@@ -72,7 +72,7 @@ const experiments = [
     title: "Market downturn",
     description: "Stress-test the plan against a difficult market period.",
     icon: AppIcons.warning,
-    available: false,
+    available: true,
   },
 ];
 
