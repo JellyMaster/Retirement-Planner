@@ -17,7 +17,7 @@ const sections: Array<{
   label: string;
 }> = [
   { id: "overview", label: "Overview" },
-  { id: "income", label: "Income & tax" },
+  { id: "income", label: "Income" },
   { id: "balance", label: "Pension balance" },
   { id: "details", label: "Year-by-year" },
   { id: "assumptions", label: "Assumptions" },
