@@ -12,8 +12,8 @@ import { AppIcons, type AppIcon } from "./icons";
 import { CompareScenariosPage } from "./pages/CompareScenariosPage";
 import { DrawdownPlannerPage } from "./pages/DrawdownPlannerPage";
 import { ExplorePage } from "./pages/ExplorePage";
+import { GuidancePage } from "./pages/GuidancePage";
 import { OverviewPage } from "./pages/OverviewPage";
-import { PolarisSectionPage } from "./pages/PolarisSectionPage";
 import { RetirementPlannerPage } from "./pages/RetirementPlannerPage";
 import { WhatIfPage } from "./pages/WhatIfPage";
 
@@ -115,14 +115,7 @@ function AppContent() {
           />
           <Route
             path="/guidance"
-            element={
-              <PolarisSectionPage
-                eyebrow="Guidance"
-                title="Know what to do next"
-                description="Bring together recommendations, risks, quick wins and personalised coaching based on your current plan."
-                primaryAction={{ label: "View my overview", to: "/" }}
-              />
-            }
+            element={<GuidancePage key={activeScenarioId} />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
