@@ -44,10 +44,10 @@ describe("RetirementPlannerPage", () => {
     );
     expect(
       screen.getByRole("link", { name: "Explore a What If?" }),
-    ).toHaveAttribute("href", "/what-if");
+    ).toHaveAttribute("href", "/what-if?experiment=retirement-age");
     expect(screen.getByRole("link", { name: "Review drawdown" })).toHaveAttribute(
       "href",
-      "/drawdown",
+      "/drawdown?tab=overview",
     );
 
     expect(
