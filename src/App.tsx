@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
 
+import { ConnectedJourneyLinks } from "./components/navigation/ConnectedJourneyLinks";
 import { DeepLinkedPage } from "./components/navigation/DeepLinkedPage";
 import {
   ActiveScenarioSwitcher,
@@ -53,6 +54,7 @@ function AppContent() {
   return (
     <div className="app-shell">
       <SkipLink />
+      <ConnectedJourneyLinks />
 
       <header className="app-header">
         <div className="app-header-inner">
