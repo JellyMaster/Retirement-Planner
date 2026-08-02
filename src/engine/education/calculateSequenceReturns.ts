@@ -18,7 +18,7 @@ export interface SequenceReturnsYear {
 }
 
 export interface SequenceReturnsJourney {
-  label: "early-loss" | "late-loss";
+  label: "early-loss" | "mid-loss" | "late-loss";
   returns: number[];
   years: SequenceReturnsYear[];
   endingBalance: number;
@@ -30,8 +30,10 @@ export interface SequenceReturnsJourney {
 
 export interface SequenceReturnsComparison {
   earlyLoss: SequenceReturnsJourney;
+  midLoss: SequenceReturnsJourney;
   lateLoss: SequenceReturnsJourney;
   endingBalanceDifference: number;
+  midEndingBalanceDifference: number;
 }
 
 export function calculateSequenceReturns(
@@ -44,8 +46,14 @@ export function calculateSequenceReturns(
     { length: durationYears },
     (_, index) => (index === 0 ? shock : normalReturn),
   );
+  const middleIndex = Math.floor((durationYears - 1) / 2);
 
   const earlyLoss = simulateJourney("early-loss", sharedReturns, input);
+  const midLoss = simulateJourney(
+    "mid-loss",
+    moveShockToIndex(sharedReturns, middleIndex),
+    input,
+  );
   const lateLoss = simulateJourney(
     "late-loss",
     [...sharedReturns].reverse(),
@@ -54,10 +62,22 @@ export function calculateSequenceReturns(
 
   return {
     earlyLoss,
+    midLoss,
     lateLoss,
     endingBalanceDifference:
       lateLoss.endingBalance - earlyLoss.endingBalance,
+    midEndingBalanceDifference:
+      midLoss.endingBalance - earlyLoss.endingBalance,
   };
+}
+
+function moveShockToIndex(returns: number[], targetIndex: number): number[] {
+  if (returns.length === 0) return [];
+
+  const [shock, ...normalReturns] = returns;
+  const reordered = [...normalReturns];
+  reordered.splice(Math.min(targetIndex, reordered.length), 0, shock);
+  return reordered;
 }
 
 function simulateJourney(
