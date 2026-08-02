@@ -7,5 +7,5 @@ export { ScenarioGrowthChart } from "./ScenarioGrowthChart";
 export { ScenarioInsights } from "./ScenarioInsights";
 export { ScenarioIntelligencePanel } from "./ScenarioIntelligencePanel";
 export { ScenarioProvider } from "./ScenarioProvider";
-export { useScenarios } from "./ScenarioContext";
+export { useOptionalScenarios, useScenarios } from "./ScenarioContext";
 export type { ScenarioContextValue } from "./ScenarioContext";
