@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { SequenceReturnsLesson } from "../components/explore/SequenceReturnsLesson";
 import { useScenarios } from "../components/scenarios";
@@ -19,6 +20,7 @@ interface ExploreCard {
 
 export function ExplorePage() {
   const { activeScenario } = useScenarios();
+  const [searchParams] = useSearchParams();
   const [retirementGoals] = useStoredRetirementGoals();
   const projection = usePensionProjection(activeScenario.inputs);
   const inputs = activeScenario.inputs;
@@ -36,6 +38,20 @@ export function ExplorePage() {
     (drawdown?.planningAge ?? 95) - inputs.retirementAge,
   );
 
+  useEffect(() => {
+    if (searchParams.get("lesson") !== "sequence-returns") return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const heading = document.getElementById("sequence-returns-title");
+      if (!heading) return;
+      heading.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1");
+      heading.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [searchParams]);
+
   const personalisedInsights: ExploreCard[] = [
     {
       title: "Why retirement timing matters",
@@ -44,7 +60,7 @@ export function ExplorePage() {
       insight: `${yearsToRetirement} years remain until retirement at age ${inputs.retirementAge}.`,
       icon: AppIcons.retirement,
       actionLabel: "Explore retirement age",
-      to: "/what-if",
+      to: "/what-if?experiment=retirement-age",
     },
     {
       title: "What your monthly saving could build",
@@ -53,7 +69,7 @@ export function ExplorePage() {
       insight: `${formatCurrency(monthlySaving)} is currently added each month.`,
       icon: AppIcons.pension,
       actionLabel: "Explore saving more",
-      to: "/what-if",
+      to: "/what-if?experiment=contributions",
     },
     {
       title: "Why pension fees compound",
@@ -62,7 +78,7 @@ export function ExplorePage() {
       insight: `The active plan uses an annual fee of ${formatPercentage(inputs.annualFee)}.`,
       icon: AppIcons.fees,
       actionLabel: "Explore lower fees",
-      to: "/what-if",
+      to: "/what-if?experiment=fees",
     },
     {
       title: "How State Pension supports income",
@@ -73,7 +89,7 @@ export function ExplorePage() {
         : "State Pension is not currently included in the plan.",
       icon: AppIcons.pension,
       actionLabel: "Explore State Pension",
-      to: "/what-if",
+      to: "/what-if?experiment=state-pension",
     },
   ];
 
@@ -85,7 +101,7 @@ export function ExplorePage() {
       insight: `The active plan currently projects ${formatCurrency(projectedPension)} at retirement.`,
       icon: AppIcons.warning,
       actionLabel: "Open market downturn",
-      to: "/what-if",
+      to: "/what-if?experiment=market-downturn",
     },
     {
       title: "Higher inflation",
@@ -94,7 +110,7 @@ export function ExplorePage() {
       insight: `The active plan assumes ${formatPercentage(inputs.inflation)} annual inflation.`,
       icon: AppIcons.money,
       actionLabel: "Explore inflation",
-      to: "/what-if",
+      to: "/what-if?experiment=inflation",
     },
     {
       title: "Living longer than planned",
@@ -103,7 +119,7 @@ export function ExplorePage() {
       insight: `The income plan currently runs to age ${drawdown?.planningAge ?? 95}.`,
       icon: AppIcons.health,
       actionLabel: "Review Drawdown",
-      to: "/drawdown",
+      to: "/drawdown?tab=overview",
     },
   ];
 
@@ -218,8 +234,8 @@ export function ExplorePage() {
           </p>
         </div>
         <div>
-          <Link className="primary-button" to="/what-if">Open What If?</Link>
-          <Link className="secondary-button" to="/drawdown">Review Drawdown</Link>
+          <Link className="primary-button" to="/what-if?experiment=retirement-age">Open What If?</Link>
+          <Link className="secondary-button" to="/drawdown?tab=overview">Review Drawdown</Link>
         </div>
       </section>
     </main>
