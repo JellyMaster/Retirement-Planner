@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
 
+import { DeepLinkedPage } from "./components/navigation/DeepLinkedPage";
 import {
   ActiveScenarioSwitcher,
   ScenarioProvider,
@@ -98,20 +99,36 @@ function AppContent() {
           <Route path="/" element={<OverviewPage />} />
           <Route
             path="/plan"
-            element={<RetirementPlannerPage key={activeScenarioId} />}
+            element={
+              <DeepLinkedPage kind="plan">
+                <RetirementPlannerPage key={activeScenarioId} />
+              </DeepLinkedPage>
+            }
           />
           <Route
             path="/what-if"
-            element={<WhatIfPage key={activeScenarioId} />}
+            element={
+              <DeepLinkedPage kind="what-if">
+                <WhatIfPage key={activeScenarioId} />
+              </DeepLinkedPage>
+            }
           />
           <Route path="/compare" element={<CompareScenariosPage />} />
           <Route
             path="/drawdown"
-            element={<DrawdownPlannerPage key={activeScenarioId} />}
+            element={
+              <DeepLinkedPage kind="drawdown">
+                <DrawdownPlannerPage key={activeScenarioId} />
+              </DeepLinkedPage>
+            }
           />
           <Route
             path="/explore"
-            element={<ExplorePage key={activeScenarioId} />}
+            element={
+              <DeepLinkedPage kind="explore">
+                <ExplorePage key={activeScenarioId} />
+              </DeepLinkedPage>
+            }
           />
           <Route
             path="/guidance"
