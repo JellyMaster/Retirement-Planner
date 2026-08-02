@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
 import { useScenarios } from "../components/scenarios";
+import { ContributionExperiment } from "../components/what-if/ContributionExperiment";
 import {
   ExperimentLauncher,
   type ExperimentId,
@@ -59,11 +60,62 @@ function WhatIfWorkspace({
   const planningAge =
     activeScenario.drawdown?.planningAge ??
     createDefaultScenarioDrawdownPreferences().planningAge;
+  const baselineExtraContribution =
+    activeScenario.inputs.extraMonthlyContribution ?? 0;
+  const baselineExtraContributionAge =
+    activeScenario.inputs.extraContributionAge ?? activeScenario.inputs.currentAge;
+
+  function selectExperiment(experiment: ExperimentId) {
+    setActiveExperiment(experiment);
+    setAlternativeInputs({ ...activeScenario.inputs });
+    setSaveMessage(null);
+  }
 
   function changeRetirementAge(retirementAge: number) {
     setAlternativeInputs(
       createRetirementAgeExperimentInputs(activeScenario.inputs, retirementAge),
     );
+    setSaveMessage(null);
+  }
+
+  function changeEmployeeContribution(amount: number) {
+    setAlternativeInputs((current) => ({
+      ...current,
+      monthlyEmployeeContribution: amount,
+    }));
+    setSaveMessage(null);
+  }
+
+  function changeExtraContributionEnabled(enabled: boolean) {
+    setAlternativeInputs((current) => {
+      const next = { ...current };
+      if (!enabled) {
+        delete next.extraContributionAge;
+        delete next.extraMonthlyContribution;
+        return next;
+      }
+
+      next.extraContributionAge = Math.min(
+        baselineExtraContributionAge,
+        Math.max(next.currentAge, next.retirementAge - 1),
+      );
+      next.extraMonthlyContribution = baselineExtraContribution || 250;
+      return next;
+    });
+    setSaveMessage(null);
+  }
+
+  function changeExtraContribution(amount: number) {
+    setAlternativeInputs((current) => ({
+      ...current,
+      extraContributionAge:
+        current.extraContributionAge ??
+        Math.min(
+          baselineExtraContributionAge,
+          Math.max(current.currentAge, current.retirementAge - 1),
+        ),
+      extraMonthlyContribution: amount,
+    }));
     setSaveMessage(null);
   }
 
@@ -75,7 +127,10 @@ function WhatIfWorkspace({
   function saveExperiment() {
     if (alternativeScenario.hasErrors) return;
 
-    const suggestedName = `Retire at ${alternativeInputs.retirementAge}`;
+    const suggestedName =
+      activeExperiment === "contributions"
+        ? `Save ${Math.round(alternativeInputs.monthlyEmployeeContribution)} monthly`
+        : `Retire at ${alternativeInputs.retirementAge}`;
     const name = window.prompt("Name this scenario", suggestedName)?.trim();
     if (!name) return;
 
@@ -109,7 +164,7 @@ function WhatIfWorkspace({
 
       <ExperimentLauncher
         activeExperiment={activeExperiment}
-        onSelect={setActiveExperiment}
+        onSelect={selectExperiment}
       />
 
       {activeExperiment === "retirement-age" && (
@@ -133,6 +188,41 @@ function WhatIfWorkspace({
           onSave={saveExperiment}
         />
       )}
+
+      {activeExperiment === "contributions" && (
+        <ContributionExperiment
+          activePlanName={activeScenario.name}
+          currentAge={activeScenario.inputs.currentAge}
+          retirementAge={activeScenario.inputs.retirementAge}
+          baselineEmployeeContribution={
+            activeScenario.inputs.monthlyEmployeeContribution
+          }
+          employeeContribution={alternativeInputs.monthlyEmployeeContribution}
+          employerContribution={activeScenario.inputs.monthlyEmployerContribution}
+          baselineExtraContribution={baselineExtraContribution}
+          extraContribution={alternativeInputs.extraMonthlyContribution ?? baselineExtraContribution || 250}
+          extraContributionAge={
+            alternativeInputs.extraContributionAge ?? baselineExtraContributionAge
+          }
+          includeExtraContribution={
+            alternativeInputs.extraContributionAge !== undefined &&
+            alternativeInputs.extraMonthlyContribution !== undefined
+          }
+          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+          projectedPension={alternativeScenario.projection.finalBalance.real}
+          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+          baselinePreparedness={baselineHealth?.score ?? 0}
+          preparedness={alternativeHealth?.score ?? 0}
+          canSave={!alternativeScenario.hasErrors}
+          saveMessage={saveMessage}
+          onEmployeeContributionChange={changeEmployeeContribution}
+          onExtraContributionEnabledChange={changeExtraContributionEnabled}
+          onExtraContributionChange={changeExtraContribution}
+          onReset={resetExperiment}
+          onSave={saveExperiment}
+        />
+      )}
     </main>
   );
 }
@@ -146,9 +236,6 @@ function createRetirementAgeExperimentInputs(
     retirementAge,
   };
 
-  // A saved future contribution increase cannot occur on or after the
-  // experimental retirement date. Exclude it from this temporary alternative
-  // rather than invalidating the retirement-age projection.
   if (
     nextInputs.extraContributionAge !== undefined &&
     nextInputs.extraContributionAge >= retirementAge
