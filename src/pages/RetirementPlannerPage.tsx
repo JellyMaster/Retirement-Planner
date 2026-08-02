@@ -248,10 +248,7 @@ export function RetirementPlannerPage() {
     setComparisonInputs(createDefaultPensionInputs());
   }
 
-  function enableComparison() {
-    setComparisonInputs({ ...effectiveInputs });
-    setComparisonEnabled(true);
-  }
+ 
 
   function applyRecommendationToComparison(recommendedInputs: PensionInputs) {
     setComparisonInputs({ ...recommendedInputs });
@@ -524,21 +521,7 @@ export function RetirementPlannerPage() {
             plan visible.
           </p>
         </div>
-        <button
-          type="button"
-          className={
-            comparisonEnabled
-              ? "comparison-toggle-button comparison-toggle-button-active"
-              : "comparison-toggle-button"
-          }
-          onClick={() =>
-            comparisonEnabled
-              ? setComparisonEnabled(false)
-              : enableComparison()
-          }
-        >
-          {comparisonEnabled ? "Stop comparing" : "Compare scenario"}
-        </button>
+      
       </header>
 
       <section

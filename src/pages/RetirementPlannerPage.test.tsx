@@ -114,26 +114,5 @@ describe("RetirementPlannerPage", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("copies the current scenario when comparison is enabled", async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<RetirementPlannerPage />);
-
-    const currentAgeInput = screen.getByRole("spinbutton", {
-      name: /current age/i,
-    });
-    await user.clear(currentAgeInput);
-    await user.type(currentAgeInput, "52");
-
-    await user.click(
-      screen.getByRole("button", { name: /compare scenario/i }),
-    );
-
-    expect(document.getElementById("current-currentAge")).toHaveValue(52);
-
-    await user.click(
-      screen.getByRole("tab", { name: /comparison plan/i }),
-    );
-
-    expect(document.getElementById("comparison-currentAge")).toHaveValue(52);
-  });
+ 
 });
