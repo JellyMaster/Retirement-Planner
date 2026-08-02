@@ -47,8 +47,9 @@ export function ScenarioSpendingPhaseFields({
       phaseIndex === index
         ? {
             ...phase,
-            [field]: nextValue ??
-              (field === "startAge" ? phase.startAge : phase.annualIncome),
+            [field]:
+              nextValue ??
+              (field === "startAge" ? phase.startAge : 0),
           }
         : phase,
     );
