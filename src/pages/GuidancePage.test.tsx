@@ -41,9 +41,9 @@ describe("GuidancePage", () => {
 
     expect(
       screen.getByRole("link", { name: "Open the interactive lesson" }),
-    ).toHaveAttribute("href", "/explore");
+    ).toHaveAttribute("href", "/explore?lesson=sequence-returns");
     expect(
       screen.getAllByRole("link", { name: "Review My Plan" })[0],
-    ).toHaveAttribute("href", "/plan");
+    ).toHaveAttribute("href", "/plan?step=income&section=income-target");
   });
 });
