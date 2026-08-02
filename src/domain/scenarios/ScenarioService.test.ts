@@ -107,6 +107,41 @@ describe("ScenarioService", () => {
     ).toBe(1_500);
   });
 
+  it("updates pension and drawdown settings together", () => {
+    const { service } = createService();
+    const scenario = service.createScenario("Income Plan");
+    const inputs = {
+      ...scenario.inputs,
+      retirementAge: 65,
+    };
+    const drawdown = {
+      planningAge: 100,
+      withdrawalStrategy: "percentage" as const,
+      withdrawalRate: 0.035,
+      desiredAnnualIncome: 36_000,
+      incomeTargetMode: "gross" as const,
+      taxFreeCash: 40_000,
+    };
+
+    const updated = service.updateScenarioPlan(
+      scenario.id,
+      inputs,
+      drawdown,
+    );
+    inputs.retirementAge = 70;
+    drawdown.taxFreeCash = 0;
+
+    expect(updated.inputs.retirementAge).toBe(65);
+    expect(updated.drawdown).toEqual(
+      expect.objectContaining({
+        planningAge: 100,
+        withdrawalStrategy: "percentage",
+        taxFreeCash: 40_000,
+      }),
+    );
+    expect(service.getActiveScenario().drawdown?.taxFreeCash).toBe(40_000);
+  });
+
   it("switches the active scenario", () => {
     const { service } = createService();
     const scenario = service.createScenario("Early Retirement");
@@ -142,8 +177,12 @@ describe("ScenarioService", () => {
     const state = service.getState();
     state.scenarios[0].name = "Mutated";
     state.scenarios[0].inputs.currentPot = 999;
+    if (state.scenarios[0].drawdown) {
+      state.scenarios[0].drawdown.taxFreeCash = 999;
+    }
 
     expect(service.getActiveScenario().name).toBe("Baseline Plan");
     expect(service.getActiveScenario().inputs.currentPot).toBe(0);
+    expect(service.getActiveScenario().drawdown?.taxFreeCash).toBe(0);
   });
 });
