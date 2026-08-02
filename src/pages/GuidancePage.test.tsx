@@ -43,7 +43,7 @@ describe("GuidancePage", () => {
       screen.getByRole("link", { name: "Open the interactive lesson" }),
     ).toHaveAttribute("href", "/explore");
     expect(
-      screen.getByRole("link", { name: "Review My Plan" }),
+      screen.getAllByRole("link", { name: "Review My Plan" })[0],
     ).toHaveAttribute("href", "/plan");
   });
 });
