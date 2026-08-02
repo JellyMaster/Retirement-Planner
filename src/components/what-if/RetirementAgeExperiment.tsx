@@ -6,6 +6,7 @@ import { formatCurrency } from "../../utils/formatters";
 interface RetirementAgeExperimentProps {
   activePlanName: string;
   currentAge: number;
+  statePensionAge: number;
   baselineRetirementAge: number;
   retirementAge: number;
   planningAge: number;
@@ -25,6 +26,7 @@ interface RetirementAgeExperimentProps {
 export function RetirementAgeExperiment({
   activePlanName,
   currentAge,
+  statePensionAge,
   baselineRetirementAge,
   retirementAge,
   planningAge,
@@ -46,8 +48,8 @@ export function RetirementAgeExperiment({
   const preparednessDifference = preparedness - baselinePreparedness;
   const retirementYearsDifference = baselineRetirementAge - retirementAge;
   const hasChanged = ageDifference !== 0;
-  const minAge = Math.max(currentAge + 1, baselineRetirementAge - 10);
-  const maxAge = Math.min(100, baselineRetirementAge + 10);
+  const minAge = currentAge;
+  const maxAge = Math.max(minAge, Math.min(100, statePensionAge + 5));
 
   const story = createRetirementAgeStory({
     activePlanName,
@@ -89,15 +91,15 @@ export function RetirementAgeExperiment({
             min={minAge}
             max={maxAge}
             step={1}
-            value={retirementAge}
+            value={Math.min(maxAge, Math.max(minAge, retirementAge))}
             aria-label="Experimental retirement age"
             aria-valuetext={`Age ${retirementAge}`}
             onChange={(event) => onRetirementAgeChange(Number(event.target.value))}
           />
           <div className="what-if-slider-labels" aria-hidden="true">
-            <span>Age {minAge}</span>
-            <span>Age {baselineRetirementAge}</span>
-            <span>Age {maxAge}</span>
+            <span>Current age {minAge}</span>
+            <span>Saved plan {baselineRetirementAge}</span>
+            <span>State Pension + 5 · age {maxAge}</span>
           </div>
         </div>
       </div>
