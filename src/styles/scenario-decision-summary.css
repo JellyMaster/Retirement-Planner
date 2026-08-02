@@ -8,6 +8,11 @@
   box-shadow: var(--shadow-panel);
 }
 
+.scenario-detailed-comparison {
+  display: grid;
+  gap: var(--space-4);
+}
+
 .scenario-decision-summary-header {
   display: flex;
   align-items: flex-start;
@@ -21,7 +26,8 @@
 
 .scenario-decision-summary-header h2,
 .scenario-tradeoffs h3,
-.scenario-tradeoff-card h4 {
+.scenario-tradeoff-card h4,
+.scenario-detailed-comparison h2 {
   margin: 0;
 }
 
@@ -177,10 +183,7 @@
 }
 
 @media (max-width: 1000px) {
-  .scenario-ranking-grid {
-    grid-template-columns: 1fr;
-  }
-
+  .scenario-ranking-grid,
   .scenario-tradeoff-grid {
     grid-template-columns: 1fr;
   }
