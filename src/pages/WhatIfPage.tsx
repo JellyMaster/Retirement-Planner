@@ -113,12 +113,11 @@ function WhatIfWorkspace({
         <RetirementAgeExperiment
           activePlanName={activeScenario.name}
           currentAge={activeScenario.inputs.currentAge}
+          statePensionAge={retirementGoals.statePensionAge}
           baselineRetirementAge={activeScenario.inputs.retirementAge}
           retirementAge={alternativeInputs.retirementAge}
           planningAge={planningAge}
-          baselineProjectedPension={
-            baselineScenario.projection.finalBalance.real
-          }
+          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
           projectedPension={alternativeScenario.projection.finalBalance.real}
           baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
           annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
