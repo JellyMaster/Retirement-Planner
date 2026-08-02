@@ -17,7 +17,7 @@ function renderPage() {
 }
 
 describe("ExplorePage", () => {
-  it("presents personalised learning, risk demonstrations and essentials", async () => {
+  it("presents personalised learning, the live risk lesson and essentials", async () => {
     const user = userEvent.setup();
     renderPage();
 
@@ -30,15 +30,22 @@ describe("ExplorePage", () => {
       screen.getByRole("heading", { name: "Topics worth understanding now" }),
     ).toBeInTheDocument();
     expect(
+      screen.getByRole("heading", {
+        name: "Same returns. Different retirement outcome.",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("slider", { name: "One-year market fall" }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole("heading", { name: "Demonstrate what averages can hide" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Next to build")).toBeInTheDocument();
 
     expect(
       screen.getByRole("link", { name: "Explore retirement age" }),
     ).toHaveAttribute("href", "/what-if");
     expect(
-      screen.getByRole("link", { name: "Review drawdown" }),
+      screen.getByRole("link", { name: "Review Drawdown" }),
     ).toHaveAttribute("href", "/drawdown");
 
     await user.click(screen.getByText("Gross versus net income"));
