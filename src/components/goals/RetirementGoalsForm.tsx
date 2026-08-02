@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import type { RetirementGoals } from "../../engine/models/RetirementGoals";
+import { useStoredRetirementGoals } from "../../hooks/useStoredRetirementGoals";
 import { AppIcons } from "../../icons";
 import { saveRetirementGoals } from "../../state/retirementGoalsStorage";
 import { formatCurrency } from "../../utils/formatters";
@@ -22,7 +23,14 @@ export function RetirementGoalsForm({
   collapsible = false,
   defaultExpanded = false,
 }: RetirementGoalsFormProps) {
+  const [storedGoals] = useStoredRetirementGoals();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded || !collapsible);
+  const isLegacyMyPlanEditor = compact && collapsible;
+
+  useEffect(() => {
+    if (!isLegacyMyPlanEditor) return;
+    onChange({ ...storedGoals });
+  }, [isLegacyMyPlanEditor, onChange, storedGoals]);
 
   function update<K extends keyof RetirementGoals>(
     key: K,
@@ -31,6 +39,10 @@ export function RetirementGoalsForm({
     const nextGoals = { ...value, [key]: nextValue };
     saveRetirementGoals(nextGoals);
     onChange(nextGoals);
+  }
+
+  if (isLegacyMyPlanEditor) {
+    return null;
   }
 
   const className = [
