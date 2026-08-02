@@ -1,5 +1,13 @@
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  NavLink,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 
 import { TabKeyboardNavigation } from "./components/navigation/TabKeyboardNavigation";
 import {
@@ -49,6 +57,23 @@ export default function App() {
 
 function AppContent() {
   const { activeScenarioId } = useScenarios();
+  const location = useLocation();
+  const [isNavigationOpen, setIsNavigationOpen] = useState(false);
+
+  useEffect(() => {
+    setIsNavigationOpen(false);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    if (!isNavigationOpen) return;
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsNavigationOpen(false);
+    }
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isNavigationOpen]);
 
   return (
     <div className="app-shell">
@@ -68,25 +93,50 @@ function AppContent() {
             </span>
           </NavLink>
 
-          <nav className="app-navigation" aria-label="Primary navigation">
-            {navigationItems.map(({ to, label, icon, end }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                className={({ isActive }) =>
-                  isActive ? "nav-link nav-link-active" : "nav-link"
-                }
-              >
-                <span className="nav-link-icon" aria-hidden="true">
-                  <FontAwesomeIcon icon={icon} fixedWidth />
-                </span>
-                <span>{label}</span>
-              </NavLink>
-            ))}
+          <button
+            type="button"
+            className="app-navigation-toggle"
+            aria-expanded={isNavigationOpen}
+            aria-controls="primary-navigation"
+            aria-label={isNavigationOpen ? "Close navigation" : "Open navigation"}
+            onClick={() => setIsNavigationOpen((current) => !current)}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
 
-            <span className="app-navigation-divider" aria-hidden="true" />
-            <ActiveScenarioSwitcher />
+          <nav
+            id="primary-navigation"
+            className={
+              isNavigationOpen
+                ? "app-navigation app-navigation-open"
+                : "app-navigation"
+            }
+            aria-label="Primary navigation"
+          >
+            <div className="app-navigation-links">
+              {navigationItems.map(({ to, label, icon, end }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={end}
+                  className={({ isActive }) =>
+                    isActive ? "nav-link nav-link-active" : "nav-link"
+                  }
+                >
+                  <span className="nav-link-icon" aria-hidden="true">
+                    <FontAwesomeIcon icon={icon} fixedWidth />
+                  </span>
+                  <span>{label}</span>
+                </NavLink>
+              ))}
+            </div>
+
+            <div className="app-navigation-plan">
+              <span className="app-navigation-divider" aria-hidden="true" />
+              <ActiveScenarioSwitcher />
+            </div>
           </nav>
 
           <div className="app-header-actions">
@@ -94,6 +144,15 @@ function AppContent() {
           </div>
         </div>
       </header>
+
+      {isNavigationOpen && (
+        <button
+          type="button"
+          className="app-navigation-backdrop"
+          aria-label="Close navigation"
+          onClick={() => setIsNavigationOpen(false)}
+        />
+      )}
 
       <div id="app-main-content" className="app-main-content" tabIndex={-1}>
         <Routes>
