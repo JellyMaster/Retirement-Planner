@@ -4,22 +4,18 @@
 }
 
 .scenario-income-section-nav {
-  position: sticky;
-  z-index: 2;
-  top: -1px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--ui-space-2);
-  padding: var(--ui-space-3);
+  padding: var(--ui-space-2);
   border: 1px solid var(--colour-border);
   border-radius: var(--ui-radius-control);
   background: color-mix(in srgb, var(--colour-surface) 94%, var(--colour-primary));
-  box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 8%);
 }
 
 .scenario-income-section-nav button {
-  min-height: 2.5rem;
-  padding: 0.55rem 0.7rem;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.75rem;
   border: 1px solid transparent;
   border-radius: var(--ui-radius-control);
   background: transparent;
@@ -30,11 +26,16 @@
   font-weight: 800;
 }
 
-.scenario-income-section-nav button:hover,
-.scenario-income-section-nav button:focus-visible {
+.scenario-income-section-nav button:hover {
+  color: var(--colour-text);
+}
+
+.scenario-income-section-nav button.is-active,
+.scenario-income-section-nav button[aria-selected="true"] {
   border-color: var(--colour-primary);
   background: var(--colour-surface);
   color: var(--colour-primary);
+  box-shadow: 0 0.25rem 0.8rem rgb(0 0 0 / 8%);
 }
 
 .scenario-income-section-nav button:focus-visible {
@@ -42,20 +43,31 @@
   outline-offset: 1px;
 }
 
-.scenario-retirement-income-editor > .scenario-edit-subsection {
-  scroll-margin-top: 5rem;
+.scenario-income-panel-shell {
+  min-height: 24rem;
+}
+
+.scenario-income-panel-shell > .scenario-edit-subsection {
+  display: grid;
+  gap: var(--ui-space-4);
+  min-height: 24rem;
   padding: var(--ui-space-5);
   border: 1px solid var(--colour-border);
   border-radius: var(--ui-radius-control);
   background: var(--colour-surface-secondary);
+  animation: scenario-income-panel-in var(--ui-duration-fast) var(--ui-ease-standard);
 }
 
-.scenario-retirement-income-editor > .scenario-edit-subsection > div:first-child h3,
-.scenario-retirement-income-editor > .scenario-edit-subsection > div:first-child p {
+.scenario-income-panel-shell > .scenario-edit-subsection:focus {
+  outline: none;
+}
+
+.scenario-income-panel-shell > .scenario-edit-subsection > div:first-child h3,
+.scenario-income-panel-shell > .scenario-edit-subsection > div:first-child p {
   margin: 0;
 }
 
-.scenario-retirement-income-editor > .scenario-edit-subsection > div:first-child p {
+.scenario-income-panel-shell > .scenario-edit-subsection > div:first-child p {
   margin-top: var(--ui-space-2);
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-sm);
@@ -77,10 +89,42 @@
   margin-top: var(--ui-space-4);
 }
 
+.scenario-income-panel-actions {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--ui-space-3);
+  padding-top: var(--ui-space-2);
+  border-top: 1px solid var(--colour-border);
+}
+
+.scenario-income-panel-actions > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  text-align: center;
+}
+
+@keyframes scenario-income-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 52rem) {
   .scenario-income-section-nav {
-    position: static;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scenario-income-panel-shell,
+  .scenario-income-panel-shell > .scenario-edit-subsection {
+    min-height: 0;
   }
 }
 
@@ -89,7 +133,22 @@
     grid-template-columns: 1fr;
   }
 
-  .scenario-retirement-income-editor > .scenario-edit-subsection {
+  .scenario-income-panel-shell > .scenario-edit-subsection {
     padding: var(--ui-space-4);
+  }
+
+  .scenario-income-panel-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .scenario-income-panel-actions > span {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenario-income-panel-shell > .scenario-edit-subsection {
+    animation: none;
   }
 }
