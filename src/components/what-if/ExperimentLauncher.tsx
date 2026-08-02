@@ -44,7 +44,7 @@ const experiments = [
     title: "Lower fees",
     description: "See the long-term effect of pension charges.",
     icon: AppIcons.settings,
-    available: false,
+    available: true,
   },
   {
     id: "returns" as const,
