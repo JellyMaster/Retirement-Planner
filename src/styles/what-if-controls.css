@@ -1,0 +1,103 @@
+.what-if-controls-stack {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.what-if-extra-control {
+  background: color-mix(
+    in srgb,
+    var(--colour-positive, #16845b) 6%,
+    var(--colour-surface)
+  );
+}
+
+.what-if-extra-controls {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-4);
+}
+
+.what-if-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+}
+
+.what-if-toggle-row > span {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.what-if-toggle-row small,
+.what-if-control-note {
+  color: var(--colour-text-muted);
+  line-height: 1.45;
+}
+
+.what-if-toggle-row input[role="switch"] {
+  width: 2.8rem;
+  height: 1.45rem;
+  flex: 0 0 auto;
+  accent-color: var(--colour-primary);
+}
+
+.what-if-control-note {
+  margin: var(--space-2) 0 0;
+  font-size: var(--ui-font-size-xs);
+}
+
+.what-if-header-mark svg,
+.what-if-experiment-icon svg,
+.what-if-story-icon svg {
+  display: block;
+  width: 1.1em;
+  height: 1.1em;
+  color: currentColor;
+  fill: currentColor;
+}
+
+.what-if-header-mark,
+.what-if-experiment-icon,
+.what-if-story-icon {
+  isolation: isolate;
+}
+
+.what-if-header-mark::before,
+.what-if-experiment-icon::before,
+.what-if-story-icon::before {
+  position: absolute;
+  z-index: -1;
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.what-if-header-mark,
+.what-if-experiment-icon,
+.what-if-story-icon {
+  position: relative;
+  background: transparent;
+}
+
+.what-if-slider-wrap input[type="range"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@media (max-width: 800px) {
+  .what-if-toggle-row {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .what-if-toggle-row {
+    flex-direction: column;
+  }
+}
