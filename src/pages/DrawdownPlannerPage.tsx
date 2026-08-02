@@ -9,6 +9,7 @@ import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWa
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
+import { DrawdownRetirementChapters } from "../components/drawdown/DrawdownRetirementChapters";
 import { DrawdownRetirementJourney } from "../components/drawdown/DrawdownRetirementJourney";
 import { DrawdownRetirementTimeline } from "../components/drawdown/DrawdownRetirementTimeline";
 import { DrawdownSummary } from "../components/drawdown/DrawdownSummary";
@@ -86,11 +87,11 @@ export function DrawdownPlannerPage() {
     <main className="planner-page drawdown-dashboard-page drawdown-workspace-page drawdown-guided-page">
       <header className="planner-header dashboard-header drawdown-workspace-header">
         <div>
-          <p className="planner-eyebrow">Retirement income</p>
-          <h1>Drawdown Planner</h1>
+          <p className="planner-eyebrow">Your retirement</p>
+          <h1>Your Retirement</h1>
           <p>
-            Review whether the active plan can provide the retirement income you
-            selected in My Plan.
+            See how the active plan could provide income through each chapter of
+            retirement.
           </p>
         </div>
       </header>
@@ -105,8 +106,8 @@ export function DrawdownPlannerPage() {
         <div className="drawdown-guided-section-heading drawdown-outcome-heading">
           <div>
             <p className="panel-eyebrow">Retirement outcome</p>
-            <h2 id="drawdown-results-title">Review the outcome</h2>
-            <p>Move between the views below to explore the complete projection.</p>
+            <h2 id="drawdown-results-title">Review your retirement</h2>
+            <p>Move between the views below to understand the complete story.</p>
           </div>
           <MoneyDisplayToggle value={displayMode} onChange={setDisplayMode} />
         </div>
@@ -129,7 +130,8 @@ export function DrawdownPlannerPage() {
 
               {activeSection === "overview" && (
                 <div className="drawdown-workspace-section" id="drawdown-overview-section" role="tabpanel" aria-labelledby="drawdown-tab-overview" tabIndex={0}>
-                  <SectionHeading eyebrow="Retirement outlook" title="What could retirement look like?" description="Follow the retirement journey first, then review the sustainability measures and risks behind it." />
+                  <SectionHeading eyebrow="Retirement outlook" title="What could retirement look like?" description="Start with the key questions and retirement chapters, then follow the journey and sustainability measures behind them." />
+                  <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownRetirementJourney inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   <DrawdownRetirementTimeline inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
@@ -139,11 +141,18 @@ export function DrawdownPlannerPage() {
 
               {activeSection === "income" && (
                 <div className="drawdown-workspace-section" id="drawdown-income-section" role="tabpanel" aria-labelledby="drawdown-tab-income" tabIndex={0}>
-                  <SectionHeading eyebrow="Income and tax" title="Where does retirement income come from?" description="Review pension withdrawals, State Pension, tax and any modelled income gaps across each spending phase." />
+                  <SectionHeading eyebrow="Income and tax" title="Where does retirement income come from?" description="Review income from your pension, State Pension, tax and any modelled gaps across each retirement chapter." />
+                  <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
                   <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
                     <div className="dashboard-chart-stage">
-                      <DrawdownIncomeChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+                      <DrawdownIncomeChart
+                        years={result.years}
+                        inflationRate={inputs.inflationRate}
+                        displayMode={displayMode}
+                        spendingPhases={inputs.spendingPhases}
+                        statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
+                      />
                     </div>
                   </section>
                   <DrawdownSummary result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
@@ -152,11 +161,19 @@ export function DrawdownPlannerPage() {
 
               {activeSection === "balance" && (
                 <div className="drawdown-workspace-section" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
-                  <SectionHeading eyebrow="Pension balance" title="How does the pension change through retirement?" description="See the effect of withdrawals, investment growth, fees, spending phases and any eventual depletion." />
+                  <SectionHeading eyebrow="Pension balance" title="How does your pension change through retirement?" description="See how income from your pension, investment growth, fees and retirement chapters affect what remains." />
+                  <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} />
                   <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
                     <div className="dashboard-chart-stage">
-                      <DrawdownBalanceChart years={result.years} depletionAge={result.depletionAge} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+                      <DrawdownBalanceChart
+                        years={result.years}
+                        depletionAge={result.depletionAge}
+                        inflationRate={inputs.inflationRate}
+                        displayMode={displayMode}
+                        spendingPhases={inputs.spendingPhases}
+                        statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
+                      />
                     </div>
                   </section>
                 </div>
@@ -164,14 +181,14 @@ export function DrawdownPlannerPage() {
 
               {activeSection === "details" && (
                 <div className="drawdown-workspace-section" id="drawdown-details-section" role="tabpanel" aria-labelledby="drawdown-tab-details" tabIndex={0}>
-                  <SectionHeading eyebrow="Year-by-year details" title="Inspect the full drawdown projection" description="Trace the changing income target, State Pension, tax, growth, fees and closing balances for every retirement year." />
+                  <SectionHeading eyebrow="Retirement timeline" title="Inspect every year of retirement" description="Trace income from your pension, State Pension, tax, growth, fees and the pension left at the end of each year." />
                   <DrawdownProjectionTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                 </div>
               )}
 
               {activeSection === "assumptions" && (
                 <div className="drawdown-workspace-section" id="drawdown-assumptions-section" role="tabpanel" aria-labelledby="drawdown-tab-assumptions" tabIndex={0}>
-                  <SectionHeading eyebrow="Calculation basis" title="What rules drive the illustration?" description="Understand the methodology, money basis, spending phases and plan values used by the deterministic model." />
+                  <SectionHeading eyebrow="Calculation basis" title="What rules drive the illustration?" description="Understand the methodology, money basis, retirement chapters and plan values used by the deterministic model." />
                   <DrawdownAssumptionsPanel inputs={inputs} displayMode={displayMode} />
                 </div>
               )}
@@ -179,7 +196,7 @@ export function DrawdownPlannerPage() {
           ) : (
             <section className="panel retirement-dashboard-empty-state" aria-live="polite">
               <h2>Review the retirement-income settings</h2>
-              <p>Edit the active plan to correct the saved drawdown choices.</p>
+              <p>Edit the active plan to correct the saved retirement choices.</p>
             </section>
           )}
         </section>
