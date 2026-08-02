@@ -4,7 +4,7 @@ import { calculateSequenceReturns } from "./calculateSequenceReturns";
 
 const baseInput = {
   startingBalance: 600_000,
-  annualWithdrawal: 35_000,
+  annualWithdrawal: 25_000,
   retirementAge: 65,
   durationYears: 30,
   shockPercentage: 0.25,
