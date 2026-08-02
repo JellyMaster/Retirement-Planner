@@ -1,13 +1,6 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  BrowserRouter,
-  Navigate,
-  NavLink,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
 
 import { TabKeyboardNavigation } from "./components/navigation/TabKeyboardNavigation";
 import {
@@ -57,12 +50,7 @@ export default function App() {
 
 function AppContent() {
   const { activeScenarioId } = useScenarios();
-  const location = useLocation();
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
-
-  useEffect(() => {
-    setIsNavigationOpen(false);
-  }, [location.pathname, location.search]);
 
   useEffect(() => {
     if (!isNavigationOpen) return;
@@ -82,7 +70,11 @@ function AppContent() {
 
       <header className="app-header">
         <div className="app-header-inner">
-          <NavLink to="/" className="app-brand">
+          <NavLink
+            to="/"
+            className="app-brand"
+            onClick={() => setIsNavigationOpen(false)}
+          >
             <span className="app-brand-mark" aria-hidden="true">
               RP
             </span>
@@ -124,6 +116,7 @@ function AppContent() {
                   className={({ isActive }) =>
                     isActive ? "nav-link nav-link-active" : "nav-link"
                   }
+                  onClick={() => setIsNavigationOpen(false)}
                 >
                   <span className="nav-link-icon" aria-hidden="true">
                     <FontAwesomeIcon icon={icon} fixedWidth />
