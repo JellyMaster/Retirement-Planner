@@ -19,7 +19,17 @@ function renderPage() {
 }
 
 function getScenarioCard(name: string): HTMLElement {
-  const heading = screen.getByRole("heading", { name, hidden: true });
+  const librarySummary = screen.getByText("Manage scenarios").closest("summary");
+  const library = librarySummary?.closest("details");
+
+  if (!library) {
+    throw new Error("Could not find the scenario library.");
+  }
+
+  const heading = within(library).getByRole("heading", {
+    name,
+    hidden: true,
+  });
   const card = heading.closest("article");
 
   if (!card) {
@@ -276,8 +286,12 @@ describe("CompareScenariosPage", () => {
     await openMoreActions(user, renamedCard);
     await user.click(within(renamedCard).getByRole("button", { name: "Delete" }));
 
+    const librarySummary = screen.getByText("Manage scenarios").closest("summary");
+    const library = librarySummary?.closest("details");
+    if (!library) throw new Error("Could not find the scenario library.");
+
     expect(
-      screen.queryByRole("heading", {
+      within(library).queryByRole("heading", {
         name: "Higher Contributions",
         hidden: true,
       }),
