@@ -3,6 +3,11 @@
   gap: var(--space-5);
 }
 
+#drawdown-income-section .drawdown-key-questions,
+#drawdown-balance-section .drawdown-key-questions {
+  display: none;
+}
+
 .drawdown-key-questions,
 .drawdown-retirement-chapters {
   display: grid;
