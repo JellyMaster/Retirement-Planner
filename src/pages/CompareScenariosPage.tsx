@@ -8,6 +8,7 @@ import {
   useScenarios,
 } from "../components/scenarios";
 import { calculateScenarioSummary } from "../domain/scenarios/calculateScenarioSummary";
+import type { ScenarioDrawdownPreferences } from "../domain/scenarios";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import { AppIcons } from "../icons";
 import { savePensionInputs } from "../state/planStorage";
@@ -23,7 +24,7 @@ export function CompareScenariosPage() {
     createScenario,
     duplicateScenario,
     renameScenario,
-    updateScenarioInputs,
+    updateScenarioPlan,
     setActiveScenario,
     deleteScenario,
   } = useScenarios();
@@ -100,11 +101,14 @@ export function CompareScenariosPage() {
     }
   }
 
-  function handleScenarioSave(inputs: PensionInputs) {
+  function handleScenarioSave(
+    inputs: PensionInputs,
+    drawdown: ScenarioDrawdownPreferences,
+  ) {
     if (!scenarioBeingEdited) return;
 
     try {
-      updateScenarioInputs(scenarioBeingEdited.id, inputs);
+      updateScenarioPlan(scenarioBeingEdited.id, inputs, drawdown);
       if (scenarioBeingEdited.isBaseline) savePensionInputs(inputs);
       setScenarioEditorId(null);
       setError(null);
