@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
@@ -47,8 +47,16 @@ describe("ExplorePage", () => {
     expect(
       screen.getByRole("link", { name: "Explore retirement age" }),
     ).toHaveAttribute("href", "/what-if");
+
+    const nextStepHeading = screen.getByRole("heading", {
+      name: "Turn understanding into a decision",
+    });
+    const nextStepSection = nextStepHeading.closest("section");
+    expect(nextStepSection).not.toBeNull();
     expect(
-      screen.getByRole("link", { name: "Review Drawdown" }),
+      within(nextStepSection as HTMLElement).getByRole("link", {
+        name: "Review Drawdown",
+      }),
     ).toHaveAttribute("href", "/drawdown");
 
     await user.click(screen.getByText("Gross versus net income"));
