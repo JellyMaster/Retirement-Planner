@@ -3,8 +3,8 @@ import { Check, Info, PoundSterling, TrendingUp } from "lucide-react";
 
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
 import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
+import { DrawdownChoiceSummary } from "../components/drawdown/DrawdownChoiceSummary";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
-import { DrawdownInputsForm } from "../components/drawdown/DrawdownInputsForm";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
@@ -17,14 +17,17 @@ import {
   type DrawdownWorkspaceSection,
 } from "../components/drawdown/DrawdownWorkspaceNavigation";
 import { ScenarioEditModal, useScenarios } from "../components/scenarios";
+import type { ScenarioDrawdownPreferences } from "../domain/scenarios";
+import { DrawdownEngine } from "../engine/drawdown/DrawdownEngine";
 import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
+import { validateDrawdownInputs } from "../engine/drawdown/validators/DrawdownInputsValidator";
 import type { PensionInputs } from "../engine/models/PensionInputs";
-import { useDrawdownProjection } from "../hooks/useDrawdownProjection";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import type { MoneyDisplayMode } from "../utils/drawdownDisplayValues";
 
 const MONEY_DISPLAY_STORAGE_KEY = "retirement-planner:drawdown-money-display";
+const drawdownEngine = new DrawdownEngine();
 
 function getInitialMoneyDisplayMode(): MoneyDisplayMode {
   if (typeof window === "undefined") return "today";
@@ -34,33 +37,45 @@ function getInitialMoneyDisplayMode(): MoneyDisplayMode {
 }
 
 export function DrawdownPlannerPage() {
-  const { activeScenario, updateScenarioInputs } = useScenarios();
+  const { activeScenario, updateScenarioPlan } = useScenarios();
   const [retirementGoals] = useStoredRetirementGoals();
   const [isEditingPlan, setIsEditingPlan] = useState(false);
   const pensionProjection = usePensionProjection(activeScenario.inputs);
-  const initialDrawdownInputs = useMemo(
+  const inputs = useMemo(
     () =>
       createDrawdownInputsFromPlan({
         pensionInputs: activeScenario.inputs,
         projection: pensionProjection.projection,
         retirementGoals,
+        drawdown: activeScenario.drawdown,
       }),
-    [activeScenario.inputs, pensionProjection.projection, retirementGoals],
+    [
+      activeScenario.drawdown,
+      activeScenario.inputs,
+      pensionProjection.projection,
+      retirementGoals,
+    ],
+  );
+  const validation = useMemo(() => validateDrawdownInputs(inputs), [inputs]);
+  const result = useMemo(
+    () => (validation.isValid ? drawdownEngine.calculate(inputs) : null),
+    [inputs, validation.isValid],
   );
   const [displayMode, setDisplayMode] = useState<MoneyDisplayMode>(
     getInitialMoneyDisplayMode,
   );
   const [activeSection, setActiveSection] =
     useState<DrawdownWorkspaceSection>("overview");
-  const { inputs, validation, result, updateInput, resetInputs } =
-    useDrawdownProjection(initialDrawdownInputs);
 
   useEffect(() => {
     window.localStorage.setItem(MONEY_DISPLAY_STORAGE_KEY, displayMode);
   }, [displayMode]);
 
-  function saveActivePlan(nextInputs: PensionInputs) {
-    updateScenarioInputs(activeScenario.id, nextInputs);
+  function saveActivePlan(
+    nextInputs: PensionInputs,
+    drawdown: ScenarioDrawdownPreferences,
+  ) {
+    updateScenarioPlan(activeScenario.id, nextInputs, drawdown);
     setIsEditingPlan(false);
   }
 
@@ -71,8 +86,8 @@ export function DrawdownPlannerPage() {
           <p className="planner-eyebrow">Retirement income</p>
           <h1>Drawdown Planner</h1>
           <p>
-            Choose how you want to take income, then review whether the active
-            plan can support it through retirement.
+            Review whether the active plan can provide the retirement income you
+            selected in My Plan.
           </p>
         </div>
 
@@ -85,11 +100,9 @@ export function DrawdownPlannerPage() {
         onEdit={() => setIsEditingPlan(true)}
       />
 
-      <DrawdownInputsForm
+      <DrawdownChoiceSummary
         value={inputs}
-        errors={validation.errors}
-        onChange={updateInput}
-        onReset={resetInputs}
+        onEdit={() => setIsEditingPlan(true)}
       />
 
       <section className="drawdown-results-workspace" aria-labelledby="drawdown-results-title">
@@ -284,8 +297,8 @@ export function DrawdownPlannerPage() {
               className="panel retirement-dashboard-empty-state"
               aria-live="polite"
             >
-              <h2>Complete the highlighted income choices</h2>
-              <p>Correct the input errors to calculate your drawdown projection.</p>
+              <h2>Review the retirement-income settings</h2>
+              <p>Edit the active plan to correct the saved drawdown choices.</p>
             </section>
           )}
         </section>
