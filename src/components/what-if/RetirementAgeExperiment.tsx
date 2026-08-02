@@ -28,65 +28,66 @@ interface RetirementAgeExperimentProps {
   onSave: () => void;
 }
 
-export function RetirementAgeExperiment({
-  activePlanName,
-  currentAge,
-  statePensionAge,
-  baselineRetirementAge,
-  retirementAge,
-  planningAge,
-  baselineProjectedPension,
-  projectedPension,
-  baselineAnnualIncome,
-  annualIncome,
-  baselinePreparedness,
-  preparedness,
-  includeExtraContributions,
-  extraMonthlyContribution,
-  baselineExtraMonthlyContribution,
-  canSave,
-  saveMessage,
-  onRetirementAgeChange,
-  onExtraContributionEnabledChange,
-  onExtraMonthlyContributionChange,
-  onReset,
-  onSave,
-}: RetirementAgeExperimentProps) {
+export function RetirementAgeExperiment(props: RetirementAgeExperimentProps) {
+  const {
+    activePlanName,
+    currentAge,
+    statePensionAge,
+    baselineRetirementAge,
+    retirementAge,
+    planningAge,
+    baselineProjectedPension,
+    projectedPension,
+    baselineAnnualIncome,
+    annualIncome,
+    baselinePreparedness,
+    preparedness,
+    includeExtraContributions,
+    extraMonthlyContribution,
+    baselineExtraMonthlyContribution,
+    canSave,
+    saveMessage,
+    onRetirementAgeChange,
+    onExtraContributionEnabledChange,
+    onExtraMonthlyContributionChange,
+    onReset,
+    onSave,
+  } = props;
+
   const ageDifference = retirementAge - baselineRetirementAge;
   const pensionDifference = projectedPension - baselineProjectedPension;
   const incomeDifference = annualIncome - baselineAnnualIncome;
   const preparednessDifference = preparedness - baselinePreparedness;
   const retirementYearsDifference = baselineRetirementAge - retirementAge;
+  const selectedExtraContribution = includeExtraContributions
+    ? extraMonthlyContribution
+    : 0;
   const extraContributionDifference =
-    (includeExtraContributions ? extraMonthlyContribution : 0) -
-    baselineExtraMonthlyContribution;
-  const hasChanged =
-    ageDifference !== 0 || extraContributionDifference !== 0;
+    selectedExtraContribution - baselineExtraMonthlyContribution;
+  const hasChanged = ageDifference !== 0 || extraContributionDifference !== 0;
   const minAge = currentAge;
-  const maxAge = Math.max(minAge, Math.min(100, statePensionAge + 5));
+  const maxAge = Math.max(currentAge, Math.min(100, statePensionAge + 5));
   const maxExtraContribution = Math.max(
     2_000,
     Math.ceil(
       Math.max(extraMonthlyContribution, baselineExtraMonthlyContribution) / 250,
     ) * 250,
   );
-
-  const story = createRetirementAgeStory({
+  const immediateRetirement = retirementAge === currentAge;
+  const story = createStory({
     activePlanName,
     ageDifference,
-    pensionDifference,
     retirementAge,
     currentAge,
+    projectedPension,
+    pensionDifference,
     includeExtraContributions,
     extraMonthlyContribution,
     extraContributionDifference,
   });
 
   return (
-    <section
-      className="what-if-workspace"
-      aria-labelledby="retirement-age-experiment-title"
-    >
+    <section className="what-if-workspace" aria-labelledby="retirement-age-experiment-title">
       <header className="what-if-workspace-header">
         <div>
           <p className="planner-eyebrow">Current experiment</p>
@@ -100,41 +101,30 @@ export function RetirementAgeExperiment({
       </header>
 
       <div className="what-if-controls-stack">
-        <div className="what-if-control-panel">
-          <div className="what-if-control-copy">
-            <span>Retirement age</span>
-            <strong>Age {retirementAge}</strong>
-            <small>
-              Saved plan: age {baselineRetirementAge} ·{" "}
-              {Math.max(0, retirementAge - currentAge)} years away
-            </small>
-          </div>
-
-          <div className="what-if-slider-wrap">
+        <ExperimentSlider
+          label="Retirement age"
+          value={`Age ${retirementAge}`}
+          detail={`Saved plan: age ${baselineRetirementAge} · ${Math.max(0, retirementAge - currentAge)} years away`}
+          input={
             <input
               id="what-if-retirement-age"
               type="range"
               min={minAge}
               max={maxAge}
               step={1}
-              value={Math.min(maxAge, Math.max(minAge, retirementAge))}
+              value={retirementAge}
               aria-label="Experimental retirement age"
               aria-valuetext={`Age ${retirementAge}`}
-              onChange={(event) =>
-                onRetirementAgeChange(Number(event.target.value))
-              }
+              onChange={(event) => onRetirementAgeChange(Number(event.target.value))}
             />
-            <div className="what-if-slider-labels" aria-hidden="true">
-              <span>Retire today · age {minAge}</span>
-              <span>Saved plan {baselineRetirementAge}</span>
-              <span>State Pension + 5 · age {maxAge}</span>
-            </div>
-            <p className="what-if-control-note">
-              Selecting your current age models immediate retirement using the
-              pension already built, with no further contribution or growth years.
-            </p>
-          </div>
-        </div>
+          }
+          labels={[
+            `Retire today · age ${minAge}`,
+            `Saved plan ${baselineRetirementAge}`,
+            `State Pension + 5 · age ${maxAge}`,
+          ]}
+          note="Selecting your current age models immediate retirement using the pension already built, with no further contribution or growth years."
+        />
 
         <div className="what-if-control-panel what-if-extra-control">
           <div className="what-if-control-copy">
@@ -153,10 +143,7 @@ export function RetirementAgeExperiment({
             <label className="what-if-toggle-row">
               <span>
                 <strong>Include extra contributions</strong>
-                <small>
-                  Compare the experiment with or without an additional monthly
-                  payment.
-                </small>
+                <small>Compare the outcome with or without an additional monthly payment.</small>
               </span>
               <input
                 type="checkbox"
@@ -177,7 +164,7 @@ export function RetirementAgeExperiment({
                 max={maxExtraContribution}
                 step={25}
                 value={extraMonthlyContribution}
-                disabled={!includeExtraContributions || retirementAge === currentAge}
+                disabled={!includeExtraContributions || immediateRetirement}
                 aria-label="Extra monthly contribution"
                 aria-valuetext={`${formatCurrency(extraMonthlyContribution)} per month`}
                 onChange={(event) =>
@@ -186,15 +173,12 @@ export function RetirementAgeExperiment({
               />
               <div className="what-if-slider-labels" aria-hidden="true">
                 <span>£0</span>
-                <span>
-                  Saved · {formatCurrency(baselineExtraMonthlyContribution)}
-                </span>
+                <span>Saved · {formatCurrency(baselineExtraMonthlyContribution)}</span>
                 <span>{formatCurrency(maxExtraContribution)}</span>
               </div>
-              {retirementAge === currentAge && (
+              {immediateRetirement && (
                 <p className="what-if-control-note">
-                  Extra contributions have no accumulation period when retiring
-                  today, so they do not affect this outcome.
+                  Extra contributions have no accumulation period when retiring today.
                 </p>
               )}
             </div>
@@ -206,7 +190,7 @@ export function RetirementAgeExperiment({
         <span className="what-if-story-icon" aria-hidden="true">
           <FontAwesomeIcon
             icon={
-              retirementAge === currentAge
+              immediateRetirement
                 ? AppIcons.concepts.retirement
                 : extraContributionDifference !== 0
                   ? AppIcons.concepts.pension
@@ -272,17 +256,7 @@ export function RetirementAgeExperiment({
             }).map((impact) => (
               <li key={impact.label}>
                 <span>{impact.label}</span>
-                <strong
-                  className={
-                    impact.value.startsWith("+")
-                      ? "is-positive"
-                      : impact.value.startsWith("-")
-                        ? "is-negative"
-                        : undefined
-                  }
-                >
-                  {impact.value}
-                </strong>
+                <strong className={toneClass(impact.value)}>{impact.value}</strong>
               </li>
             ))}
           </ol>
@@ -292,25 +266,21 @@ export function RetirementAgeExperiment({
           <p className="planner-eyebrow">Why it changes</p>
           <h3>The mechanics behind the result</h3>
           <ul>
-            {createReasons(
-              ageDifference,
-              extraContributionDifference,
-              retirementAge === currentAge,
-            ).map((reason) => (
-              <li key={reason}>
-                <FontAwesomeIcon icon={AppIcons.check} aria-hidden="true" />
-                <span>{reason}</span>
-              </li>
-            ))}
+            {createReasons(ageDifference, extraContributionDifference, immediateRetirement).map(
+              (reason) => (
+                <li key={reason}>
+                  <FontAwesomeIcon icon={AppIcons.check} aria-hidden="true" />
+                  <span>{reason}</span>
+                </li>
+              ),
+            )}
           </ul>
         </article>
       </div>
 
       <footer className="what-if-toolbar">
         <div>
-          <strong>
-            {hasChanged ? "This experiment is temporary" : "Move a slider to begin"}
-          </strong>
+          <strong>{hasChanged ? "This experiment is temporary" : "Move a slider to begin"}</strong>
           <span>
             {hasChanged
               ? "Save it as a scenario only when the outcome is worth keeping."
@@ -346,6 +316,41 @@ export function RetirementAgeExperiment({
   );
 }
 
+function ExperimentSlider({
+  label,
+  value,
+  detail,
+  input,
+  labels,
+  note,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+  input: React.ReactNode;
+  labels: [string, string, string];
+  note: string;
+}) {
+  return (
+    <div className="what-if-control-panel">
+      <div className="what-if-control-copy">
+        <span>{label}</span>
+        <strong>{value}</strong>
+        <small>{detail}</small>
+      </div>
+      <div className="what-if-slider-wrap">
+        {input}
+        <div className="what-if-slider-labels" aria-hidden="true">
+          {labels.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+        <p className="what-if-control-note">{note}</p>
+      </div>
+    </div>
+  );
+}
+
 function OutcomeCard({
   label,
   baseline,
@@ -357,12 +362,6 @@ function OutcomeCard({
   experiment: string;
   difference: string;
 }) {
-  const tone = difference.startsWith("+")
-    ? " is-positive"
-    : difference.startsWith("-")
-      ? " is-negative"
-      : "";
-
   return (
     <article className="what-if-outcome-card">
       <span>{label}</span>
@@ -379,26 +378,30 @@ function OutcomeCard({
         <small>Experiment</small>
         <strong>{experiment}</strong>
       </div>
-      <em className={`what-if-outcome-difference${tone}`}>{difference}</em>
+      <em className={`what-if-outcome-difference${toneSuffix(difference)}`}>
+        {difference}
+      </em>
     </article>
   );
 }
 
-function createRetirementAgeStory({
+function createStory({
   activePlanName,
   ageDifference,
-  pensionDifference,
   retirementAge,
   currentAge,
+  projectedPension,
+  pensionDifference,
   includeExtraContributions,
   extraMonthlyContribution,
   extraContributionDifference,
 }: {
   activePlanName: string;
   ageDifference: number;
-  pensionDifference: number;
   retirementAge: number;
   currentAge: number;
+  projectedPension: number;
+  pensionDifference: number;
   includeExtraContributions: boolean;
   extraMonthlyContribution: number;
   extraContributionDifference: number;
@@ -414,7 +417,7 @@ function createRetirementAgeStory({
   if (retirementAge === currentAge) {
     return {
       title: `Retiring now means stopping work at age ${currentAge}`,
-      description: `The illustration uses the ${formatCurrency(Math.max(0, pensionDifference + Math.abs(pensionDifference)))} already available at retirement and assumes no further contribution or investment-growth years.`,
+      description: `The illustration starts retirement with the ${formatCurrency(projectedPension)} pension already built and assumes no further contribution or investment-growth years.`,
     };
   }
 
@@ -422,8 +425,8 @@ function createRetirementAgeStory({
   const timing = ageDifference < 0 ? "earlier" : "later";
   const direction = pensionDifference < 0 ? "reduce" : "increase";
   const contributionText = includeExtraContributions
-    ? ` The experiment also includes ${formatCurrency(extraMonthlyContribution)} of extra contributions each month.`
-    : " The experiment excludes extra monthly contributions.";
+    ? ` It also includes ${formatCurrency(extraMonthlyContribution)} of extra contributions each month.`
+    : " It excludes extra monthly contributions.";
 
   return {
     title:
@@ -441,7 +444,7 @@ function createReasons(
 ): string[] {
   if (immediateRetirement) {
     return [
-      "The current pension becomes the starting retirement fund immediately.",
+      "The current pension becomes the retirement fund immediately.",
       "No further employee or employer contributions are added.",
       "There are no additional accumulation years before retirement.",
     ];
@@ -451,13 +454,13 @@ function createReasons(
     ageDifference < 0
       ? [
           "Fewer years of employee and employer contributions enter the pension.",
-          "The existing pension has less time to benefit from compound growth.",
+          "The pension has less time to benefit from compound growth.",
           "The retirement-income plan needs to cover more years.",
         ]
       : ageDifference > 0
         ? [
             "More employee and employer contributions enter the pension.",
-            "The existing pension has longer to benefit from compound growth.",
+            "The pension has longer to benefit from compound growth.",
             "The retirement-income plan needs to cover fewer years.",
           ]
         : ["The planned retirement date remains unchanged."];
@@ -504,7 +507,7 @@ function createImpacts({
       magnitude: Math.abs(retirementYearsDifference) * 10_000,
     },
   ]
-    .sort((a, b) => b.magnitude - a.magnitude)
+    .sort((left, right) => right.magnitude - left.magnitude)
     .slice(0, 3);
 }
 
@@ -521,4 +524,16 @@ function formatSignedPercentage(value: number): string {
 function formatSignedYears(value: number): string {
   if (value === 0) return "No change";
   return `${value > 0 ? "+" : ""}${value} ${Math.abs(value) === 1 ? "year" : "years"}`;
+}
+
+function toneSuffix(value: string): string {
+  if (value.startsWith("+")) return " is-positive";
+  if (value.startsWith("-")) return " is-negative";
+  return "";
+}
+
+function toneClass(value: string): string | undefined {
+  if (value.startsWith("+")) return "is-positive";
+  if (value.startsWith("-")) return "is-negative";
+  return undefined;
 }
