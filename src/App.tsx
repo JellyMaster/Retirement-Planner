@@ -109,20 +109,12 @@ function AppContent() {
           />
           <Route
             path="/what-if"
-            element={
-              <DeepLinkedPage kind="what-if">
-                <WhatIfPage key={activeScenarioId} />
-              </DeepLinkedPage>
-            }
+            element={<WhatIfPage key={activeScenarioId} />}
           />
           <Route path="/compare" element={<CompareScenariosPage />} />
           <Route
             path="/drawdown"
-            element={
-              <DeepLinkedPage kind="drawdown">
-                <DrawdownPlannerPage key={activeScenarioId} />
-              </DeepLinkedPage>
-            }
+            element={<DrawdownPlannerPage key={activeScenarioId} />}
           />
           <Route
             path="/explore"
