@@ -63,7 +63,11 @@ function WhatIfWorkspace({
   const baselineExtraContribution =
     activeScenario.inputs.extraMonthlyContribution ?? 0;
   const baselineExtraContributionAge =
-    activeScenario.inputs.extraContributionAge ?? activeScenario.inputs.currentAge;
+    activeScenario.inputs.extraContributionAge ??
+    Math.min(
+      activeScenario.inputs.retirementAge - 1,
+      activeScenario.inputs.currentAge + 1,
+    );
 
   function selectExperiment(experiment: ExperimentId) {
     setActiveExperiment(experiment);
@@ -81,7 +85,15 @@ function WhatIfWorkspace({
   function changeEmployeeContribution(amount: number) {
     setAlternativeInputs((current) => ({
       ...current,
-      monthlyEmployeeContribution: amount,
+      monthlyEmployeeContribution: Math.max(0, amount),
+    }));
+    setSaveMessage(null);
+  }
+
+  function changeEmployerContribution(amount: number) {
+    setAlternativeInputs((current) => ({
+      ...current,
+      monthlyEmployerContribution: Math.max(0, amount),
     }));
     setSaveMessage(null);
   }
@@ -129,7 +141,10 @@ function WhatIfWorkspace({
 
     const suggestedName =
       activeExperiment === "contributions"
-        ? `Save ${Math.round(alternativeInputs.monthlyEmployeeContribution)} monthly`
+        ? `Save ${Math.round(
+            alternativeInputs.monthlyEmployeeContribution +
+              alternativeInputs.monthlyEmployerContribution,
+          )} monthly`
         : `Retire at ${alternativeInputs.retirementAge}`;
     const name = window.prompt("Name this scenario", suggestedName)?.trim();
     if (!name) return;
@@ -198,7 +213,10 @@ function WhatIfWorkspace({
             activeScenario.inputs.monthlyEmployeeContribution
           }
           employeeContribution={alternativeInputs.monthlyEmployeeContribution}
-          employerContribution={activeScenario.inputs.monthlyEmployerContribution}
+          baselineEmployerContribution={
+            activeScenario.inputs.monthlyEmployerContribution
+          }
+          employerContribution={alternativeInputs.monthlyEmployerContribution}
           baselineExtraContribution={baselineExtraContribution}
           extraContribution={
             alternativeInputs.extraMonthlyContribution ??
@@ -220,6 +238,7 @@ function WhatIfWorkspace({
           canSave={!alternativeScenario.hasErrors}
           saveMessage={saveMessage}
           onEmployeeContributionChange={changeEmployeeContribution}
+          onEmployerContributionChange={changeEmployerContribution}
           onExtraContributionEnabledChange={changeExtraContributionEnabled}
           onExtraContributionChange={changeExtraContribution}
           onReset={resetExperiment}
