@@ -1,0 +1,95 @@
+.scenario-retirement-income-editor {
+  display: grid;
+  gap: var(--ui-space-4);
+}
+
+.scenario-income-section-nav {
+  position: sticky;
+  z-index: 2;
+  top: -1px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: color-mix(in srgb, var(--colour-surface) 94%, var(--colour-primary));
+  box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 8%);
+}
+
+.scenario-income-section-nav button {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: var(--ui-radius-control);
+  background: transparent;
+  color: var(--colour-text-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.scenario-income-section-nav button:hover,
+.scenario-income-section-nav button:focus-visible {
+  border-color: var(--colour-primary);
+  background: var(--colour-surface);
+  color: var(--colour-primary);
+}
+
+.scenario-income-section-nav button:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.scenario-retirement-income-editor > .scenario-edit-subsection {
+  scroll-margin-top: 5rem;
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.scenario-retirement-income-editor > .scenario-edit-subsection > div:first-child h3,
+.scenario-retirement-income-editor > .scenario-edit-subsection > div:first-child p {
+  margin: 0;
+}
+
+.scenario-retirement-income-editor > .scenario-edit-subsection > div:first-child p {
+  margin-top: var(--ui-space-2);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.scenario-retirement-chapters-editor > .scenario-edit-section {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.scenario-retirement-chapters-editor > .scenario-edit-section > legend {
+  padding: 0;
+  font-size: 1.05rem;
+}
+
+.scenario-retirement-chapters-editor .scenario-spending-phase-grid {
+  margin-top: var(--ui-space-4);
+}
+
+@media (max-width: 52rem) {
+  .scenario-income-section-nav {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 32rem) {
+  .scenario-income-section-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-retirement-income-editor > .scenario-edit-subsection {
+    padding: var(--ui-space-4);
+  }
+}
