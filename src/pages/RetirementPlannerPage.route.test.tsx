@@ -1,11 +1,20 @@
 import { screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { renderWithAppProviders } from "../test/renderWithAppProviders";
 import { RetirementPlannerPage } from "./RetirementPlannerPage";
 
 describe("RetirementPlannerPage route selection", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("opens the requested retirement-income section", async () => {
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+      callback(0);
+      return 1;
+    });
+
     renderWithAppProviders(<RetirementPlannerPage />, {
       initialEntries: [
         "/plan?step=income&section=retirement-chapters",
