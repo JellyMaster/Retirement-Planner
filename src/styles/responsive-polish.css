@@ -1,0 +1,292 @@
+/* =========================================================
+   Polaris responsive shell and editor polish
+   ========================================================= */
+
+.app-navigation-toggle,
+.app-navigation-backdrop {
+  display: none;
+}
+
+.app-navigation-links,
+.app-navigation-plan {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--ui-space-1);
+}
+
+.app-navigation-links {
+  flex: 1 1 auto;
+}
+
+.app-navigation-plan {
+  flex: 0 0 auto;
+}
+
+/* Keep the plan editor inside the viewport and let only its body scroll. */
+.scenario-edit-backdrop {
+  padding: clamp(0.75rem, 3vw, 2rem);
+  overscroll-behavior: contain;
+}
+
+.scenario-edit-modal {
+  display: grid;
+  width: min(72rem, 100%);
+  max-height: calc(100dvh - clamp(1.5rem, 6vw, 4rem));
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.scenario-edit-header,
+.scenario-edit-actions {
+  position: relative;
+  z-index: 2;
+  background: var(--colour-surface);
+}
+
+.scenario-edit-header {
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.scenario-edit-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.scenario-edit-actions {
+  border-top: 1px solid var(--colour-border);
+  box-shadow: 0 -12px 24px color-mix(in srgb, var(--colour-background) 60%, transparent);
+}
+
+.scenario-income-section-nav {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.scenario-income-section-nav > [role="tab"] {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .app-header-inner {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .app-navigation-toggle {
+    display: inline-grid;
+    width: 42px;
+    height: 42px;
+    place-content: center;
+    gap: 4px;
+    border: 1px solid var(--colour-border);
+    border-radius: var(--ui-radius-control);
+    background: var(--colour-surface-secondary);
+    color: var(--colour-text);
+    cursor: pointer;
+  }
+
+  .app-navigation-toggle span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transition:
+      transform var(--ui-duration-fast) var(--ui-ease-standard),
+      opacity var(--ui-duration-fast) var(--ui-ease-standard);
+  }
+
+  .app-navigation-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .app-navigation-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .app-navigation-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  .app-navigation-toggle:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--colour-primary) 38%, transparent);
+    outline-offset: 2px;
+  }
+
+  .app-navigation {
+    position: absolute;
+    z-index: calc(var(--ui-z-sticky, 20) + 2);
+    top: calc(100% + 0.5rem);
+    right: var(--ui-space-4);
+    left: var(--ui-space-4);
+    display: none;
+    max-height: calc(100dvh - 7rem);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: var(--ui-space-3);
+    padding: var(--ui-space-3);
+    overflow: auto;
+    border-radius: calc(var(--ui-radius-control) + 4px);
+    background: var(--colour-surface);
+    box-shadow: 0 18px 50px rgb(0 0 0 / 20%);
+  }
+
+  .app-navigation-open {
+    display: flex;
+  }
+
+  .app-navigation-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ui-space-2);
+  }
+
+  .app-navigation .nav-link {
+    justify-content: flex-start;
+    min-height: 46px;
+    padding-inline: var(--ui-space-3);
+  }
+
+  .app-navigation .nav-link-icon {
+    display: grid;
+  }
+
+  .app-navigation-plan {
+    display: grid;
+    gap: var(--ui-space-2);
+  }
+
+  .app-navigation-divider {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+  }
+
+  .active-scenario-switcher {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--ui-space-2);
+  }
+
+  .active-scenario-switcher select {
+    width: 100%;
+  }
+
+  .app-navigation-backdrop {
+    position: fixed;
+    z-index: var(--ui-z-sticky, 20);
+    inset: 0;
+    display: block;
+    border: 0;
+    background: rgb(0 0 0 / 32%);
+    cursor: default;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    position: sticky;
+  }
+
+  .app-header-inner {
+    min-height: 64px;
+    padding: var(--ui-space-2) var(--ui-space-3);
+  }
+
+  .app-brand-mark {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .app-brand-copy strong {
+    font-size: 0.9rem;
+  }
+
+  .theme-toggle {
+    min-width: 3.75rem;
+  }
+
+  .app-navigation {
+    right: var(--ui-space-3);
+    left: var(--ui-space-3);
+  }
+
+  .app-navigation-links {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-edit-backdrop {
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .scenario-edit-modal {
+    width: 100%;
+    max-height: 100dvh;
+    min-height: 100dvh;
+    border-radius: 0;
+  }
+
+  .scenario-edit-header,
+  .scenario-edit-body,
+  .scenario-edit-actions {
+    padding-inline: var(--ui-space-4);
+  }
+
+  .scenario-edit-header {
+    align-items: flex-start;
+    gap: var(--ui-space-3);
+  }
+
+  .scenario-edit-header h2 {
+    font-size: clamp(1.2rem, 7vw, 1.6rem);
+  }
+
+  .scenario-edit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-edit-actions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--ui-space-3);
+  }
+
+  .scenario-edit-actions > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .scenario-edit-actions .ui-button {
+    width: 100%;
+  }
+
+  .scenario-income-section-nav {
+    margin-inline: calc(var(--ui-space-4) * -1);
+    padding-inline: var(--ui-space-4);
+  }
+}
+
+@media (max-width: 390px) {
+  .app-brand-copy strong {
+    max-width: 8.5rem;
+  }
+
+  .scenario-edit-actions > div {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-navigation-toggle span {
+    transition: none;
+  }
+}
