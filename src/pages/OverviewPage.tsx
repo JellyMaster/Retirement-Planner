@@ -1,7 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
-import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
+import {
+  calculateRetirementHealth,
+  type RetirementHealthMetrics,
+} from "../components/goals/calculateRetirementHealth";
 import { OverviewGrowthChart } from "../components/overview/OverviewGrowthChart";
 import { useScenarios } from "../components/scenarios";
 import { usePensionProjection } from "../hooks/usePensionProjection";
@@ -24,236 +27,310 @@ export function OverviewPage() {
     ? calculateRetirementHealth(scenario.projection, retirementGoals)
     : null;
 
+  const story = createOverviewStory({
+    planName: activeScenario.name,
+    retirementAge: inputs.retirementAge,
+    yearsToRetirement,
+    hasPensionBalance,
+    hasProjection,
+    preparedness,
+  });
+
   return (
     <main className="planner-page polaris-overview-page">
       <header className="polaris-overview-header">
         <div>
-          <p className="planner-eyebrow">Overview</p>
-          <h1>Your retirement at a glance</h1>
+          <p className="planner-eyebrow">Overview · {activeScenario.name}</p>
+          <h1>Your retirement story</h1>
           <p>
-            See the key information currently available for your active plan and
-            where more detail would improve the projection.
+            A high-level view of where the active plan could take you and the
+            assumptions currently shaping that outcome.
           </p>
         </div>
+        <Link className="ui-button ui-button-secondary ui-button-medium" to="/plan">
+          <FontAwesomeIcon icon={AppIcons.navigation.plan} aria-hidden="true" />
+          Open My Plan
+        </Link>
       </header>
 
       <section
-        className="polaris-overview-status"
-        aria-labelledby="overview-status-title"
+        className={`polaris-overview-story is-${story.tone}`}
+        aria-labelledby="overview-story-title"
       >
-        <span className="polaris-overview-status-icon" aria-hidden="true">
-          <FontAwesomeIcon
-            icon={
-              hasPensionBalance
-                ? AppIcons.status.success
-                : AppIcons.status.information
-            }
-          />
-        </span>
-        <div>
-          <p className="planner-eyebrow">Active plan</p>
-          <h2 id="overview-status-title">
-            {hasPensionBalance
-              ? `${activeScenario.name} is available`
-              : `Add pension details to ${activeScenario.name}`}
-          </h2>
-          <p>
-            {hasPensionBalance
-              ? `The figures below are based on the inputs saved in ${activeScenario.name}.`
-              : "Contribution assumptions are available, but adding a current pension balance will make this overview more useful."}
-          </p>
+        <div className="polaris-overview-story-copy">
+          <p className="planner-eyebrow">Your outlook</p>
+          <h2 id="overview-story-title">{story.title}</h2>
+          <p>{story.description}</p>
         </div>
+
+        {preparedness ? (
+          <div className="polaris-overview-story-score">
+            <span>Target coverage</span>
+            <strong>{preparedness.score}%</strong>
+            <small>{formatPreparednessStatus(preparedness.status)}</small>
+          </div>
+        ) : (
+          <span className="polaris-overview-story-icon" aria-hidden="true">
+            <FontAwesomeIcon icon={AppIcons.status.information} />
+          </span>
+        )}
       </section>
 
-      <section
-        className="polaris-overview-grid"
-        aria-label="Retirement plan summary"
-      >
-        <OverviewMetric
-          icon={AppIcons.concepts.pension}
-          label="Current pension"
-          value={
-            hasPensionBalance ? formatCurrency(inputs.currentPot) : "Not added"
-          }
-          detail={
-            hasPensionBalance ? "Current pension balance" : "Add this in My Plan"
-          }
-          incomplete={!hasPensionBalance}
-        />
-
-        <OverviewMetric
-          icon={AppIcons.concepts.income}
-          label="Monthly saving"
-          value={
-            hasContributions ? formatCurrency(monthlyContribution) : "Not added"
-          }
-          detail={
-            hasContributions
-              ? `${formatCurrency(inputs.monthlyEmployeeContribution)} you + ${formatCurrency(inputs.monthlyEmployerContribution)} employer`
-              : "Add employee and employer contributions"
-          }
-          incomplete={!hasContributions}
-        />
-
-        <OverviewMetric
-          icon={AppIcons.concepts.retirement}
-          label="Planned retirement"
+      <section className="polaris-overview-key-facts" aria-label="Key retirement facts">
+        <OverviewFact
+          label="Retirement timeline"
           value={`Age ${inputs.retirementAge}`}
           detail={`${yearsToRetirement} years from the current plan age`}
         />
-
-        <OverviewMetric
-          icon={AppIcons.concepts.projection}
+        <OverviewFact
           label="Projected pension"
           value={
             hasProjection
               ? formatCurrency(scenario.projection.finalBalance.real)
               : "Unavailable"
           }
-          detail={
-            hasProjection
-              ? "Estimated value at retirement in today's money"
-              : "Review the plan inputs to calculate a projection"
-          }
+          detail="Estimated at retirement in today’s money"
           incomplete={!hasProjection}
+        />
+        <OverviewFact
+          label="Estimated retirement income"
+          value={
+            preparedness
+              ? `${formatCurrency(preparedness.estimatedAnnualIncome)}/year`
+              : "Unavailable"
+          }
+          detail={
+            preparedness
+              ? `Against a ${formatCurrency(retirementGoals.desiredAnnualIncome)} annual target`
+              : "Complete the active plan to estimate income"
+          }
+          incomplete={!preparedness}
         />
       </section>
 
-      <section className="polaris-overview-outlook" aria-label="Active plan outlook">
+      <section className="polaris-overview-main-story" aria-label="Retirement outlook details">
         <article className="polaris-overview-chart-panel">
           <div className="polaris-overview-panel-heading">
             <div>
-              <p className="planner-eyebrow">Growth</p>
-              <h2>Pension growth over time</h2>
+              <p className="planner-eyebrow">The journey</p>
+              <h2>How your pension could grow</h2>
+              <p>
+                The projection follows the active plan from age {inputs.currentAge} to
+                retirement at age {inputs.retirementAge}.
+              </p>
             </div>
             <span>Today&apos;s money</span>
           </div>
           <OverviewGrowthChart years={scenario.projection.years} />
         </article>
 
-        <article
-          className={`polaris-overview-preparedness${
-            preparedness ? ` is-${preparedness.status}` : " is-unavailable"
-          }`}
-        >
+        <article className="polaris-overview-meaning-panel">
           <div>
-            <p className="planner-eyebrow">Preparedness</p>
-            <h2>How prepared is this plan?</h2>
+            <p className="planner-eyebrow">What this means</p>
+            <h2>{createMeaningHeading(preparedness)}</h2>
           </div>
 
-          {preparedness ? (
-            <>
-              <div className="polaris-overview-preparedness-score">
-                <strong>{preparedness.score}</strong>
-                <span>out of 100</span>
-              </div>
-              <div
-                className="polaris-overview-preparedness-progress"
-                role="progressbar"
-                aria-label="Retirement preparedness"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={preparedness.score}
-              >
-                <span style={{ width: `${preparedness.score}%` }} />
-              </div>
-              <strong className="polaris-overview-preparedness-label">
-                {formatPreparednessStatus(preparedness.status)}
-              </strong>
+          <div className="polaris-overview-meaning-list">
+            <StoryPoint
+              icon={AppIcons.concepts.pension}
+              title="You have already built"
+              description={
+                hasPensionBalance
+                  ? `${formatCurrency(inputs.currentPot)} in the pension included in this plan.`
+                  : "No current pension balance has been added yet."
+              }
+              incomplete={!hasPensionBalance}
+            />
+            <StoryPoint
+              icon={AppIcons.concepts.income}
+              title="You are adding"
+              description={
+                hasContributions
+                  ? `${formatCurrency(monthlyContribution)} each month, including ${formatCurrency(inputs.monthlyEmployerContribution)} from your employer.`
+                  : "No regular employee or employer contributions have been added."
+              }
+              incomplete={!hasContributions}
+            />
+            <StoryPoint
+              icon={AppIcons.concepts.retirement}
+              title="Your income picture"
+              description={createIncomeDescription(preparedness, retirementGoals)}
+              incomplete={!preparedness}
+            />
+          </div>
 
-              <dl className="polaris-overview-goal-summary">
-                <div>
-                  <dt>Target income</dt>
-                  <dd>{formatCurrency(retirementGoals.desiredAnnualIncome)}/year</dd>
-                </div>
-                <div>
-                  <dt>Estimated income</dt>
-                  <dd>{formatCurrency(preparedness.estimatedAnnualIncome)}/year</dd>
-                </div>
-                <div>
-                  <dt>{preparedness.annualGap >= 0 ? "Surplus" : "Income gap"}</dt>
-                  <dd>
-                    {formatCurrency(Math.abs(preparedness.annualGap))}/year
-                  </dd>
-                </div>
-                <div>
-                  <dt>State Pension</dt>
-                  <dd>
-                    {retirementGoals.includeStatePension
-                      ? `${formatCurrency(retirementGoals.statePensionAnnualAmount)}/year from age ${retirementGoals.statePensionAge}`
-                      : "Not included"}
-                  </dd>
-                </div>
-              </dl>
+          <div className="polaris-overview-state-pension">
+            <span>State Pension</span>
+            <strong>
+              {retirementGoals.includeStatePension
+                ? `${formatCurrency(retirementGoals.statePensionAnnualAmount)}/year from age ${retirementGoals.statePensionAge}`
+                : "Not included in this plan"}
+            </strong>
+          </div>
 
-              <small>
-                This is an illustrative planning score based on your saved goals,
-                not a guarantee or financial advice.
-              </small>
-            </>
-          ) : (
-            <p>Correct the active plan inputs to calculate preparedness.</p>
-          )}
+          <small>
+            Figures are illustrations based on the active plan and saved retirement
+            goals. They are not a guarantee or financial advice.
+          </small>
         </article>
       </section>
 
-      <section className="polaris-overview-next-step">
+      <section className="polaris-overview-next-action">
         <div>
-          <p className="planner-eyebrow">Next step</p>
-          <h2>Keep your active plan information up to date</h2>
-          <p>
-            Changes saved to the active scenario and retirement goals update this
-            overview immediately and are restored when you return to the
-            application.
-          </p>
+          <p className="planner-eyebrow">A useful next move</p>
+          <h2>{createNextActionHeading(preparedness, hasProjection)}</h2>
+          <p>{createNextActionDescription(preparedness, hasProjection)}</p>
         </div>
-
         <Link
           className="ui-button ui-button-primary ui-button-medium"
-          to="/plan"
+          to={hasProjection ? "/what-if" : "/plan"}
         >
-          <FontAwesomeIcon
-            icon={AppIcons.navigation.plan}
-            aria-hidden="true"
-          />
-          Open My Plan
+          {hasProjection ? "Explore a What If?" : "Complete My Plan"}
         </Link>
       </section>
     </main>
   );
 }
 
-interface OverviewMetricProps {
-  icon: (typeof AppIcons.concepts)[keyof typeof AppIcons.concepts];
+interface OverviewFactProps {
   label: string;
   value: string;
   detail: string;
   incomplete?: boolean;
 }
 
-function OverviewMetric({
-  icon,
-  label,
-  value,
-  detail,
-  incomplete = false,
-}: OverviewMetricProps) {
+function OverviewFact({ label, value, detail, incomplete = false }: OverviewFactProps) {
   return (
-    <article
-      className={`polaris-overview-metric${
-        incomplete ? " is-incomplete" : ""
-      }`}
-    >
-      <span className="polaris-overview-metric-icon" aria-hidden="true">
-        <FontAwesomeIcon icon={icon} fixedWidth />
-      </span>
-      <div className="polaris-overview-metric-copy">
-        <p>{label}</p>
-        <strong>{value}</strong>
-        <span>{detail}</span>
-      </div>
+    <article className={`polaris-overview-fact${incomplete ? " is-incomplete" : ""}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{detail}</small>
     </article>
   );
+}
+
+function StoryPoint({
+  icon,
+  title,
+  description,
+  incomplete = false,
+}: {
+  icon: (typeof AppIcons.concepts)[keyof typeof AppIcons.concepts];
+  title: string;
+  description: string;
+  incomplete?: boolean;
+}) {
+  return (
+    <div className={`polaris-overview-story-point${incomplete ? " is-incomplete" : ""}`}>
+      <span aria-hidden="true">
+        <FontAwesomeIcon icon={icon} fixedWidth />
+      </span>
+      <div>
+        <strong>{title}</strong>
+        <p>{description}</p>
+      </div>
+    </div>
+  );
+}
+
+function createOverviewStory({
+  planName,
+  retirementAge,
+  yearsToRetirement,
+  hasPensionBalance,
+  hasProjection,
+  preparedness,
+}: {
+  planName: string;
+  retirementAge: number;
+  yearsToRetirement: number;
+  hasPensionBalance: boolean;
+  hasProjection: boolean;
+  preparedness: RetirementHealthMetrics | null;
+}) {
+  if (!hasPensionBalance || !hasProjection || !preparedness) {
+    return {
+      tone: "information",
+      title: `${planName} needs a little more information`,
+      description:
+        "Complete the missing pension details so Polaris can turn the plan into a meaningful retirement outlook.",
+    };
+  }
+
+  const timeline =
+    yearsToRetirement === 0
+      ? `at age ${retirementAge}`
+      : `in ${yearsToRetirement} years, at age ${retirementAge}`;
+
+  if (preparedness.status === "on-track") {
+    return {
+      tone: "positive",
+      title: `Your plan is currently on track for retirement ${timeline}`,
+      description: `The illustrated income meets your saved annual target, based on the assumptions in ${planName}.`,
+    };
+  }
+
+  if (preparedness.status === "close") {
+    return {
+      tone: "warning",
+      title: `Your plan is close to its income target for retirement ${timeline}`,
+      description:
+        "The projected outcome covers most of your target, so a relatively focused change may be enough to close the gap.",
+    };
+  }
+
+  return {
+    tone: "attention",
+    title: `Your plan may leave an income gap at retirement ${timeline}`,
+    description:
+      "The current assumptions produce less illustrated annual income than your saved target, making this a useful plan to review or experiment with.",
+  };
+}
+
+function createMeaningHeading(preparedness: RetirementHealthMetrics | null): string {
+  if (!preparedness) return "The story will become clearer once the plan is complete";
+  if (preparedness.status === "on-track") return "The main pieces of the plan currently work together";
+  if (preparedness.status === "close") return "The plan is within reach of the target";
+  return "The income target is the main pressure point";
+}
+
+function createIncomeDescription(
+  preparedness: RetirementHealthMetrics | null,
+  goals: ReturnType<typeof useStoredRetirementGoals>[0],
+): string {
+  if (!preparedness) return "Complete the active plan to calculate an income illustration.";
+
+  const gap = Math.abs(preparedness.annualGap);
+  if (preparedness.annualGap >= 0) {
+    return `${formatCurrency(preparedness.estimatedAnnualIncome)} a year is illustrated, around ${formatCurrency(gap)} above the saved target.`;
+  }
+
+  return `${formatCurrency(preparedness.estimatedAnnualIncome)} a year is illustrated, around ${formatCurrency(gap)} below the ${formatCurrency(goals.desiredAnnualIncome)} target.`;
+}
+
+function createNextActionHeading(
+  preparedness: RetirementHealthMetrics | null,
+  hasProjection: boolean,
+): string {
+  if (!hasProjection || !preparedness) return "Complete the plan before exploring alternatives";
+  if (preparedness.status === "on-track") return "See how resilient this outcome is to a change";
+  if (preparedness.status === "close") return "Test one focused improvement";
+  return "Explore which lever could close the income gap";
+}
+
+function createNextActionDescription(
+  preparedness: RetirementHealthMetrics | null,
+  hasProjection: boolean,
+): string {
+  if (!hasProjection || !preparedness) {
+    return "Add or correct the pension information in My Plan so the projection and income story can be calculated.";
+  }
+
+  if (preparedness.status === "on-track") {
+    return "Use What If? to test an earlier retirement, different contribution level, or less optimistic assumption without changing the saved plan.";
+  }
+
+  return "Use What If? to test retirement age, contributions, fees, or other assumptions and see which change has the clearest effect.";
 }
 
 function formatPreparednessStatus(
