@@ -1,6 +1,10 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import {
+  createDefaultScenarioDrawdownPreferences,
+  type ScenarioDrawdownPreferences,
+} from "../../../domain/scenarios";
 import type { PensionInputs } from "../../../engine/models/PensionInputs";
 import { AppIcons } from "../../../icons";
 import type { PensionInputErrors } from "../../../validation/validatePensionInputs";
@@ -12,6 +16,10 @@ import {
   NumberInput,
   PercentageInput,
 } from "../../forms";
+import {
+  ScenarioDrawdownFields,
+  useScenarios,
+} from "../../scenarios";
 
 interface GuidedPensionInputsFormProps {
   idPrefix?: string;
@@ -21,7 +29,13 @@ interface GuidedPensionInputsFormProps {
   onReset: () => void;
 }
 
-type StepId = "personal" | "pension" | "assumptions" | "changes" | "review";
+type StepId =
+  | "personal"
+  | "pension"
+  | "assumptions"
+  | "changes"
+  | "income"
+  | "review";
 
 type RequiredNumberField =
   | "currentAge"
@@ -48,6 +62,7 @@ const steps: Array<{
   { id: "pension", label: "Your pension", shortLabel: "Pension", icon: AppIcons.pension },
   { id: "assumptions", label: "Assumptions", shortLabel: "Returns", icon: AppIcons.growth },
   { id: "changes", label: "Contribution changes", shortLabel: "Changes", icon: AppIcons.plus },
+  { id: "income", label: "Retirement income", shortLabel: "Income", icon: AppIcons.money },
   { id: "review", label: "Review plan", shortLabel: "Review", icon: AppIcons.check },
 ];
 
@@ -58,6 +73,10 @@ export function GuidedPensionInputsForm({
   onChange,
   onReset,
 }: GuidedPensionInputsFormProps) {
+  const { activeScenario, updateScenarioPlan } = useScenarios();
+  const [drawdown, setDrawdown] = useState<ScenarioDrawdownPreferences>(() => ({
+    ...(activeScenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
+  }));
   const [activeStep, setActiveStep] = useState<StepId>("personal");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const activeIndex = steps.findIndex((step) => step.id === activeStep);
@@ -76,9 +95,10 @@ export function GuidedPensionInputsForm({
         errors.extraContributionAge,
         errors.extraMonthlyContribution,
       ].filter(Boolean).length,
+      income: 0,
       review: Object.values(errors).filter(Boolean).length,
     }),
-    [errors]
+    [errors],
   );
 
   function fieldId(name: string) {
@@ -97,27 +117,32 @@ export function GuidedPensionInputsForm({
     onChange({ ...value, [field]: next ?? Number.NaN });
   }
 
+  function updateDrawdown(next: ScenarioDrawdownPreferences) {
+    setDrawdown(next);
+    updateScenarioPlan(activeScenario.id, activeScenario.inputs, next);
+  }
+
   function goToStep(step: StepId) {
     setIsCollapsed(false);
     setActiveStep(step);
-   window.requestAnimationFrame(() => {
-  const formElement = document.getElementById("guided-pension-form");
+    window.requestAnimationFrame(() => {
+      const formElement = document.getElementById("guided-pension-form");
 
-  if (
-    formElement &&
-    typeof formElement.scrollIntoView === "function"
-  ) {
-    formElement.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
+      if (
+        formElement &&
+        typeof formElement.scrollIntoView === "function"
+      ) {
+        formElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     });
-  }
-});
   }
 
   function continueForward() {
     const errorsForStep = stepErrors[activeStep];
-    if (activeStep !== "changes" && activeStep !== "review" && errorsForStep > 0) {
+    if (activeStep !== "changes" && activeStep !== "income" && activeStep !== "review" && errorsForStep > 0) {
       return;
     }
     const next = steps[Math.min(activeIndex + 1, steps.length - 1)];
@@ -168,7 +193,7 @@ export function GuidedPensionInputsForm({
               <span><small>Current pot</small><strong>{formatCurrency(value.currentPot)}</strong></span>
               <span><small>Monthly saving</small><strong>{formatCurrency(totalMonthly)}</strong></span>
               <span><small>Expected return</small><strong>{formatPercentage(value.annualReturn)}</strong></span>
-              <span><small>Annual fee</small><strong>{formatPercentage(value.annualFee)}</strong></span>
+              <span><small>Income plan</small><strong>{drawdown.withdrawalStrategy === "target-income" ? formatCurrency(drawdown.desiredAnnualIncome) : formatPercentage(drawdown.withdrawalRate)}</strong></span>
             </div>
           </div>
         </div>
@@ -241,7 +266,7 @@ export function GuidedPensionInputsForm({
         {activeStep === "personal" && (
           <StepShell
             icon={AppIcons.user}
-            eyebrow="Step 1 of 5"
+            eyebrow="Step 1 of 6"
             title="Tell us about you"
             description="Your ages determine how long your pension has to grow."
           >
@@ -259,7 +284,7 @@ export function GuidedPensionInputsForm({
         )}
 
         {activeStep === "pension" && (
-          <StepShell icon={AppIcons.pension} eyebrow="Step 2 of 5" title="Your pension today" description="Add what you have already saved and what goes in each month.">
+          <StepShell icon={AppIcons.pension} eyebrow="Step 2 of 6" title="Your pension today" description="Add what you have already saved and what goes in each month.">
             <FormField id={fieldId("currentPot")} label="Current pension pot" hint="The combined value of pensions included in this plan." error={errors.currentPot}>
               {(id, describedBy) => <CurrencyInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.currentPot) ? value.currentPot : ""} step={100} error={Boolean(errors.currentPot)} onValueChange={(next) => updateRequired("currentPot", next)} />}
             </FormField>
@@ -273,7 +298,7 @@ export function GuidedPensionInputsForm({
         )}
 
         {activeStep === "assumptions" && (
-          <StepShell icon={AppIcons.growth} eyebrow="Step 3 of 5" title="Set your assumptions" description="Use realistic long-term estimates. You can refine them later.">
+          <StepShell icon={AppIcons.growth} eyebrow="Step 3 of 6" title="Set your assumptions" description="Use realistic long-term estimates. You can refine them later.">
             <FormField id={fieldId("annualReturn")} label="Expected annual return" hint="Investment growth before pension fees." error={errors.annualReturn}>
               {(id, describedBy) => <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.annualReturn) ? value.annualReturn : ""} max={20} step={0.1} error={Boolean(errors.annualReturn)} onValueChange={(next) => updatePercentage("annualReturn", next)} />}
             </FormField>
@@ -287,7 +312,7 @@ export function GuidedPensionInputsForm({
         )}
 
         {activeStep === "changes" && (
-          <StepShell icon={AppIcons.plus} eyebrow="Step 4 of 5 · Optional" title="Plan future contribution changes" description="Model regular increases or an extra amount starting later.">
+          <StepShell icon={AppIcons.plus} eyebrow="Step 4 of 6 · Optional" title="Plan future contribution changes" description="Model regular increases or an extra amount starting later.">
             <FormField id={fieldId("contributionIncrease")} label="Annual contribution increase" hint="For example, contributions rising with salary." error={errors.annualContributionIncrease}>
               {(id, describedBy) => <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.annualContributionIncrease) ? value.annualContributionIncrease : ""} max={20} step={0.1} error={Boolean(errors.annualContributionIncrease)} onValueChange={(next) => updatePercentage("annualContributionIncrease", next)} />}
             </FormField>
@@ -300,8 +325,23 @@ export function GuidedPensionInputsForm({
           </StepShell>
         )}
 
+        {activeStep === "income" && (
+          <StepShell
+            icon={AppIcons.money}
+            eyebrow="Step 5 of 6"
+            title="Plan your retirement income"
+            description="Choose how this plan should provide income after retirement."
+          >
+            <ScenarioDrawdownFields
+              idPrefix={fieldId("drawdown")}
+              value={drawdown}
+              onChange={updateDrawdown}
+            />
+          </StepShell>
+        )}
+
         {activeStep === "review" && (
-          <StepShell icon={AppIcons.check} eyebrow="Step 5 of 5" title="Review your plan" description="Check the key details before exploring your projection.">
+          <StepShell icon={AppIcons.check} eyebrow="Step 6 of 6" title="Review your plan" description="Check the key details before exploring your projection.">
             <div className="guided-plan-review">
               <ReviewGroup title="Your timeline" icon={AppIcons.user} onEdit={() => goToStep("personal")}>
                 <ReviewRow label="Current age" value={String(value.currentAge)} />
@@ -321,12 +361,23 @@ export function GuidedPensionInputsForm({
                 <ReviewRow label="Annual increase" value={formatPercentage(value.annualContributionIncrease)} />
                 <ReviewRow label="Extra monthly" value={value.extraMonthlyContribution ? formatCurrency(value.extraMonthlyContribution) : "Not added"} />
               </ReviewGroup>
+              <ReviewGroup title="Retirement income" icon={AppIcons.money} onEdit={() => goToStep("income")}>
+                <ReviewRow
+                  label="Approach"
+                  value={drawdown.withdrawalStrategy === "target-income" ? "Target annual income" : "Percentage withdrawal"}
+                />
+                <ReviewRow
+                  label={drawdown.withdrawalStrategy === "target-income" ? "Income target" : "Withdrawal rate"}
+                  value={drawdown.withdrawalStrategy === "target-income" ? formatCurrency(drawdown.desiredAnnualIncome) : formatPercentage(drawdown.withdrawalRate)}
+                />
+                <ReviewRow label="Tax-free cash" value={drawdown.taxFreeCash > 0 ? formatCurrency(drawdown.taxFreeCash) : "Not selected"} />
+              </ReviewGroup>
             </div>
             <div className={stepErrors.review > 0 ? "guided-review-status review" : "guided-review-status ready"} role="status">
               <FontAwesomeIcon icon={stepErrors.review > 0 ? AppIcons.warning : AppIcons.success} />
               <span>
                 <strong>{stepErrors.review > 0 ? `Review ${stepErrors.review} fields` : "Your plan is ready"}</strong>
-                <small>{stepErrors.review > 0 ? "Use the Edit buttons above to correct highlighted information." : "Your projection is already updated using these assumptions."}</small>
+                <small>{stepErrors.review > 0 ? "Use the Edit buttons above to correct highlighted information." : "Your projection and drawdown analysis use these saved choices."}</small>
               </span>
             </div>
           </StepShell>
@@ -338,8 +389,8 @@ export function GuidedPensionInputsForm({
           Back
         </button>
         {activeStep !== "review" ? (
-          <button type="button" className="primary-button" onClick={continueForward} aria-disabled={activeStep !== "changes" && stepErrors[activeStep] > 0}>
-            {activeStep === "changes" ? "Review plan" : "Continue"}
+          <button type="button" className="primary-button" onClick={continueForward} aria-disabled={activeStep !== "changes" && activeStep !== "income" && stepErrors[activeStep] > 0}>
+            {activeStep === "income" ? "Review plan" : "Continue"}
           </button>
         ) : (
           <button type="button" className="primary-button" onClick={viewProjection} disabled={stepErrors.review > 0}>
