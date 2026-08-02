@@ -9,6 +9,7 @@ import {
   type ExperimentId,
 } from "../components/what-if/ExperimentLauncher";
 import { FeeExperiment } from "../components/what-if/FeeExperiment";
+import { InflationExperiment } from "../components/what-if/InflationExperiment";
 import { RetirementAgeExperiment } from "../components/what-if/RetirementAgeExperiment";
 import { ReturnExperiment } from "../components/what-if/ReturnExperiment";
 import { SpendingExperiment } from "../components/what-if/SpendingExperiment";
@@ -151,6 +152,14 @@ function WhatIfWorkspace({ activeScenario, createScenario, updateScenarioPlan }:
     setSaveMessage(null);
   }
 
+  function changeInflation(inflation: number) {
+    setAlternativeInputs((current) => ({
+      ...current,
+      inflation: Math.min(0.08, Math.max(0, inflation)),
+    }));
+    setSaveMessage(null);
+  }
+
   function resetExperiment() {
     setAlternativeInputs({ ...activeScenario.inputs });
     setAlternativeDrawdown({ ...baselineDrawdown });
@@ -169,7 +178,9 @@ function WhatIfWorkspace({ activeScenario, createScenario, updateScenarioPlan }:
             ? `Fees ${(alternativeInputs.annualFee * 100).toFixed(2)} percent`
             : activeExperiment === "returns"
               ? `Return ${(alternativeInputs.annualReturn * 100).toFixed(1)} percent`
-              : `Retire at ${alternativeInputs.retirementAge}`;
+              : activeExperiment === "inflation"
+                ? `Inflation ${(alternativeInputs.inflation * 100).toFixed(1)} percent`
+                : `Retire at ${alternativeInputs.retirementAge}`;
     const name = window.prompt("Name this scenario", suggestedName)?.trim();
     if (!name) return;
 
@@ -311,6 +322,28 @@ function WhatIfWorkspace({ activeScenario, createScenario, updateScenarioPlan }:
           canSave={!alternativeScenario.hasErrors}
           saveMessage={saveMessage}
           onReturnChange={changeAnnualReturn}
+          onReset={resetExperiment}
+          onSave={saveExperiment}
+        />
+      )}
+
+      {activeExperiment === "inflation" && (
+        <InflationExperiment
+          activePlanName={activeScenario.name}
+          baselineInflation={activeScenario.inputs.inflation}
+          inflation={alternativeInputs.inflation}
+          yearsToRetirement={yearsToRetirement}
+          baselineNominalPension={baselineScenario.projection.finalBalance.nominal}
+          nominalPension={alternativeScenario.projection.finalBalance.nominal}
+          baselineRealPension={baselineScenario.projection.finalBalance.real}
+          realPension={alternativeScenario.projection.finalBalance.real}
+          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+          baselinePreparedness={baselineHealth?.score ?? 0}
+          preparedness={alternativeHealth?.score ?? 0}
+          canSave={!alternativeScenario.hasErrors}
+          saveMessage={saveMessage}
+          onInflationChange={changeInflation}
           onReset={resetExperiment}
           onSave={saveExperiment}
         />
