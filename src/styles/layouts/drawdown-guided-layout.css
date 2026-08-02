@@ -14,6 +14,11 @@
   gap: var(--ui-space-4);
 }
 
+.drawdown-results-workspace {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding-top: var(--ui-space-2);
+}
+
 .drawdown-guided-section-heading {
   display: flex;
   align-items: end;
@@ -33,32 +38,45 @@
   color: var(--colour-text-muted);
 }
 
-.drawdown-results-workspace {
-  gap: 0;
-  padding-top: var(--ui-space-2);
+.drawdown-outcome-heading {
+  display: contents;
 }
 
-.drawdown-outcome-heading {
-  align-items: center;
-  margin-bottom: var(--ui-space-4);
+.drawdown-outcome-heading > div {
+  grid-column: 1 / -1;
+}
+
+.drawdown-outcome-heading > .money-display-compact {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: end;
+  z-index: 1;
 }
 
 .drawdown-outcome-toolbar {
-  display: grid;
+  display: flex;
+  grid-column: 1 / -1;
+  grid-row: 2;
   min-width: 0;
-  gap: var(--ui-space-2);
+  align-items: end;
+  gap: var(--ui-space-4);
+  padding-right: min(22rem, 36%);
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.drawdown-outcome-toolbar .drawdown-workspace-navigation {
+  flex: 1 1 auto;
 }
 
 .drawdown-outcome-toolbar .money-display-status {
-  justify-self: end;
-  margin: 0 0 var(--ui-space-2);
-  white-space: nowrap;
+  display: none;
 }
 
 .money-display-compact {
   display: grid;
   flex: 0 0 auto;
   gap: var(--ui-space-1);
+  padding-bottom: var(--ui-space-1);
 }
 
 .money-display-compact-heading {
@@ -73,185 +91,136 @@
 
 .money-display-compact-options {
   display: inline-flex;
-  gap: 3px;
-  padding: 3px;
-  border: 1px solid var(--colour-border);
-  border-radius: var(--ui-radius-control);
-  background: var(--colour-surface-secondary);
+  gap: var(--ui-space-1);
 }
 
 .money-display-compact-options button {
   display: inline-flex;
-  min-height: 36px;
+  min-height: 2.5rem;
   align-items: center;
   justify-content: center;
   gap: var(--ui-space-1);
-  padding: 0.45rem 0.7rem;
-  border: 1px solid transparent;
-  border-radius: calc(var(--ui-radius-control) - 3px);
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
   background: transparent;
   color: var(--colour-text-muted);
   cursor: pointer;
   font: inherit;
   font-size: var(--ui-font-size-xs);
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
 }
 
 .money-display-compact-options button:hover {
-  background: var(--colour-surface);
   color: var(--colour-text);
 }
 
 .money-display-compact-options button.is-active,
 .money-display-compact-options button[aria-pressed="true"] {
-  border-color: var(--colour-primary);
-  background: var(--colour-primary);
-  color: var(--colour-primary-text);
+  border-bottom-color: var(--colour-primary);
+  color: var(--colour-text);
 }
 
 .money-display-compact-options button:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--colour-primary) 38%, transparent);
-  outline-offset: 2px;
+  outline: 3px solid var(--focus-ring);
+  outline-offset: -3px;
 }
 
 .drawdown-workspace-navigation {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(9rem, 1fr));
+  display: flex;
   min-width: 0;
-  gap: 0;
-  padding: 0;
+  gap: var(--ui-space-2);
   overflow-x: auto;
+  padding: 0;
   border: 0;
-  border-bottom: 1px solid var(--colour-border);
-  border-radius: var(--ui-radius-panel) var(--ui-radius-panel) 0 0;
   background: transparent;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.drawdown-workspace-navigation::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .drawdown-workspace-nav-item {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  min-height: 64px;
+  display: inline-flex;
+  min-height: 2.75rem;
+  flex: 0 0 auto;
   align-items: center;
+  justify-content: center;
   gap: var(--ui-space-2);
-  padding: 0.7rem 0.85rem;
-  border: 1px solid var(--colour-border);
-  border-right: 0;
-  border-bottom: 0;
-  border-radius: 0;
-  background: var(--colour-surface-secondary);
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
   color: var(--colour-text-muted);
   cursor: pointer;
   font: inherit;
-  text-align: left;
-}
-
-.drawdown-workspace-nav-item:first-child {
-  border-top-left-radius: var(--ui-radius-panel);
-}
-
-.drawdown-workspace-nav-item:last-child {
-  border-right: 1px solid var(--colour-border);
-  border-top-right-radius: var(--ui-radius-panel);
-}
-
-.drawdown-workspace-nav-marker {
-  display: grid;
-  width: 1.9rem;
-  height: 1.9rem;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--colour-surface);
-  color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-xs);
-  font-weight: 800;
-}
-
-.drawdown-workspace-nav-copy {
-  display: grid;
-  min-width: 0;
-  gap: 0.1rem;
-}
-
-.drawdown-workspace-nav-copy small {
-  color: inherit;
-  font-size: 0.67rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.drawdown-workspace-nav-copy strong {
-  overflow: hidden;
-  color: inherit;
   font-size: var(--ui-font-size-sm);
-  text-overflow: ellipsis;
+  font-weight: 800;
   white-space: nowrap;
 }
 
-.drawdown-workspace-nav-icon {
-  color: inherit;
-}
-
 .drawdown-workspace-nav-item:hover {
-  background: var(--colour-surface);
   color: var(--colour-text);
 }
 
 .drawdown-workspace-nav-item.active,
 .drawdown-workspace-nav-item[aria-selected="true"] {
-  z-index: 1;
-  border-color: var(--colour-primary);
-  background: var(--colour-surface);
-  color: var(--colour-primary);
-  box-shadow: inset 0 3px 0 var(--colour-primary);
-}
-
-.drawdown-workspace-nav-item.active::after,
-.drawdown-workspace-nav-item[aria-selected="true"]::after {
-  position: absolute;
-  right: 0;
-  bottom: -1px;
-  left: 0;
-  height: 2px;
-  background: var(--colour-surface);
-  content: "";
-}
-
-.drawdown-workspace-nav-item.active .drawdown-workspace-nav-marker,
-.drawdown-workspace-nav-item[aria-selected="true"] .drawdown-workspace-nav-marker {
-  background: var(--colour-primary);
-  color: var(--colour-primary-text);
+  border-bottom-color: var(--colour-primary);
+  color: var(--colour-text);
 }
 
 .drawdown-workspace-nav-item:focus-visible {
-  z-index: 2;
-  outline: 3px solid color-mix(in srgb, var(--colour-primary) 38%, transparent);
+  outline: 3px solid var(--focus-ring);
   outline-offset: -3px;
+}
+
+.drawdown-workspace-nav-marker {
+  display: none;
+}
+
+.drawdown-workspace-nav-copy {
+  display: inline;
+}
+
+.drawdown-workspace-nav-copy small {
+  display: none;
+}
+
+.drawdown-workspace-nav-copy strong {
+  font: inherit;
 }
 
 .drawdown-workspace-content {
   display: grid;
+  grid-column: 1 / -1;
   min-width: 0;
-  gap: var(--ui-space-4);
-  padding: var(--ui-space-5);
+  gap: 0;
+  overflow: hidden;
   border: 1px solid var(--colour-border);
-  border-top: 0;
-  border-radius: 0 0 var(--ui-radius-panel) var(--ui-radius-panel);
+  border-radius: var(--ui-radius-panel);
   background: var(--colour-surface);
   box-shadow: var(--shadow-panel);
+}
+
+.drawdown-workspace-content > .drawdown-summary-ribbon {
+  border: 0;
+  border-bottom: 1px solid var(--colour-border);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .drawdown-workspace-section {
   display: grid;
   min-width: 0;
   gap: var(--ui-space-5);
-  padding: 0;
+  padding: var(--ui-space-6);
   border: 0;
   border-radius: 0;
-  background: transparent;
   box-shadow: none;
 }
 
@@ -260,12 +229,23 @@
 }
 
 @media (max-width: 1050px) {
-  .drawdown-workspace-navigation {
-    grid-template-columns: repeat(5, minmax(8.5rem, 1fr));
+  .drawdown-results-workspace {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .drawdown-outcome-toolbar .money-display-status {
+  .drawdown-outcome-heading > .money-display-compact,
+  .drawdown-outcome-toolbar {
+    grid-column: 1;
+  }
+
+  .drawdown-outcome-heading > .money-display-compact {
+    grid-row: 3;
     justify-self: start;
+  }
+
+  .drawdown-outcome-toolbar {
+    grid-row: 2;
+    padding-right: 0;
   }
 }
 
@@ -286,6 +266,7 @@
 
   .money-display-compact-options {
     width: 100%;
+    border-bottom: 1px solid var(--colour-border);
   }
 
   .money-display-compact-options button {
@@ -299,20 +280,19 @@
   }
 
   .drawdown-workspace-nav-item {
-    min-width: 8.5rem;
-    grid-template-columns: auto minmax(0, 1fr);
+    padding-inline: var(--ui-space-3);
   }
 
-  .drawdown-workspace-nav-icon {
+  .drawdown-workspace-nav-item svg {
     display: none;
-  }
-
-  .drawdown-workspace-content {
-    padding: var(--ui-space-4);
   }
 
   .money-display-compact-options button {
     padding-inline: var(--ui-space-2);
+  }
+
+  .drawdown-workspace-section {
+    padding: var(--ui-space-4);
   }
 }
 
