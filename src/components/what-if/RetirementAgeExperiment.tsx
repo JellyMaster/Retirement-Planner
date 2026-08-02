@@ -48,7 +48,7 @@ export function RetirementAgeExperiment({
   const preparednessDifference = preparedness - baselinePreparedness;
   const retirementYearsDifference = baselineRetirementAge - retirementAge;
   const hasChanged = ageDifference !== 0;
-  const minAge = currentAge;
+  const minAge = Math.min(100, currentAge + 1);
   const maxAge = Math.max(minAge, Math.min(100, statePensionAge + 5));
 
   const story = createRetirementAgeStory({
@@ -97,10 +97,14 @@ export function RetirementAgeExperiment({
             onChange={(event) => onRetirementAgeChange(Number(event.target.value))}
           />
           <div className="what-if-slider-labels" aria-hidden="true">
-            <span>Current age {minAge}</span>
+            <span>Earliest retirement · age {minAge}</span>
             <span>Saved plan {baselineRetirementAge}</span>
             <span>State Pension + 5 · age {maxAge}</span>
           </div>
+          <small className="what-if-slider-note">
+            Today is age {currentAge}. The first selectable retirement age is age {minAge}
+            so the projection includes at least one year.
+          </small>
         </div>
       </div>
 
@@ -141,7 +145,7 @@ export function RetirementAgeExperiment({
             label="Target coverage"
             baseline={`${baselinePreparedness}%`}
             experiment={`${preparedness}%`}
-            difference={formatSignedPoints(preparednessDifference)}
+            difference={formatSignedPercentage(preparednessDifference)}
           />
           <OutcomeCard
             label="Years planned in retirement"
@@ -336,7 +340,7 @@ function createImpacts({
     },
     {
       label: "Target coverage",
-      value: formatSignedPoints(preparednessDifference),
+      value: formatSignedPercentage(preparednessDifference),
       magnitude: Math.abs(preparednessDifference) * 5_000,
     },
     {
@@ -354,9 +358,9 @@ function formatSignedCurrency(value: number): string {
   return `${value > 0 ? "+" : "-"}${formatCurrency(Math.abs(value))}`;
 }
 
-function formatSignedPoints(value: number): string {
+function formatSignedPercentage(value: number): string {
   if (value === 0) return "No change";
-  return `${value > 0 ? "+" : ""}${value} points`;
+  return `${value > 0 ? "+" : ""}${value}%`;
 }
 
 function formatSignedYears(value: number): string {
