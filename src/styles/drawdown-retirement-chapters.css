@@ -1,0 +1,155 @@
+.drawdown-chapters-and-questions {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.drawdown-key-questions,
+.drawdown-retirement-chapters {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-key-questions > header,
+.drawdown-retirement-chapters > header {
+  max-width: 760px;
+}
+
+.drawdown-key-questions h3,
+.drawdown-retirement-chapters h3,
+.retirement-chapter-card h4 {
+  margin: 0;
+}
+
+.drawdown-key-questions header > p:last-child,
+.drawdown-retirement-chapters header > p:last-child,
+.retirement-chapter-card p,
+.drawdown-question-card p {
+  margin: var(--space-2) 0 0;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.drawdown-question-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.drawdown-question-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+}
+
+.drawdown-question-card > span {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--colour-surface-secondary);
+  color: var(--colour-primary);
+}
+
+.drawdown-question-card.is-positive > span {
+  color: var(--colour-positive, #16845b);
+}
+
+.drawdown-question-card.is-warning > span {
+  color: var(--colour-negative, #c2414b);
+}
+
+.drawdown-question-card > div {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.drawdown-question-card small {
+  color: var(--colour-text-muted);
+  font-weight: 800;
+}
+
+.drawdown-question-card strong {
+  overflow-wrap: anywhere;
+  font-size: 1.05rem;
+}
+
+.drawdown-chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.retirement-chapter-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+}
+
+.retirement-chapter-icon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--colour-primary) 10%, var(--colour-surface));
+  color: var(--colour-primary);
+}
+
+.retirement-chapter-card > div {
+  min-width: 0;
+}
+
+.retirement-chapter-card small {
+  color: var(--colour-text-muted);
+  font-weight: 800;
+}
+
+.retirement-chapter-card h4 {
+  margin-top: var(--space-1);
+  font-size: 1.1rem;
+}
+
+.retirement-chapter-card strong {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--colour-primary);
+}
+
+.drawdown-chapter-action {
+  width: fit-content;
+  color: var(--colour-primary);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.drawdown-chapter-action:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1100px) {
+  .drawdown-question-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .drawdown-chapter-grid,
+  .drawdown-question-grid {
+    grid-template-columns: 1fr;
+  }
+}
