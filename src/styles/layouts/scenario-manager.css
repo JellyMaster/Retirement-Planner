@@ -337,10 +337,56 @@
   font-weight: 800;
 }
 
+.scenario-edit-section-copy {
+  margin: 0 0 var(--ui-space-4);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
 .scenario-edit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--ui-space-4);
+}
+
+.scenario-edit-field-wide {
+  grid-column: 1 / -1;
+}
+
+.scenario-drawdown-strategy {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-3);
+  margin-bottom: var(--ui-space-4);
+}
+
+.scenario-drawdown-option {
+  display: grid;
+  gap: var(--ui-space-1);
+  padding: var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.scenario-drawdown-option span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.45;
+}
+
+.scenario-drawdown-option.is-selected {
+  border-color: var(--colour-primary);
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--colour-primary) 15%, transparent);
+}
+
+.guided-step-fields > .scenario-edit-section {
+  grid-column: 1 / -1;
+  width: 100%;
 }
 
 .scenario-edit-actions {
@@ -378,7 +424,8 @@
     width: 100%;
   }
 
-  .scenario-edit-grid {
+  .scenario-edit-grid,
+  .scenario-drawdown-strategy {
     grid-template-columns: 1fr;
   }
 
