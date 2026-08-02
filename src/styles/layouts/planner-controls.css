@@ -202,6 +202,32 @@
    This component still renders legacy primary-button/secondary-button
    classes. Scope the shared button presentation to its footer until the
    markup is migrated to the Button component. */
+.guided-pension-progress {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(8.5rem, 1fr));
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.guided-pension-progress-step {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.guided-pension-progress-step > span:last-child {
+  min-width: 0;
+}
+
+.guided-pension-progress-step strong,
+.guided-pension-progress-step small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .guided-pension-actions :is(.primary-button, .secondary-button),
 .guided-pension-edit-button.secondary-button {
   display: inline-flex;
@@ -273,6 +299,12 @@
   transform: none;
 }
 
+@media (max-width: 900px) {
+  .guided-pension-progress {
+    grid-template-columns: repeat(6, minmax(8rem, 1fr));
+  }
+}
+
 @media (max-width: 640px) {
   .panel {
     padding: var(--space-5);
@@ -290,6 +322,10 @@
   .reset-button {
     width: 100%;
     justify-content: center;
+  }
+
+  .guided-pension-progress {
+    grid-template-columns: repeat(6, minmax(7.5rem, 1fr));
   }
 
   .guided-pension-actions {
