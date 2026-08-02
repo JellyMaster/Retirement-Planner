@@ -10,7 +10,7 @@ import {
 import { ScenarioSpendingPhaseFields } from "./ScenarioSpendingPhaseFields";
 
 describe("ScenarioSpendingPhaseFields", () => {
-  it("creates active, slower and later-life phases when enabled", async () => {
+  it("creates active, settled and later-life chapters when enabled", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     const value = {
@@ -39,9 +39,9 @@ describe("ScenarioSpendingPhaseFields", () => {
           expect.objectContaining({
             startAge: 65,
             annualIncome: 40_000,
-            label: "Active years",
+            label: "Active retirement",
           }),
-          expect.objectContaining({ label: "Slower years" }),
+          expect.objectContaining({ label: "Settled retirement" }),
           expect.objectContaining({ label: "Later life" }),
         ],
       }),
@@ -55,8 +55,8 @@ describe("ScenarioSpendingPhaseFields", () => {
       ...createDefaultScenarioDrawdownPreferences(40_000),
       planningAge: 95,
       spendingPhases: [
-        { startAge: 65, annualIncome: 40_000, label: "Active years" },
-        { startAge: 75, annualIncome: 34_000, label: "Slower years" },
+        { startAge: 65, annualIncome: 40_000, label: "Active retirement" },
+        { startAge: 75, annualIncome: 34_000, label: "Settled retirement" },
         { startAge: 85, annualIncome: 28_000, label: "Later life" },
       ],
     };
@@ -84,7 +84,7 @@ describe("ScenarioSpendingPhaseFields", () => {
     const laterLifeCard = screen
       .getByRole("heading", { name: "Later life" })
       .closest("section");
-    if (!laterLifeCard) throw new Error("Later-life phase card not found.");
+    if (!laterLifeCard) throw new Error("Later-life chapter card not found.");
 
     const income = within(laterLifeCard).getByRole("spinbutton", {
       name: "Annual income target",
