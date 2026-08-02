@@ -50,21 +50,37 @@ function isPensionInputs(value: unknown): value is PensionInputs {
   );
 }
 
-function isScenarioDrawdownPreferences(
+function normaliseDrawdownPreferences(
   value: unknown,
-): value is ScenarioDrawdownPreferences {
-  if (!value || typeof value !== "object") return false;
+): ScenarioDrawdownPreferences {
+  const defaults = createDefaultScenarioDrawdownPreferences();
+  if (!value || typeof value !== "object") return defaults;
 
   const preferences = value as Partial<ScenarioDrawdownPreferences>;
-  return (
-    (preferences.withdrawalStrategy === "target-income" ||
-      preferences.withdrawalStrategy === "percentage") &&
-    (preferences.incomeTargetMode === "gross" ||
-      preferences.incomeTargetMode === "net") &&
-    isFiniteNumber(preferences.withdrawalRate) &&
-    isFiniteNumber(preferences.desiredAnnualIncome) &&
-    isFiniteNumber(preferences.taxFreeCash)
-  );
+  return {
+    planningAge: isFiniteNumber(preferences.planningAge)
+      ? preferences.planningAge
+      : defaults.planningAge,
+    withdrawalStrategy:
+      preferences.withdrawalStrategy === "target-income" ||
+      preferences.withdrawalStrategy === "percentage"
+        ? preferences.withdrawalStrategy
+        : defaults.withdrawalStrategy,
+    withdrawalRate: isFiniteNumber(preferences.withdrawalRate)
+      ? preferences.withdrawalRate
+      : defaults.withdrawalRate,
+    desiredAnnualIncome: isFiniteNumber(preferences.desiredAnnualIncome)
+      ? preferences.desiredAnnualIncome
+      : defaults.desiredAnnualIncome,
+    incomeTargetMode:
+      preferences.incomeTargetMode === "gross" ||
+      preferences.incomeTargetMode === "net"
+        ? preferences.incomeTargetMode
+        : defaults.incomeTargetMode,
+    taxFreeCash: isFiniteNumber(preferences.taxFreeCash)
+      ? preferences.taxFreeCash
+      : defaults.taxFreeCash,
+  };
 }
 
 function normaliseScenario(value: unknown): Scenario | null {
@@ -94,9 +110,7 @@ function normaliseScenario(value: unknown): Scenario | null {
     createdAt: scenario.createdAt,
     updatedAt: scenario.updatedAt,
     inputs: { ...scenario.inputs },
-    drawdown: isScenarioDrawdownPreferences(scenario.drawdown)
-      ? { ...scenario.drawdown }
-      : createDefaultScenarioDrawdownPreferences(),
+    drawdown: normaliseDrawdownPreferences(scenario.drawdown),
   };
 }
 
@@ -154,9 +168,7 @@ function cloneScenario(scenario: Scenario): Scenario {
   return {
     ...scenario,
     inputs: { ...scenario.inputs },
-    drawdown: {
-      ...(scenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
-    },
+    drawdown: normaliseDrawdownPreferences(scenario.drawdown),
   };
 }
 
