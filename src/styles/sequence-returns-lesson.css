@@ -1,0 +1,246 @@
+.sequence-returns-lesson {
+  display: grid;
+  gap: var(--ui-space-5);
+  padding: var(--ui-space-6);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.sequence-returns-heading,
+.sequence-returns-explanation,
+.sequence-returns-suggestions,
+.sequence-returns-chart-panel > div:first-child {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-5);
+}
+
+.sequence-returns-heading > div,
+.sequence-returns-chart-panel > div:first-child > div,
+.sequence-returns-explanation > div:first-child {
+  max-width: 48rem;
+}
+
+.sequence-returns-heading h2,
+.sequence-returns-chart-panel h3,
+.sequence-returns-explanation h3,
+.sequence-returns-suggestions h3,
+.sequence-journey-card h3 {
+  margin: 0;
+}
+
+.sequence-returns-heading p:not(.planner-eyebrow),
+.sequence-returns-chart-panel p:not(.planner-eyebrow),
+.sequence-returns-explanation p:not(.planner-eyebrow),
+.sequence-journey-card p {
+  margin: var(--ui-space-2) 0 0;
+  color: var(--colour-text-muted);
+  line-height: 1.55;
+}
+
+.sequence-returns-average,
+.sequence-returns-difference {
+  display: grid;
+  min-width: 12rem;
+  gap: var(--ui-space-1);
+  padding: var(--ui-space-4);
+  border-radius: var(--ui-radius-control);
+  background: color-mix(in srgb, var(--colour-primary) 9%, var(--colour-surface));
+}
+
+.sequence-returns-average small,
+.sequence-returns-difference small,
+.sequence-returns-difference span {
+  color: var(--colour-text-muted);
+}
+
+.sequence-returns-average strong,
+.sequence-returns-difference strong {
+  font-size: 1.5rem;
+}
+
+.sequence-returns-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: var(--ui-space-3);
+  align-items: end;
+  padding: var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.sequence-range-control {
+  display: grid;
+  gap: var(--ui-space-3);
+}
+
+.sequence-range-control > span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.sequence-range-control small {
+  color: var(--colour-text-muted);
+  font-weight: 700;
+}
+
+.sequence-range-control input {
+  width: 100%;
+  accent-color: var(--colour-primary);
+}
+
+.sequence-returns-outcomes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-4);
+}
+
+.sequence-journey-card {
+  display: grid;
+  gap: var(--ui-space-4);
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface-secondary);
+}
+
+.sequence-journey-card.is-warning {
+  border-top: 4px solid var(--colour-warning, #c77800);
+}
+
+.sequence-journey-card.is-positive {
+  border-top: 4px solid var(--colour-primary);
+}
+
+.sequence-journey-card > div > small {
+  color: var(--colour-text-muted);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.sequence-journey-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-3);
+  margin: 0;
+}
+
+.sequence-journey-card dl div {
+  display: grid;
+  gap: var(--ui-space-1);
+  padding: var(--ui-space-3);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface);
+}
+
+.sequence-journey-card dt {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+}
+
+.sequence-journey-card dd {
+  margin: 0;
+  font-weight: 800;
+}
+
+.sequence-returns-chart-panel {
+  display: grid;
+  gap: var(--ui-space-4);
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface-secondary);
+}
+
+.sequence-returns-chart {
+  width: 100%;
+  height: 24rem;
+}
+
+.sequence-returns-explanation {
+  padding: var(--ui-space-5);
+  border-radius: var(--ui-radius-panel);
+  background: color-mix(in srgb, var(--colour-primary) 7%, var(--colour-surface-secondary));
+}
+
+.sequence-returns-suggestions {
+  align-items: center;
+}
+
+.sequence-returns-suggestions > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ui-space-2);
+}
+
+.sequence-returns-suggestions button {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-pill);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.sequence-returns-suggestions button:hover {
+  border-color: var(--colour-primary);
+  color: var(--colour-primary);
+}
+
+.sequence-returns-note {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.5;
+}
+
+@media (max-width: 70rem) {
+  .sequence-returns-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sequence-returns-controls > button {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 48rem) {
+  .sequence-returns-lesson {
+    padding: var(--ui-space-4);
+  }
+
+  .sequence-returns-heading,
+  .sequence-returns-explanation,
+  .sequence-returns-suggestions,
+  .sequence-returns-chart-panel > div:first-child {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sequence-returns-controls,
+  .sequence-returns-outcomes,
+  .sequence-journey-card dl {
+    grid-template-columns: 1fr;
+  }
+
+  .sequence-returns-average,
+  .sequence-returns-difference {
+    min-width: 0;
+  }
+
+  .sequence-returns-suggestions > div:last-child {
+    justify-content: flex-start;
+  }
+
+  .sequence-returns-chart {
+    height: 20rem;
+  }
+}
