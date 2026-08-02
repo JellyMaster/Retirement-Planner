@@ -22,11 +22,16 @@ export function createDrawdownInputsFromPlan({
 
   return {
     ...defaults,
-    ...drawdown,
     startingBalance: Math.max(0, projection.finalBalance.real),
     retirementAge: pensionInputs.retirementAge,
+    endAge: drawdown?.planningAge ?? defaults.endAge,
+    withdrawalStrategy:
+      drawdown?.withdrawalStrategy ?? defaults.withdrawalStrategy,
+    withdrawalRate: drawdown?.withdrawalRate ?? defaults.withdrawalRate,
     desiredAnnualIncome:
       drawdown?.desiredAnnualIncome ?? retirementGoals.desiredAnnualIncome,
+    incomeTargetMode: drawdown?.incomeTargetMode ?? defaults.incomeTargetMode,
+    taxFreeCash: drawdown?.taxFreeCash ?? defaults.taxFreeCash,
     annualStatePension: retirementGoals.includeStatePension
       ? retirementGoals.statePensionAnnualAmount
       : 0,
