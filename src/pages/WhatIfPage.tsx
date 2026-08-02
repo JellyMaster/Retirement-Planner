@@ -15,6 +15,7 @@ import { RetirementAgeExperiment } from "../components/what-if/RetirementAgeExpe
 import { ReturnExperiment } from "../components/what-if/ReturnExperiment";
 import { SpendingExperiment } from "../components/what-if/SpendingExperiment";
 import { StatePensionExperiment } from "../components/what-if/StatePensionExperiment";
+import { ExperimentInsights } from "../components/what-if/shared/ExperimentInsights";
 import {
   createDefaultScenarioDrawdownPreferences,
   type ScenarioDrawdownPreferences,
@@ -25,9 +26,11 @@ import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import { AppIcons } from "../icons";
 import "../styles/what-if-page.css";
 import "../styles/what-if-controls.css";
+import "../styles/what-if-insights.css";
 
 export function WhatIfPage() {
   const scenarios = useScenarios();
+
   return (
     <WhatIfWorkspace
       key={scenarios.activeScenario.id}
@@ -115,13 +118,24 @@ function WhatIfWorkspace({
     activeScenario.inputs.retirementAge,
     activeScenario.inputs.currentAge + 5,
   );
-  const downturnAge =
-    alternativeInputs.marketDownturnAge ?? defaultDownturnAge;
-  const downturnPercentage =
-    alternativeInputs.marketDownturnPercentage ?? 0;
+  const downturnAge = alternativeInputs.marketDownturnAge ?? defaultDownturnAge;
+  const downturnPercentage = alternativeInputs.marketDownturnPercentage ?? 0;
   const balanceAtDownturn =
     baselineScenario.projection.years.find((year) => year.age >= downturnAge)
       ?.closingBalance.real ?? activeScenario.inputs.currentPot;
+  const experimentHasChanged = hasExperimentChanged(
+    activeExperiment,
+    activeScenario.inputs,
+    alternativeInputs,
+    baselineDrawdown,
+    alternativeDrawdown,
+    baselineStateIncluded,
+    alternativeStateIncluded,
+    baselineStateAmount,
+    alternativeStateAmount,
+    baselineStateAge,
+    alternativeStateAge,
+  );
 
   function selectExperiment(experiment: ExperimentId) {
     setActiveExperiment(experiment);
@@ -153,7 +167,7 @@ function WhatIfWorkspace({
 
   function changeExtraContributionEnabled(enabled: boolean) {
     setAlternativeInputs((current) => {
-      const next = { ...current };
+      const next: PensionInputs = { ...current };
       if (!enabled) {
         delete next.extraContributionAge;
         delete next.extraMonthlyContribution;
@@ -273,11 +287,11 @@ function WhatIfWorkspace({
 
   function changeDownturnPercentage(percentage: number) {
     setAlternativeInputs((current) => {
-     const next: PensionInputs = {
-  ...current,
-  marketDownturnAge: current.marketDownturnAge ?? defaultDownturnAge,
-  marketDownturnPercentage: Math.min(0.5, Math.max(0, percentage)),
-};
+      const next: PensionInputs = {
+        ...current,
+        marketDownturnAge: current.marketDownturnAge ?? defaultDownturnAge,
+        marketDownturnPercentage: Math.min(0.5, Math.max(0, percentage)),
+      };
       if (next.marketDownturnPercentage === 0) {
         delete next.marketDownturnPercentage;
         delete next.marketDownturnAge;
@@ -516,8 +530,71 @@ function WhatIfWorkspace({
           onSave={saveExperiment}
         />
       )}
+
+      <ExperimentInsights
+        activeExperiment={activeExperiment}
+        baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+        projectedPension={alternativeScenario.projection.finalBalance.real}
+        baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+        annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+        baselinePreparedness={baselineHealth?.score ?? 0}
+        preparedness={alternativeHealth?.score ?? 0}
+        currentAge={activeScenario.inputs.currentAge}
+        retirementAge={alternativeInputs.retirementAge}
+        statePensionAge={alternativeStateAge}
+        extraContributionAge={alternativeInputs.extraContributionAge}
+        downturnAge={downturnAge}
+        hasChanged={experimentHasChanged}
+        onSelectExperiment={selectExperiment}
+      />
     </main>
   );
+}
+
+function hasExperimentChanged(
+  experiment: ExperimentId,
+  baselineInputs: PensionInputs,
+  inputs: PensionInputs,
+  baselineDrawdown: ScenarioDrawdownPreferences,
+  drawdown: ScenarioDrawdownPreferences,
+  baselineStateIncluded: boolean,
+  stateIncluded: boolean,
+  baselineStateAmount: number,
+  stateAmount: number,
+  baselineStateAge: number,
+  stateAge: number,
+): boolean {
+  switch (experiment) {
+    case "retirement-age":
+      return inputs.retirementAge !== baselineInputs.retirementAge;
+    case "contributions":
+      return (
+        inputs.monthlyEmployeeContribution !== baselineInputs.monthlyEmployeeContribution ||
+        inputs.monthlyEmployerContribution !== baselineInputs.monthlyEmployerContribution ||
+        inputs.extraMonthlyContribution !== baselineInputs.extraMonthlyContribution ||
+        inputs.extraContributionAge !== baselineInputs.extraContributionAge
+      );
+    case "spending":
+      return drawdown.desiredAnnualIncome !== baselineDrawdown.desiredAnnualIncome;
+    case "fees":
+      return inputs.annualFee !== baselineInputs.annualFee;
+    case "returns":
+      return inputs.annualReturn !== baselineInputs.annualReturn;
+    case "inflation":
+      return inputs.inflation !== baselineInputs.inflation;
+    case "state-pension":
+      return (
+        stateIncluded !== baselineStateIncluded ||
+        stateAmount !== baselineStateAmount ||
+        stateAge !== baselineStateAge
+      );
+    case "market-downturn":
+      return (
+        (inputs.marketDownturnPercentage ?? 0) !==
+          (baselineInputs.marketDownturnPercentage ?? 0) ||
+        inputs.marketDownturnAge !== baselineInputs.marketDownturnAge
+      );
+  }
 }
 
 function createSuggestedName(
