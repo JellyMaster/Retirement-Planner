@@ -5,6 +5,7 @@ import type { Scenario } from "../../domain/scenarios";
 import { formatCurrency } from "../../utils/formatters";
 import { ScenarioChangesSummary } from "./ScenarioChangesSummary";
 import { ScenarioComparisonTabs } from "./ScenarioComparisonTabs";
+import { ScenarioDecisionSummary } from "./ScenarioDecisionSummary";
 import { ScenarioGrowthChart } from "./ScenarioGrowthChart";
 import { ScenarioInsights } from "./ScenarioInsights";
 
@@ -35,33 +36,50 @@ export function ScenarioIntelligencePanel({
   );
 
   return (
-    <ScenarioComparisonTabs
-      outcomes={
-        <OutcomesTable
-          summaries={summaries}
-          activeSummary={activeSummary}
-          activeScenarioId={activeScenario.id}
+    <>
+      <ScenarioDecisionSummary
+        activeScenario={activeScenario}
+        scenarios={scenarios}
+      />
+
+      <section className="scenario-detailed-comparison" aria-labelledby="scenario-detailed-comparison-title">
+        <div className="scenario-manager-section-heading">
+          <div>
+            <p className="planner-eyebrow">Detailed comparison</p>
+            <h2 id="scenario-detailed-comparison-title">Inspect the numbers behind the story</h2>
+          </div>
+          <span>Outcomes, growth, changes and insights</span>
+        </div>
+
+        <ScenarioComparisonTabs
+          outcomes={
+            <OutcomesTable
+              summaries={summaries}
+              activeSummary={activeSummary}
+              activeScenarioId={activeScenario.id}
+            />
+          }
+          chart={
+            <ScenarioGrowthChart
+              scenarios={scenarios}
+              activeScenarioId={activeScenario.id}
+            />
+          }
+          changes={
+            <ScenarioChangesSummary
+              activeScenario={activeScenario}
+              scenarios={scenarios}
+            />
+          }
+          insights={
+            <ScenarioInsights
+              activeScenario={activeScenario}
+              scenarios={scenarios}
+            />
+          }
         />
-      }
-      chart={
-        <ScenarioGrowthChart
-          scenarios={scenarios}
-          activeScenarioId={activeScenario.id}
-        />
-      }
-      changes={
-        <ScenarioChangesSummary
-          activeScenario={activeScenario}
-          scenarios={scenarios}
-        />
-      }
-      insights={
-        <ScenarioInsights
-          activeScenario={activeScenario}
-          scenarios={scenarios}
-        />
-      }
-    />
+      </section>
+    </>
   );
 }
 
