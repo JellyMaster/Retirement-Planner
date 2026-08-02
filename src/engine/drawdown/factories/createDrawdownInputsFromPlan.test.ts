@@ -56,6 +56,33 @@ describe("createDrawdownInputsFromPlan", () => {
     );
   });
 
+  it("applies the drawdown choices saved with the scenario", () => {
+    const inputs = createDrawdownInputsFromPlan({
+      pensionInputs: createDefaultPensionInputs(),
+      projection: createProjection(),
+      retirementGoals: defaultRetirementGoals,
+      drawdown: {
+        planningAge: 100,
+        withdrawalStrategy: "percentage",
+        withdrawalRate: 0.035,
+        desiredAnnualIncome: 38_000,
+        incomeTargetMode: "gross",
+        taxFreeCash: 50_000,
+      },
+    });
+
+    expect(inputs).toEqual(
+      expect.objectContaining({
+        endAge: 100,
+        withdrawalStrategy: "percentage",
+        withdrawalRate: 0.035,
+        desiredAnnualIncome: 38_000,
+        incomeTargetMode: "gross",
+        taxFreeCash: 50_000,
+      }),
+    );
+  });
+
   it("excludes State Pension when it is disabled in saved goals", () => {
     const inputs = createDrawdownInputsFromPlan({
       pensionInputs: createDefaultPensionInputs(),
