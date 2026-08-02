@@ -37,7 +37,13 @@ describe("GuidedPensionInputsForm", () => {
       screen.getByRole("radio", { name: /target annual income/i }),
     ).toBeChecked();
 
-    await user.click(screen.getByRole("button", { name: "Review plan" }));
+    const reviewAction = screen
+      .getAllByRole("button", { name: "Review plan" })
+      .find((button) => button.classList.contains("primary-button"));
+
+    expect(reviewAction).toBeDefined();
+    await user.click(reviewAction!);
+
     expect(screen.getByText("Your plan is ready")).toBeInTheDocument();
     expect(screen.getByText("Retirement income")).toBeInTheDocument();
 
