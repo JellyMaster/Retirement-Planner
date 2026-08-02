@@ -5,6 +5,7 @@ import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumpt
 import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
+import { DrawdownOutcomeStory } from "../components/drawdown/DrawdownOutcomeStory";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
 import { DrawdownRetirementTimeline } from "../components/drawdown/DrawdownRetirementTimeline";
@@ -126,7 +127,8 @@ export function DrawdownPlannerPage() {
 
               {activeSection === "overview" && (
                 <div className="drawdown-workspace-section" id="drawdown-overview-section" role="tabpanel" aria-labelledby="drawdown-tab-overview" tabIndex={0}>
-                  <SectionHeading eyebrow="Retirement outlook" title="Can this plan support your retirement?" description="Review sustainability first, followed by the important milestones and risks across the plan." />
+                  <SectionHeading eyebrow="Retirement outlook" title="Can this plan support your retirement?" description="Start with the plain-English conclusion, then review sustainability, milestones and the risks that shape it." />
+                  <DrawdownOutcomeStory inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   <DrawdownRetirementTimeline inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   <DrawdownInsights result={result} />
@@ -135,7 +137,7 @@ export function DrawdownPlannerPage() {
 
               {activeSection === "income" && (
                 <div className="drawdown-workspace-section" id="drawdown-income-section" role="tabpanel" aria-labelledby="drawdown-tab-income" tabIndex={0}>
-                  <SectionHeading eyebrow="Income and tax" title="How does retirement income change over time?" description="Review pension withdrawals, State Pension, tax and any modelled income gaps." />
+                  <SectionHeading eyebrow="Income and tax" title="Where does retirement income come from?" description="Review pension withdrawals, State Pension, tax and any modelled income gaps across each spending phase." />
                   <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
                     <div className="dashboard-chart-stage">
                       <DrawdownIncomeChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
@@ -147,7 +149,7 @@ export function DrawdownPlannerPage() {
 
               {activeSection === "balance" && (
                 <div className="drawdown-workspace-section" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
-                  <SectionHeading eyebrow="Pension balance" title="How does the pension change through retirement?" description="See the effect of withdrawals, investment growth, fees and any eventual depletion." />
+                  <SectionHeading eyebrow="Pension balance" title="How does the pension change through retirement?" description="See the effect of withdrawals, investment growth, fees, spending phases and any eventual depletion." />
                   <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
                     <div className="dashboard-chart-stage">
                       <DrawdownBalanceChart years={result.years} depletionAge={result.depletionAge} inflationRate={inputs.inflationRate} displayMode={displayMode} />
@@ -158,14 +160,14 @@ export function DrawdownPlannerPage() {
 
               {activeSection === "details" && (
                 <div className="drawdown-workspace-section" id="drawdown-details-section" role="tabpanel" aria-labelledby="drawdown-tab-details" tabIndex={0}>
-                  <SectionHeading eyebrow="Year-by-year details" title="Inspect the full drawdown projection" description="Trace income, tax, growth, fees and closing balances for every retirement year." />
+                  <SectionHeading eyebrow="Year-by-year details" title="Inspect the full drawdown projection" description="Trace the changing income target, State Pension, tax, growth, fees and closing balances for every retirement year." />
                   <DrawdownProjectionTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                 </div>
               )}
 
               {activeSection === "assumptions" && (
                 <div className="drawdown-workspace-section" id="drawdown-assumptions-section" role="tabpanel" aria-labelledby="drawdown-tab-assumptions" tabIndex={0}>
-                  <SectionHeading eyebrow="Calculation basis" title="Review the assumptions behind the projection" description="Understand the methodology, money basis and plan values used by the deterministic model." />
+                  <SectionHeading eyebrow="Calculation basis" title="What rules drive the illustration?" description="Understand the methodology, money basis, spending phases and plan values used by the deterministic model." />
                   <DrawdownAssumptionsPanel inputs={inputs} displayMode={displayMode} />
                 </div>
               )}
