@@ -18,6 +18,13 @@ function sum(years: DrawdownYear[], selector: (year: DrawdownYear) => number): n
   return roundMoney(years.reduce((total, year) => total + selector(year), 0));
 }
 
+function getIncomeTarget(inputs: DrawdownInputs, age: number): number {
+  const phase = inputs.spendingPhases
+    ?.filter((candidate) => candidate.startAge <= age)
+    .at(-1);
+  return roundMoney(phase?.annualIncome ?? inputs.desiredAnnualIncome);
+}
+
 export class DrawdownEngine {
   private readonly incomeTaxEngine = new UkIncomeTaxEngine();
 
@@ -70,7 +77,7 @@ export class DrawdownEngine {
         : 0;
 
       const percentageWithdrawal = roundMoney(openingBalance * inputs.withdrawalRate);
-      const fixedIncomeTarget = roundMoney(inputs.desiredAnnualIncome);
+      const fixedIncomeTarget = getIncomeTarget(inputs, age);
       const requiredPensionWithdrawal = inputs.withdrawalStrategy === "percentage"
         ? percentageWithdrawal
         : inputs.incomeTargetMode === "net"
@@ -96,31 +103,30 @@ export class DrawdownEngine {
       const fees = roundMoney(balanceBeforeFees * inputs.annualFee);
       const closingBalance = roundMoney(Math.max(0, balanceBeforeFees - fees));
 
-     years.push({
-  year,
-  age,
-  openingBalance,
-  desiredIncome,
-  incomeTargetMode: inputs.incomeTargetMode,
-  statePensionIncome,
-  requiredPensionWithdrawal,
-  pensionWithdrawal,
-  grossIncome: tax.grossIncome,
-  taxableIncome: tax.taxableIncome,
-  personalAllowance: tax.personalAllowance,
-  incomeTax: tax.incomeTax,
-  netIncome: tax.netIncome,
-  effectiveTaxRate: tax.effectiveTaxRate,
-  netIncomeShortfall,
-  incomeShortfall,
-  investmentGrowth,
-  fees,
-  closingBalance,
-
-  isDepleted:
-    closingBalance === 0 &&
-    requiredPensionWithdrawal > pensionWithdrawal,
-});
+      years.push({
+        year,
+        age,
+        openingBalance,
+        desiredIncome,
+        incomeTargetMode: inputs.incomeTargetMode,
+        statePensionIncome,
+        requiredPensionWithdrawal,
+        pensionWithdrawal,
+        grossIncome: tax.grossIncome,
+        taxableIncome: tax.taxableIncome,
+        personalAllowance: tax.personalAllowance,
+        incomeTax: tax.incomeTax,
+        netIncome: tax.netIncome,
+        effectiveTaxRate: tax.effectiveTaxRate,
+        netIncomeShortfall,
+        incomeShortfall,
+        investmentGrowth,
+        fees,
+        closingBalance,
+        isDepleted:
+          closingBalance === 0 &&
+          requiredPensionWithdrawal > pensionWithdrawal,
+      });
       openingBalance = closingBalance;
     }
 
@@ -135,7 +141,9 @@ export class DrawdownEngine {
       withdrawalStrategy: inputs.withdrawalStrategy,
       withdrawalRate: roundRate(inputs.withdrawalRate),
       incomeTargetMode: inputs.incomeTargetMode,
-      taxFreeCashTaken, balanceAfterTaxFreeCash, years,
+      taxFreeCashTaken,
+      balanceAfterTaxFreeCash,
+      years,
       finalBalance: years.at(-1)?.closingBalance ?? balanceAfterTaxFreeCash,
       depletionAge: depletionYear?.age ?? null,
       firstShortfallAge: firstShortfallYear?.age ?? null,
@@ -143,7 +151,8 @@ export class DrawdownEngine {
       totalDesiredIncome: sum(years, (year) => year.desiredIncome),
       totalStatePensionIncome: sum(years, (year) => year.statePensionIncome),
       totalPensionWithdrawals: sum(years, (year) => year.pensionWithdrawal),
-      totalGrossIncome, totalIncomeTax,
+      totalGrossIncome,
+      totalIncomeTax,
       totalNetIncome: sum(years, (year) => year.netIncome),
       totalNetIncomeShortfall: sum(years, (year) => year.netIncomeShortfall),
       averageEffectiveTaxRate: totalGrossIncome === 0 ? 0 : roundRate(totalIncomeTax / totalGrossIncome),
