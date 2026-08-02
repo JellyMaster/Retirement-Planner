@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useInRouterContext,
+  useSearchParams,
+} from "react-router-dom";
 
 import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
 import { GuidedPensionInputsForm } from "../components/inputs/guided";
@@ -22,8 +26,24 @@ const incomeSectionIds: Record<string, string> = {
 };
 
 export function RetirementPlannerPage() {
-  const { activeScenario, updateScenarioInputs } = useScenarios();
+  return useInRouterContext() ? (
+    <RoutedRetirementPlannerPage />
+  ) : (
+    <RetirementPlannerPageContent searchParams={new URLSearchParams()} />
+  );
+}
+
+function RoutedRetirementPlannerPage() {
   const [searchParams] = useSearchParams();
+  return <RetirementPlannerPageContent searchParams={searchParams} />;
+}
+
+function RetirementPlannerPageContent({
+  searchParams,
+}: {
+  searchParams: URLSearchParams;
+}) {
+  const { activeScenario, updateScenarioInputs } = useScenarios();
   const [inputs, setInputs] = useState<PensionInputs>(() => ({
     ...activeScenario.inputs,
   }));
@@ -49,7 +69,7 @@ export function RetirementPlannerPage() {
         ) as HTMLButtonElement | null;
         tab?.click();
         tab?.focus();
-        tab?.scrollIntoView({ behavior: "smooth", block: "center" });
+        tab?.scrollIntoView?.({ behavior: "smooth", block: "center" });
       });
     });
 
