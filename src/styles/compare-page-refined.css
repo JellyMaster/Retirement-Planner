@@ -11,15 +11,15 @@
   order: 1;
 }
 
-.compare-page-refined > .scenario-library {
+.compare-page-refined > .compare-setup {
   order: 2;
 }
 
-.compare-page-refined > .compare-setup {
+.compare-page-refined > .scenario-intelligence-panel {
   order: 3;
 }
 
-.compare-page-refined > .scenario-intelligence-panel {
+.compare-page-refined > .scenario-library {
   order: 4;
 }
 
@@ -37,11 +37,17 @@
   align-items: center;
   gap: var(--space-5);
   padding: var(--space-5);
+  border-color: color-mix(in srgb, var(--colour-primary) 45%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 4%, var(--colour-surface));
 }
 
 .compare-setup-copy h2,
 .scenario-library h2 {
   margin: 0;
+}
+
+.compare-setup-copy h2 {
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
 }
 
 .compare-setup-copy p:not(.planner-eyebrow) {
@@ -85,6 +91,9 @@
 
 .compare-selected-plans > strong {
   margin-left: auto;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: var(--colour-surface);
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
 }
@@ -111,15 +120,16 @@
   align-items: center;
   gap: var(--space-2);
   padding: 0.7rem 0.9rem;
-  border: 1px solid var(--colour-border);
+  border: 1px solid var(--colour-primary);
   border-radius: var(--radius-md);
+  background: var(--colour-surface);
   color: var(--colour-primary);
   font-weight: 800;
   white-space: nowrap;
 }
 
 .compare-create-disclosure[open] > summary {
-  border-color: var(--colour-primary);
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
 }
 
 .compare-create-panel {
@@ -154,71 +164,35 @@
 
 .scenario-library {
   overflow: clip;
-  border-color: color-mix(in srgb, var(--colour-primary) 45%, var(--colour-border));
-  background: color-mix(in srgb, var(--colour-primary) 4%, var(--colour-surface));
 }
 
 .scenario-library > summary {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  min-height: 4.75rem;
   padding: var(--space-4) var(--space-5);
   font-weight: 800;
-}
-
-.scenario-library > summary::after {
-  content: "⌄";
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--colour-primary) 12%, transparent);
-  color: var(--colour-primary);
-  font-size: 1.15rem;
-  transition: transform 160ms ease;
-}
-
-.scenario-library[open] > summary::after {
-  transform: rotate(180deg);
 }
 
 .scenario-library > summary > span {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  color: var(--colour-text);
-  font-size: 1.05rem;
-}
-
-.scenario-library > summary > span svg {
-  color: var(--colour-primary);
-  font-size: 1.2rem;
+  gap: var(--space-2);
 }
 
 .scenario-library > summary small {
-  margin-left: auto;
-  padding: 0.4rem 0.7rem;
-  border-radius: 999px;
-  background: var(--colour-surface-secondary);
   color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-xs);
 }
 
 .scenario-library[open] > summary {
   border-bottom: 1px solid var(--colour-border);
-  background: var(--colour-surface);
 }
 
 .scenario-library > section {
   display: grid;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: var(--colour-surface);
 }
 
 .compare-scenario-grid {
@@ -288,7 +262,7 @@
   }
 
   .compare-selected-plans > strong {
-    width: 100%;
+    width: fit-content;
     margin-left: 0;
   }
 
@@ -306,20 +280,6 @@
   .scenario-library > summary,
   .scenario-library > section {
     padding: var(--space-4);
-  }
-
-  .scenario-library > summary {
-    flex-wrap: wrap;
-  }
-
-  .scenario-library > summary small {
-    order: 3;
-    width: fit-content;
-    margin-left: 0;
-  }
-
-  .scenario-library > summary::after {
-    margin-left: auto;
   }
 
   .compare-scenario-grid,
