@@ -3,7 +3,9 @@ import { Info, PoundSterling, TrendingUp } from "lucide-react";
 
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
 import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
+import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStory";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
+import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
@@ -138,6 +140,7 @@ export function DrawdownPlannerPage() {
               {activeSection === "income" && (
                 <div className="drawdown-workspace-section" id="drawdown-income-section" role="tabpanel" aria-labelledby="drawdown-tab-income" tabIndex={0}>
                   <SectionHeading eyebrow="Income and tax" title="Where does retirement income come from?" description="Review pension withdrawals, State Pension, tax and any modelled income gaps across each spending phase." />
+                  <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
                   <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
                     <div className="dashboard-chart-stage">
                       <DrawdownIncomeChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
@@ -150,6 +153,7 @@ export function DrawdownPlannerPage() {
               {activeSection === "balance" && (
                 <div className="drawdown-workspace-section" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
                   <SectionHeading eyebrow="Pension balance" title="How does the pension change through retirement?" description="See the effect of withdrawals, investment growth, fees, spending phases and any eventual depletion." />
+                  <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} />
                   <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
                     <div className="dashboard-chart-stage">
                       <DrawdownBalanceChart years={result.years} depletionAge={result.depletionAge} inflationRate={inputs.inflationRate} displayMode={displayMode} />
