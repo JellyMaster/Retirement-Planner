@@ -1,0 +1,294 @@
+.polaris-overview-story-income {
+  display: grid;
+  width: fit-content;
+  gap: 0.15rem;
+  margin-top: var(--ui-space-5) !important;
+  padding-top: var(--ui-space-4);
+  border-top: 1px solid color-mix(in srgb, var(--colour-border) 75%, transparent);
+}
+
+.polaris-overview-story-income span,
+.polaris-overview-story-income small {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+}
+
+.polaris-overview-story-income strong {
+  color: var(--colour-text);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.05;
+}
+
+.polaris-overview-story-score {
+  display: grid;
+  min-width: 10rem;
+  flex: 0 0 auto;
+  justify-items: center;
+  gap: var(--ui-space-2);
+  text-align: center;
+}
+
+.polaris-overview-score-ring {
+  display: grid;
+  width: 9rem;
+  height: 9rem;
+  place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--colour-surface) 62%, transparent 63%),
+    conic-gradient(
+      var(--colour-primary) calc(var(--overview-score) * 1%),
+      var(--colour-surface-secondary) 0
+    );
+  box-shadow: inset 0 0 0 1px var(--colour-border);
+}
+
+.polaris-overview-story.is-positive .polaris-overview-score-ring {
+  background:
+    radial-gradient(circle, var(--colour-surface) 62%, transparent 63%),
+    conic-gradient(
+      var(--colour-positive, #16845b) calc(var(--overview-score) * 1%),
+      var(--colour-surface-secondary) 0
+    );
+}
+
+.polaris-overview-story.is-warning .polaris-overview-score-ring {
+  background:
+    radial-gradient(circle, var(--colour-surface) 62%, transparent 63%),
+    conic-gradient(
+      var(--colour-warning, #b7791f) calc(var(--overview-score) * 1%),
+      var(--colour-surface-secondary) 0
+    );
+}
+
+.polaris-overview-story.is-attention .polaris-overview-score-ring {
+  background:
+    radial-gradient(circle, var(--colour-surface) 62%, transparent 63%),
+    conic-gradient(
+      var(--colour-negative, #c2414b) calc(var(--overview-score) * 1%),
+      var(--colour-surface-secondary) 0
+    );
+}
+
+.polaris-overview-score-ring > span {
+  display: grid;
+  justify-items: center;
+}
+
+.polaris-overview-score-ring strong {
+  color: var(--colour-text);
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.polaris-overview-score-ring small,
+.polaris-overview-score-label {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.polaris-overview-score-label {
+  color: var(--colour-text);
+}
+
+.polaris-overview-timeline {
+  display: grid;
+  gap: var(--ui-space-5);
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.polaris-overview-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-5);
+}
+
+.polaris-overview-section-heading h2,
+.polaris-overview-section-heading p {
+  margin: 0;
+}
+
+.polaris-overview-section-heading > p {
+  max-width: 44ch;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.polaris-overview-timeline ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.polaris-overview-timeline li {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+  padding: 0 var(--ui-space-4) 0 0;
+}
+
+.polaris-overview-timeline li:not(:last-child)::after {
+  position: absolute;
+  top: 1.1rem;
+  right: 0;
+  left: 2.75rem;
+  height: 2px;
+  background: var(--colour-border-strong);
+  content: "";
+}
+
+.polaris-overview-timeline-marker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 2.2rem;
+  height: 2.2rem;
+  margin-bottom: var(--ui-space-2);
+  place-items: center;
+  border: 3px solid var(--colour-surface);
+  border-radius: 50%;
+  background: var(--colour-primary);
+  color: var(--colour-primary-text);
+  box-shadow: 0 0 0 1px var(--colour-primary);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.polaris-overview-timeline-age {
+  color: var(--colour-primary);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.polaris-overview-timeline li strong {
+  color: var(--colour-text);
+}
+
+.polaris-overview-timeline li small {
+  max-width: 22ch;
+  color: var(--colour-text-muted);
+  line-height: 1.45;
+}
+
+.polaris-overview-progress-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-4);
+}
+
+.polaris-overview-milestone,
+.polaris-overview-insight {
+  min-width: 0;
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.polaris-overview-milestone h2,
+.polaris-overview-insight h2,
+.polaris-overview-milestone p,
+.polaris-overview-insight p {
+  margin: 0;
+}
+
+.polaris-overview-milestone h2,
+.polaris-overview-insight h2 {
+  color: var(--colour-text);
+  font-size: clamp(1.2rem, 2.5vw, 1.65rem);
+}
+
+.polaris-overview-milestone p:not(.planner-eyebrow),
+.polaris-overview-insight p:not(.planner-eyebrow) {
+  margin-top: var(--ui-space-2);
+  color: var(--colour-text-muted);
+  line-height: 1.55;
+}
+
+.polaris-overview-milestone-progress {
+  height: 0.65rem;
+  margin-top: var(--ui-space-4);
+  overflow: hidden;
+  border-radius: var(--ui-radius-pill);
+  background: var(--colour-surface-secondary);
+}
+
+.polaris-overview-milestone-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--colour-primary);
+}
+
+.polaris-overview-insight {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--colour-primary) 9%, var(--colour-surface)),
+      var(--colour-surface)
+    );
+}
+
+@media (max-width: 900px) {
+  .polaris-overview-timeline ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ui-space-5);
+  }
+
+  .polaris-overview-timeline li:nth-child(2n)::after {
+    display: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .polaris-overview-story-score {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .polaris-overview-progress-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .polaris-overview-section-heading {
+    flex-direction: column;
+  }
+
+  .polaris-overview-timeline ol {
+    grid-template-columns: 1fr;
+  }
+
+  .polaris-overview-timeline li {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--ui-space-3);
+    padding: 0 0 var(--ui-space-4);
+  }
+
+  .polaris-overview-timeline li:not(:last-child)::after {
+    top: 2.2rem;
+    right: auto;
+    bottom: 0;
+    left: 1.05rem;
+    width: 2px;
+    height: auto;
+  }
+
+  .polaris-overview-timeline-marker {
+    grid-row: 1 / 4;
+  }
+}
