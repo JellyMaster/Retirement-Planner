@@ -1,14 +1,21 @@
 import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
-import { CurrencyInput, FormField, PercentageInput } from "../forms";
+import {
+  CurrencyInput,
+  FormField,
+  NumberInput,
+  PercentageInput,
+} from "../forms";
 
 interface ScenarioDrawdownFieldsProps {
   idPrefix: string;
+  retirementAge: number;
   value: ScenarioDrawdownPreferences;
   onChange: (value: ScenarioDrawdownPreferences) => void;
 }
 
 export function ScenarioDrawdownFields({
   idPrefix,
+  retirementAge,
   value,
   onChange,
 }: ScenarioDrawdownFieldsProps) {
@@ -19,6 +26,13 @@ export function ScenarioDrawdownFields({
     onChange({ ...value, [field]: nextValue });
   }
 
+  const planningAgeError =
+    value.planningAge <= retirementAge
+      ? "Planning age must be later than retirement age."
+      : value.planningAge > 120
+        ? "Planning age must be 120 or below."
+        : undefined;
+
   return (
     <fieldset className="scenario-edit-section">
       <legend>Retirement income</legend>
@@ -27,7 +41,11 @@ export function ScenarioDrawdownFields({
         the scenario and can be changed later.
       </p>
 
-      <div className="scenario-drawdown-strategy" role="radiogroup" aria-label="Retirement income approach">
+      <div
+        className="scenario-drawdown-strategy"
+        role="radiogroup"
+        aria-label="Retirement income approach"
+      >
         <button
           type="button"
           role="radio"
@@ -59,11 +77,37 @@ export function ScenarioDrawdownFields({
       </div>
 
       <div className="scenario-edit-grid">
+        <FormField
+          id={`${idPrefix}-planningAge`}
+          label="Plan retirement income to age"
+          hint="The final age included in the drawdown projection."
+          error={planningAgeError}
+        >
+          {(id, describedBy) => (
+            <NumberInput
+              id={id}
+              aria-describedby={describedBy}
+              value={value.planningAge}
+              min={Math.min(120, retirementAge + 1)}
+              max={120}
+              suffix="years"
+              error={Boolean(planningAgeError)}
+              onValueChange={(nextValue) =>
+                update("planningAge", nextValue ?? 95)
+              }
+            />
+          )}
+        </FormField>
+
         {value.withdrawalStrategy === "target-income" ? (
           <>
             <div className="form-field scenario-edit-field-wide">
               <span className="form-field-label">Income target basis</span>
-              <div className="income-target-toggle" role="group" aria-label="Income target basis">
+              <div
+                className="income-target-toggle"
+                role="group"
+                aria-label="Income target basis"
+              >
                 <button
                   type="button"
                   className={
