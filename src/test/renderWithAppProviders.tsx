@@ -1,30 +1,10 @@
 import { render, type RenderOptions } from "@testing-library/react";
-import type { ReactElement, ReactNode } from "react";
-import { MemoryRouter } from "react-router-dom";
+import type { ReactElement } from "react";
 
-import { ScenarioProvider } from "../components/scenarios";
-import { ThemeProvider } from "../theme/ThemeProvider";
-
-interface AppProvidersProps {
-  children: ReactNode;
-  initialEntries?: string[];
-}
+import { AppTestProviders } from "./AppTestProviders";
 
 interface AppRenderOptions extends Omit<RenderOptions, "wrapper"> {
   initialEntries?: string[];
-}
-
-function AppProviders({
-  children,
-  initialEntries = ["/"],
-}: AppProvidersProps) {
-  return (
-    <MemoryRouter initialEntries={initialEntries}>
-      <ThemeProvider>
-        <ScenarioProvider>{children}</ScenarioProvider>
-      </ThemeProvider>
-    </MemoryRouter>
-  );
 }
 
 export function renderWithAppProviders(
@@ -33,7 +13,9 @@ export function renderWithAppProviders(
 ) {
   return render(ui, {
     wrapper: ({ children }) => (
-      <AppProviders initialEntries={initialEntries}>{children}</AppProviders>
+      <AppTestProviders initialEntries={initialEntries}>
+        {children}
+      </AppTestProviders>
     ),
     ...renderOptions,
   });
