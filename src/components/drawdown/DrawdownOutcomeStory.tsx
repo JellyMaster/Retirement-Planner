@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
 import { AppIcons } from "../../icons";
-import { getDrawdownDisplayValue, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
+import { toDisplayValue, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import { formatCurrency } from "../../utils/formatters";
 
 interface DrawdownOutcomeStoryProps {
@@ -22,16 +22,30 @@ export function DrawdownOutcomeStory({
       ? result.firstNetIncomeShortfallAge
       : result.firstShortfallAge;
   const lastsThroughPlan = result.depletionAge === null && shortfallAge === null;
-  const finalBalance = getDrawdownDisplayValue(
+  const finalBalance = toDisplayValue(
     result.finalBalance,
-    Math.max(0, inputs.endAge - inputs.retirementAge),
+    Math.max(0, result.years.length - 1),
     inputs.inflationRate,
     displayMode,
   );
+  const displayYears = result.years.map((year, index) => ({
+    ...year,
+    closingBalance: toDisplayValue(
+      year.closingBalance,
+      index,
+      inputs.inflationRate,
+      displayMode,
+    ),
+  }));
   const statePensionShare =
     result.totalDesiredIncome <= 0
       ? 0
-      : Math.min(100, Math.round((result.totalStatePensionIncome / result.totalDesiredIncome) * 100));
+      : Math.min(
+          100,
+          Math.round(
+            (result.totalStatePensionIncome / result.totalDesiredIncome) * 100,
+          ),
+        );
   const phases = inputs.spendingPhases?.length
     ? inputs.spendingPhases
     : [
@@ -43,10 +57,19 @@ export function DrawdownOutcomeStory({
       ];
 
   return (
-    <section className="drawdown-outcome-story" aria-labelledby="drawdown-story-title">
-      <article className={`drawdown-conclusion-card${lastsThroughPlan ? " is-positive" : " is-warning"}`}>
+    <section
+      className="drawdown-outcome-story"
+      aria-labelledby="drawdown-story-title"
+    >
+      <article
+        className={`drawdown-conclusion-card${
+          lastsThroughPlan ? " is-positive" : " is-warning"
+        }`}
+      >
         <span className="drawdown-conclusion-icon" aria-hidden="true">
-          <FontAwesomeIcon icon={lastsThroughPlan ? AppIcons.success : AppIcons.warning} />
+          <FontAwesomeIcon
+            icon={lastsThroughPlan ? AppIcons.success : AppIcons.warning}
+          />
         </span>
         <div>
           <p className="panel-eyebrow">Plain-English conclusion</p>
@@ -60,7 +83,7 @@ export function DrawdownOutcomeStory({
           <p>
             {lastsThroughPlan
               ? `The pension remains above £0 throughout the planning horizon, with ${formatCurrency(finalBalance)} left at age ${inputs.endAge}.`
-              : `The projection should be reviewed alongside the income phases, State Pension timing and tax-free cash choice below.`}
+              : "Review the income phases, State Pension timing and tax-free cash choice below to understand the pressure on the plan."}
           </p>
         </div>
       </article>
@@ -68,33 +91,68 @@ export function DrawdownOutcomeStory({
       <div className="drawdown-story-metrics">
         <StoryMetric
           label="Pension longevity"
-          value={result.depletionAge === null ? `Beyond age ${inputs.endAge}` : `To age ${result.depletionAge}`}
-          detail={result.depletionAge === null ? "No depletion in the model" : `${Math.max(0, result.depletionAge - inputs.retirementAge)} retirement years`}
+          value={
+            result.depletionAge === null
+              ? `Beyond age ${inputs.endAge}`
+              : `To age ${result.depletionAge}`
+          }
+          detail={
+            result.depletionAge === null
+              ? "No depletion in the model"
+              : `${Math.max(
+                  0,
+                  result.depletionAge - inputs.retirementAge,
+                )} retirement years`
+          }
         />
         <StoryMetric
           label="State Pension contribution"
-          value={inputs.annualStatePension > 0 ? `${statePensionShare}% of target income` : "Not included"}
-          detail={inputs.annualStatePension > 0 ? `Starts at age ${inputs.statePensionAge}` : "Private pension carries the full target"}
+          value={
+            inputs.annualStatePension > 0
+              ? `${statePensionShare}% of target income`
+              : "Not included"
+          }
+          detail={
+            inputs.annualStatePension > 0
+              ? `Starts at age ${inputs.statePensionAge}`
+              : "Private pension carries the full target"
+          }
         />
         <StoryMetric
           label="Tax-free cash"
           value={formatCurrency(result.taxFreeCashTaken)}
-          detail={`${formatCurrency(result.balanceAfterTaxFreeCash)} remains for income`}
+          detail={`${formatCurrency(
+            result.balanceAfterTaxFreeCash,
+          )} remains for income`}
         />
         <StoryMetric
           label="Lowest planned balance"
-          value={formatCurrency(Math.min(result.balanceAfterTaxFreeCash, ...result.years.map((year) => year.closingBalance)))}
-          detail={displayMode === "today" ? "Shown in today's money" : "Shown in future pounds"}
+          value={formatCurrency(
+            Math.min(
+              result.balanceAfterTaxFreeCash,
+              ...displayYears.map((year) => year.closingBalance),
+            ),
+          )}
+          detail={
+            displayMode === "today"
+              ? "Shown in today's money"
+              : "Shown in future pounds"
+          }
         />
       </div>
 
-      <section className="drawdown-phase-story" aria-labelledby="drawdown-phase-story-title">
+      <section
+        className="drawdown-phase-story"
+        aria-labelledby="drawdown-phase-story-title"
+      >
         <div>
           <p className="panel-eyebrow">Retirement spending phases</p>
-          <h3 id="drawdown-phase-story-title">How the income target changes with age</h3>
+          <h3 id="drawdown-phase-story-title">
+            How the income target changes with age
+          </h3>
           <p>
-            A flat target is used unless phases are saved in the active plan. Each
-            phase remains in force until the next one begins.
+            A flat target is used unless phases are saved in the active plan.
+            Each phase remains in force until the next one begins.
           </p>
         </div>
         <div className="drawdown-phase-grid">
@@ -102,7 +160,10 @@ export function DrawdownOutcomeStory({
             const nextAge = phases[index + 1]?.startAge ?? inputs.endAge;
             return (
               <article key={`${phase.startAge}-${phase.label}`}>
-                <span>Age {phase.startAge}–{Math.max(phase.startAge, nextAge - 1)}</span>
+                <span>
+                  Age {phase.startAge}–
+                  {Math.max(phase.startAge, nextAge - 1)}
+                </span>
                 <strong>{formatCurrency(phase.annualIncome)}/year</strong>
                 <small>{phase.label}</small>
               </article>
@@ -114,7 +175,15 @@ export function DrawdownOutcomeStory({
   );
 }
 
-function StoryMetric({ label, value, detail }: { label: string; value: string; detail: string }) {
+function StoryMetric({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+}) {
   return (
     <article>
       <span>{label}</span>
