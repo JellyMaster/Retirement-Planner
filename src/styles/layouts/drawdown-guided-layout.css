@@ -165,30 +165,22 @@
 }
 
 .drawdown-workspace-navigation {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   min-width: 0;
   gap: var(--ui-space-2);
-  overflow-x: auto;
   padding: 0;
   border: 0;
   background: transparent;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.drawdown-workspace-navigation::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
 }
 
 .drawdown-workspace-nav-item {
   display: inline-flex;
+  min-width: 0;
   min-height: 2.75rem;
-  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  padding: 0.65rem 1rem;
+  padding: 0.65rem 0.75rem;
   border: 0;
   border-bottom: 3px solid transparent;
   background: transparent;
@@ -197,7 +189,8 @@
   font: inherit;
   font-size: var(--ui-font-size-sm);
   font-weight: 800;
-  white-space: nowrap;
+  text-align: center;
+  white-space: normal;
 }
 
 .drawdown-workspace-nav-item:hover {
@@ -258,11 +251,19 @@
     align-self: stretch;
     justify-content: flex-start;
   }
+
+  .drawdown-workspace-navigation {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 700px) {
   .drawdown-guided-page {
     gap: var(--ui-space-5);
+  }
+
+  .drawdown-workspace-navigation {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .drawdown-workspace-nav-item {
