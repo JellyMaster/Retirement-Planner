@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { ProjectionResultFactory } from "../engine/factories/ProjectionResultFactory";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import type { ProjectionYear } from "../engine/models/ProjectionYear";
+import { applyMarketDownturn } from "../engine/services/applyMarketDownturn";
 import { RetirementComparisonEngine } from "../engine/services/RetirementComparisonEngine";
 
 import {
@@ -31,15 +32,12 @@ export function usePensionProjection(inputs: PensionInputs) {
       return ProjectionResultFactory.create([]);
     }
 
-    if (inputs.retirementAge === inputs.currentAge) {
-      return ProjectionResultFactory.create([
-        createImmediateRetirementYear(inputs),
-      ]);
-    }
+    const baseProjection =
+      inputs.retirementAge === inputs.currentAge
+        ? ProjectionResultFactory.create([createImmediateRetirementYear(inputs)])
+        : comparisonResult?.projection ?? ProjectionResultFactory.create([]);
 
-    return (
-      comparisonResult?.projection ?? ProjectionResultFactory.create([])
-    );
+    return applyMarketDownturn(baseProjection, inputs);
   }, [comparisonResult?.projection, hasErrors, inputs]);
 
   return {
