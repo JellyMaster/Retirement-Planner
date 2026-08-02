@@ -1,4 +1,5 @@
-import type { KeyboardEvent } from "react";
+import { useEffect, type KeyboardEvent } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export type DrawdownWorkspaceSection =
   | "overview"
@@ -14,19 +15,37 @@ interface DrawdownWorkspaceNavigationProps {
 
 const sections: Array<{
   id: DrawdownWorkspaceSection;
+  queryValue: string;
   label: string;
 }> = [
-  { id: "overview", label: "Overview" },
-  { id: "income", label: "Income" },
-  { id: "balance", label: "Balance" },
-  { id: "details", label: "Timeline" },
-  { id: "assumptions", label: "Assumptions" },
+  { id: "overview", queryValue: "overview", label: "Overview" },
+  { id: "income", queryValue: "income", label: "Income" },
+  { id: "balance", queryValue: "balance", label: "Balance" },
+  { id: "details", queryValue: "timeline", label: "Timeline" },
+  { id: "assumptions", queryValue: "assumptions", label: "Assumptions" },
 ];
 
 export function DrawdownWorkspaceNavigation({
   value,
   onChange,
 }: DrawdownWorkspaceNavigationProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedSection = parseSection(searchParams.get("tab"));
+
+  useEffect(() => {
+    if (!requestedSection || requestedSection === value) return;
+    onChange(requestedSection);
+  }, [onChange, requestedSection, value]);
+
+  function selectSection(section: DrawdownWorkspaceSection) {
+    const next = new URLSearchParams(searchParams);
+    const queryValue =
+      sections.find((candidate) => candidate.id === section)?.queryValue ?? section;
+    next.set("tab", queryValue);
+    setSearchParams(next, { replace: true });
+    onChange(section);
+  }
+
   function handleKeyDown(
     event: KeyboardEvent<HTMLButtonElement>,
     currentIndex: number,
@@ -52,7 +71,8 @@ export function DrawdownWorkspaceNavigation({
 
     event.preventDefault();
     const nextSection = sections[nextIndex];
-    onChange(nextSection.id);
+    if (!nextSection) return;
+    selectSection(nextSection.id);
     document.getElementById(`drawdown-tab-${nextSection.id}`)?.focus();
   }
 
@@ -79,7 +99,7 @@ export function DrawdownWorkspaceNavigation({
                 ? "drawdown-workspace-nav-item active"
                 : "drawdown-workspace-nav-item"
             }
-            onClick={() => onChange(section.id)}
+            onClick={() => selectSection(section.id)}
             onKeyDown={(event) => handleKeyDown(event, index)}
           >
             {section.label}
@@ -88,4 +108,19 @@ export function DrawdownWorkspaceNavigation({
       })}
     </div>
   );
+}
+
+function parseSection(value: string | null): DrawdownWorkspaceSection | null {
+  switch (value) {
+    case "overview":
+    case "income":
+    case "balance":
+    case "assumptions":
+      return value;
+    case "timeline":
+    case "details":
+      return "details";
+    default:
+      return null;
+  }
 }
