@@ -200,7 +200,10 @@ function WhatIfWorkspace({
           employeeContribution={alternativeInputs.monthlyEmployeeContribution}
           employerContribution={activeScenario.inputs.monthlyEmployerContribution}
           baselineExtraContribution={baselineExtraContribution}
-          extraContribution={alternativeInputs.extraMonthlyContribution ?? baselineExtraContribution || 250}
+          extraContribution={
+            alternativeInputs.extraMonthlyContribution ??
+            (baselineExtraContribution || 250)
+          }
           extraContributionAge={
             alternativeInputs.extraContributionAge ?? baselineExtraContributionAge
           }
