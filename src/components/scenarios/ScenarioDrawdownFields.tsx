@@ -32,13 +32,16 @@ export function ScenarioDrawdownFields({
   const projectedPensionAtRetirement = activeProjection.hasErrors
     ? 0
     : Math.max(0, activeProjection.projection.finalBalance.real);
-  const maximumTaxFreeCash = Math.min(
-    projectedPensionAtRetirement * TAX_FREE_CASH_RATE,
-    STANDARD_LUMP_SUM_ALLOWANCE,
+  const maximumTaxFreeCash = Math.floor(
+    Math.min(
+      projectedPensionAtRetirement * TAX_FREE_CASH_RATE,
+      STANDARD_LUMP_SUM_ALLOWANCE,
+    ),
   );
+  const selectedTaxFreeCash = Math.floor(Math.max(0, value.taxFreeCash));
   const pensionRemainingAfterCash = Math.max(
     0,
-    projectedPensionAtRetirement - value.taxFreeCash,
+    projectedPensionAtRetirement - selectedTaxFreeCash,
   );
 
   function update<K extends keyof ScenarioDrawdownPreferences>(
@@ -71,7 +74,7 @@ export function ScenarioDrawdownFields({
         : undefined;
 
   const taxFreeCashError =
-    value.taxFreeCash > maximumTaxFreeCash
+    selectedTaxFreeCash > maximumTaxFreeCash
       ? `Enter no more than the illustrated maximum of ${formatCurrency(maximumTaxFreeCash)}.`
       : undefined;
 
@@ -246,55 +249,57 @@ export function ScenarioDrawdownFields({
           </div>
         </div>
 
-        <div className="scenario-edit-grid">
-          <FormField
-            id={`${idPrefix}-taxFreeCash`}
-            label="Tax-free cash amount"
-            hint={`Enter an amount up to ${formatCurrency(maximumTaxFreeCash)}.`}
-            error={taxFreeCashError}
-            optional
-          >
-            {(id, describedBy) => (
+        <FormField
+          id={`${idPrefix}-taxFreeCash`}
+          label="Tax-free cash amount"
+          hint={`Enter a whole-pound amount up to ${formatCurrency(maximumTaxFreeCash)}.`}
+          error={taxFreeCashError}
+          optional
+        >
+          {(id, describedBy) => (
+            <div className="scenario-tax-free-cash-input-row">
               <CurrencyInput
                 id={id}
                 aria-describedby={describedBy}
-                value={value.taxFreeCash}
+                value={selectedTaxFreeCash}
                 min={0}
                 max={maximumTaxFreeCash}
-                step={1_000}
+                step={1}
                 error={Boolean(taxFreeCashError)}
                 onValueChange={(nextValue) =>
                   update(
                     "taxFreeCash",
-                    Math.min(
-                      Math.max(0, nextValue ?? 0),
-                      maximumTaxFreeCash,
+                    Math.floor(
+                      Math.min(
+                        Math.max(0, nextValue ?? 0),
+                        maximumTaxFreeCash,
+                      ),
                     ),
                   )
                 }
               />
-            )}
-          </FormField>
 
-          <div className="scenario-tax-free-cash-actions">
-            <button
-              type="button"
-              className="ui-button ui-button-secondary ui-button-small"
-              disabled={maximumTaxFreeCash <= 0}
-              onClick={() => update("taxFreeCash", maximumTaxFreeCash)}
-            >
-              Use maximum
-            </button>
-            <button
-              type="button"
-              className="comparison-text-button"
-              disabled={value.taxFreeCash === 0}
-              onClick={() => update("taxFreeCash", 0)}
-            >
-              Take no cash
-            </button>
-          </div>
-        </div>
+              <div className="scenario-tax-free-cash-actions">
+                <button
+                  type="button"
+                  className="ui-button ui-button-secondary ui-button-small"
+                  disabled={maximumTaxFreeCash <= 0}
+                  onClick={() => update("taxFreeCash", maximumTaxFreeCash)}
+                >
+                  Use maximum
+                </button>
+                <button
+                  type="button"
+                  className="comparison-text-button"
+                  disabled={selectedTaxFreeCash === 0}
+                  onClick={() => update("taxFreeCash", 0)}
+                >
+                  Take no cash
+                </button>
+              </div>
+            </div>
+          )}
+        </FormField>
 
         <dl className="scenario-tax-free-cash-summary">
           <div>
@@ -303,7 +308,7 @@ export function ScenarioDrawdownFields({
           </div>
           <div>
             <dt>Tax-free cash selected</dt>
-            <dd>{formatCurrency(value.taxFreeCash)}</dd>
+            <dd>{formatCurrency(selectedTaxFreeCash)}</dd>
           </div>
           <div>
             <dt>Pension remaining for income</dt>
