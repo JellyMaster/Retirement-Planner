@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
 import { GuidedPensionInputsForm } from "../components/inputs/guided";
@@ -13,13 +13,48 @@ import { AppIcons } from "../icons";
 import { savePensionInputs } from "../state/planStorage";
 import { formatCurrency } from "../utils/formatters";
 
+const incomeSectionIds: Record<string, string> = {
+  "income-target": "income-target",
+  chapters: "retirement-chapters",
+  "retirement-chapters": "retirement-chapters",
+  "tax-free-cash": "tax-free-cash",
+  "state-pension": "state-pension",
+};
+
 export function RetirementPlannerPage() {
   const { activeScenario, updateScenarioInputs } = useScenarios();
+  const [searchParams] = useSearchParams();
   const [inputs, setInputs] = useState<PensionInputs>(() => ({
     ...activeScenario.inputs,
   }));
   const [retirementGoals] = useStoredRetirementGoals();
   const scenario = usePensionProjection(inputs);
+
+  useEffect(() => {
+    if (searchParams.get("step") !== "income") return;
+
+    const stepFrame = window.requestAnimationFrame(() => {
+      const incomeStep = document.querySelector<HTMLButtonElement>(
+        'button[aria-label="Retirement income"]',
+      );
+      incomeStep?.click();
+      incomeStep?.focus();
+
+      const requestedSection = incomeSectionIds[searchParams.get("section") ?? ""];
+      if (!requestedSection) return;
+
+      window.requestAnimationFrame(() => {
+        const tab = document.getElementById(
+          `current-drawdown-${requestedSection}-tab`,
+        ) as HTMLButtonElement | null;
+        tab?.click();
+        tab?.focus();
+        tab?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+
+    return () => window.cancelAnimationFrame(stepFrame);
+  }, [searchParams]);
 
   const commitInputs = useCallback(
     (nextInputs: PensionInputs) => {
@@ -202,10 +237,16 @@ export function RetirementPlannerPage() {
                 compare saved plans or model retirement withdrawals.
               </p>
               <div>
-                <Link className="ui-button ui-button-primary ui-button-medium" to="/what-if">
+                <Link
+                  className="ui-button ui-button-primary ui-button-medium"
+                  to="/what-if?experiment=retirement-age"
+                >
                   Explore a What If?
                 </Link>
-                <Link className="ui-button ui-button-secondary ui-button-medium" to="/drawdown">
+                <Link
+                  className="ui-button ui-button-secondary ui-button-medium"
+                  to="/drawdown?tab=overview"
+                >
                   Review drawdown
                 </Link>
               </div>
