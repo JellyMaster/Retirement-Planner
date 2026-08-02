@@ -88,6 +88,7 @@ describe("OverviewPage", () => {
       duplicateScenario: vi.fn(),
       renameScenario: vi.fn(),
       updateScenarioInputs: vi.fn(),
+      updateScenarioPlan: vi.fn(),
       setActiveScenario: vi.fn(),
       deleteScenario: vi.fn(),
     };
