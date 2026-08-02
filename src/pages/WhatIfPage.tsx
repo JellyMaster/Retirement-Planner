@@ -8,6 +8,7 @@ import {
   ExperimentLauncher,
   type ExperimentId,
 } from "../components/what-if/ExperimentLauncher";
+import { FeeExperiment } from "../components/what-if/FeeExperiment";
 import { RetirementAgeExperiment } from "../components/what-if/RetirementAgeExperiment";
 import { SpendingExperiment } from "../components/what-if/SpendingExperiment";
 import {
@@ -167,6 +168,14 @@ function WhatIfWorkspace({
     setSaveMessage(null);
   }
 
+  function changeAnnualFee(fee: number) {
+    setAlternativeInputs((current) => ({
+      ...current,
+      annualFee: Math.min(0.02, Math.max(0, fee)),
+    }));
+    setSaveMessage(null);
+  }
+
   function resetExperiment() {
     setAlternativeInputs({ ...activeScenario.inputs });
     setAlternativeDrawdown({ ...baselineDrawdown });
@@ -184,7 +193,9 @@ function WhatIfWorkspace({
           )} monthly`
         : activeExperiment === "spending"
           ? `Spend ${Math.round(alternativeDrawdown.desiredAnnualIncome)} yearly`
-          : `Retire at ${alternativeInputs.retirementAge}`;
+          : activeExperiment === "fees"
+            ? `Fees ${(alternativeInputs.annualFee * 100).toFixed(2)} percent`
+            : `Retire at ${alternativeInputs.retirementAge}`;
     const name = window.prompt("Name this scenario", suggestedName)?.trim();
     if (!name) return;
 
@@ -287,6 +298,31 @@ function WhatIfWorkspace({
           canSave={!alternativeScenario.hasErrors}
           saveMessage={saveMessage}
           onTargetIncomeChange={changeTargetIncome}
+          onReset={resetExperiment}
+          onSave={saveExperiment}
+        />
+      )}
+
+      {activeExperiment === "fees" && (
+        <FeeExperiment
+          activePlanName={activeScenario.name}
+          baselineFee={activeScenario.inputs.annualFee}
+          fee={alternativeInputs.annualFee}
+          yearsToRetirement={Math.max(
+            0,
+            activeScenario.inputs.retirementAge - activeScenario.inputs.currentAge,
+          )}
+          baselineTotalFees={baselineScenario.projection.totalFees.real}
+          totalFees={alternativeScenario.projection.totalFees.real}
+          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+          projectedPension={alternativeScenario.projection.finalBalance.real}
+          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+          baselinePreparedness={baselineHealth?.score ?? 0}
+          preparedness={alternativeHealth?.score ?? 0}
+          canSave={!alternativeScenario.hasErrors}
+          saveMessage={saveMessage}
+          onFeeChange={changeAnnualFee}
           onReset={resetExperiment}
           onSave={saveExperiment}
         />
