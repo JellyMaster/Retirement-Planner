@@ -1,0 +1,276 @@
+.guidance-page {
+  display: grid;
+  gap: var(--ui-space-7);
+}
+
+.guidance-header {
+  align-items: stretch;
+}
+
+.guidance-header-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: min(100%, 32rem);
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.guidance-header-summary span {
+  display: grid;
+  align-content: center;
+  gap: var(--ui-space-1);
+  min-width: 0;
+  padding: var(--ui-space-3);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.guidance-header-summary small,
+.guidance-check-card small {
+  color: var(--colour-text-muted);
+  font-weight: 800;
+}
+
+.guidance-header-summary strong {
+  overflow-wrap: anywhere;
+  font-size: 1.15rem;
+}
+
+.guidance-primary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ui-space-5);
+  padding: var(--ui-space-6);
+  border: 1px solid color-mix(in srgb, var(--colour-primary) 42%, var(--colour-border));
+  border-radius: var(--ui-radius-panel);
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+  box-shadow: var(--shadow-panel);
+}
+
+.guidance-primary-icon,
+.guidance-card-icon,
+.guidance-check-card > span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.guidance-primary-icon {
+  width: 4rem;
+  height: 4rem;
+  background: var(--colour-surface);
+  color: var(--colour-primary);
+  font-size: 1.4rem;
+}
+
+.guidance-primary-icon.is-attention {
+  color: var(--colour-warning, #c77800);
+}
+
+.guidance-primary-icon.is-positive {
+  color: var(--colour-positive, #16845b);
+}
+
+.guidance-primary h2,
+.guidance-section-heading h2,
+.guidance-card h3 {
+  margin: 0;
+}
+
+.guidance-primary p:not(.planner-eyebrow),
+.guidance-section-heading p:not(.planner-eyebrow),
+.guidance-card p,
+.guidance-check-card p {
+  margin: var(--ui-space-2) 0 0;
+  color: var(--colour-text-muted);
+  line-height: 1.55;
+}
+
+.guidance-primary > div > strong {
+  display: block;
+  margin-top: var(--ui-space-3);
+}
+
+.guidance-section,
+.guidance-checks {
+  display: grid;
+  gap: var(--ui-space-4);
+}
+
+.guidance-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--ui-space-5);
+}
+
+.guidance-section-heading > div {
+  max-width: 50rem;
+}
+
+.guidance-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ui-space-4);
+}
+
+.guidance-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: start;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.guidance-card.is-attention {
+  border-top: 4px solid var(--colour-warning, #c77800);
+}
+
+.guidance-card.is-opportunity {
+  border-top: 4px solid var(--colour-primary);
+}
+
+.guidance-card-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  background: color-mix(in srgb, var(--colour-primary) 10%, var(--colour-surface));
+  color: var(--colour-primary);
+}
+
+.guidance-card.is-attention .guidance-card-icon {
+  background: color-mix(in srgb, var(--colour-warning, #c77800) 10%, var(--colour-surface));
+  color: var(--colour-warning, #c77800);
+}
+
+.guidance-card > div > strong {
+  display: block;
+  margin-top: var(--ui-space-3);
+  font-size: var(--ui-font-size-sm);
+}
+
+.guidance-card-action {
+  grid-column: 2;
+  width: fit-content;
+  color: var(--colour-primary);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.guidance-card-action:hover {
+  text-decoration: underline;
+}
+
+.guidance-checks {
+  padding: var(--ui-space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--colour-surface-secondary);
+}
+
+.guidance-check-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ui-space-3);
+}
+
+.guidance-check-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface);
+}
+
+.guidance-check-card > span {
+  width: 2rem;
+  height: 2rem;
+  background: color-mix(in srgb, var(--colour-positive, #16845b) 10%, var(--colour-surface));
+  color: var(--colour-positive, #16845b);
+}
+
+.guidance-check-card > div {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-space-1);
+  min-width: 0;
+}
+
+.guidance-check-card strong {
+  overflow-wrap: anywhere;
+  font-size: 1.05rem;
+}
+
+.guidance-check-card p {
+  font-size: var(--ui-font-size-xs);
+}
+
+.guidance-disclaimer {
+  margin: 0;
+  padding: var(--ui-space-4);
+  border-left: 4px solid var(--colour-primary);
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.55;
+}
+
+@media (max-width: 70rem) {
+  .guidance-card-grid,
+  .guidance-check-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 52rem) {
+  .guidance-header-summary,
+  .guidance-card-grid,
+  .guidance-check-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guidance-primary {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .guidance-primary > .primary-button {
+    grid-column: 2;
+    width: fit-content;
+  }
+
+  .guidance-section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 36rem) {
+  .guidance-primary {
+    grid-template-columns: 1fr;
+    padding: var(--ui-space-4);
+  }
+
+  .guidance-primary > .primary-button {
+    grid-column: 1;
+    width: 100%;
+  }
+
+  .guidance-card {
+    grid-template-columns: 1fr;
+  }
+
+  .guidance-card-action {
+    grid-column: 1;
+  }
+}
