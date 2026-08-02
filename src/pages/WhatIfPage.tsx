@@ -1,61 +1,89 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { RetirementComparisonDashboard } from "../components/comparison/RetirementComparisonDashboard";
+import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
 import { useScenarios } from "../components/scenarios";
+import {
+  ExperimentLauncher,
+  type ExperimentId,
+} from "../components/what-if/ExperimentLauncher";
+import { RetirementAgeExperiment } from "../components/what-if/RetirementAgeExperiment";
+import { createDefaultScenarioDrawdownPreferences } from "../domain/scenarios";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
-import { formatCurrency } from "../utils/formatters";
+import { AppIcons } from "../icons";
 import "../styles/what-if-page.css";
 
 export function WhatIfPage() {
-  const {
-    activeScenario,
-    createScenario,
-    updateScenarioPlan,
-  } = useScenarios();
-  const [retirementGoals, setRetirementGoals] = useStoredRetirementGoals();
-  const [baselineInputs, setBaselineInputs] = useState<PensionInputs>(() => ({
-    ...activeScenario.inputs,
-  }));
+  const scenarios = useScenarios();
+
+  return (
+    <WhatIfWorkspace
+      key={scenarios.activeScenario.id}
+      activeScenario={scenarios.activeScenario}
+      createScenario={scenarios.createScenario}
+      updateScenarioPlan={scenarios.updateScenarioPlan}
+    />
+  );
+}
+
+interface WhatIfWorkspaceProps {
+  activeScenario: ReturnType<typeof useScenarios>["activeScenario"];
+  createScenario: ReturnType<typeof useScenarios>["createScenario"];
+  updateScenarioPlan: ReturnType<typeof useScenarios>["updateScenarioPlan"];
+}
+
+function WhatIfWorkspace({
+  activeScenario,
+  createScenario,
+  updateScenarioPlan,
+}: WhatIfWorkspaceProps) {
+  const [retirementGoals] = useStoredRetirementGoals();
+  const [activeExperiment, setActiveExperiment] =
+    useState<ExperimentId>("retirement-age");
   const [alternativeInputs, setAlternativeInputs] = useState<PensionInputs>(() => ({
     ...activeScenario.inputs,
   }));
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
-  const baselineScenario = usePensionProjection(baselineInputs);
+  const baselineScenario = usePensionProjection(activeScenario.inputs);
   const alternativeScenario = usePensionProjection(alternativeInputs);
+  const baselineHealth = baselineScenario.hasErrors
+    ? null
+    : calculateRetirementHealth(baselineScenario.projection, retirementGoals);
+  const alternativeHealth = alternativeScenario.hasErrors
+    ? null
+    : calculateRetirementHealth(alternativeScenario.projection, retirementGoals);
+  const planningAge =
+    activeScenario.drawdown?.planningAge ??
+    createDefaultScenarioDrawdownPreferences().planningAge;
 
-  const projectedDifference = useMemo(
-    () =>
-      alternativeScenario.projection.finalBalance.real -
-      baselineScenario.projection.finalBalance.real,
-    [
-      alternativeScenario.projection.finalBalance.real,
-      baselineScenario.projection.finalBalance.real,
-    ],
-  );
-
-  function resetBaseline() {
-    setBaselineInputs({ ...activeScenario.inputs });
+  function changeRetirementAge(retirementAge: number) {
+    setAlternativeInputs((current) => ({ ...current, retirementAge }));
+    setSaveMessage(null);
   }
 
-  function resetAlternative() {
+  function resetExperiment() {
     setAlternativeInputs({ ...activeScenario.inputs });
     setSaveMessage(null);
   }
 
-  function saveAlternative() {
-    const suggestedName = `${activeScenario.name} experiment`;
-    const name = window.prompt("Name this scenario", suggestedName)?.trim();
+  function saveExperiment() {
+    if (alternativeScenario.hasErrors) return;
 
+    const suggestedName = `Retire at ${alternativeInputs.retirementAge}`;
+    const name = window.prompt("Name this scenario", suggestedName)?.trim();
     if (!name) return;
 
     const scenario = createScenario(name, activeScenario.id);
     updateScenarioPlan(
       scenario.id,
       { ...alternativeInputs },
-      { ...activeScenario.drawdown },
+      {
+        ...(activeScenario.drawdown ??
+          createDefaultScenarioDrawdownPreferences()),
+      },
     );
     setSaveMessage(`${name} has been saved and is ready to compare.`);
   }
@@ -64,67 +92,45 @@ export function WhatIfPage() {
     <main className="planner-page what-if-page">
       <header className="planner-header what-if-header">
         <div>
-          <p className="planner-eyebrow">Planning sandbox</p>
-          <h1>What If?</h1>
+          <p className="planner-eyebrow">Decision lab · {activeScenario.name}</p>
+          <h1>What would happen if you changed one decision?</h1>
           <p>
-            Test changes against {activeScenario.name} without altering the saved
-            plan. Keep an experiment only when it is worth comparing later.
+            Explore one meaningful lever at a time. Every experiment starts from
+            the active plan and remains temporary until you choose to save it.
           </p>
         </div>
-
-        <button
-          type="button"
-          className="ui-button ui-button-primary ui-button-medium"
-          disabled={alternativeScenario.hasErrors}
-          onClick={saveAlternative}
-        >
-          Save as scenario
-        </button>
+        <div className="what-if-header-mark" aria-hidden="true">
+          <FontAwesomeIcon icon={AppIcons.lightbulb} />
+        </div>
       </header>
 
-      <section className="what-if-summary" aria-label="Experiment summary">
-        <div>
-          <span>Current plan</span>
-          <strong>{activeScenario.name}</strong>
-        </div>
-        <div>
-          <span>Current projected pot</span>
-          <strong>{formatCurrency(baselineScenario.projection.finalBalance.real)}</strong>
-        </div>
-        <div>
-          <span>Alternative projected pot</span>
-          <strong>{formatCurrency(alternativeScenario.projection.finalBalance.real)}</strong>
-        </div>
-        <div>
-          <span>Difference</span>
-          <strong>
-            {projectedDifference >= 0 ? "+" : ""}
-            {formatCurrency(projectedDifference)}
-          </strong>
-        </div>
-      </section>
-
-      {saveMessage && (
-        <p className="what-if-save-message" role="status">
-          {saveMessage}
-        </p>
-      )}
-
-      <RetirementComparisonDashboard
-        baselineInputs={baselineInputs}
-        alternativeInputs={alternativeInputs}
-        baselineScenario={baselineScenario}
-        alternativeScenario={alternativeScenario}
-        onBaselineChange={setBaselineInputs}
-        onAlternativeChange={(nextInputs) => {
-          setAlternativeInputs(nextInputs);
-          setSaveMessage(null);
-        }}
-        onResetBaseline={resetBaseline}
-        onResetAlternative={resetAlternative}
-        retirementGoals={retirementGoals}
-        onRetirementGoalsChange={setRetirementGoals}
+      <ExperimentLauncher
+        activeExperiment={activeExperiment}
+        onSelect={setActiveExperiment}
       />
+
+      {activeExperiment === "retirement-age" && (
+        <RetirementAgeExperiment
+          activePlanName={activeScenario.name}
+          currentAge={activeScenario.inputs.currentAge}
+          baselineRetirementAge={activeScenario.inputs.retirementAge}
+          retirementAge={alternativeInputs.retirementAge}
+          planningAge={planningAge}
+          baselineProjectedPension={
+            baselineScenario.projection.finalBalance.real
+          }
+          projectedPension={alternativeScenario.projection.finalBalance.real}
+          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+          baselinePreparedness={baselineHealth?.score ?? 0}
+          preparedness={alternativeHealth?.score ?? 0}
+          canSave={!alternativeScenario.hasErrors}
+          saveMessage={saveMessage}
+          onRetirementAgeChange={changeRetirementAge}
+          onReset={resetExperiment}
+          onSave={saveExperiment}
+        />
+      )}
     </main>
   );
 }
