@@ -12,14 +12,22 @@ const baseInput = {
 };
 
 describe("calculateSequenceReturns", () => {
-  it("uses the same return values and average in a different order", () => {
+  it("uses the same return values and averages in all three orders", () => {
     const result = calculateSequenceReturns(baseInput);
+    const sortedEarlyReturns = [...result.earlyLoss.returns].sort();
 
-    expect([...result.earlyLoss.returns].sort()).toEqual(
-      [...result.lateLoss.returns].sort(),
+    expect([...result.midLoss.returns].sort()).toEqual(sortedEarlyReturns);
+    expect([...result.lateLoss.returns].sort()).toEqual(sortedEarlyReturns);
+    expect(result.earlyLoss.arithmeticAverageReturn).toBeCloseTo(
+      result.midLoss.arithmeticAverageReturn,
+      10,
     );
     expect(result.earlyLoss.arithmeticAverageReturn).toBeCloseTo(
       result.lateLoss.arithmeticAverageReturn,
+      10,
+    );
+    expect(result.earlyLoss.compoundedReturn).toBeCloseTo(
+      result.midLoss.compoundedReturn,
       10,
     );
     expect(result.earlyLoss.compoundedReturn).toBeCloseTo(
@@ -28,21 +36,40 @@ describe("calculateSequenceReturns", () => {
     );
   });
 
-  it("shows a worse ending balance when the loss happens early and withdrawals continue", () => {
+  it("places the shared market fall at the start, midpoint and end", () => {
+    const result = calculateSequenceReturns(baseInput);
+    const midpoint = Math.floor((baseInput.durationYears - 1) / 2);
+
+    expect(result.earlyLoss.returns[0]).toBe(-baseInput.shockPercentage);
+    expect(result.midLoss.returns[midpoint]).toBe(-baseInput.shockPercentage);
+    expect(result.lateLoss.returns.at(-1)).toBe(-baseInput.shockPercentage);
+  });
+
+  it("shows the midpoint outcome between early and late losses when withdrawals continue", () => {
     const result = calculateSequenceReturns(baseInput);
 
     expect(result.earlyLoss.endingBalance).toBeLessThan(
+      result.midLoss.endingBalance,
+    );
+    expect(result.midLoss.endingBalance).toBeLessThan(
       result.lateLoss.endingBalance,
     );
-    expect(result.endingBalanceDifference).toBeGreaterThan(0);
+    expect(result.midEndingBalanceDifference).toBeGreaterThan(0);
+    expect(result.endingBalanceDifference).toBeGreaterThan(
+      result.midEndingBalanceDifference,
+    );
   });
 
-  it("finishes with the same balance when there are no withdrawals", () => {
+  it("finishes with the same balance in every order when there are no withdrawals", () => {
     const result = calculateSequenceReturns({
       ...baseInput,
       annualWithdrawal: 0,
     });
 
+    expect(result.earlyLoss.endingBalance).toBeCloseTo(
+      result.midLoss.endingBalance,
+      6,
+    );
     expect(result.earlyLoss.endingBalance).toBeCloseTo(
       result.lateLoss.endingBalance,
       6,
@@ -58,6 +85,10 @@ describe("calculateSequenceReturns", () => {
     });
 
     expect(result.earlyLoss.depletionAge).not.toBeNull();
-    expect(result.earlyLoss.years.find((year) => year.age === result.earlyLoss.depletionAge)?.closingBalance).toBe(0);
+    expect(
+      result.earlyLoss.years.find(
+        (year) => year.age === result.earlyLoss.depletionAge,
+      )?.closingBalance,
+    ).toBe(0);
   });
 });
