@@ -79,14 +79,52 @@
   line-height: 1.45;
 }
 
-.drawdown-plan-context-grid {
+.drawdown-plan-context-sections {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--ui-space-2);
+  gap: var(--ui-space-4);
+}
+
+.drawdown-income-strategy-summary,
+.drawdown-plan-details-summary {
+  padding: var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface);
+}
+
+.drawdown-income-strategy-summary {
+  display: grid;
+  gap: var(--ui-space-4);
+  border-color: color-mix(in srgb, var(--colour-primary) 24%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 5%, var(--colour-surface));
+}
+
+.drawdown-income-strategy-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-4);
+}
+
+.drawdown-income-strategy-heading h3,
+.drawdown-income-strategy-heading p,
+.drawdown-plan-details-summary h3 {
   margin: 0;
 }
 
-.drawdown-plan-context-grid > div {
+.drawdown-income-strategy-heading h3,
+.drawdown-plan-details-summary h3 {
+  margin-top: var(--ui-space-1);
+}
+
+.drawdown-income-breakdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ui-space-3);
+  margin: 0;
+}
+
+.drawdown-income-breakdown > div {
   min-width: 0;
   padding: var(--ui-space-3);
   border: 1px solid var(--colour-border);
@@ -94,18 +132,56 @@
   background: var(--colour-surface);
 }
 
+.drawdown-income-breakdown > div.is-emphasised {
+  border-color: color-mix(in srgb, var(--colour-primary) 38%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 10%, var(--colour-surface));
+}
+
+.drawdown-income-breakdown dt,
 .drawdown-plan-context-grid dt {
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
   font-weight: 700;
 }
 
+.drawdown-income-breakdown dd,
 .drawdown-plan-context-grid dd {
   margin: var(--ui-space-1) 0 0;
   color: var(--colour-text);
   font-size: var(--ui-font-size-sm);
   font-weight: 800;
+  line-height: 1.4;
   overflow-wrap: anywhere;
+}
+
+.drawdown-income-tax-free-cash {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-4);
+  padding-top: var(--ui-space-3);
+  border-top: 1px solid var(--colour-border);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-income-tax-free-cash strong {
+  color: var(--colour-text);
+}
+
+.drawdown-plan-context-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--ui-space-2);
+  margin: var(--ui-space-3) 0 0;
+}
+
+.drawdown-plan-context-grid > div {
+  min-width: 0;
+  padding: var(--ui-space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
 }
 
 .drawdown-editor-panel-compact {
@@ -127,14 +203,23 @@
 }
 
 @media (max-width: 1100px) {
+  .drawdown-income-breakdown {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .drawdown-plan-context-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 700px) {
-  .drawdown-editor-panel-compact .withdrawal-strategy-grid {
+  .drawdown-editor-panel-compact .withdrawal-strategy-grid,
+  .drawdown-income-breakdown {
     grid-template-columns: 1fr;
+  }
+
+  .drawdown-income-strategy-heading {
+    flex-direction: column;
   }
 
   .drawdown-plan-context-grid {
@@ -149,6 +234,12 @@
 
   .drawdown-plan-context-strategy {
     white-space: normal;
+  }
+
+  .drawdown-income-tax-free-cash {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--ui-space-1);
   }
 
   .drawdown-plan-context-grid {
