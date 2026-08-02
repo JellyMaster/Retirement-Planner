@@ -9,6 +9,7 @@ import {
   PercentageInput,
 } from "../forms";
 import { useScenarios } from "./ScenarioContext";
+import { ScenarioSpendingPhaseFields } from "./ScenarioSpendingPhaseFields";
 
 const STANDARD_LUMP_SUM_ALLOWANCE = 268_275;
 const TAX_FREE_CASH_RATE = 0.25;
@@ -66,6 +67,12 @@ export function ScenarioDrawdownFields({
     setRetirementGoals({ ...retirementGoals, [field]: nextValue });
   }
 
+  function goToSection(section: string) {
+    document
+      .getElementById(`${idPrefix}-${section}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   const planningAgeError =
     value.planningAge <= retirementAge
       ? "Planning age must be later than retirement age."
@@ -79,151 +86,192 @@ export function ScenarioDrawdownFields({
       : undefined;
 
   return (
-    <fieldset className="scenario-edit-section">
+    <fieldset className="scenario-edit-section scenario-retirement-income-editor">
       <legend>Retirement income</legend>
       <p className="scenario-edit-section-copy">
-        Choose how this plan will provide retirement income, including whether
-        State Pension should contribute to the plan.
+        Choose how this plan will provide retirement income, including how your
+        spending changes over retirement and whether State Pension contributes.
       </p>
 
-      <div
-        className="scenario-drawdown-strategy"
-        role="radiogroup"
-        aria-label="Retirement income approach"
+      <nav className="scenario-income-section-nav" aria-label="Retirement income sections">
+        <button type="button" onClick={() => goToSection("income-target")}>
+          Income target
+        </button>
+        <button type="button" onClick={() => goToSection("retirement-chapters")}>
+          Retirement chapters
+        </button>
+        <button type="button" onClick={() => goToSection("tax-free-cash-heading")}>
+          Tax-free cash
+        </button>
+        <button type="button" onClick={() => goToSection("state-pension-heading")}>
+          State Pension
+        </button>
+      </nav>
+
+      <section
+        id={`${idPrefix}-income-target`}
+        className="scenario-edit-subsection scenario-income-target-section"
+        aria-labelledby={`${idPrefix}-income-target-heading`}
       >
-        <button
-          type="button"
-          role="radio"
-          aria-checked={value.withdrawalStrategy === "target-income"}
-          className={
-            value.withdrawalStrategy === "target-income"
-              ? "scenario-drawdown-option is-selected"
-              : "scenario-drawdown-option"
-          }
-          onClick={() => update("withdrawalStrategy", "target-income")}
-        >
-          <strong>Target annual income</strong>
-          <span>Calculate the pension withdrawal needed for a chosen income.</span>
-        </button>
-        <button
-          type="button"
-          role="radio"
-          aria-checked={value.withdrawalStrategy === "percentage"}
-          className={
-            value.withdrawalStrategy === "percentage"
-              ? "scenario-drawdown-option is-selected"
-              : "scenario-drawdown-option"
-          }
-          onClick={() => update("withdrawalStrategy", "percentage")}
-        >
-          <strong>Percentage withdrawal</strong>
-          <span>Take a percentage of the remaining pension each year.</span>
-        </button>
-      </div>
+        <div>
+          <h3 id={`${idPrefix}-income-target-heading`}>Income approach</h3>
+          <p>Choose one annual target or a percentage of the remaining pension.</p>
+        </div>
 
-      <div className="scenario-edit-grid">
-        <FormField
-          id={`${idPrefix}-planningAge`}
-          label="Plan retirement income to age"
-          hint="The final age included in the drawdown projection."
-          error={planningAgeError}
+        <div
+          className="scenario-drawdown-strategy"
+          role="radiogroup"
+          aria-label="Retirement income approach"
         >
-          {(id, describedBy) => (
-            <NumberInput
-              id={id}
-              aria-describedby={describedBy}
-              value={value.planningAge}
-              min={Math.min(120, retirementAge + 1)}
-              max={120}
-              suffix="years"
-              error={Boolean(planningAgeError)}
-              onValueChange={(nextValue) =>
-                update("planningAge", nextValue ?? 95)
-              }
-            />
-          )}
-        </FormField>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={value.withdrawalStrategy === "target-income"}
+            className={
+              value.withdrawalStrategy === "target-income"
+                ? "scenario-drawdown-option is-selected"
+                : "scenario-drawdown-option"
+            }
+            onClick={() => update("withdrawalStrategy", "target-income")}
+          >
+            <strong>Target annual income</strong>
+            <span>Calculate the pension income needed for a chosen lifestyle.</span>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={value.withdrawalStrategy === "percentage"}
+            className={
+              value.withdrawalStrategy === "percentage"
+                ? "scenario-drawdown-option is-selected"
+                : "scenario-drawdown-option"
+            }
+            onClick={() => update("withdrawalStrategy", "percentage")}
+          >
+            <strong>Percentage withdrawal</strong>
+            <span>Take a percentage of the remaining pension each year.</span>
+          </button>
+        </div>
 
-        {value.withdrawalStrategy === "target-income" ? (
-          <>
-            <div className="form-field scenario-edit-field-wide">
-              <span className="form-field-label">Income target basis</span>
-              <div
-                className="income-target-toggle"
-                role="group"
-                aria-label="Income target basis"
-              >
-                <button
-                  type="button"
-                  className={
-                    value.incomeTargetMode === "net"
-                      ? "income-target-option income-target-option-active"
-                      : "income-target-option"
-                  }
-                  aria-pressed={value.incomeTargetMode === "net"}
-                  onClick={() => update("incomeTargetMode", "net")}
-                >
-                  Net spendable income
-                </button>
-                <button
-                  type="button"
-                  className={
-                    value.incomeTargetMode === "gross"
-                      ? "income-target-option income-target-option-active"
-                      : "income-target-option"
-                  }
-                  aria-pressed={value.incomeTargetMode === "gross"}
-                  onClick={() => update("incomeTargetMode", "gross")}
-                >
-                  Gross income
-                </button>
-              </div>
-            </div>
-
-            <FormField
-              id={`${idPrefix}-desiredAnnualIncome`}
-              label={
-                value.incomeTargetMode === "net"
-                  ? "Desired net annual income"
-                  : "Desired gross annual income"
-              }
-              hint="This target is also used by the preparedness and confidence calculations."
-            >
-              {(id, describedBy) => (
-                <CurrencyInput
-                  id={id}
-                  aria-describedby={describedBy}
-                  value={value.desiredAnnualIncome}
-                  min={0}
-                  step={500}
-                  onValueChange={(nextValue) =>
-                    update("desiredAnnualIncome", nextValue ?? 0)
-                  }
-                />
-              )}
-            </FormField>
-          </>
-        ) : (
+        <div className="scenario-edit-grid">
           <FormField
-            id={`${idPrefix}-withdrawalRate`}
-            label="Annual withdrawal rate"
+            id={`${idPrefix}-planningAge`}
+            label="End of retirement plan"
+            hint="The final age included in the retirement illustration."
+            error={planningAgeError}
           >
             {(id, describedBy) => (
-              <PercentageInput
+              <NumberInput
                 id={id}
                 aria-describedby={describedBy}
-                value={value.withdrawalRate}
-                min={0}
-                max={100}
-                step={0.1}
+                value={value.planningAge}
+                min={Math.min(120, retirementAge + 1)}
+                max={120}
+                suffix="years"
+                error={Boolean(planningAgeError)}
                 onValueChange={(nextValue) =>
-                  update("withdrawalRate", nextValue ?? 0)
+                  update("planningAge", nextValue ?? 95)
                 }
               />
             )}
           </FormField>
-        )}
-      </div>
+
+          {value.withdrawalStrategy === "target-income" ? (
+            <>
+              <div className="form-field scenario-edit-field-wide">
+                <span className="form-field-label">Income target basis</span>
+                <div
+                  className="income-target-toggle"
+                  role="group"
+                  aria-label="Income target basis"
+                >
+                  <button
+                    type="button"
+                    className={
+                      value.incomeTargetMode === "net"
+                        ? "income-target-option income-target-option-active"
+                        : "income-target-option"
+                    }
+                    aria-pressed={value.incomeTargetMode === "net"}
+                    onClick={() => update("incomeTargetMode", "net")}
+                  >
+                    Net spendable income
+                  </button>
+                  <button
+                    type="button"
+                    className={
+                      value.incomeTargetMode === "gross"
+                        ? "income-target-option income-target-option-active"
+                        : "income-target-option"
+                    }
+                    aria-pressed={value.incomeTargetMode === "gross"}
+                    onClick={() => update("incomeTargetMode", "gross")}
+                  >
+                    Gross income
+                  </button>
+                </div>
+              </div>
+
+              <FormField
+                id={`${idPrefix}-desiredAnnualIncome`}
+                label={
+                  value.incomeTargetMode === "net"
+                    ? "Desired net annual income"
+                    : "Desired gross annual income"
+                }
+                hint="This is the default target and the starting value for active retirement."
+              >
+                {(id, describedBy) => (
+                  <CurrencyInput
+                    id={id}
+                    aria-describedby={describedBy}
+                    value={value.desiredAnnualIncome}
+                    min={0}
+                    step={500}
+                    onValueChange={(nextValue) =>
+                      update("desiredAnnualIncome", nextValue ?? 0)
+                    }
+                  />
+                )}
+              </FormField>
+            </>
+          ) : (
+            <FormField
+              id={`${idPrefix}-withdrawalRate`}
+              label="Annual withdrawal rate"
+            >
+              {(id, describedBy) => (
+                <PercentageInput
+                  id={id}
+                  aria-describedby={describedBy}
+                  value={value.withdrawalRate}
+                  min={0}
+                  max={100}
+                  step={0.1}
+                  onValueChange={(nextValue) =>
+                    update("withdrawalRate", nextValue ?? 0)
+                  }
+                />
+              )}
+            </FormField>
+          )}
+        </div>
+      </section>
+
+      {value.withdrawalStrategy === "target-income" && (
+        <section
+          id={`${idPrefix}-retirement-chapters`}
+          className="scenario-edit-subsection scenario-retirement-chapters-editor"
+          aria-label="Retirement chapters"
+        >
+          <ScenarioSpendingPhaseFields
+            idPrefix={`${idPrefix}-chapters`}
+            retirementAge={retirementAge}
+            value={value}
+            onChange={onChange}
+          />
+        </section>
+      )}
 
       <section
         className="scenario-edit-subsection scenario-tax-free-cash-section"
@@ -231,9 +279,7 @@ export function ScenarioDrawdownFields({
       >
         <div className="scenario-tax-free-cash-heading">
           <div>
-            <h3 id={`${idPrefix}-tax-free-cash-heading`}>
-              Tax-free cash at retirement
-            </h3>
+            <h3 id={`${idPrefix}-tax-free-cash-heading`}>Tax-free cash at retirement</h3>
             <p>
               Choose any amount from £0 up to the illustrated maximum. Taking
               cash reduces the pension left to provide retirement income.
@@ -270,15 +316,11 @@ export function ScenarioDrawdownFields({
                   update(
                     "taxFreeCash",
                     Math.floor(
-                      Math.min(
-                        Math.max(0, nextValue ?? 0),
-                        maximumTaxFreeCash,
-                      ),
+                      Math.min(Math.max(0, nextValue ?? 0), maximumTaxFreeCash),
                     ),
                   )
                 }
               />
-
               <div className="scenario-tax-free-cash-actions">
                 <button
                   type="button"
@@ -302,18 +344,9 @@ export function ScenarioDrawdownFields({
         </FormField>
 
         <dl className="scenario-tax-free-cash-summary">
-          <div>
-            <dt>Projected pension at retirement</dt>
-            <dd>{formatCurrency(projectedPensionAtRetirement)}</dd>
-          </div>
-          <div>
-            <dt>Tax-free cash selected</dt>
-            <dd>{formatCurrency(selectedTaxFreeCash)}</dd>
-          </div>
-          <div>
-            <dt>Pension remaining for income</dt>
-            <dd>{formatCurrency(pensionRemainingAfterCash)}</dd>
-          </div>
+          <div><dt>Projected pension at retirement</dt><dd>{formatCurrency(projectedPensionAtRetirement)}</dd></div>
+          <div><dt>Tax-free cash selected</dt><dd>{formatCurrency(selectedTaxFreeCash)}</dd></div>
+          <div><dt>Pension remaining for income</dt><dd>{formatCurrency(pensionRemainingAfterCash)}</dd></div>
         </dl>
 
         <p className="scenario-tax-free-cash-note">
@@ -362,15 +395,11 @@ export function ScenarioDrawdownFields({
                   min={0}
                   step={100}
                   onValueChange={(nextValue) =>
-                    updateRetirementGoal(
-                      "statePensionAnnualAmount",
-                      nextValue ?? 0,
-                    )
+                    updateRetirementGoal("statePensionAnnualAmount", nextValue ?? 0)
                   }
                 />
               )}
             </FormField>
-
             <FormField
               id={`${idPrefix}-statePensionAge`}
               label="State Pension starts at age"
