@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const destinations: Record<string, string> = {
   "Explore retirement age": "/what-if?experiment=retirement-age",
@@ -25,21 +25,56 @@ const destinations: Record<string, string> = {
 
 export function ConnectedJourneyLinks() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateLinks = () => {
       document.querySelectorAll<HTMLAnchorElement>("a").forEach((link) => {
-        const label = link.textContent?.replace(/\s+/g, " ").trim() ?? "";
-        const destination = destinations[label];
+        const destination = getDestination(link);
         if (destination) link.setAttribute("href", destination);
       });
     };
 
+    const handleClick = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const link = target.closest<HTMLAnchorElement>("a");
+      if (!link || link.target === "_blank" || link.hasAttribute("download")) return;
+
+      const destination = getDestination(link);
+      if (!destination) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      navigate(destination);
+    };
+
     updateLinks();
+    document.addEventListener("click", handleClick, true);
     const observer = new MutationObserver(updateLinks);
     observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, [location.pathname, location.search]);
+
+    return () => {
+      document.removeEventListener("click", handleClick, true);
+      observer.disconnect();
+    };
+  }, [location.pathname, location.search, navigate]);
 
   return null;
+}
+
+function getDestination(link: HTMLAnchorElement): string | undefined {
+  const label = link.textContent?.replace(/\s+/g, " ").trim() ?? "";
+  return destinations[label];
 }
