@@ -24,10 +24,13 @@ describe("RetirementPlannerPage", () => {
       screen.getByRole("heading", { name: "Your pension details" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "What the current choices produce" }),
+      screen.getByRole("heading", { name: "Your plan at a glance" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByLabelText("Retirement plan summary"),
+      screen.getByRole("region", { name: "Your saved choices" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Illustrated outcome" }),
     ).toBeInTheDocument();
 
     expect(screen.getByText("Time to retirement")).toBeInTheDocument();
@@ -71,11 +74,12 @@ describe("RetirementPlannerPage", () => {
     expect(
       screen.getByText(/current age must be between 18 and 100/i),
     ).toBeInTheDocument();
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "The plan needs attention",
-    );
+    expect(screen.getByText("The plan needs attention")).toBeInTheDocument();
     expect(
-      screen.queryByLabelText("Retirement plan summary"),
+      screen.queryByRole("region", { name: "Your saved choices" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Illustrated outcome" }),
     ).not.toBeInTheDocument();
   });
 });
