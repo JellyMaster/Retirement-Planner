@@ -273,11 +273,11 @@ function WhatIfWorkspace({
 
   function changeDownturnPercentage(percentage: number) {
     setAlternativeInputs((current) => {
-      const next = {
-        ...current,
-        marketDownturnAge: current.marketDownturnAge ?? defaultDownturnAge,
-        marketDownturnPercentage: Math.min(0.5, Math.max(0, percentage)),
-      };
+     const next: PensionInputs = {
+  ...current,
+  marketDownturnAge: current.marketDownturnAge ?? defaultDownturnAge,
+  marketDownturnPercentage: Math.min(0.5, Math.max(0, percentage)),
+};
       if (next.marketDownturnPercentage === 0) {
         delete next.marketDownturnPercentage;
         delete next.marketDownturnAge;
