@@ -14,6 +14,7 @@ interface ContributionExperimentProps {
   baselineEmployerContribution: number;
   employerContribution: number;
   baselineExtraContribution: number;
+  baselineExtraContributionAge: number;
   extraContribution: number;
   extraContributionAge: number;
   includeExtraContribution: boolean;
@@ -29,6 +30,7 @@ interface ContributionExperimentProps {
   onEmployerContributionChange: (amount: number) => void;
   onExtraContributionEnabledChange: (enabled: boolean) => void;
   onExtraContributionChange: (amount: number) => void;
+  onExtraContributionAgeChange: (age: number) => void;
   onReset: () => void;
   onSave: () => void;
 }
@@ -42,6 +44,7 @@ export function ContributionExperiment({
   baselineEmployerContribution,
   employerContribution,
   baselineExtraContribution,
+  baselineExtraContributionAge,
   extraContribution,
   extraContributionAge,
   includeExtraContribution,
@@ -57,6 +60,7 @@ export function ContributionExperiment({
   onEmployerContributionChange,
   onExtraContributionEnabledChange,
   onExtraContributionChange,
+  onExtraContributionAgeChange,
   onReset,
   onSave,
 }: ContributionExperimentProps) {
@@ -64,13 +68,17 @@ export function ContributionExperiment({
   const employerDifference = employerContribution - baselineEmployerContribution;
   const selectedExtra = includeExtraContribution ? extraContribution : 0;
   const extraDifference = selectedExtra - baselineExtraContribution;
+  const extraAgeDifference = includeExtraContribution
+    ? extraContributionAge - baselineExtraContributionAge
+    : 0;
   const pensionDifference = projectedPension - baselineProjectedPension;
   const incomeDifference = annualIncome - baselineAnnualIncome;
   const preparednessDifference = preparedness - baselinePreparedness;
   const hasChanged =
     employeeDifference !== 0 ||
     employerDifference !== 0 ||
-    extraDifference !== 0;
+    extraDifference !== 0 ||
+    extraAgeDifference !== 0;
   const yearsToRetirement = Math.max(0, retirementAge - currentAge);
   const totalSavedContribution =
     baselineEmployeeContribution + baselineEmployerContribution;
@@ -79,6 +87,7 @@ export function ContributionExperiment({
     Math.max(2_000, baselineExtraContribution * 2, extraContribution),
     250,
   );
+  const latestExtraContributionAge = Math.max(currentAge, retirementAge - 1);
 
   return (
     <section className="what-if-workspace" aria-labelledby="contribution-experiment-title">
@@ -87,9 +96,8 @@ export function ContributionExperiment({
           <p className="planner-eyebrow">Current experiment</p>
           <h2 id="contribution-experiment-title">Save more each month</h2>
           <p>
-            Adjust your contribution and the employer contribution around the
-            amounts saved in the active plan. Retirement timing and investment
-            assumptions remain unchanged.
+            Adjust personal, employer and scheduled future contributions while
+            keeping retirement timing and investment assumptions unchanged.
           </p>
         </div>
         <span className="what-if-baseline-pill">Based on {activePlanName}</span>
@@ -114,34 +122,31 @@ export function ContributionExperiment({
 
         <div className="what-if-control-panel what-if-extra-control">
           <div className="what-if-control-copy">
-            <span>Extra contribution from age {extraContributionAge}</span>
+            <span>Scheduled extra contribution</span>
             <strong>
               {includeExtraContribution
-                ? `${formatCurrency(extraContribution)}/month`
+                ? `${formatCurrency(extraContribution)}/month from age ${extraContributionAge}`
                 : "Not included"}
             </strong>
             <small>
-              This payment begins at age {extraContributionAge}, not at the current
-              age of {currentAge}.
+              Saved plan: {formatCurrency(baselineExtraContribution)}/month from
+              age {baselineExtraContributionAge}.
             </small>
           </div>
 
           <div className="what-if-extra-controls">
             <label className="what-if-toggle-row">
               <span>
-                <strong>
-                  Include the extra payment from age {extraContributionAge}
-                </strong>
+                <strong>Include a scheduled extra payment</strong>
                 <small>
-                  It is added only from age {extraContributionAge} until retirement
-                  at age {retirementAge}.
+                  Choose both the monthly amount and the age at which it begins.
                 </small>
               </span>
               <input
                 type="checkbox"
                 role="switch"
                 checked={includeExtraContribution}
-                aria-label={`Include extra contribution from age ${extraContributionAge}`}
+                aria-label="Include scheduled extra contribution"
                 onChange={(event) =>
                   onExtraContributionEnabledChange(event.target.checked)
                 }
@@ -149,25 +154,56 @@ export function ContributionExperiment({
             </label>
 
             <div className="what-if-slider-wrap">
+              <label htmlFor="what-if-extra-contribution-age">
+                <strong>Start age: {extraContributionAge}</strong>
+              </label>
               <input
+                id="what-if-extra-contribution-age"
+                type="range"
+                min={currentAge}
+                max={latestExtraContributionAge}
+                step={1}
+                value={extraContributionAge}
+                disabled={!includeExtraContribution}
+                aria-label="Experimental extra contribution start age"
+                aria-valuetext={`Starts at age ${extraContributionAge}`}
+                onChange={(event) =>
+                  onExtraContributionAgeChange(Number(event.target.value))
+                }
+              />
+              <div className="what-if-slider-labels" aria-hidden="true">
+                <span>Current age {currentAge}</span>
+                <span>Saved · age {baselineExtraContributionAge}</span>
+                <span>Before retirement · age {latestExtraContributionAge}</span>
+              </div>
+              <p className="what-if-control-note">
+                This extra payment will be added from age {extraContributionAge}
+                until retirement at age {retirementAge}.
+              </p>
+            </div>
+
+            <div className="what-if-slider-wrap">
+              <label htmlFor="what-if-extra-contribution-amount">
+                <strong>Monthly amount: {formatCurrency(extraContribution)}</strong>
+              </label>
+              <input
+                id="what-if-extra-contribution-amount"
                 type="range"
                 min={0}
                 max={extraMaximum}
                 step={25}
                 value={extraContribution}
                 disabled={!includeExtraContribution}
-                aria-label={`Experimental extra monthly contribution from age ${extraContributionAge}`}
+                aria-label="Experimental extra monthly contribution"
                 aria-valuetext={`${formatCurrency(extraContribution)} per month from age ${extraContributionAge}`}
                 onChange={(event) =>
                   onExtraContributionChange(Number(event.target.value))
                 }
               />
               <div className="what-if-slider-labels" aria-hidden="true">
-                <span>£0 from age {extraContributionAge}</span>
-                <span>
-                  Saved · {formatCurrency(baselineExtraContribution)} from age {extraContributionAge}
-                </span>
-                <span>{formatCurrency(extraMaximum)} from age {extraContributionAge}</span>
+                <span>£0</span>
+                <span>Saved · {formatCurrency(baselineExtraContribution)}</span>
+                <span>{formatCurrency(extraMaximum)}</span>
               </div>
             </div>
           </div>
@@ -185,6 +221,7 @@ export function ContributionExperiment({
               employeeDifference,
               employerDifference,
               extraDifference,
+              extraAgeDifference,
             )}
           </h3>
           <p>
@@ -194,6 +231,7 @@ export function ContributionExperiment({
               selectedExtra,
               includeExtraContribution,
               extraContributionAge,
+              baselineExtraContributionAge,
               pensionDifference,
               yearsToRetirement,
             })}
@@ -269,6 +307,7 @@ export function ContributionExperiment({
               employeeDifference,
               employerDifference,
               extraDifference,
+              extraAgeDifference,
               extraContributionAge,
               yearsToRetirement,
             }).map((reason) => (
@@ -406,23 +445,26 @@ function createStoryTitle(
   employeeDifference: number,
   employerDifference: number,
   extraDifference: number,
+  extraAgeDifference: number,
 ): string {
   if (
     employeeDifference === 0 &&
     employerDifference === 0 &&
-    extraDifference === 0
+    extraDifference === 0 &&
+    extraAgeDifference === 0
   ) {
     return "The saved contribution plan is unchanged";
   }
 
   if (
     employeeDifference + employerDifference > 0 ||
-    extraDifference > 0
+    extraDifference > 0 ||
+    extraAgeDifference < 0
   ) {
-    return "Putting more aside could strengthen the retirement outcome";
+    return "Putting more aside, or starting sooner, could strengthen the outcome";
   }
 
-  return "Reducing contributions gives the pension less money and time to grow";
+  return "Reducing contributions or starting later gives the pension less time to grow";
 }
 
 function createStoryDescription({
@@ -431,6 +473,7 @@ function createStoryDescription({
   selectedExtra,
   includeExtraContribution,
   extraContributionAge,
+  baselineExtraContributionAge,
   pensionDifference,
   yearsToRetirement,
 }: {
@@ -439,6 +482,7 @@ function createStoryDescription({
   selectedExtra: number;
   includeExtraContribution: boolean;
   extraContributionAge: number;
+  baselineExtraContributionAge: number;
   pensionDifference: number;
   yearsToRetirement: number;
 }): string {
@@ -447,14 +491,14 @@ function createStoryDescription({
     employerDifference === 0 &&
     pensionDifference === 0
   ) {
-    return "Move either regular-contribution slider or change the scheduled extra payment to see how a different saving pattern affects the plan.";
+    return "Move a regular-contribution slider, change the scheduled amount, or choose a different start age to see how the saving pattern affects the plan.";
   }
 
   const employeeText = `Your monthly payment changes by ${formatSignedCurrency(employeeDifference)}.`;
   const employerText = ` The employer payment changes by ${formatSignedCurrency(employerDifference)}.`;
   const extraText = includeExtraContribution
-    ? ` An additional ${formatCurrency(selectedExtra)} a month is added from age ${extraContributionAge}, not from today.`
-    : ` The extra payment that would begin at age ${extraContributionAge} is excluded.`;
+    ? ` An additional ${formatCurrency(selectedExtra)} a month begins at age ${extraContributionAge}${extraContributionAge === baselineExtraContributionAge ? "" : ` instead of the saved age ${baselineExtraContributionAge}`}.`
+    : ` The saved extra payment from age ${baselineExtraContributionAge} is excluded.`;
   const outcomeText = ` Across the ${yearsToRetirement} years to retirement, the projected pension changes by ${formatSignedCurrency(pensionDifference)}.`;
 
   return `${employeeText}${employerText}${extraText}${outcomeText}`;
@@ -464,24 +508,27 @@ function createReasons({
   employeeDifference,
   employerDifference,
   extraDifference,
+  extraAgeDifference,
   extraContributionAge,
   yearsToRetirement,
 }: {
   employeeDifference: number;
   employerDifference: number;
   extraDifference: number;
+  extraAgeDifference: number;
   extraContributionAge: number;
   yearsToRetirement: number;
 }): string[] {
   if (
     employeeDifference === 0 &&
     employerDifference === 0 &&
-    extraDifference === 0
+    extraDifference === 0 &&
+    extraAgeDifference === 0
   ) {
     return [
       "The experiment currently matches the saved contribution plan.",
-      "Both regular contribution sliders are centred on their saved amounts.",
-      "Move a slider to create a temporary alternative.",
+      "Regular contribution sliders are centred on their saved amounts.",
+      "The scheduled payment retains its saved amount and start age.",
     ];
   }
 
@@ -492,9 +539,13 @@ function createReasons({
     employerDifference >= 0
       ? "A higher employer payment increases the regular amount entering the pension."
       : "A lower employer payment reduces the regular pension funding.",
-    extraDifference >= 0
-      ? `The scheduled extra payment begins only from age ${extraContributionAge}.`
-      : `Reducing or removing the payment from age ${extraContributionAge} lowers later contributions across the ${yearsToRetirement}-year saving period.`,
+    extraAgeDifference < 0
+      ? `Starting the extra payment at age ${extraContributionAge} gives it more years to compound.`
+      : extraAgeDifference > 0
+        ? `Starting the extra payment at age ${extraContributionAge} shortens the period over which it is invested.`
+        : extraDifference >= 0
+          ? `The scheduled extra payment begins from age ${extraContributionAge}.`
+          : `Reducing or removing the scheduled payment lowers later contributions across the ${yearsToRetirement}-year saving period.`,
   ];
 }
 
