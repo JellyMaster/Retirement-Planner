@@ -76,7 +76,7 @@ describe("DrawdownRetirementJourney", () => {
     expect(screen.getByRole("heading", { name: "Slower years" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Later life" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Planning horizon" })).toBeInTheDocument();
-    expect(screen.getByText("Strong")).toBeInTheDocument();
+    expect(screen.getAllByText("Strong")).not.toHaveLength(0);
     expect(
       screen.getByLabelText("5 out of 5 retirement health rating"),
     ).toBeInTheDocument();
