@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BrowserRouter, Navigate, NavLink, Route, Routes } from "react-router-dom";
 
-import { DeepLinkedPage } from "./components/navigation/DeepLinkedPage";
 import { TabKeyboardNavigation } from "./components/navigation/TabKeyboardNavigation";
 import {
   ActiveScenarioSwitcher,
@@ -101,11 +100,7 @@ function AppContent() {
           <Route path="/" element={<OverviewPage />} />
           <Route
             path="/plan"
-            element={
-              <DeepLinkedPage kind="plan">
-                <RetirementPlannerPage key={activeScenarioId} />
-              </DeepLinkedPage>
-            }
+            element={<RetirementPlannerPage key={activeScenarioId} />}
           />
           <Route
             path="/what-if"
