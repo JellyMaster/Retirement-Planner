@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useMemo } from "react";
 
 import { useScenarios } from "../components/scenarios";
+import { createDefaultScenarioDrawdownPreferences } from "../domain/scenarios";
 import type { AppIcon } from "../icons";
 import { AppIcons } from "../icons";
 import { DrawdownEngine } from "../engine/drawdown/DrawdownEngine";
@@ -31,6 +32,11 @@ export function GuidancePage() {
   const { activeScenario, scenarios } = useScenarios();
   const [retirementGoals] = useStoredRetirementGoals();
   const pensionProjection = usePensionProjection(activeScenario.inputs);
+  const drawdown =
+    activeScenario.drawdown ??
+    createDefaultScenarioDrawdownPreferences(
+      retirementGoals.desiredAnnualIncome,
+    );
 
   const drawdownInputs = useMemo(
     () =>
@@ -38,11 +44,11 @@ export function GuidancePage() {
         pensionInputs: activeScenario.inputs,
         projection: pensionProjection.projection,
         retirementGoals,
-        drawdown: activeScenario.drawdown,
+        drawdown,
       }),
     [
-      activeScenario.drawdown,
       activeScenario.inputs,
+      drawdown,
       pensionProjection.projection,
       retirementGoals,
     ],
@@ -65,7 +71,7 @@ export function GuidancePage() {
   const monthlySaving =
     activeScenario.inputs.monthlyEmployeeContribution +
     activeScenario.inputs.monthlyEmployerContribution;
-  const hasChapters = Boolean(activeScenario.drawdown.spendingPhases?.length);
+  const hasChapters = Boolean(drawdown.spendingPhases?.length);
 
   const attentionItems: GuidanceItem[] = [];
   const opportunityItems: GuidanceItem[] = [];
@@ -130,16 +136,13 @@ export function GuidancePage() {
     });
   }
 
-  if (
-    activeScenario.drawdown.withdrawalStrategy === "target-income" &&
-    !hasChapters
-  ) {
+  if (drawdown.withdrawalStrategy === "target-income" && !hasChapters) {
     opportunityItems.push({
       id: "chapters",
       title: "Model how spending may change later",
       description:
         "Active, settled and later-life retirement chapters can be more realistic than one flat income target.",
-      evidence: `${formatCurrency(activeScenario.drawdown.desiredAnnualIncome)} is currently used throughout retirement.`,
+      evidence: `${formatCurrency(drawdown.desiredAnnualIncome)} is currently used throughout retirement.`,
       actionLabel: "Set retirement chapters",
       to: "/plan",
       icon: AppIcons.calendar,
@@ -240,14 +243,14 @@ export function GuidancePage() {
     {
       label: "Income target",
       value:
-        activeScenario.drawdown.withdrawalStrategy === "target-income"
-          ? `${formatCurrency(activeScenario.drawdown.desiredAnnualIncome)}/year`
-          : `${formatPercentage(activeScenario.drawdown.withdrawalRate)} of the pension`,
+        drawdown.withdrawalStrategy === "target-income"
+          ? `${formatCurrency(drawdown.desiredAnnualIncome)}/year`
+          : `${formatPercentage(drawdown.withdrawalRate)} of the pension`,
       detail: "Confirm that it still reflects the intended lifestyle.",
     },
     {
       label: "End of plan",
-      value: `Age ${activeScenario.drawdown.planningAge}`,
+      value: `Age ${drawdown.planningAge}`,
       detail: "Consider whether the longevity horizon remains suitable.",
     },
   ];
