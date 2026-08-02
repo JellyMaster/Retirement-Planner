@@ -14,6 +14,7 @@ import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import { AppIcons } from "../icons";
 import "../styles/what-if-page.css";
+import "../styles/what-if-controls.css";
 
 export function WhatIfPage() {
   const scenarios = useScenarios();
