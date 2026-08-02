@@ -161,6 +161,7 @@ function arrange(activeScenario: Scenario) {
     duplicateScenario: vi.fn(),
     renameScenario: vi.fn(),
     updateScenarioInputs,
+    updateScenarioPlan: vi.fn(),
     setActiveScenario: vi.fn(),
     deleteScenario: vi.fn(),
   });
