@@ -74,7 +74,14 @@ describe("FeeExperiment", () => {
         name: "Lower fees leave more of the pension invested",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("−17 basis points")).toBeInTheDocument();
+    expect(
+      screen.getByText((_, element) => {
+        if (element?.tagName.toLowerCase() !== "small") return false;
+
+        const text = element.textContent?.replace(/\s+/g, " ").trim();
+        return text === "Saved plan: 0.27% · −17 basis points";
+      }),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Reset experiment" }));
     await user.click(screen.getByRole("button", { name: "Save as scenario" }));
