@@ -174,6 +174,19 @@ function AppContent() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+
+      <footer className="app-disclaimer" aria-label="Financial information disclaimer">
+        <div className="app-disclaimer-inner">
+          <strong>For educational and illustrative purposes only.</strong>
+          <p>
+            Retirement Planner provides planning illustrations and general information,
+            not financial, investment, pension, tax or legal advice. Projections are
+            estimates based on the information and assumptions used and are not
+            guarantees of future outcomes. If you are unsure about a financial decision,
+            consider speaking to a suitably qualified and regulated financial adviser.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
