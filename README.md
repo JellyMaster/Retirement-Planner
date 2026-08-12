@@ -1,219 +1,223 @@
-<div align="center">
+# 🌌 Polaris Retirement Planner
 
-# 💷 Retirement Planner
+> **Plan today. Understand tomorrow. Retire with confidence.**
 
-### A modern retirement planning application built with React, TypeScript and Vite
-
-Model your retirement, understand the impact of fees, compare retirement strategies, and explore **"What If?"** scenarios through an intuitive guided planning experience.
-
----
-
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
-![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)
-![Vitest](https://img.shields.io/badge/Vitest-Tested-6E9F18?logo=vitest)
-![ESLint](https://img.shields.io/badge/ESLint-Quality-4B32C3?logo=eslint)
-
-</div>
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite)
+![License](https://img.shields.io/badge/license-Private-red)
 
 ---
 
-# Overview
+## Overview
 
-Retirement Planner is a modern retirement modelling application designed to help users understand how today's financial decisions affect their future retirement.
+Polaris Retirement Planner is a modern retirement planning application designed to help people understand how today's financial decisions influence tomorrow's retirement.
 
-Unlike a traditional pension calculator, Retirement Planner combines:
+Unlike traditional pension calculators, Polaris allows users to:
 
-- 📈 Pension projections
-- 💰 Drawdown modelling
-- ❤️ Retirement health analysis
-- 🎯 Goal tracking
-- 🔍 Interactive "What If?" scenarios
-- ⚖️ Scenario comparison
-- 📉 Fee impact analysis
+- Build a complete retirement plan
+- Compare multiple scenarios
+- Model retirement drawdown strategies
+- Experiment with financial decisions
+- Understand investment risks
+- Learn retirement concepts interactively
+- Receive personalised planning guidance
 
-into a single guided experience.
+The goal is simple:
 
-The application has been designed around one goal:
+> **Transform retirement planning from a collection of numbers into a clear story about your future.**
 
-> **Help users understand whether they are on track for retirement—and what they can do to improve it.**
+---
+
+# Version
+
+Current Release
+
+**Polaris Retirement Planner v1.0.0**
+
+Released:
+
+**2 August 2026**
 
 ---
 
 # Features
 
-## 🧭 Guided Retirement Planner
+## 🏠 Overview
 
-A modern step-by-step planning experience.
-
-- Multi-step guided workflow
-- Live validation
-- Retirement plan review
-- Collapsible completed plan
-- Responsive design
-- Font Awesome Pro interface
-
----
-
-## 📈 Pension Projection Engine
-
-The projection engine models long-term pension growth including:
-
-- Compound investment growth
-- Monthly employee contributions
-- Employer contributions
-- Salary growth
-- Contribution increases
-- Inflation
-- Pension fees
-- Retirement age
-- Life expectancy
-
----
-
-## 💳 Retirement Drawdown
-
-Model retirement withdrawals using multiple strategies.
-
-Supports:
-
-- Fixed annual income
-- Percentage-based withdrawals
-- Tax calculations
-- State Pension integration
-- Income shortfall analysis
-- Pension depletion forecasting
-- Today's Money / Future Money calculations
-
----
-
-## ❤️ Retirement Health Dashboard
-
-Receive an overall retirement health score based on:
-
-- Retirement readiness
-- Savings adequacy
-- Contribution levels
-- Investment assumptions
-- Drawdown sustainability
-
-The dashboard highlights:
-
-- Strengths
-- Risks
-- Personalised recommendations
-
----
-
-## 🎯 Retirement Goals
-
-Track progress towards your retirement objectives.
+The personalised dashboard provides an instant summary of your retirement plan.
 
 Features include:
 
-- Target retirement age
-- Desired retirement income
 - Retirement readiness
-- Goal progress
-- Milestone tracking
-
----
-
-## 💸 Fee Impact Analysis
-
-Understand how pension charges affect long-term wealth.
-
-Compare:
-
-- Projection with fees
-- Projection without fees
-- Total fees paid
-- Lost investment growth
-- Lifetime fee impact
-
----
-
-## ⚖️ Scenario Comparison
-
-Compare multiple retirement plans side-by-side.
-
-Compare:
-
-- Pension values
+- Projected pension
 - Retirement income
-- Contributions
-- Retirement health
-- Drawdown strategies
-- Investment assumptions
+- Plan health
+- Active scenario summary
+- Quick navigation
+- Recommended next actions
 
 ---
 
-## 🔍 Interactive "What If?" Analysis
+## 📝 My Plan
 
-Instantly explore retirement scenarios without changing your existing plan.
+The heart of Polaris.
 
-Current scenarios include:
-
-- Retire one year later
-- Save an extra £100 per month
-- Lower investment returns
-- Higher pension fees
-- Higher inflation
-- Remove future planned contributions
-
----
-
-## 📊 Visual Dashboards
-
-Interactive dashboards help explain your retirement journey.
+A guided planning experience that walks users through every important assumption.
 
 Includes:
 
-- Pension growth
-- Fee impact
-- Drawdown projections
-- Retirement summary
-- Retirement health
-- Projection tables
+- Personal information
+- Pension details
+- Contributions
+- Investment assumptions
+- Retirement goals
+- Retirement income planning
+- Tax-Free Cash planning
+- State Pension
+- Retirement spending chapters
+
+### Retirement Chapters
+
+Income can be planned separately for:
+
+- Active Retirement
+- Settled Retirement
+- Later Life
+
+This reflects how spending naturally changes throughout retirement.
 
 ---
 
-# Technology Stack
+## 🧪 What If? Decision Lab
 
-| Technology | Purpose |
-|------------|---------|
-| React | User Interface |
-| TypeScript | Type safety |
-| Vite | Build tooling |
-| Vitest | Unit testing |
-| ESLint | Code quality |
-| Font Awesome Pro | Icons |
+Explore one decision at a time.
+
+Experiments currently include:
+
+- Retirement Age
+- Save More
+- Spend More
+- Lower Fees
+- Inflation
+- State Pension
+- Market Downturn
+
+Each experiment can be saved as a new scenario.
+
+---
+
+## ⚖ Scenario Comparison
+
+Create and compare multiple retirement plans.
+
+Compare:
+
+- Pension value
+- Retirement income
+- Contributions
+- Growth
+- Fees
+- Drawdown sustainability
+
+Visual charts and comparison tables make differences easy to understand.
+
+---
+
+## 💷 Drawdown
+
+Model retirement income over time.
+
+Includes:
+
+- Lifetime balance
+- Annual withdrawals
+- Spending phases
+- State Pension integration
+- Retirement timeline
+- Sustainability analysis
+
+---
+
+## 🎓 Explore
+
+Interactive learning based on your own retirement plan.
+
+Topics include:
+
+- Investment growth
+- Sequence of Returns Risk
+- Market downturns
+- Pension fees
+- Inflation
+- Retirement timing
+
+Learning is connected directly to the planner.
+
+---
+
+## 🧭 Guidance
+
+Receive personalised planning recommendations.
+
+Guidance highlights:
+
+- Areas requiring attention
+- Opportunities for improvement
+- Suggested next actions
+- Links directly into the relevant planning page
+
+---
+
+# Technology
+
+Built with
+
+- React 19
+- TypeScript
+- Vite
+- React Router
+- Font Awesome Pro
+- Vitest
+- Testing Library
 
 ---
 
 # Project Structure
 
-```text
+```
 src/
 
-├── components/
-│   ├── comparison/
-│   ├── drawdown/
-│   ├── forms/
-│   ├── goals/
-│   ├── planner/
-│   └── shared/
-│
-├── engine/
-│   ├── projection/
-│   └── drawdown/
-│
-├── hooks/
-├── pages/
-├── styles/
-├── types/
-└── utils/
+    components/
+    contexts/
+    domain/
+    hooks/
+    pages/
+    services/
+    styles/
+    test/
+    theme/
+    utils/
 ```
+
+---
+
+# Screenshots
+
+*(Replace these placeholders with screenshots as the project evolves.)*
+
+| Overview | My Plan |
+|----------|---------|
+| *(Screenshot)* | *(Screenshot)* |
+
+| What If? | Drawdown |
+|----------|-----------|
+| *(Screenshot)* | *(Screenshot)* |
+
+| Explore | Guidance |
+|----------|-----------|
+| *(Screenshot)* | *(Screenshot)* |
 
 ---
 
@@ -222,7 +226,7 @@ src/
 Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/retirement-planner.git
+git clone https://github.com/JellyMaster/Retirement-Planner.git
 ```
 
 Install dependencies
@@ -231,147 +235,173 @@ Install dependencies
 npm install
 ```
 
-Start the development server
+Run the application
 
 ```bash
 npm run dev
 ```
 
-Open:
-
-```
-http://localhost:5173
-```
-
----
-
-# Available Scripts
-
-```bash
-npm run dev
-```
-
-Starts the development server.
-
-```bash
-npm run test:run
-```
-
-Runs the unit tests.
-
-```bash
-npm run lint
-```
-
-Runs ESLint.
-
-```bash
-npm run check
-```
-
-Runs:
-
-- ESLint
-- TypeScript
-- Tests
-
-```bash
-npm run verify
-```
-
-Runs the complete verification process.
+Build production
 
 ```bash
 npm run build
 ```
 
-Creates a production build.
-
 ---
 
-# Roadmap
+# Running Tests
 
-## ✅ Completed
+Run all tests
 
-- Guided retirement planner
-- Pension projection engine
-- Drawdown modelling
-- Retirement health dashboard
-- Retirement goals
-- Fee impact analysis
-- Scenario comparison
-- Interactive What If analysis
-- Modern reusable component library
+```bash
+npm test
+```
 
----
+or
 
-## 🚧 In Progress
-
-- Results dashboard redesign
-- Interactive scenario drawer
-- Custom What If builder
-
----
-
-## 📅 Planned
-
-- Monte Carlo retirement simulation
-- PDF retirement reports
-- ISA optimisation
-- Retirement cashflow planner
-- UK tax optimisation
-- Save and load retirement plans
-- AI retirement insights
-
----
-
-# Testing
-
-The application includes:
-
-- Unit tests
-- Engine edge-case testing
-- TypeScript type checking
-- ESLint validation
-
-Business logic is intentionally separated from the UI to make calculations easier to test and maintain.
+```bash
+npm run verify
+```
 
 ---
 
 # Design Philosophy
 
-The application is built around four principles:
+Polaris follows several guiding principles.
 
-- **Clarity** — complex financial concepts presented in a simple way.
-- **Transparency** — show how every result is calculated.
-- **Experimentation** — encourage users to explore different retirement scenarios.
-- **Confidence** — help users make informed retirement decisions.
+## Build confidence
+
+Planning for retirement should reduce uncertainty.
+
+## Explain every number
+
+Every calculation should have a clear explanation.
+
+## Encourage experimentation
+
+Users should feel comfortable exploring different scenarios.
+
+## Keep complexity hidden
+
+Sophisticated calculations should be presented through simple interactions.
+
+## One source of truth
+
+Every page works from the currently active retirement plan.
 
 ---
 
-# Future Vision
+# Documentation
 
-Retirement Planner is intended to evolve into a complete retirement planning platform, including:
+Further documentation can be found in:
 
-- Pension optimisation
-- ISA modelling
-- Monte Carlo simulations
-- Tax planning
-- Professional PDF reports
-- AI-assisted retirement guidance
+- CHANGELOG.md
+- ROADMAP.md
+- ARCHITECTURE.md
+- FEATURES.md
+- DESIGN.md
+- TESTING.md
+- CONTRIBUTING.md
+- RELEASES.md
+
+---
+
+# Roadmap
+
+## Version 1.1
+
+Visual Intelligence
+
+- Interactive charts
+- Unified retirement timeline
+- Better visual storytelling
+
+## Version 1.2
+
+Professional Planning
+
+- PDF reports
+- Cashflow planning
+- Printable retirement plans
+
+## Version 1.3
+
+Connected Data
+
+- Import / Export
+- Local database
+- Version history
+
+## Version 2.0
+
+Polaris Cloud
+
+- User accounts
+- Cloud synchronisation
+- Adviser mode
+- Secure backups
 
 ---
 
 # Contributing
 
-The project is currently under active development.
+Contributions are welcome.
 
-Suggestions, ideas and feedback are always welcome.
+Please read
+
+```
+CONTRIBUTING.md
+```
+
+before submitting changes.
 
 ---
 
-<div align="center">
+# Changelog
 
-**Built with ❤️ using React, TypeScript and Vite**
+See
 
-</div>
+```
+CHANGELOG.md
+```
+
+for a complete release history.
+
+---
+
+# License
+
+This project is currently maintained as a private project.
+
+See the LICENSE file for further details.
+
+---
+
+# Acknowledgements
+
+Polaris Retirement Planner has been developed through many iterations with a focus on creating an intuitive, educational and trustworthy retirement planning experience.
+
+Version 1.0.0 represents the first stable release and establishes the foundation for future versions.
+
+---
+
+## Future Vision
+
+The long-term vision for Polaris is to become a complete retirement planning platform combining:
+
+- Retirement planning
+- Scenario modelling
+- Financial education
+- Drawdown optimisation
+- Visual analytics
+- Cloud synchronisation
+
+Helping users make better retirement decisions through understanding rather than guesswork.
+
+---
+
+**Polaris Retirement Planner**
+
+*Version 1.0.0*
+
+*"Plan today. Understand tomorrow. Retire with confidence."*
