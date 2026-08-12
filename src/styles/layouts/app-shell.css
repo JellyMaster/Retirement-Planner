@@ -3,12 +3,15 @@
    ========================================================= */
 
 .app-shell {
+  display: flex;
   min-height: 100vh;
+  flex-direction: column;
   background: var(--colour-background);
 }
 
 .app-main-content {
   min-width: 0;
+  flex: 1 0 auto;
 }
 
 .app-main-content:focus {
@@ -290,6 +293,34 @@
   transform: translateX(1.75rem);
 }
 
+.app-disclaimer {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--colour-border);
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text-muted);
+}
+
+.app-disclaimer-inner {
+  display: flex;
+  width: min(var(--ui-content-max, 1680px), 100%);
+  align-items: baseline;
+  gap: var(--ui-space-3);
+  margin: 0 auto;
+  padding: var(--ui-space-3) var(--ui-space-6);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.55;
+}
+
+.app-disclaimer strong {
+  flex: 0 0 auto;
+  color: var(--colour-text);
+  font-size: inherit;
+}
+
+.app-disclaimer p {
+  margin: 0;
+}
+
 @media (max-width: 1220px) {
   .app-brand-copy span,
   .nav-link-icon {
@@ -333,6 +364,12 @@
 
   .nav-link {
     padding-inline: var(--ui-space-3);
+  }
+
+  .app-disclaimer-inner {
+    display: grid;
+    gap: var(--ui-space-1);
+    padding: var(--ui-space-3) var(--ui-space-4);
   }
 }
 
