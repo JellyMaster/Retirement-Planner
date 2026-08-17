@@ -2,45 +2,65 @@ import { DrawdownEngine } from "./DrawdownEngine";
 import type { DrawdownInputs } from "./models/DrawdownInputs";
 
 const engine = new DrawdownEngine();
+const MAX_SEARCH_INCOME = 100_000_000;
+const MAX_ITERATIONS = 100;
+const SEARCH_TOLERANCE = 0.01;
 
 export function calculateIncomeForEndingBalance(
   inputs: DrawdownInputs,
   targetEndingBalance: number,
 ): { annualIncome: number; result: ReturnType<DrawdownEngine["calculate"]> } {
+  const { spendingPhases: _spendingPhases, ...withoutSpendingPhases } = inputs;
   const comparisonInputs: DrawdownInputs = {
-    ...inputs,
+    ...withoutSpendingPhases,
     withdrawalStrategy: "target-income",
   };
+  const target = Math.max(0, targetEndingBalance);
 
   const calculate = (annualIncome: number) =>
-    engine.calculate(applyIncomeBaseline(comparisonInputs, annualIncome));
+    engine.calculate({
+      ...comparisonInputs,
+      desiredAnnualIncome: annualIncome,
+    });
+
+  const meetsGoal = (
+    result: ReturnType<DrawdownEngine["calculate"]>,
+  ): boolean =>
+    result.depletionAge === null &&
+    result.firstShortfallAge === null &&
+    result.firstNetIncomeShortfallAge === null &&
+    result.finalBalance >= target;
 
   let low = 0;
-  let high = Math.max(comparisonInputs.desiredAnnualIncome, 1);
   let lowResult = calculate(low);
-  let highResult = calculate(high);
 
-  if (lowResult.finalBalance < targetEndingBalance) {
+  if (!meetsGoal(lowResult)) {
     return { annualIncome: 0, result: lowResult };
   }
 
-  while (high < 100_000_000 && highResult.finalBalance >= targetEndingBalance) {
+  let high = Math.max(comparisonInputs.desiredAnnualIncome, 1);
+  let highResult = calculate(high);
+
+  while (high < MAX_SEARCH_INCOME && meetsGoal(highResult)) {
     low = high;
     lowResult = highResult;
-    high *= 2;
+    high = Math.min(high * 2, MAX_SEARCH_INCOME);
     highResult = calculate(high);
   }
 
-  for (let iteration = 0; iteration < 100 && high - low > 0.01; iteration += 1) {
+  if (high === MAX_SEARCH_INCOME && meetsGoal(highResult)) {
+    return { annualIncome: MAX_SEARCH_INCOME, result: highResult };
+  }
+
+  for (
+    let iteration = 0;
+    iteration < MAX_ITERATIONS && high - low > SEARCH_TOLERANCE;
+    iteration += 1
+  ) {
     const midpoint = (low + high) / 2;
     const midpointResult = calculate(midpoint);
 
-    if (
-      midpointResult.depletionAge === null &&
-      midpointResult.firstShortfallAge === null &&
-      midpointResult.firstNetIncomeShortfallAge === null &&
-      midpointResult.finalBalance >= targetEndingBalance
-    ) {
+    if (meetsGoal(midpointResult)) {
       low = midpoint;
       lowResult = midpointResult;
     } else {
@@ -48,25 +68,13 @@ export function calculateIncomeForEndingBalance(
     }
   }
 
-  const annualIncome = Math.max(0, Math.floor(low));
-  return { annualIncome, result: calculate(annualIncome) };
-}
+  let annualIncome = Math.max(0, Math.floor(low));
+  let result = calculate(annualIncome);
 
-function applyIncomeBaseline(inputs: DrawdownInputs, annualIncome: number): DrawdownInputs {
-  const baseline = inputs.desiredAnnualIncome;
-  const spendingPhases = inputs.spendingPhases?.map((phase, index) => ({
-    ...phase,
-    annualIncome:
-      baseline > 0
-        ? phase.annualIncome * (annualIncome / baseline)
-        : index === 0
-          ? annualIncome
-          : phase.annualIncome,
-  }));
+  while (meetsGoal(calculate(annualIncome + 1))) {
+    annualIncome += 1;
+    result = calculate(annualIncome);
+  }
 
-  return {
-    ...inputs,
-    desiredAnnualIncome: annualIncome,
-    ...(spendingPhases ? { spendingPhases } : {}),
-  };
+  return { annualIncome, result };
 }
