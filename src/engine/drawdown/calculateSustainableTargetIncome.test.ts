@@ -39,6 +39,30 @@ describe("calculateSustainableTargetIncome", () => {
     expect(unsustainableResult.firstShortfallAge).not.toBeNull();
   });
 
+  it("can preserve the full retirement pot", () => {
+    expect(
+      calculateSustainableTargetIncome(baseInputs, {
+        endingBalanceGoal: { mode: "preserve", percentage: 1 },
+      }),
+    ).toBe(0);
+  });
+
+  it("can retain a percentage of the retirement pot", () => {
+    expect(
+      calculateSustainableTargetIncome(baseInputs, {
+        endingBalanceGoal: { mode: "percentage", percentage: 0.5 },
+      }),
+    ).toBe(10_000);
+  });
+
+  it("can deliberately spend the retirement pot down to zero at the planning age", () => {
+    expect(
+      calculateSustainableTargetIncome(baseInputs, {
+        endingBalanceGoal: { mode: "spend-to-zero", percentage: 0 },
+      }),
+    ).toBe(20_000);
+  });
+
   it("includes State Pension when finding the sustainable gross target", () => {
     expect(
       calculateSustainableTargetIncome({
