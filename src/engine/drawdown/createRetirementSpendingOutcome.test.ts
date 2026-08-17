@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { createDefaultScenarioDrawdownPreferences } from "../../domain/scenarios";
 import { createRetirementSpendingOutcome } from "./createRetirementSpendingOutcome";
 import type { DrawdownInputs } from "./models/DrawdownInputs";
 
@@ -19,13 +20,17 @@ const inputs: DrawdownInputs = {
   taxFreeCash: 0,
 };
 
+const defaults = createDefaultScenarioDrawdownPreferences(30_000);
+
 describe("createRetirementSpendingOutcome", () => {
   it("uses the selected reserve goal when solving sustainable net spending", () => {
     const preserve = createRetirementSpendingOutcome(inputs, {
+      ...defaults,
       endingBalanceMode: "preserve",
       endingBalancePercentage: 1,
     });
     const spend = createRetirementSpendingOutcome(inputs, {
+      ...defaults,
       endingBalanceMode: "spend-to-zero",
       endingBalancePercentage: 0,
     });
@@ -39,6 +44,7 @@ describe("createRetirementSpendingOutcome", () => {
 
   it("reports headroom and a living-standard level", () => {
     const outcome = createRetirementSpendingOutcome(inputs, {
+      ...defaults,
       endingBalanceMode: "percentage",
       endingBalancePercentage: 0.5,
       retirementLivingStandardsHousehold: "one-person",
