@@ -11,8 +11,7 @@ import {
 } from "recharts";
 
 import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
-import { DrawdownEngine } from "../../engine/drawdown/DrawdownEngine";
-import { calculateSustainableTargetIncome } from "../../engine/drawdown/calculateSustainableTargetIncome";
+import { createEndingBalancePaths } from "../../engine/drawdown/createEndingBalancePaths";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
 import { useChartTheme } from "../../theme/useChartTheme";
@@ -26,8 +25,6 @@ import {
 } from "../../utils/formatters";
 import { PercentageInput } from "../forms";
 import { DrawdownBalanceChart } from "./DrawdownBalanceChart";
-
-const drawdownEngine = new DrawdownEngine();
 
 type ChartView = "plan" | "ending-balance";
 type EndingBalanceMode = NonNullable<
@@ -51,29 +48,20 @@ export function DrawdownBalanceChartExplorer({
 }: DrawdownBalanceChartExplorerProps) {
   const [view, setView] = useState<ChartView>("plan");
 
-  if (inputs.withdrawalStrategy !== "target-income") {
-    return (
-      <DrawdownBalanceChart
-        years={result.years}
-        depletionAge={result.depletionAge}
-        inflationRate={inputs.inflationRate}
-        displayMode={displayMode}
-        spendingPhases={inputs.spendingPhases}
-        statePensionAge={
-          inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined
-        }
-      />
-    );
-  }
-
   return (
     <section className="drawdown-balance-chart-explorer">
       <div className="drawdown-chart-view-header">
         <div>
           <span>Balance chart view</span>
-          <small>Switch between your saved plan and sustainable ending-balance paths.</small>
+          <small>
+            Switch between your saved plan and sustainable ending-balance paths.
+          </small>
         </div>
-        <div className="drawdown-chart-view-toggle" role="group" aria-label="Balance chart view">
+        <div
+          className="drawdown-chart-view-toggle"
+          role="group"
+          aria-label="Balance chart view"
+        >
           <button
             type="button"
             className={view === "plan" ? "is-active" : undefined}
@@ -129,16 +117,10 @@ function EndingBalanceComparisonChart({
   const reservePercentage =
     savedPercentage > 0 && savedPercentage < 1 ? savedPercentage : 0.5;
 
-  const paths = useMemo(() => {
-    const preserve = createPath(inputs, { mode: "preserve", percentage: 1 });
-    const reserve = createPath(inputs, {
-      mode: "percentage",
-      percentage: reservePercentage,
-    });
-    const spend = createPath(inputs, { mode: "spend-to-zero", percentage: 0 });
-
-    return { preserve, reserve, spend };
-  }, [inputs, reservePercentage]);
+  const paths = useMemo(
+    () => createEndingBalancePaths(inputs, reservePercentage),
+    [inputs, reservePercentage],
+  );
 
   const preserveYears = getDisplayYears(
     paths.preserve.result.years,
@@ -192,11 +174,22 @@ function EndingBalanceComparisonChart({
           <p className="panel-eyebrow">Ending balance paths</p>
           <h2>See the income-versus-reserve trade-off</h2>
           <p>
-            Each line uses the highest modelled sustainable income that still
-            reaches the selected ending-balance goal at age {inputs.endAge}.
+            Each line uses the highest modelled target income that still reaches
+            its ending-balance goal at age {inputs.endAge}.
           </p>
+          {inputs.withdrawalStrategy === "percentage" && (
+            <p className="drawdown-ending-path-strategy-note">
+              Your saved plan currently uses percentage drawdown. These comparison
+              paths temporarily use target-income modelling so the three reserve
+              choices can be compared on the same basis. Your saved withdrawal
+              strategy is not changed.
+            </p>
+          )}
         </div>
-        <label className="drawdown-reserve-control" htmlFor="drawdown-reserve-percentage">
+        <label
+          className="drawdown-reserve-control"
+          htmlFor="drawdown-reserve-percentage"
+        >
           <span>Pot reserve at age {inputs.endAge}</span>
           <small>Adjust the middle path.</small>
           <PercentageInput
@@ -210,7 +203,11 @@ function EndingBalanceComparisonChart({
         </label>
       </div>
 
-      <div className="drawdown-ending-path-options" role="radiogroup" aria-label="Active ending balance goal">
+      <div
+        className="drawdown-ending-path-options"
+        role="radiogroup"
+        aria-label="Active ending balance goal"
+      >
         <PathOption
           selected={selectedMode === "preserve"}
           label="Preserve 100%"
@@ -242,14 +239,26 @@ function EndingBalanceComparisonChart({
 
       <div className="drawdown-chart">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 10, left: 10 }}>
-            <CartesianGrid stroke={chartColours.grid} strokeDasharray="3 3" vertical={false} />
+          <LineChart
+            data={chartData}
+            margin={{ top: 20, right: 20, bottom: 10, left: 10 }}
+          >
+            <CartesianGrid
+              stroke={chartColours.grid}
+              strokeDasharray="3 3"
+              vertical={false}
+            />
             <XAxis
               dataKey="age"
               tickLine={false}
               tick={{ fill: chartColours.text }}
               axisLine={false}
-              label={{ value: "Age", position: "insideBottom", offset: -5, fill: chartColours.text }}
+              label={{
+                value: "Age",
+                position: "insideBottom",
+                offset: -5,
+                fill: chartColours.text,
+              }}
             />
             <YAxis
               tickLine={false}
@@ -327,7 +336,11 @@ function PathOption({
       type="button"
       role="radio"
       aria-checked={selected}
-      className={selected ? "drawdown-ending-path-option is-selected" : "drawdown-ending-path-option"}
+      className={
+        selected
+          ? "drawdown-ending-path-option is-selected"
+          : "drawdown-ending-path-option"
+      }
       onClick={onSelect}
     >
       <span>{label}</span>
@@ -337,40 +350,9 @@ function PathOption({
   );
 }
 
-function createPath(
+function createFallbackPreferences(
   inputs: DrawdownInputs,
-  goal: { mode: EndingBalanceMode; percentage: number },
-) {
-  const income = calculateSustainableTargetIncome(inputs, {
-    endingBalanceGoal: goal,
-  });
-  const candidateInputs = applyIncomeBaseline(inputs, income);
-  return {
-    income,
-    result: drawdownEngine.calculate(candidateInputs),
-  };
-}
-
-function applyIncomeBaseline(inputs: DrawdownInputs, annualIncome: number): DrawdownInputs {
-  const baseline = inputs.desiredAnnualIncome;
-  const spendingPhases = inputs.spendingPhases?.map((phase, index) => ({
-    ...phase,
-    annualIncome:
-      baseline > 0
-        ? phase.annualIncome * (annualIncome / baseline)
-        : index === 0
-          ? annualIncome
-          : phase.annualIncome,
-  }));
-
-  return {
-    ...inputs,
-    desiredAnnualIncome: annualIncome,
-    ...(spendingPhases ? { spendingPhases } : {}),
-  };
-}
-
-function createFallbackPreferences(inputs: DrawdownInputs): ScenarioDrawdownPreferences {
+): ScenarioDrawdownPreferences {
   return {
     planningAge: inputs.endAge,
     withdrawalStrategy: inputs.withdrawalStrategy,
