@@ -66,6 +66,7 @@ export function EssentialAdvancedPensionInputsForm({
     !errors.monthlyEmployerContribution;
   const incomeComplete = planningAgeValid && drawdown.desiredAnnualIncome >= 0;
   const essentialComplete = retirementComplete && pensionComplete && incomeComplete;
+  const usesMaximumTaxFreeCash = drawdown.taxFreeCashMode === "maximum";
 
   function fieldId(name: string) {
     return `${idPrefix}-${name}`;
@@ -96,6 +97,14 @@ export function EssentialAdvancedPensionInputsForm({
     setOpenAdvanced((current) => (current === section ? null : section));
   }
 
+  function setMaximumTaxFreeCash(enabled: boolean) {
+    updateDrawdown({
+      ...drawdown,
+      taxFreeCashMode: enabled ? "maximum" : "custom",
+      taxFreeCash: enabled ? drawdown.taxFreeCash : 0,
+    });
+  }
+
   return (
     <section id="guided-pension-form" className="essential-plan-editor panel">
       <header className="essential-plan-editor-header">
@@ -123,41 +132,19 @@ export function EssentialAdvancedPensionInputsForm({
           </span>
         </div>
 
-        <EssentialCard
-          title="You & retirement"
-          summary={`Age ${safeNumber(value.currentAge)} → retire ${safeNumber(value.retirementAge)} → plan to ${drawdown.planningAge}`}
-          icon={AppIcons.user}
-          complete={retirementComplete}
-          open={openEssential === "retirement"}
-          ariaLabel="You and retirement"
-          onToggle={() => toggleEssential("retirement")}
-        >
+        <EssentialCard title="You & retirement" summary={`Age ${safeNumber(value.currentAge)} → retire ${safeNumber(value.retirementAge)} → plan to ${drawdown.planningAge}`} icon={AppIcons.user} complete={retirementComplete} open={openEssential === "retirement"} ariaLabel="You and retirement" onToggle={() => toggleEssential("retirement")}>
           <FormField id={fieldId("currentAge")} label="Current age" hint="Your age today." error={errors.currentAge}>
-            {(id, describedBy) => (
-              <NumberInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.currentAge) ? value.currentAge : ""} min={18} max={100} suffix="years" error={Boolean(errors.currentAge)} onValueChange={(next) => updateRequired("currentAge", next)} />
-            )}
+            {(id, describedBy) => <NumberInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.currentAge) ? value.currentAge : ""} min={18} max={100} suffix="years" error={Boolean(errors.currentAge)} onValueChange={(next) => updateRequired("currentAge", next)} />}
           </FormField>
           <FormField id={fieldId("retirementAge")} label="Retirement age" hint="When you expect regular pension contributions to stop." error={errors.retirementAge}>
-            {(id, describedBy) => (
-              <NumberInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.retirementAge) ? value.retirementAge : ""} min={18} max={100} suffix="years" error={Boolean(errors.retirementAge)} onValueChange={(next) => updateRequired("retirementAge", next)} />
-            )}
+            {(id, describedBy) => <NumberInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.retirementAge) ? value.retirementAge : ""} min={18} max={100} suffix="years" error={Boolean(errors.retirementAge)} onValueChange={(next) => updateRequired("retirementAge", next)} />}
           </FormField>
           <FormField id={fieldId("planningAge")} label="Plan income to age" hint="How long should this retirement plan provide income?" error={!planningAgeValid ? "Planning age must be after retirement and no more than 120." : undefined}>
-            {(id, describedBy) => (
-              <NumberInput id={id} aria-describedby={describedBy} value={drawdown.planningAge} min={value.retirementAge + 1} max={120} suffix="years" error={!planningAgeValid} onValueChange={(next) => updateDrawdown({ ...drawdown, planningAge: next ?? drawdown.planningAge })} />
-            )}
+            {(id, describedBy) => <NumberInput id={id} aria-describedby={describedBy} value={drawdown.planningAge} min={value.retirementAge + 1} max={120} suffix="years" error={!planningAgeValid} onValueChange={(next) => updateDrawdown({ ...drawdown, planningAge: next ?? drawdown.planningAge })} />}
           </FormField>
         </EssentialCard>
 
-        <EssentialCard
-          title="Your pension"
-          summary={`${formatCurrency(value.currentPot)} saved · ${formatCurrency(totalMonthly)}/month`}
-          icon={AppIcons.pension}
-          complete={pensionComplete}
-          open={openEssential === "pension"}
-          ariaLabel="Your pension"
-          onToggle={() => toggleEssential("pension")}
-        >
+        <EssentialCard title="Your pension" summary={`${formatCurrency(value.currentPot)} saved · ${formatCurrency(totalMonthly)}/month`} icon={AppIcons.pension} complete={pensionComplete} open={openEssential === "pension"} ariaLabel="Your pension" onToggle={() => toggleEssential("pension")}>
           <FormField id={fieldId("currentPot")} label="Current pension pot" hint="The combined value of pensions included in this plan." error={errors.currentPot}>
             {(id, describedBy) => <CurrencyInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.currentPot) ? value.currentPot : ""} step={100} error={Boolean(errors.currentPot)} onValueChange={(next) => updateRequired("currentPot", next)} />}
           </FormField>
@@ -169,20 +156,8 @@ export function EssentialAdvancedPensionInputsForm({
           </FormField>
         </EssentialCard>
 
-        <EssentialCard
-          title="Retirement income"
-          summary={`${formatCurrency(drawdown.desiredAnnualIncome)}/year spending target · ${retirementGoals.includeStatePension ? "State Pension included" : "State Pension not included"}`}
-          icon={AppIcons.money}
-          complete={incomeComplete}
-          open={openEssential === "income"}
-          ariaLabel="Retirement income"
-          onToggle={() => toggleEssential("income")}
-        >
-          <EssentialRetirementIncomeFields
-            idPrefix={fieldId("essential-income")}
-            value={drawdown}
-            onChange={updateDrawdown}
-          />
+        <EssentialCard title="Retirement income" summary={`${formatCurrency(drawdown.desiredAnnualIncome)}/year spending target · ${retirementGoals.includeStatePension ? "State Pension included" : "State Pension not included"}`} icon={AppIcons.money} complete={incomeComplete} open={openEssential === "income"} ariaLabel="Retirement income" onToggle={() => toggleEssential("income")}>
+          <EssentialRetirementIncomeFields idPrefix={fieldId("essential-income")} value={drawdown} onChange={updateDrawdown} />
         </EssentialCard>
       </section>
 
@@ -220,15 +195,17 @@ export function EssentialAdvancedPensionInputsForm({
         </AdvancedCard>
 
         <AdvancedCard title="Retirement strategy" summary="Withdrawal approach, spending chapters, tax-free cash and State Pension details" icon={AppIcons.settings} open={openAdvanced === "strategy"} ariaLabel="Retirement strategy" onToggle={() => toggleAdvanced("strategy")}>
+          <p className="advanced-plan-note">These settings are optional refinements. Use them when you want more control over how retirement income is modelled.</p>
+          <label className="retirement-goals-checkbox">
+            <input type="checkbox" checked={usesMaximumTaxFreeCash} onChange={(event) => setMaximumTaxFreeCash(event.target.checked)} />
+            <span>Take the maximum illustrated 25% tax-free cash at retirement</span>
+          </label>
           <p className="advanced-plan-note">
-            These settings are optional refinements. Use them when you want more control over how retirement income is modelled.
+            {usesMaximumTaxFreeCash
+              ? "The amount automatically follows the projected pension at retirement, subject to the modelled lump-sum allowance. Switch this off before entering a custom amount below."
+              : "Maximum tax-free cash is switched off. Use the Tax-free cash section below to choose no cash or a custom amount."}
           </p>
-          <ScenarioDrawdownFields
-            idPrefix={fieldId("drawdown")}
-            retirementAge={value.retirementAge}
-            value={drawdown}
-            onChange={updateDrawdown}
-          />
+          <ScenarioDrawdownFields idPrefix={fieldId("drawdown")} retirementAge={value.retirementAge} value={drawdown} onChange={updateDrawdown} />
         </AdvancedCard>
       </section>
     </section>
