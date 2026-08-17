@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
-import { calculateSustainableTargetIncome } from "../../engine/drawdown/calculateSustainableTargetIncome";
+import { calculateIncomeForEndingBalance } from "../../engine/drawdown/calculateIncomeForEndingBalance";
 import { createIncomeHeadroomAssessment } from "../../engine/drawdown/createIncomeHeadroomAssessment";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import { formatCurrency } from "../../utils/formatters";
@@ -35,15 +35,18 @@ export function DrawdownSustainableIncomeHeadroom({
 }: DrawdownSustainableIncomeHeadroomProps) {
   const endingBalanceMode = drawdown?.endingBalanceMode ?? "preserve";
   const endingBalancePercentage = drawdown?.endingBalancePercentage ?? 1;
+  const retirementPot = Math.max(0, inputs.startingBalance - inputs.taxFreeCash);
+  const targetEndingBalance =
+    endingBalanceMode === "spend-to-zero"
+      ? 0
+      : endingBalanceMode === "percentage"
+        ? retirementPot * Math.min(1, Math.max(0, endingBalancePercentage))
+        : retirementPot;
+
   const sustainableIncome = useMemo(
     () =>
-      calculateSustainableTargetIncome(inputs, {
-        endingBalanceGoal: {
-          mode: endingBalanceMode,
-          percentage: endingBalancePercentage,
-        },
-      }),
-    [endingBalanceMode, endingBalancePercentage, inputs],
+      calculateIncomeForEndingBalance(inputs, targetEndingBalance).annualIncome,
+    [inputs, targetEndingBalance],
   );
   const assessment = createIncomeHeadroomAssessment(
     inputs.desiredAnnualIncome,
@@ -62,10 +65,10 @@ export function DrawdownSustainableIncomeHeadroom({
         }`;
   const endingGoalText =
     endingBalanceMode === "spend-to-zero"
-      ? "spending the pension down to £0 at the planning age"
+      ? "finishing with no private pension pot at the planning age"
       : endingBalanceMode === "percentage"
-        ? `retaining ${(endingBalancePercentage * 100).toFixed(0)}% of the retirement pot in today's-money terms`
-        : "preserving 100% of the retirement pot in today's-money terms";
+        ? `finishing with ${(endingBalancePercentage * 100).toFixed(0)}% of the retirement pot`
+        : "finishing with the full retirement pot still available";
 
   return (
     <section
@@ -78,7 +81,7 @@ export function DrawdownSustainableIncomeHeadroom({
           <h2 id="drawdown-headroom-title">How much flexibility does your plan have?</h2>
         </div>
         <p>
-          Compare your selected target with the highest modelled {basisLabel} that
+          Compare your selected target with the modelled annual {basisLabel} that
           reaches age {inputs.endAge} while {endingGoalText}.
         </p>
       </div>
@@ -90,7 +93,7 @@ export function DrawdownSustainableIncomeHeadroom({
             {formatCurrency(assessment.sustainableIncome)}
           </strong>
           <small className="drawdown-decision-detail">
-            Annual amount supported to age {inputs.endAge}
+            Annual amount for the selected ending-balance path
           </small>
         </article>
 
