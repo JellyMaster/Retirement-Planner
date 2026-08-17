@@ -16,6 +16,7 @@ import { DrawdownRetirementTimeline } from "../components/drawdown/DrawdownRetir
 import { DrawdownSummary } from "../components/drawdown/DrawdownSummary";
 import { DrawdownSummaryRibbon } from "../components/drawdown/DrawdownSummaryRibbon";
 import { DrawdownSustainabilityDashboard } from "../components/drawdown/DrawdownSustainabilityDashboard";
+import { DrawdownSustainableIncomeHeadroom } from "../components/drawdown/DrawdownSustainableIncomeHeadroom";
 import {
   DrawdownWorkspaceNavigation,
   type DrawdownWorkspaceSection,
@@ -139,6 +140,9 @@ export function DrawdownPlannerPage() {
                   <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownRetirementJourney inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+                  {inputs.withdrawalStrategy === "target-income" && (
+                    <DrawdownSustainableIncomeHeadroom inputs={inputs} />
+                  )}
                   <DrawdownLivingStandardsComparison
                     inputs={inputs}
                     drawdown={activeScenario.drawdown}
