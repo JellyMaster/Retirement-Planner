@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
 import { calculateSustainableTargetIncome } from "../../engine/drawdown/calculateSustainableTargetIncome";
 import { createIncomeHeadroomAssessment } from "../../engine/drawdown/createIncomeHeadroomAssessment";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
@@ -7,6 +8,7 @@ import { formatCurrency } from "../../utils/formatters";
 
 interface DrawdownSustainableIncomeHeadroomProps {
   inputs: DrawdownInputs;
+  drawdown?: ScenarioDrawdownPreferences;
 }
 
 const STATUS_CONTENT = {
@@ -29,10 +31,19 @@ const STATUS_CONTENT = {
 
 export function DrawdownSustainableIncomeHeadroom({
   inputs,
+  drawdown,
 }: DrawdownSustainableIncomeHeadroomProps) {
+  const endingBalanceMode = drawdown?.endingBalanceMode ?? "preserve";
+  const endingBalancePercentage = drawdown?.endingBalancePercentage ?? 1;
   const sustainableIncome = useMemo(
-    () => calculateSustainableTargetIncome(inputs),
-    [inputs],
+    () =>
+      calculateSustainableTargetIncome(inputs, {
+        endingBalanceGoal: {
+          mode: endingBalanceMode,
+          percentage: endingBalancePercentage,
+        },
+      }),
+    [endingBalanceMode, endingBalancePercentage, inputs],
   );
   const assessment = createIncomeHeadroomAssessment(
     inputs.desiredAnnualIncome,
@@ -49,6 +60,12 @@ export function DrawdownSustainableIncomeHeadroom({
       : `${Math.abs(assessment.headroomPercent * 100).toFixed(1)}% ${
           assessment.annualHeadroom >= 0 ? "above target" : "below target"
         }`;
+  const endingGoalText =
+    endingBalanceMode === "spend-to-zero"
+      ? "spending the pension down to £0 at the planning age"
+      : endingBalanceMode === "percentage"
+        ? `retaining ${(endingBalancePercentage * 100).toFixed(0)}% of the retirement pot in today's-money terms`
+        : "preserving 100% of the retirement pot in today's-money terms";
 
   return (
     <section
@@ -62,7 +79,7 @@ export function DrawdownSustainableIncomeHeadroom({
         </div>
         <p>
           Compare your selected target with the highest modelled {basisLabel} that
-          reaches age {inputs.endAge} without an income shortfall.
+          reaches age {inputs.endAge} while {endingGoalText}.
         </p>
       </div>
 
@@ -105,9 +122,10 @@ export function DrawdownSustainableIncomeHeadroom({
       </div>
 
       <p className="drawdown-headroom-note">
-        This classification uses the current deterministic assumptions. It is an
-        illustration of modelled headroom, not a guarantee that future investment
-        returns, inflation or tax will follow those assumptions.
+        This classification uses the current deterministic assumptions and your
+        selected ending-balance goal. It is an illustration of modelled headroom,
+        not a guarantee that future investment returns, inflation or tax will
+        follow those assumptions.
       </p>
     </section>
   );
