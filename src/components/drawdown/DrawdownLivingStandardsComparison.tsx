@@ -5,7 +5,7 @@ import {
   type ScenarioDrawdownPreferences,
 } from "../../domain/scenarios";
 import { DrawdownEngine } from "../../engine/drawdown/DrawdownEngine";
-import { calculateSustainableTargetIncome } from "../../engine/drawdown/calculateSustainableTargetIncome";
+import { calculateIncomeForEndingBalance } from "../../engine/drawdown/calculateIncomeForEndingBalance";
 import { createLivingStandardsProgression } from "../../engine/drawdown/createLivingStandardsProgression";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import {
@@ -36,25 +36,27 @@ export function DrawdownLivingStandardsComparison({
   const endingBalanceMode = preferences.endingBalanceMode ?? "preserve";
   const endingBalancePercentage = preferences.endingBalancePercentage ?? 1;
   const standards = getRetirementLivingStandards(household, region);
+  const retirementPot = Math.max(0, inputs.startingBalance - inputs.taxFreeCash);
+  const targetEndingBalance =
+    endingBalanceMode === "spend-to-zero"
+      ? 0
+      : endingBalanceMode === "percentage"
+        ? retirementPot * Math.min(1, Math.max(0, endingBalancePercentage))
+        : retirementPot;
 
   const currentPlan = useMemo(() => drawdownEngine.calculate(inputs), [inputs]);
   const targetNetSpending = currentPlan.years[0]?.netIncome ?? 0;
   const sustainableNetIncome = useMemo(
     () =>
-      calculateSustainableTargetIncome(
+      calculateIncomeForEndingBalance(
         {
           ...inputs,
           withdrawalStrategy: "target-income",
           incomeTargetMode: "net",
         },
-        {
-          endingBalanceGoal: {
-            mode: endingBalanceMode,
-            percentage: endingBalancePercentage,
-          },
-        },
-      ),
-    [endingBalanceMode, endingBalancePercentage, inputs],
+        targetEndingBalance,
+      ).annualIncome,
+    [inputs, targetEndingBalance],
   );
   const progression = createLivingStandardsProgression(
     targetNetSpending,
@@ -71,10 +73,7 @@ export function DrawdownLivingStandardsComparison({
   }
 
   return (
-    <section
-      className="panel drawdown-living-standards-panel"
-      aria-labelledby="living-standards-title"
-    >
+    <section className="panel drawdown-living-standards-panel" aria-labelledby="living-standards-title">
       <div className="drawdown-section-heading">
         <div>
           <p className="panel-eyebrow">Lifestyle benchmark</p>
