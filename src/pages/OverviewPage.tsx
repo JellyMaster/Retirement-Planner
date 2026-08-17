@@ -96,6 +96,16 @@ export function OverviewPage() {
 
       <section className="polaris-overview-key-facts" aria-label="Key retirement facts">
         <OverviewFact
+          label="Retirement age"
+          value={`Age ${inputs.retirementAge}`}
+          detail={`${Math.max(0, inputs.retirementAge - inputs.currentAge)} years from the current plan age`}
+        />
+        <OverviewFact
+          label="Plan to"
+          value={`Age ${planningAge}`}
+          detail="Retirement income planning horizon"
+        />
+        <OverviewFact
           label="Projected pension"
           value={
             hasProjection
@@ -118,16 +128,6 @@ export function OverviewPage() {
               : "Complete the plan to estimate income"
           }
           incomplete={!preparedness}
-        />
-        <OverviewFact
-          label="Retirement"
-          value={`Age ${inputs.retirementAge}`}
-          detail={`${Math.max(0, inputs.retirementAge - inputs.currentAge)} years from the current plan age`}
-        />
-        <OverviewFact
-          label="Plan to"
-          value={`Age ${planningAge}`}
-          detail="Retirement income planning horizon"
         />
       </section>
 
