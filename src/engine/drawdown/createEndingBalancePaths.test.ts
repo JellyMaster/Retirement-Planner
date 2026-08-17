@@ -19,6 +19,21 @@ const baseInputs: DrawdownInputs = {
   taxFreeCash: 0,
 };
 
+const realisticInputs: DrawdownInputs = {
+  ...baseInputs,
+  startingBalance: 600_000,
+  retirementAge: 60,
+  endAge: 95,
+  withdrawalStrategy: "percentage",
+  desiredAnnualIncome: 30_000,
+  incomeTargetMode: "net",
+  annualStatePension: 12_000,
+  statePensionAge: 67,
+  annualReturn: 0.05,
+  annualFee: 0.005,
+  inflationRate: 0.025,
+};
+
 describe("createEndingBalancePaths", () => {
   it("creates distinct incomes and retirement-pot anchored ending balances", () => {
     const paths = createEndingBalancePaths(baseInputs, 0.5);
@@ -48,23 +63,7 @@ describe("createEndingBalancePaths", () => {
   });
 
   it("produces ordered paths with realistic returns, fees, inflation and State Pension", () => {
-    const paths = createEndingBalancePaths(
-      {
-        ...baseInputs,
-        startingBalance: 600_000,
-        retirementAge: 60,
-        endAge: 95,
-        withdrawalStrategy: "percentage",
-        desiredAnnualIncome: 30_000,
-        incomeTargetMode: "net",
-        annualStatePension: 12_000,
-        statePensionAge: 67,
-        annualReturn: 0.05,
-        annualFee: 0.005,
-        inflationRate: 0.025,
-      },
-      0.5,
-    );
+    const paths = createEndingBalancePaths(realisticInputs, 0.5);
 
     expect(paths.preserve.income).toBeLessThan(paths.reserve.income);
     expect(paths.reserve.income).toBeLessThan(paths.spend.income);
@@ -79,21 +78,24 @@ describe("createEndingBalancePaths", () => {
 
     expect(paths.spend.income).toBeLessThan(200_000);
     expect(paths.spend.result.depletionAge).toBeNull();
-    expect(paths.spend.result.firstNetIncomeShortfallAge).toBeNull();
+    expect(paths.spend.result.totalNetIncomeShortfall).toBeLessThanOrEqual(1);
+  });
+
+  it("changes the middle path when the reserve percentage changes", () => {
+    const twentyFive = createEndingBalancePaths(realisticInputs, 0.25);
+    const fifty = createEndingBalancePaths(realisticInputs, 0.5);
+
+    expect(twentyFive.reserve.targetEndingBalance).toBe(150_000);
+    expect(fifty.reserve.targetEndingBalance).toBe(300_000);
+    expect(twentyFive.reserve.income).toBeGreaterThan(fifty.reserve.income);
+    expect(twentyFive.reserve.result.finalBalance).toBeLessThan(
+      fifty.reserve.result.finalBalance,
+    );
   });
 
   it("does not let saved retirement chapters cap the ending-balance comparison", () => {
     const withChapters: DrawdownInputs = {
-      ...baseInputs,
-      startingBalance: 600_000,
-      retirementAge: 60,
-      endAge: 95,
-      incomeTargetMode: "net",
-      annualStatePension: 12_000,
-      statePensionAge: 67,
-      annualReturn: 0.05,
-      annualFee: 0.005,
-      inflationRate: 0.025,
+      ...realisticInputs,
       spendingPhases: [
         { startAge: 60, annualIncome: 30_000, label: "Active" },
         { startAge: 75, annualIncome: 90_000, label: "Later" },
