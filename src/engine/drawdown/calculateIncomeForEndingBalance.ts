@@ -5,15 +5,27 @@ const engine = new DrawdownEngine();
 const MAX_SEARCH_INCOME = 100_000_000;
 const MAX_ITERATIONS = 100;
 const SEARCH_TOLERANCE = 0.01;
+const INCOME_SHORTFALL_TOLERANCE = 1;
 
 export function calculateIncomeForEndingBalance(
   inputs: DrawdownInputs,
   targetEndingBalance: number,
 ): { annualIncome: number; result: ReturnType<DrawdownEngine["calculate"]> } {
   const { spendingPhases: _spendingPhases, ...withoutSpendingPhases } = inputs;
+
+  // The retirement pot entering drawdown is already expressed in today's money.
+  // Run this comparison on the same real-money basis so that preserving 100%
+  // literally means ending with the same pound value that entered drawdown.
+  const realReturn =
+    (1 + withoutSpendingPhases.annualReturn) /
+      (1 + withoutSpendingPhases.inflationRate) -
+    1;
+
   const comparisonInputs: DrawdownInputs = {
     ...withoutSpendingPhases,
     withdrawalStrategy: "target-income",
+    annualReturn: realReturn,
+    inflationRate: 0,
   };
   const target = Math.max(0, targetEndingBalance);
 
@@ -27,8 +39,8 @@ export function calculateIncomeForEndingBalance(
     result: ReturnType<DrawdownEngine["calculate"]>,
   ): boolean =>
     result.depletionAge === null &&
-    result.firstShortfallAge === null &&
-    result.firstNetIncomeShortfallAge === null &&
+    result.totalIncomeShortfall <= INCOME_SHORTFALL_TOLERANCE &&
+    result.totalNetIncomeShortfall <= INCOME_SHORTFALL_TOLERANCE &&
     result.finalBalance >= target;
 
   let low = 0;
@@ -71,9 +83,11 @@ export function calculateIncomeForEndingBalance(
   let annualIncome = Math.max(0, Math.floor(low));
   let result = calculate(annualIncome);
 
-  while (meetsGoal(calculate(annualIncome + 1))) {
+  while (annualIncome < MAX_SEARCH_INCOME) {
+    const nextResult = calculate(annualIncome + 1);
+    if (!meetsGoal(nextResult)) break;
     annualIncome += 1;
-    result = calculate(annualIncome);
+    result = nextResult;
   }
 
   return { annualIncome, result };
