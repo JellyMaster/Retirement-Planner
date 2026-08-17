@@ -14,6 +14,12 @@ export {
   type LivingStandardsValues,
 } from "./createLivingStandardsProgression";
 export { createDefaultDrawdownInputs } from "./factories/createDefaultDrawdownInputs";
+export {
+  DEFAULT_DRAWDOWN_ENDING_BALANCE_GOAL,
+  getEndingBalanceTarget,
+  type DrawdownEndingBalanceGoal,
+  type DrawdownEndingBalanceMode,
+} from "./models/DrawdownEndingBalanceGoal";
 export type { DrawdownInputs } from "./models/DrawdownInputs";
 export type { DrawdownResult } from "./models/DrawdownResult";
 export type { DrawdownYear } from "./models/DrawdownYear";
