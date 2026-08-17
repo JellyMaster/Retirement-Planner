@@ -9,6 +9,8 @@ import type {
   RetirementLivingStandardRegion,
 } from "../../engine/drawdown/retirementLivingStandards";
 
+export type TaxFreeCashMode = "maximum" | "custom";
+
 export interface ScenarioDrawdownPreferences {
   planningAge: number;
   withdrawalStrategy: WithdrawalStrategy;
@@ -17,6 +19,7 @@ export interface ScenarioDrawdownPreferences {
   incomeTargetMode: IncomeTargetMode;
   spendingPhases?: DrawdownSpendingPhase[];
   taxFreeCash: number;
+  taxFreeCashMode?: TaxFreeCashMode;
   endingBalanceMode?: DrawdownEndingBalanceMode;
   endingBalancePercentage?: number;
   retirementLivingStandardsHousehold?: RetirementLivingStandardHousehold;
@@ -36,6 +39,7 @@ export function createDefaultScenarioDrawdownPreferences(
     desiredAnnualIncome,
     incomeTargetMode: "net",
     taxFreeCash: 0,
+    taxFreeCashMode: "maximum",
     endingBalanceMode: "preserve",
     endingBalancePercentage: 1,
     retirementLivingStandardsHousehold: "one-person",
