@@ -1,8 +1,14 @@
 export { DrawdownEngine } from "./DrawdownEngine";
+export { calculateIncomeForEndingBalance } from "./calculateIncomeForEndingBalance";
 export {
   calculateSustainableTargetIncome,
   type SustainableTargetIncomeOptions,
 } from "./calculateSustainableTargetIncome";
+export {
+  createEndingBalancePaths,
+  type EndingBalancePath,
+  type EndingBalancePaths,
+} from "./createEndingBalancePaths";
 export {
   createIncomeHeadroomAssessment,
   type IncomeHeadroomAssessment,
