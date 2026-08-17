@@ -65,7 +65,20 @@ export function calculateSustainableTargetIncome(
     else high = midpoint;
   }
 
-  return Math.floor(low);
+  // The binary search works with fractional pounds, but the public result is a
+  // whole-pound benchmark. Verify the neighbouring integers so an exact
+  // sustainable boundary is not lost by flooring a lower fractional bound.
+  let candidate = Math.min(MAX_SEARCH_INCOME, Math.ceil(low));
+
+  if (!isSustainable(candidate)) {
+    candidate -= 1;
+  }
+
+  while (candidate < MAX_SEARCH_INCOME && isSustainable(candidate + 1)) {
+    candidate += 1;
+  }
+
+  return Math.max(0, candidate);
 }
 
 function applyIncomeBaseline(
