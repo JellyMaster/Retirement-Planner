@@ -93,13 +93,90 @@
 }
 
 .what-if-summary-card .is-positive,
-.what-if-ranked-changes .is-positive {
+.what-if-ranked-changes .is-positive,
+.what-if-retirement-impact-card .is-positive {
   color: var(--colour-positive, #16845b);
 }
 
 .what-if-summary-card .is-negative,
-.what-if-ranked-changes .is-negative {
+.what-if-ranked-changes .is-negative,
+.what-if-retirement-impact-card .is-negative {
   color: var(--colour-negative, #c2414b);
+}
+
+.what-if-retirement-impact {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--colour-primary) 35%, var(--colour-border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--colour-primary) 5%, var(--colour-surface-secondary));
+}
+
+.what-if-retirement-impact-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.what-if-retirement-impact-heading > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.what-if-retirement-impact-heading > p {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+  text-align: right;
+}
+
+.what-if-retirement-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.what-if-retirement-impact-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+}
+
+.what-if-retirement-impact-card > span,
+.what-if-retirement-impact-card > strong,
+.what-if-retirement-impact-card > em,
+.what-if-retirement-impact-card > small {
+  display: block;
+}
+
+.what-if-retirement-impact-card > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  font-weight: 800;
+}
+
+.what-if-retirement-impact-card > strong {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+}
+
+.what-if-retirement-impact-card > em {
+  font-size: var(--ui-font-size-xs);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.what-if-retirement-impact-card > small {
+  color: var(--colour-text-muted);
+  line-height: 1.45;
 }
 
 .what-if-insight-grid {
@@ -216,16 +293,23 @@
 }
 
 @media (max-width: 1100px) {
-  .what-if-summary-grid {
+  .what-if-summary-grid,
+  .what-if-retirement-impact-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 800px) {
   .what-if-insights-header,
-  .what-if-next-card {
+  .what-if-next-card,
+  .what-if-retirement-impact-heading {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .what-if-retirement-impact-heading > p {
+    max-width: none;
+    text-align: left;
   }
 
   .what-if-health-badge {
@@ -252,7 +336,8 @@
     padding: var(--space-4);
   }
 
-  .what-if-summary-grid {
+  .what-if-summary-grid,
+  .what-if-retirement-impact-grid {
     grid-template-columns: 1fr;
   }
 
