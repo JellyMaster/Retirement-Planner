@@ -1,6 +1,6 @@
 .polaris-overview-page {
   display: grid;
-  gap: var(--ui-space-6);
+  gap: var(--ui-space-5);
   width: min(var(--ui-content-wide, 1400px), 100%);
 }
 
@@ -44,7 +44,7 @@
 .polaris-overview-story {
   position: relative;
   overflow: hidden;
-  min-height: 11rem;
+  min-height: 10rem;
   border-left: 5px solid var(--colour-primary);
   background:
     linear-gradient(
@@ -112,15 +112,15 @@
 
 .polaris-overview-key-facts {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ui-space-4);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ui-space-3);
 }
 
 .polaris-overview-fact {
   display: grid;
   min-width: 0;
   gap: var(--ui-space-1);
-  padding: var(--ui-space-4) var(--ui-space-5);
+  padding: var(--ui-space-3) var(--ui-space-4);
   border-bottom: 3px solid var(--colour-primary);
   border-radius: var(--ui-radius-control);
   background: var(--colour-surface);
@@ -138,19 +138,20 @@
 }
 
 .polaris-overview-fact > span {
-  font-size: var(--ui-font-size-sm);
+  font-size: var(--ui-font-size-xs);
   font-weight: 700;
 }
 
 .polaris-overview-fact > strong {
   overflow-wrap: anywhere;
   color: var(--colour-text);
-  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
   line-height: 1.15;
 }
 
 .polaris-overview-fact > small {
-  line-height: 1.45;
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.35;
 }
 
 .polaris-overview-main-story {
@@ -170,7 +171,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--ui-space-4);
-  margin-bottom: var(--ui-space-4);
+  margin-bottom: var(--ui-space-3);
 }
 
 .polaris-overview-panel-heading p:not(.planner-eyebrow) {
@@ -189,12 +190,12 @@
 
 .polaris-overview-chart-canvas {
   width: 100%;
-  height: 17rem;
+  height: 15rem;
 }
 
 .polaris-overview-chart-empty {
   display: grid;
-  min-height: 17rem;
+  min-height: 15rem;
   place-items: center;
   padding: var(--ui-space-5);
   border: 1px dashed var(--colour-border);
@@ -206,19 +207,19 @@
 .polaris-overview-meaning-panel {
   display: grid;
   align-content: start;
-  gap: var(--ui-space-4);
+  gap: var(--ui-space-3);
 }
 
 .polaris-overview-meaning-list {
   display: grid;
-  gap: var(--ui-space-3);
+  gap: var(--ui-space-2);
 }
 
 .polaris-overview-story-point {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--ui-space-3);
-  padding-bottom: var(--ui-space-3);
+  padding-bottom: var(--ui-space-2);
   border-bottom: 1px solid var(--colour-border);
 }
 
@@ -246,7 +247,7 @@
   margin-top: var(--ui-space-1);
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-sm);
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .polaris-overview-state-pension {
@@ -278,6 +279,12 @@
   background: color-mix(in srgb, var(--colour-primary) 6%, var(--colour-surface));
 }
 
+@media (max-width: 1100px) {
+  .polaris-overview-key-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1000px) {
   .polaris-overview-main-story {
     grid-template-columns: 1fr;
@@ -297,13 +304,15 @@
     text-align: left;
   }
 
-  .polaris-overview-key-facts {
-    grid-template-columns: 1fr;
-  }
-
   .polaris-overview-next-action .ui-button,
   .polaris-overview-header .ui-button {
     width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .polaris-overview-key-facts {
+    grid-template-columns: 1fr;
   }
 }
 
