@@ -7,6 +7,7 @@ import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStor
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
+import { DrawdownLivingStandardsComparison } from "../components/drawdown/DrawdownLivingStandardsComparison";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
 import { DrawdownRetirementChapters } from "../components/drawdown/DrawdownRetirementChapters";
@@ -83,6 +84,10 @@ export function DrawdownPlannerPage() {
     setIsEditingPlan(false);
   }
 
+  function updateLivingStandardsPreferences(drawdown: ScenarioDrawdownPreferences) {
+    updateScenarioPlan(activeScenario.id, activeScenario.inputs, drawdown);
+  }
+
   return (
     <main className="planner-page drawdown-dashboard-page drawdown-workspace-page drawdown-guided-page">
       <header className="planner-header dashboard-header drawdown-workspace-header">
@@ -134,6 +139,11 @@ export function DrawdownPlannerPage() {
                   <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownRetirementJourney inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+                  <DrawdownLivingStandardsComparison
+                    inputs={inputs}
+                    drawdown={activeScenario.drawdown}
+                    onChange={updateLivingStandardsPreferences}
+                  />
                   <DrawdownRetirementTimeline inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   <DrawdownInsights result={result} />
                 </div>
