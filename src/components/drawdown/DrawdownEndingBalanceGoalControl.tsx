@@ -1,7 +1,10 @@
+import { useMemo } from "react";
+
 import {
   createDefaultScenarioDrawdownPreferences,
   type ScenarioDrawdownPreferences,
 } from "../../domain/scenarios";
+import { calculateSustainableTargetIncome } from "../../engine/drawdown/calculateSustainableTargetIncome";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import { getEndingBalanceTarget } from "../../engine/drawdown/models/DrawdownEndingBalanceGoal";
 import { formatCurrency } from "../../utils/formatters";
@@ -26,14 +29,31 @@ export function DrawdownEndingBalanceGoalControl({
     inputs.startingBalance - inputs.taxFreeCash,
   );
   const retirementYears = inputs.endAge - inputs.retirementAge;
+  const endingBalanceGoal = { mode, percentage } as const;
   const targetEndingBalance = getEndingBalanceTarget(
     startingBalanceAfterCash,
     inputs.inflationRate,
     retirementYears,
-    { mode, percentage },
+    endingBalanceGoal,
+  );
+  const sustainableIncome = useMemo(
+    () =>
+      inputs.withdrawalStrategy === "target-income"
+        ? calculateSustainableTargetIncome(inputs, { endingBalanceGoal })
+        : null,
+    [inputs, mode, percentage],
   );
 
-  function selectMode(nextMode: NonNullable<ScenarioDrawdownPreferences["endingBalanceMode"]>) {
+  const selectedGoalLabel =
+    mode === "preserve"
+      ? "Preserve the pot"
+      : mode === "spend-to-zero"
+        ? "Spend it down"
+        : `Leave ${(percentage * 100).toFixed(0)}%`;
+
+  function selectMode(
+    nextMode: NonNullable<ScenarioDrawdownPreferences["endingBalanceMode"]>,
+  ) {
     onChange({
       ...preferences,
       endingBalanceMode: nextMode,
@@ -58,9 +78,20 @@ export function DrawdownEndingBalanceGoalControl({
 
   return (
     <section
-      className="panel drawdown-ending-balance-panel"
+      className="panel drawdown-ending-balance-panel drawdown-planning-decision-panel"
       aria-labelledby="drawdown-ending-balance-title"
     >
+      <div className="drawdown-planning-decision-banner">
+        <div>
+          <span className="drawdown-planning-decision-kicker">Planning decision</span>
+          <strong>{selectedGoalLabel}</strong>
+        </div>
+        <p>
+          This choice changes the sustainable-income, headroom and Retirement
+          Living Standards figures shown below.
+        </p>
+      </div>
+
       <div className="drawdown-section-heading">
         <div>
           <p className="panel-eyebrow">Ending balance</p>
@@ -114,14 +145,31 @@ export function DrawdownEndingBalanceGoalControl({
         </div>
       )}
 
-      <div className="drawdown-ending-balance-summary">
-        <span>Illustrated ending-balance target</span>
-        <strong>{formatCurrency(targetEndingBalance)}</strong>
-        <small>
-          Future-money amount at the end of the plan. The percentage goal itself
-          is defined in today&apos;s-money purchasing-power terms.
-        </small>
+      <div className="drawdown-ending-balance-impact" aria-live="polite">
+        <div>
+          <span>Ending-balance target</span>
+          <strong>{formatCurrency(targetEndingBalance)}</strong>
+          <small>Future-money amount at age {inputs.endAge}</small>
+        </div>
+        <div>
+          <span>Sustainable annual income</span>
+          <strong>
+            {sustainableIncome === null ? "Target-income mode only" : formatCurrency(sustainableIncome)}
+          </strong>
+          <small>
+            {sustainableIncome === null
+              ? "Switch the income approach to Target annual income to calculate this figure."
+              : `Using the selected ending-balance goal to age ${inputs.endAge}.`}
+          </small>
+        </div>
       </div>
+
+      <p className="drawdown-ending-balance-explainer">
+        Your existing retirement projection and charts still show what happens if
+        you follow your saved income target. This decision changes the separate
+        sustainable-income calculation: how much the model says you could spend
+        while still meeting the ending-balance goal.
+      </p>
     </section>
   );
 }
@@ -144,11 +192,14 @@ function GoalOption({
       aria-checked={selected}
       className={
         selected
-          ? "scenario-drawdown-option is-selected"
-          : "scenario-drawdown-option"
+          ? "scenario-drawdown-option drawdown-ending-balance-option is-selected"
+          : "scenario-drawdown-option drawdown-ending-balance-option"
       }
       onClick={onSelect}
     >
+      <span className="drawdown-ending-balance-option-state" aria-hidden="true">
+        {selected ? "Selected" : "Choose"}
+      </span>
       <strong>{title}</strong>
       <span>{description}</span>
     </button>
