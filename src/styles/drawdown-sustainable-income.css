@@ -5,6 +5,55 @@
   gap: 1.25rem;
 }
 
+.drawdown-planning-decision-panel {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--colour-primary);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.08);
+}
+
+.drawdown-planning-decision-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--colour-primary);
+}
+
+.drawdown-planning-decision-banner {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.45fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.1rem;
+  border-radius: 0.9rem;
+  background: var(--colour-surface-tertiary);
+}
+
+.drawdown-planning-decision-banner > div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.drawdown-planning-decision-kicker {
+  color: var(--colour-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.drawdown-planning-decision-banner strong {
+  color: var(--colour-text);
+  font-size: 1.3rem;
+}
+
+.drawdown-planning-decision-banner p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
 .drawdown-decision-grid,
 .drawdown-lifestyle-progression,
 .drawdown-benchmark-grid,
@@ -139,8 +188,40 @@
   min-height: 100%;
 }
 
+.drawdown-ending-balance-option {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  text-align: left;
+}
+
+.drawdown-ending-balance-option.is-selected {
+  border-width: 2px;
+  border-color: var(--colour-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--colour-primary) 14%, transparent);
+}
+
+.drawdown-ending-balance-option-state {
+  width: fit-content;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: var(--colour-surface-tertiary);
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.drawdown-ending-balance-option.is-selected .drawdown-ending-balance-option-state {
+  background: var(--colour-primary);
+  color: white;
+}
+
 .drawdown-ending-balance-percentage,
-.drawdown-ending-balance-summary {
+.drawdown-ending-balance-summary,
+.drawdown-ending-balance-impact {
   display: grid;
   align-items: center;
   gap: 1rem;
@@ -181,6 +262,46 @@
   font-size: 1.25rem;
 }
 
+.drawdown-ending-balance-impact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.drawdown-ending-balance-impact > div {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.drawdown-ending-balance-impact span,
+.drawdown-ending-balance-impact strong,
+.drawdown-ending-balance-impact small {
+  display: block;
+}
+
+.drawdown-ending-balance-impact span {
+  color: var(--colour-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.drawdown-ending-balance-impact strong {
+  color: var(--colour-text);
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+}
+
+.drawdown-ending-balance-impact small,
+.drawdown-ending-balance-explainer {
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.drawdown-ending-balance-explainer {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid var(--colour-primary);
+  background: var(--colour-surface-tertiary);
+}
+
 @media (max-width: 820px) {
   .drawdown-decision-grid,
   .drawdown-lifestyle-progression,
@@ -188,7 +309,9 @@
   .drawdown-lifestyle-story,
   .drawdown-ending-balance-options,
   .drawdown-ending-balance-percentage,
-  .drawdown-ending-balance-summary {
+  .drawdown-ending-balance-summary,
+  .drawdown-ending-balance-impact,
+  .drawdown-planning-decision-banner {
     grid-template-columns: 1fr;
   }
 
