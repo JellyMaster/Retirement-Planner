@@ -38,13 +38,6 @@ export function EssentialRetirementIncomeFields({
     });
   }
 
-  function updateStatePensionIncluded(includeStatePension: boolean) {
-    setRetirementGoals({
-      ...retirementGoals,
-      includeStatePension,
-    });
-  }
-
   return (
     <div className="essential-retirement-income-fields">
       <div className="essential-retirement-income-intro">
@@ -82,21 +75,22 @@ export function EssentialRetirementIncomeFields({
         )}
       </FormField>
 
-      <div className="essential-state-pension">
-        <label className="retirement-goals-checkbox">
-          <input
-            id={`${idPrefix}-statePension`}
-            type="checkbox"
-            checked={retirementGoals.includeStatePension}
-            onChange={(event) => updateStatePensionIncluded(event.target.checked)}
-          />
-          <span>Include State Pension</span>
-        </label>
+      <div className="essential-state-pension" id={`${idPrefix}-statePension`}>
+        <strong>State Pension included</strong>
         <p>
           {retirementGoals.includeStatePension
-            ? `Using ${formatCurrency(retirementGoals.statePensionAnnualAmount)}/year from age ${retirementGoals.statePensionAge}. Detailed State Pension assumptions can be changed under Advanced.`
-            : "State Pension is not currently included in the retirement income illustration."}
+            ? `The plan includes ${formatCurrency(retirementGoals.statePensionAnnualAmount)}/year from age ${retirementGoals.statePensionAge}. You can change or switch this off under Advanced → Retirement strategy.`
+            : "State Pension has been switched off in Advanced retirement settings."}
         </p>
+      </div>
+
+      <div className="essential-retirement-income-note" role="note">
+        <strong>25% tax-free cash is included by default.</strong>
+        <span>
+          The model will use the maximum illustrated tax-free amount available from
+          the pension at retirement. You can change or switch this off under Advanced
+          → Retirement strategy.
+        </span>
       </div>
     </div>
   );
