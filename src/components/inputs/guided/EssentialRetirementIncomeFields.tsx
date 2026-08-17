@@ -94,8 +94,12 @@ export function EssentialRetirementIncomeFields({
 
         <p className="essential-retirement-defaults-copy">
           {retirementGoals.includeStatePension
-            ? `The plan currently uses ${formatCurrency(retirementGoals.statePensionAnnualAmount)} a year from age ${retirementGoals.statePensionAge}, based on the State Pension value stored in today’s money. The actual cash amount you receive may be higher by then because State Pension rates can be uprated over time, including under the triple lock while that policy remains in place. You can change the State Pension amount, age, inclusion and tax-free cash choices under Advanced → Retirement strategy.`
-            : "State Pension is currently switched off. You can change the State Pension amount, age, inclusion and tax-free cash choices under Advanced → Retirement strategy."}
+            ? `The plan currently uses ${formatCurrency(retirementGoals.statePensionAnnualAmount)} a year from age ${retirementGoals.statePensionAge}, based on the State Pension value stored in today’s money. The actual cash amount you receive may be higher by then because State Pension rates can be uprated over time, including under the triple lock while that policy remains in place. `
+            : "State Pension is currently switched off. "}
+          {usesMaximumTaxFreeCash
+            ? "The plan also assumes you take the maximum illustrated tax-free cash available from your pension when you retire. This is normally up to 25% of the pension being accessed, subject to the tax-free lump-sum allowance and your individual circumstances. "
+            : "The default maximum tax-free cash assumption has been changed for this plan. "}
+          You can change the State Pension amount, age and inclusion, or change or switch off the tax-free cash assumption, under Advanced → Retirement strategy.
         </p>
       </div>
     </div>
