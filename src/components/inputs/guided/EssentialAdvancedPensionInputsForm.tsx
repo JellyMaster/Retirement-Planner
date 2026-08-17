@@ -6,6 +6,7 @@ import {
   type ScenarioDrawdownPreferences,
 } from "../../../domain/scenarios";
 import type { PensionInputs } from "../../../engine/models/PensionInputs";
+import { useStoredRetirementGoals } from "../../../hooks/useStoredRetirementGoals";
 import { AppIcons } from "../../../icons";
 import type { PensionInputErrors } from "../../../validation/validatePensionInputs";
 import { formatCurrency, formatPercentage } from "../../../utils/formatters";
@@ -16,6 +17,7 @@ import {
   PercentageInput,
 } from "../../forms";
 import { ScenarioDrawdownFields, useScenarios } from "../../scenarios";
+import { EssentialRetirementIncomeFields } from "./EssentialRetirementIncomeFields";
 
 interface EssentialAdvancedPensionInputsFormProps {
   idPrefix?: string;
@@ -48,6 +50,7 @@ export function EssentialAdvancedPensionInputsForm({
   onReset,
 }: EssentialAdvancedPensionInputsFormProps) {
   const { activeScenario, updateScenarioPlan } = useScenarios();
+  const [retirementGoals] = useStoredRetirementGoals();
   const [drawdown, setDrawdown] = useState<ScenarioDrawdownPreferences>(() => ({
     ...(activeScenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
   }));
@@ -61,7 +64,7 @@ export function EssentialAdvancedPensionInputsForm({
     !errors.currentPot &&
     !errors.monthlyEmployeeContribution &&
     !errors.monthlyEmployerContribution;
-  const incomeComplete = planningAgeValid;
+  const incomeComplete = planningAgeValid && drawdown.desiredAnnualIncome >= 0;
   const essentialComplete = retirementComplete && pensionComplete && incomeComplete;
 
   function fieldId(name: string) {
@@ -168,16 +171,15 @@ export function EssentialAdvancedPensionInputsForm({
 
         <EssentialCard
           title="Retirement income"
-          summary={drawdown.withdrawalStrategy === "target-income" ? `${formatCurrency(drawdown.desiredAnnualIncome)}/year target` : `${formatPercentage(drawdown.withdrawalRate)} withdrawal`}
+          summary={`${formatCurrency(drawdown.desiredAnnualIncome)}/year spending target · ${retirementGoals.includeStatePension ? "State Pension included" : "State Pension not included"}`}
           icon={AppIcons.money}
           complete={incomeComplete}
           open={openEssential === "income"}
           ariaLabel="Retirement income"
           onToggle={() => toggleEssential("income")}
         >
-          <ScenarioDrawdownFields
-            idPrefix={fieldId("drawdown")}
-            retirementAge={value.retirementAge}
+          <EssentialRetirementIncomeFields
+            idPrefix={fieldId("essential-income")}
             value={drawdown}
             onChange={updateDrawdown}
           />
@@ -193,7 +195,7 @@ export function EssentialAdvancedPensionInputsForm({
           </div>
         </div>
 
-        <AdvancedCard title="Investment assumptions" summary={`${formatPercentage(value.annualReturn)} return · ${formatPercentage(value.inflation)} inflation · ${formatPercentage(value.annualFee)} fee`} icon={AppIcons.growth} open={openAdvanced === "assumptions"} onToggle={() => toggleAdvanced("assumptions")}>
+        <AdvancedCard title="Investment assumptions" summary={`${formatPercentage(value.annualReturn)} return · ${formatPercentage(value.inflation)} inflation · ${formatPercentage(value.annualFee)} fee`} icon={AppIcons.growth} open={openAdvanced === "assumptions"} ariaLabel="Investment assumptions" onToggle={() => toggleAdvanced("assumptions")}>
           <FormField id={fieldId("annualReturn")} label="Expected annual return" hint="Investment growth before pension fees." error={errors.annualReturn}>
             {(id, describedBy) => <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.annualReturn) ? value.annualReturn : ""} max={20} step={0.1} error={Boolean(errors.annualReturn)} onValueChange={(next) => updatePercentage("annualReturn", next)} />}
           </FormField>
@@ -205,7 +207,7 @@ export function EssentialAdvancedPensionInputsForm({
           </FormField>
         </AdvancedCard>
 
-        <AdvancedCard title="Future saving changes" summary={value.extraMonthlyContribution ? `${formatCurrency(value.extraMonthlyContribution)}/month extra from age ${value.extraContributionAge ?? "—"}` : `${formatPercentage(value.annualContributionIncrease)} annual increase`} icon={AppIcons.plus} open={openAdvanced === "contributions"} onToggle={() => toggleAdvanced("contributions")}>
+        <AdvancedCard title="Future saving changes" summary={value.extraMonthlyContribution ? `${formatCurrency(value.extraMonthlyContribution)}/month extra from age ${value.extraContributionAge ?? "—"}` : `${formatPercentage(value.annualContributionIncrease)} annual increase`} icon={AppIcons.plus} open={openAdvanced === "contributions"} ariaLabel="Future saving changes" onToggle={() => toggleAdvanced("contributions")}>
           <FormField id={fieldId("contributionIncrease")} label="Annual contribution increase" hint="For example, contributions rising with salary." error={errors.annualContributionIncrease}>
             {(id, describedBy) => <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.annualContributionIncrease) ? value.annualContributionIncrease : ""} max={20} step={0.1} error={Boolean(errors.annualContributionIncrease)} onValueChange={(next) => updatePercentage("annualContributionIncrease", next)} />}
           </FormField>
@@ -217,13 +219,16 @@ export function EssentialAdvancedPensionInputsForm({
           </FormField>
         </AdvancedCard>
 
-        <AdvancedCard title="Retirement strategy" summary="Tax-free cash, spending chapters and detailed withdrawal settings" icon={AppIcons.settings} open={openAdvanced === "strategy"} onToggle={() => toggleAdvanced("strategy")}>
+        <AdvancedCard title="Retirement strategy" summary="Withdrawal approach, spending chapters, tax-free cash and State Pension details" icon={AppIcons.settings} open={openAdvanced === "strategy"} ariaLabel="Retirement strategy" onToggle={() => toggleAdvanced("strategy")}>
           <p className="advanced-plan-note">
-            Detailed retirement strategy settings live in the Retirement income section above so they remain connected to the income target. Use this area as a reminder that those choices are optional refinements rather than requirements for getting started.
+            These settings are optional refinements. Use them when you want more control over how retirement income is modelled.
           </p>
-          <button type="button" className="secondary-button" onClick={() => { setOpenEssential("income"); setOpenAdvanced(null); document.getElementById("guided-pension-form")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>
-            Review retirement strategy
-          </button>
+          <ScenarioDrawdownFields
+            idPrefix={fieldId("drawdown")}
+            retirementAge={value.retirementAge}
+            value={drawdown}
+            onChange={updateDrawdown}
+          />
         </AdvancedCard>
       </section>
     </section>
@@ -244,10 +249,10 @@ function EssentialCard({ title, summary, icon, complete, open, ariaLabel, onTogg
   );
 }
 
-function AdvancedCard({ title, summary, icon, open, onToggle, children }: { title: string; summary: string; icon: (typeof AppIcons)[keyof typeof AppIcons]; open: boolean; onToggle: () => void; children: ReactNode }) {
+function AdvancedCard({ title, summary, icon, open, ariaLabel, onToggle, children }: { title: string; summary: string; icon: (typeof AppIcons)[keyof typeof AppIcons]; open: boolean; ariaLabel: string; onToggle: () => void; children: ReactNode }) {
   return (
     <article className={`advanced-plan-card${open ? " is-open" : ""}`}>
-      <button type="button" className="advanced-plan-card-toggle" aria-expanded={open} onClick={onToggle}>
+      <button type="button" className="advanced-plan-card-toggle" aria-label={ariaLabel} aria-expanded={open} onClick={onToggle}>
         <span className="essential-plan-card-icon" aria-hidden="true"><FontAwesomeIcon icon={icon} /></span>
         <span className="essential-plan-card-copy"><strong>{title}</strong><small>{summary}</small></span>
         <span aria-hidden="true" className="essential-plan-card-chevron">{open ? "−" : "+"}</span>
