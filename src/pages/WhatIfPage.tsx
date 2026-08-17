@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
@@ -20,6 +20,8 @@ import {
   createDefaultScenarioDrawdownPreferences,
   type ScenarioDrawdownPreferences,
 } from "../domain/scenarios";
+import { createRetirementSpendingOutcome } from "../engine/drawdown/createRetirementSpendingOutcome";
+import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
@@ -100,6 +102,58 @@ function WhatIfWorkspace({
         statePensionAnnualAmount: alternativeStateAmount,
         statePensionAge: alternativeStateAge,
       });
+
+  const baselineRetirementOutcome = useMemo(() => {
+    if (baselineScenario.hasErrors) return null;
+    const drawdownInputs = createDrawdownInputsFromPlan({
+      pensionInputs: activeScenario.inputs,
+      projection: baselineScenario.projection,
+      retirementGoals: {
+        ...retirementGoals,
+        desiredAnnualIncome: baselineDrawdown.desiredAnnualIncome,
+        includeStatePension: baselineStateIncluded,
+        statePensionAnnualAmount: baselineStateAmount,
+        statePensionAge: baselineStateAge,
+      },
+      drawdown: baselineDrawdown,
+    });
+    return createRetirementSpendingOutcome(drawdownInputs, baselineDrawdown);
+  }, [
+    activeScenario.inputs,
+    baselineDrawdown,
+    baselineScenario.hasErrors,
+    baselineScenario.projection,
+    baselineStateAge,
+    baselineStateAmount,
+    baselineStateIncluded,
+    retirementGoals,
+  ]);
+
+  const alternativeRetirementOutcome = useMemo(() => {
+    if (alternativeScenario.hasErrors) return null;
+    const drawdownInputs = createDrawdownInputsFromPlan({
+      pensionInputs: alternativeInputs,
+      projection: alternativeScenario.projection,
+      retirementGoals: {
+        ...retirementGoals,
+        desiredAnnualIncome: alternativeDrawdown.desiredAnnualIncome,
+        includeStatePension: alternativeStateIncluded,
+        statePensionAnnualAmount: alternativeStateAmount,
+        statePensionAge: alternativeStateAge,
+      },
+      drawdown: alternativeDrawdown,
+    });
+    return createRetirementSpendingOutcome(drawdownInputs, alternativeDrawdown);
+  }, [
+    alternativeDrawdown,
+    alternativeInputs,
+    alternativeScenario.hasErrors,
+    alternativeScenario.projection,
+    alternativeStateAge,
+    alternativeStateAmount,
+    alternativeStateIncluded,
+    retirementGoals,
+  ]);
 
   const planningAge = baselineDrawdown.planningAge;
   const yearsToRetirement = Math.max(
@@ -539,6 +593,8 @@ function WhatIfWorkspace({
         annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
         baselinePreparedness={baselineHealth?.score ?? 0}
         preparedness={alternativeHealth?.score ?? 0}
+        baselineRetirementOutcome={baselineRetirementOutcome}
+        retirementOutcome={alternativeRetirementOutcome}
         currentAge={activeScenario.inputs.currentAge}
         retirementAge={alternativeInputs.retirementAge}
         statePensionAge={alternativeStateAge}
