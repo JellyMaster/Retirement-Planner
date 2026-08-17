@@ -3,6 +3,11 @@ export {
   calculateSustainableTargetIncome,
   type SustainableTargetIncomeOptions,
 } from "./calculateSustainableTargetIncome";
+export {
+  createIncomeHeadroomAssessment,
+  type IncomeHeadroomAssessment,
+  type IncomeHeadroomStatus,
+} from "./createIncomeHeadroomAssessment";
 export { createDefaultDrawdownInputs } from "./factories/createDefaultDrawdownInputs";
 export type { DrawdownInputs } from "./models/DrawdownInputs";
 export type { DrawdownResult } from "./models/DrawdownResult";
