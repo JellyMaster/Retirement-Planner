@@ -29,10 +29,12 @@ export function createDrawdownInputsFromPlan({
   const maximumTaxFreeCash = Math.floor(
     Math.min(startingBalance * TAX_FREE_CASH_RATE, STANDARD_LUMP_SUM_ALLOWANCE),
   );
-  const taxFreeCash =
-    drawdown?.taxFreeCashMode === "maximum"
-      ? maximumTaxFreeCash
-      : (drawdown?.taxFreeCash ?? defaults.taxFreeCash);
+  const usesMaximumTaxFreeCash =
+    drawdown?.taxFreeCashMode === "maximum" ||
+    (drawdown?.taxFreeCashMode === undefined && (drawdown?.taxFreeCash ?? 0) === 0);
+  const taxFreeCash = usesMaximumTaxFreeCash
+    ? maximumTaxFreeCash
+    : (drawdown?.taxFreeCash ?? defaults.taxFreeCash);
 
   return {
     ...defaults,
