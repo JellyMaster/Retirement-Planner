@@ -13,10 +13,24 @@ export const DEFAULT_DRAWDOWN_ENDING_BALANCE_GOAL: DrawdownEndingBalanceGoal = {
   percentage: 1,
 };
 
+/**
+ * Returns the nominal balance that should remain at the planning age.
+ *
+ * Ending-balance goals are deliberately anchored to the amount actually
+ * available for drawdown at retirement (after any tax-free cash), rather than
+ * inflation-growing that reserve through retirement. This makes the choices
+ * intuitive on the balance chart:
+ * - preserve = finish with the retirement drawdown pot
+ * - percentage = finish with that percentage of the retirement drawdown pot
+ * - spend-to-zero = finish with no pension pot remaining
+ *
+ * inflationRate and retirementYears remain in the signature for compatibility
+ * with existing callers; the reserve target itself is not inflation-adjusted.
+ */
 export function getEndingBalanceTarget(
   startingBalanceAfterCash: number,
-  inflationRate: number,
-  retirementYears: number,
+  _inflationRate: number,
+  _retirementYears: number,
   goal: DrawdownEndingBalanceGoal,
 ): number {
   const percentage =
@@ -25,11 +39,6 @@ export function getEndingBalanceTarget(
       : goal.mode === "spend-to-zero"
         ? 0
         : Math.min(1, Math.max(0, goal.percentage));
-  const inflationYears = Math.max(0, retirementYears - 1);
-  const futureValueMultiplier = (1 + inflationRate) ** inflationYears;
 
-  return Math.max(
-    0,
-    startingBalanceAfterCash * percentage * futureValueMultiplier,
-  );
+  return Math.max(0, startingBalanceAfterCash * percentage);
 }
