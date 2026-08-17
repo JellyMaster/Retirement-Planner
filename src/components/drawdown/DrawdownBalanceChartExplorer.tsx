@@ -15,10 +15,7 @@ import { createEndingBalancePaths } from "../../engine/drawdown/createEndingBala
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
 import { useChartTheme } from "../../theme/useChartTheme";
-import {
-  getDisplayYears,
-  type MoneyDisplayMode,
-} from "../../utils/drawdownDisplayValues";
+import type { MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import {
   formatCompactCurrency,
   formatCurrency,
@@ -54,7 +51,7 @@ export function DrawdownBalanceChartExplorer({
         <div>
           <span>Balance chart view</span>
           <small>
-            Switch between your saved plan and sustainable ending-balance paths.
+            Switch between your saved plan and ending-balance spending paths.
           </small>
         </div>
         <div
@@ -95,7 +92,6 @@ export function DrawdownBalanceChartExplorer({
       ) : (
         <EndingBalanceComparisonChart
           inputs={inputs}
-          displayMode={displayMode}
           drawdown={drawdown}
           onChange={onChange}
         />
@@ -106,10 +102,9 @@ export function DrawdownBalanceChartExplorer({
 
 function EndingBalanceComparisonChart({
   inputs,
-  displayMode,
   drawdown,
   onChange,
-}: Omit<DrawdownBalanceChartExplorerProps, "result">) {
+}: Omit<DrawdownBalanceChartExplorerProps, "result" | "displayMode">) {
   const chartColours = useChartTheme();
   const preferences = drawdown ?? createFallbackPreferences(inputs);
   const selectedMode = preferences.endingBalanceMode ?? "preserve";
@@ -122,34 +117,12 @@ function EndingBalanceComparisonChart({
     [inputs, reservePercentage],
   );
 
-  const preserveYears = getDisplayYears(
-    paths.preserve.result.years,
-    inputs.inflationRate,
-    displayMode,
-  );
-  const reserveYears = getDisplayYears(
-    paths.reserve.result.years,
-    inputs.inflationRate,
-    displayMode,
-  );
-  const spendYears = getDisplayYears(
-    paths.spend.result.years,
-    inputs.inflationRate,
-    displayMode,
-  );
-
-  const chartData = preserveYears.map((year, index) => ({
+  const chartData = paths.preserve.result.years.map((year, index) => ({
     age: year.age,
     preserve: year.closingBalance,
-    reserve: reserveYears[index]?.closingBalance ?? 0,
-    spend: spendYears[index]?.closingBalance ?? 0,
+    reserve: paths.reserve.result.years[index]?.closingBalance ?? 0,
+    spend: paths.spend.result.years[index]?.closingBalance ?? 0,
   }));
-
-  const displayedEndingBalances = {
-    preserve: preserveYears.at(-1)?.closingBalance ?? 0,
-    reserve: reserveYears.at(-1)?.closingBalance ?? 0,
-    spend: spendYears.at(-1)?.closingBalance ?? 0,
-  };
 
   function selectMode(mode: EndingBalanceMode) {
     onChange({
@@ -174,15 +147,16 @@ function EndingBalanceComparisonChart({
           <p className="panel-eyebrow">Ending balance paths</p>
           <h2>See the income-versus-reserve trade-off</h2>
           <p>
-            Each line uses the highest modelled target income that still reaches
-            its ending-balance goal at age {inputs.endAge}.
+            The retirement pot is the anchor. Each path solves for the annual
+            spending level that aims to finish at its selected share of that pot
+            at age {inputs.endAge}.
           </p>
           {inputs.withdrawalStrategy === "percentage" && (
             <p className="drawdown-ending-path-strategy-note">
-              Your saved plan currently uses percentage drawdown. These comparison
-              paths temporarily use target-income modelling so the three reserve
-              choices can be compared on the same basis. Your saved withdrawal
-              strategy is not changed.
+              Your saved plan currently uses percentage drawdown. These paths are
+              comparison illustrations only and use target-income modelling to
+              solve the annual spending available for each reserve target. Your
+              saved withdrawal strategy is not changed.
             </p>
           )}
         </div>
@@ -212,29 +186,33 @@ function EndingBalanceComparisonChart({
           selected={selectedMode === "preserve"}
           label="Preserve 100%"
           income={paths.preserve.income}
-          endingBalance={displayedEndingBalances.preserve}
+          targetEndingBalance={paths.preserve.targetEndingBalance}
+          actualEndingBalance={paths.preserve.result.finalBalance}
           onSelect={() => selectMode("preserve")}
         />
         <PathOption
           selected={selectedMode === "percentage"}
           label={`Reserve ${(reservePercentage * 100).toFixed(0)}%`}
           income={paths.reserve.income}
-          endingBalance={displayedEndingBalances.reserve}
+          targetEndingBalance={paths.reserve.targetEndingBalance}
+          actualEndingBalance={paths.reserve.result.finalBalance}
           onSelect={() => selectMode("percentage")}
         />
         <PathOption
           selected={selectedMode === "spend-to-zero"}
           label="Spend to £0"
           income={paths.spend.income}
-          endingBalance={displayedEndingBalances.spend}
+          targetEndingBalance={paths.spend.targetEndingBalance}
+          actualEndingBalance={paths.spend.result.finalBalance}
           onSelect={() => selectMode("spend-to-zero")}
         />
       </div>
 
       <p className="drawdown-ending-path-note">
-        The highlighted path is the goal used by the sustainable-income, headroom
-        and Retirement Living Standards figures on the Overview. The chart itself
-        does not overwrite your saved retirement-income target.
+        The comparison is shown on the same pound-value basis as the pot entering
+        retirement, so the end points can be compared directly with the reserve
+        targets. The highlighted path is also used by the sustainable-income and
+        lifestyle comparison figures on the Overview.
       </p>
 
       <div className="drawdown-chart">
@@ -322,13 +300,15 @@ function PathOption({
   selected,
   label,
   income,
-  endingBalance,
+  targetEndingBalance,
+  actualEndingBalance,
   onSelect,
 }: {
   selected: boolean;
   label: string;
   income: number;
-  endingBalance: number;
+  targetEndingBalance: number;
+  actualEndingBalance: number;
   onSelect: () => void;
 }) {
   return (
@@ -345,7 +325,8 @@ function PathOption({
     >
       <span>{label}</span>
       <strong>{formatCurrency(income)} / year</strong>
-      <small>Ends with about {formatCurrency(endingBalance)}</small>
+      <small>Target reserve {formatCurrency(targetEndingBalance)}</small>
+      <small>Modelled end {formatCurrency(actualEndingBalance)}</small>
     </button>
   );
 }
