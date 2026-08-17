@@ -66,7 +66,9 @@ export function EssentialAdvancedPensionInputsForm({
     !errors.monthlyEmployerContribution;
   const incomeComplete = planningAgeValid && drawdown.desiredAnnualIncome >= 0;
   const essentialComplete = retirementComplete && pensionComplete && incomeComplete;
-  const usesMaximumTaxFreeCash = drawdown.taxFreeCashMode === "maximum";
+  const usesMaximumTaxFreeCash =
+    drawdown.taxFreeCashMode === "maximum" ||
+    (drawdown.taxFreeCashMode === undefined && drawdown.taxFreeCash === 0);
 
   function fieldId(name: string) {
     return `${idPrefix}-${name}`;
