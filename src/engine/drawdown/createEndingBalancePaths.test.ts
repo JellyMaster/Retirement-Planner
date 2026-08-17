@@ -76,5 +76,36 @@ describe("createEndingBalancePaths", () => {
     expect(paths.preserve.result.finalBalance).toBeLessThan(650_000);
     expect(paths.reserve.result.finalBalance).toBeLessThan(350_000);
     expect(paths.spend.result.finalBalance).toBeLessThan(50_000);
+
+    expect(paths.spend.income).toBeLessThan(200_000);
+    expect(paths.spend.result.depletionAge).toBeNull();
+    expect(paths.spend.result.firstNetIncomeShortfallAge).toBeNull();
+  });
+
+  it("does not let saved retirement chapters cap the ending-balance comparison", () => {
+    const withChapters: DrawdownInputs = {
+      ...baseInputs,
+      startingBalance: 600_000,
+      retirementAge: 60,
+      endAge: 95,
+      incomeTargetMode: "net",
+      annualStatePension: 12_000,
+      statePensionAge: 67,
+      annualReturn: 0.05,
+      annualFee: 0.005,
+      inflationRate: 0.025,
+      spendingPhases: [
+        { startAge: 60, annualIncome: 30_000, label: "Active" },
+        { startAge: 75, annualIncome: 90_000, label: "Later" },
+      ],
+    };
+
+    const paths = createEndingBalancePaths(withChapters, 0.25);
+
+    expect(paths.preserve.income).toBeLessThan(paths.reserve.income);
+    expect(paths.reserve.income).toBeLessThan(paths.spend.income);
+    expect(paths.reserve.result.finalBalance).toBeGreaterThanOrEqual(150_000);
+    expect(paths.reserve.result.finalBalance).toBeLessThan(200_000);
+    expect(paths.spend.result.depletionAge).toBeNull();
   });
 });
