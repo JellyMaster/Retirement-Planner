@@ -200,17 +200,20 @@
 
 .essential-retirement-defaults {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--ui-space-3);
 }
 
-.essential-retirement-default-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-space-3);
+.essential-retirement-default-item {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-space-2);
+  min-width: 0;
 }
 
 .essential-retirement-default-badge {
   display: inline-flex;
+  width: fit-content;
   align-items: center;
   gap: var(--ui-space-2);
   min-height: 2.25rem;
@@ -241,13 +244,32 @@
   color: var(--colour-negative, #c2414b);
 }
 
-.essential-retirement-defaults-copy {
-  margin: 0;
+.essential-retirement-default-copy {
+  height: 100%;
   padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid var(--colour-border);
   border-radius: var(--ui-radius-control);
   background: var(--colour-surface-secondary);
+}
+
+.essential-retirement-default-copy > strong {
+  display: block;
+  margin-bottom: var(--ui-space-1);
+  color: var(--colour-text);
+}
+
+.essential-retirement-default-copy p {
+  margin: 0;
   color: var(--colour-text-muted);
   line-height: 1.55;
+}
+
+.essential-retirement-defaults-help {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: var(--ui-space-1);
+  color: var(--colour-text-muted);
+  line-height: 1.5;
 }
 
 .advanced-plan-group {
@@ -284,12 +306,12 @@
   }
 
   .essential-plan-card-fields,
-  .essential-retirement-income-fields {
+  .essential-retirement-income-fields,
+  .essential-retirement-defaults {
     grid-template-columns: 1fr;
   }
 
-  .essential-retirement-default-badges {
-    align-items: stretch;
-    flex-direction: column;
+  .essential-retirement-defaults-help {
+    grid-column: 1;
   }
 }
