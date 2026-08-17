@@ -53,7 +53,7 @@ describe("calculateSustainableTargetIncome", () => {
     expect(
       calculateSustainableTargetIncome({
         ...baseInputs,
-        startingBalance: 375_000,
+        startingBalance: 420_000,
         spendingPhases: [
           { startAge: 65, annualIncome: 30_000, label: "Active years" },
           { startAge: 75, annualIncome: 24_000, label: "Slower years" },
