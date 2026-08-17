@@ -1,0 +1,113 @@
+.drawdown-headroom-panel,
+.drawdown-living-standards-panel {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.drawdown-decision-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.drawdown-decision-card {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 0.9rem;
+  background: var(--colour-surface-tertiary);
+}
+
+.drawdown-decision-label,
+.drawdown-decision-value,
+.drawdown-decision-detail {
+  display: block;
+}
+
+.drawdown-decision-label {
+  color: var(--colour-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.drawdown-decision-value {
+  color: var(--colour-text);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  line-height: 1.2;
+}
+
+.drawdown-decision-detail {
+  color: var(--colour-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.drawdown-headroom-status {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.35fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 0.9rem;
+  background: var(--colour-surface-tertiary);
+}
+
+.drawdown-headroom-status > div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.drawdown-headroom-status strong {
+  font-size: 1.25rem;
+}
+
+.drawdown-headroom-status p,
+.drawdown-headroom-note {
+  margin: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.55;
+}
+
+.drawdown-headroom-comfortable .drawdown-headroom-status strong {
+  color: var(--colour-positive-text);
+}
+
+.drawdown-headroom-tight .drawdown-headroom-status strong {
+  color: var(--colour-warning-text, #9a6700);
+}
+
+.drawdown-headroom-shortfall .drawdown-headroom-status strong {
+  color: var(--colour-negative-text);
+}
+
+.drawdown-living-standards-panel .drawdown-summary-grid article {
+  display: grid;
+  align-content: start;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.drawdown-living-standards-panel .drawdown-summary-grid article > span,
+.drawdown-living-standards-panel .drawdown-summary-grid article > strong,
+.drawdown-living-standards-panel .drawdown-summary-grid article > small {
+  display: block;
+}
+
+.drawdown-living-standards-panel .scenario-edit-grid {
+  margin-bottom: 0;
+}
+
+@media (max-width: 820px) {
+  .drawdown-decision-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .drawdown-headroom-status {
+    grid-template-columns: 1fr;
+  }
+}
