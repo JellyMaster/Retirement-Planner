@@ -40,7 +40,7 @@ const navigationItems: readonly NavigationItem[] = [
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ScenarioProvider>
         <AppContent />
       </ScenarioProvider>
