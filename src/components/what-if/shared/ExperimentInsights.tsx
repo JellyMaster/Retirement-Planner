@@ -1,10 +1,6 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-
-import type { ExperimentId } from "../ExperimentLauncher";
 import type { RetirementSpendingOutcome } from "../../../engine/drawdown/createRetirementSpendingOutcome";
-import { AppIcons } from "../../../icons";
 import { formatCurrency } from "../../../utils/formatters";
+import type { ExperimentId } from "../ExperimentLauncher";
 
 interface ExperimentInsightsProps {
   activeExperiment: ExperimentId;
@@ -25,24 +21,6 @@ interface ExperimentInsightsProps {
   onSelectExperiment: (experiment: ExperimentId) => void;
 }
 
-interface TimelineMarker {
-  key: string;
-  age: number;
-  label: string;
-  icon: IconDefinition;
-}
-
-const nextExperiment: Record<ExperimentId, ExperimentId> = {
-  "retirement-age": "contributions",
-  contributions: "spending",
-  spending: "fees",
-  fees: "returns",
-  returns: "inflation",
-  inflation: "state-pension",
-  "state-pension": "market-downturn",
-  "market-downturn": "retirement-age",
-};
-
 const experimentQuestion: Record<ExperimentId, string> = {
   "retirement-age": "When could I retire?",
   contributions: "What if I saved more?",
@@ -60,54 +38,13 @@ export function ExperimentInsights({
   projectedPension,
   baselineAnnualIncome,
   annualIncome,
-  baselinePreparedness,
-  preparedness,
   baselineRetirementOutcome,
   retirementOutcome,
-  currentAge,
-  retirementAge,
-  statePensionAge,
-  extraContributionAge,
-  downturnAge,
   hasChanged,
-  onSelectExperiment,
 }: ExperimentInsightsProps) {
   const pensionDifference = projectedPension - baselineProjectedPension;
   const incomeDifference = annualIncome - baselineAnnualIncome;
-  const preparednessDifference = preparedness - baselinePreparedness;
-  const health = getHealth(preparedness);
-  const sensitivity = getSensitivity(
-    relativeChange(pensionDifference, baselineProjectedPension),
-    relativeChange(incomeDifference, baselineAnnualIncome),
-    Math.abs(preparednessDifference) / 100,
-  );
-  const changes = [
-    {
-      label: "Pension at retirement",
-      value: formatSignedCurrency(pensionDifference),
-      magnitude: relativeChange(pensionDifference, baselineProjectedPension),
-      tone: toneClass(pensionDifference),
-    },
-    {
-      label: "Annual retirement income",
-      value: `${formatSignedCurrency(incomeDifference)}/year`,
-      magnitude: relativeChange(incomeDifference, baselineAnnualIncome),
-      tone: toneClass(incomeDifference),
-    },
-    {
-      label: "Target coverage",
-      value: formatSignedPercentage(preparednessDifference),
-      magnitude: Math.abs(preparednessDifference) / 100,
-      tone: toneClass(preparednessDifference),
-    },
-  ].sort((left, right) => right.magnitude - left.magnitude);
-  const next = nextExperiment[activeExperiment];
-  const timelineOptionalProps = {
-    ...(extraContributionAge !== undefined ? { extraContributionAge } : {}),
-    ...(activeExperiment === "market-downturn" && downturnAge !== undefined
-      ? { downturnAge }
-      : {}),
-  };
+  const outcome = getOutcomeVerdict(activeExperiment, pensionDifference, incomeDifference);
 
   return (
     <section className="what-if-insights" aria-labelledby="decision-summary-title">
@@ -117,279 +54,205 @@ export function ExperimentInsights({
           <h2 id="decision-summary-title">{experimentQuestion[activeExperiment]}</h2>
           <p>
             {hasChanged
-              ? "A consistent view of the most important outcome changes."
+              ? "See the main effect of this change compared with your saved plan."
               : "Move an experiment control to compare it with the saved plan."}
           </p>
         </div>
-        <span className={`what-if-health-badge ${health.className}`}>{health.label}</span>
       </header>
 
-      <div className="what-if-summary-grid">
-        <SummaryCard
-          label="Projected pension"
-          value={formatCurrency(projectedPension)}
+      <div className="what-if-before-after-grid">
+        <BeforeAfterCard
+          label="Pension at retirement"
+          before={formatCurrency(baselineProjectedPension)}
+          after={formatCurrency(projectedPension)}
           difference={formatSignedCurrency(pensionDifference)}
           tone={toneClass(pensionDifference)}
         />
-        <SummaryCard
-          label="Annual retirement income"
-          value={`${formatCurrency(annualIncome)}/year`}
+        <BeforeAfterCard
+          label="Estimated retirement income"
+          before={`${formatCurrency(baselineAnnualIncome)}/year`}
+          after={`${formatCurrency(annualIncome)}/year`}
           difference={`${formatSignedCurrency(incomeDifference)}/year`}
           tone={toneClass(incomeDifference)}
         />
-        <SummaryCard
-          label="Preparedness"
-          value={`${preparedness}%`}
-          difference={formatSignedPercentage(preparednessDifference)}
-          tone={toneClass(preparednessDifference)}
-        />
-        <article className="what-if-summary-card what-if-health-card">
-          <span>Plan health</span>
-          <strong>{health.label}</strong>
-          <p>{health.description}</p>
-        </article>
       </div>
+
+      <article className={`what-if-verdict ${outcome.className}`}>
+        <div>
+          <p className="planner-eyebrow">Overall effect</p>
+          <h3>{hasChanged ? outcome.label : "Your saved plan"}</h3>
+        </div>
+        <p>
+          {hasChanged
+            ? createExplanation(activeExperiment, pensionDifference, incomeDifference)
+            : "The figures above are your baseline. Change one control to see the effect."}
+        </p>
+      </article>
 
       {baselineRetirementOutcome && retirementOutcome && (
-        <RetirementSpendingImpact
+        <RetirementImpactDetails
           baseline={baselineRetirementOutcome}
           outcome={retirementOutcome}
-          hasChanged={hasChanged}
         />
       )}
-
-      <div className="what-if-insight-grid">
-        <article className="what-if-shared-panel">
-          <p className="planner-eyebrow">What changed?</p>
-          <h3>Biggest movements</h3>
-          <ol className="what-if-ranked-changes">
-            {changes.map((change) => (
-              <li key={change.label}>
-                <FontAwesomeIcon icon={AppIcons.chartLine} aria-hidden="true" />
-                <span>{change.label}</span>
-                <strong className={change.tone}>{change.value}</strong>
-              </li>
-            ))}
-          </ol>
-        </article>
-
-        <article className="what-if-shared-panel">
-          <p className="planner-eyebrow">Sensitivity</p>
-          <h3>{sensitivity.label} impact</h3>
-          <div
-            className="what-if-sensitivity-track"
-            role="meter"
-            aria-label="Impact of this decision"
-            aria-valuemin={0}
-            aria-valuemax={5}
-            aria-valuenow={sensitivity.level}
-            aria-valuetext={`${sensitivity.label} impact`}
-          >
-            <span style={{ width: `${sensitivity.level * 20}%` }} />
-          </div>
-          <p>{sensitivity.description}</p>
-        </article>
-      </div>
-
-      <ExperimentTimeline
-        currentAge={currentAge}
-        retirementAge={retirementAge}
-        statePensionAge={statePensionAge}
-        {...timelineOptionalProps}
-      />
-
-      <article className="what-if-next-card">
-        <span className="what-if-story-icon" aria-hidden="true">
-          <FontAwesomeIcon icon={AppIcons.lightbulb} fixedWidth />
-        </span>
-        <div>
-          <p className="planner-eyebrow">Recommended next experiment</p>
-          <h3>{experimentQuestion[next]}</h3>
-          <p>Explore another single lever while keeping this plan as the baseline.</p>
-        </div>
-        <button
-          type="button"
-          className="ui-button ui-button-secondary ui-button-medium"
-          onClick={() => onSelectExperiment(next)}
-        >
-          Open experiment
-        </button>
-      </article>
     </section>
   );
 }
 
-function RetirementSpendingImpact({
-  baseline,
-  outcome,
-  hasChanged,
+function BeforeAfterCard({
+  label,
+  before,
+  after,
+  difference,
+  tone,
 }: {
-  baseline: RetirementSpendingOutcome;
-  outcome: RetirementSpendingOutcome;
-  hasChanged: boolean;
+  label: string;
+  before: string;
+  after: string;
+  difference: string;
+  tone: string;
 }) {
-  const sustainableDifference =
-    outcome.sustainableNetSpending - baseline.sustainableNetSpending;
-  const headroomDifference = outcome.annualHeadroom - baseline.annualHeadroom;
-  const reserveDifference = outcome.targetEndingBalance - baseline.targetEndingBalance;
-
   return (
-    <article className="what-if-retirement-impact">
-      <div className="what-if-retirement-impact-heading">
+    <article className="what-if-before-after-card">
+      <span>{label}</span>
+      <div className="what-if-before-after-values">
         <div>
-          <p className="planner-eyebrow">Retirement spending impact</p>
-          <h3>What does this mean once you retire?</h3>
+          <small>Saved plan</small>
+          <strong>{before}</strong>
         </div>
-        <p>
-          {hasChanged
-            ? "Drawdown outcomes using the same ending-balance goal as your active plan."
-            : "These drawdown measures currently match your saved plan."}
-        </p>
+        <span aria-hidden="true">→</span>
+        <div>
+          <small>What if</small>
+          <strong>{after}</strong>
+        </div>
       </div>
-
-      <div className="what-if-retirement-impact-grid">
-        <ImpactCard
-          label="Sustainable net spending"
-          value={`${formatCurrency(outcome.sustainableNetSpending)}/year`}
-          difference={`${formatSignedCurrency(sustainableDifference)}/year`}
-          tone={toneClass(sustainableDifference)}
-        />
-        <ImpactCard
-          label="Annual headroom"
-          value={formatSignedCurrency(outcome.annualHeadroom)}
-          difference={`${formatSignedCurrency(headroomDifference)} vs saved plan`}
-          tone={toneClass(headroomDifference)}
-          detail={`Status: ${statusLabel(outcome.status)}`}
-        />
-        <ImpactCard
-          label="Target pot reserve"
-          value={formatCurrency(outcome.targetEndingBalance)}
-          difference={formatSignedCurrency(reserveDifference)}
-          tone={toneClass(reserveDifference)}
-          detail={`Modelled end: ${formatCurrency(outcome.modelledEndingBalance)}`}
-        />
-        <ImpactCard
-          label="Living Standard supported"
-          value={livingStandardLabel(outcome.livingStandard)}
-          difference={`${livingStandardLabel(baseline.livingStandard)} → ${livingStandardLabel(outcome.livingStandard)}`}
-          detail="2026 Retirement Living Standards"
-        />
-      </div>
+      <em className={tone}>{difference}</em>
     </article>
   );
 }
 
-function ImpactCard({
+function RetirementImpactDetails({
+  baseline,
+  outcome,
+}: {
+  baseline: RetirementSpendingOutcome;
+  outcome: RetirementSpendingOutcome;
+}) {
+  const sustainableDifference = outcome.sustainableNetSpending - baseline.sustainableNetSpending;
+  const headroomDifference = outcome.annualHeadroom - baseline.annualHeadroom;
+
+  return (
+    <details className="what-if-details">
+      <summary>See retirement impact details</summary>
+      <p>
+        These use the same drawdown assumptions and ending-balance goal as your active plan.
+      </p>
+      <div className="what-if-details-grid">
+        <DetailCard
+          label="Sustainable net spending"
+          before={`${formatCurrency(baseline.sustainableNetSpending)}/year`}
+          after={`${formatCurrency(outcome.sustainableNetSpending)}/year`}
+          difference={`${formatSignedCurrency(sustainableDifference)}/year`}
+          tone={toneClass(sustainableDifference)}
+        />
+        <DetailCard
+          label="Annual headroom"
+          before={formatSignedCurrency(baseline.annualHeadroom)}
+          after={formatSignedCurrency(outcome.annualHeadroom)}
+          difference={formatSignedCurrency(headroomDifference)}
+          tone={toneClass(headroomDifference)}
+        />
+        <DetailCard
+          label="Ending pot"
+          before={formatCurrency(baseline.modelledEndingBalance)}
+          after={formatCurrency(outcome.modelledEndingBalance)}
+          difference={`Target ${formatCurrency(outcome.targetEndingBalance)}`}
+          tone=""
+        />
+        <DetailCard
+          label="Living Standard supported"
+          before={livingStandardLabel(baseline.livingStandard)}
+          after={livingStandardLabel(outcome.livingStandard)}
+          difference={`${statusLabel(baseline.status)} → ${statusLabel(outcome.status)}`}
+          tone=""
+        />
+      </div>
+    </details>
+  );
+}
+
+function DetailCard({
   label,
-  value,
+  before,
+  after,
   difference,
-  detail,
   tone,
 }: {
   label: string;
-  value: string;
+  before: string;
+  after: string;
   difference: string;
-  detail?: string;
-  tone?: string;
+  tone: string;
 }) {
   return (
-    <div className="what-if-retirement-impact-card">
+    <div className="what-if-detail-card">
       <span>{label}</span>
-      <strong>{value}</strong>
-      <em className={tone}>{difference}</em>
-      {detail && <small>{detail}</small>}
+      <small>{before} → {after}</small>
+      <strong className={tone}>{difference}</strong>
     </div>
   );
 }
 
-function SummaryCard({
-  label,
-  value,
-  difference,
-  tone,
-}: {
-  label: string;
-  value: string;
-  difference: string;
-  tone?: string;
-}) {
-  return (
-    <article className="what-if-summary-card">
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <em className={tone}>{difference}</em>
-    </article>
-  );
+function getOutcomeVerdict(
+  experiment: ExperimentId,
+  pensionDifference: number,
+  incomeDifference: number,
+) {
+  const financialDifference = Math.abs(incomeDifference) >= 1 ? incomeDifference : pensionDifference;
+  const baselineScale = Math.max(Math.abs(pensionDifference), Math.abs(incomeDifference), 1);
+  const isSimilar = Math.abs(financialDifference) < Math.max(50, baselineScale * 0.005);
+
+  if (isSimilar) {
+    return { label: "Similar outcome", className: "is-similar" };
+  }
+
+  if (experiment === "spending") {
+    return financialDifference >= 0
+      ? { label: "More flexibility", className: "is-positive" }
+      : { label: "More pressure", className: "is-negative" };
+  }
+
+  return financialDifference > 0
+    ? { label: "More flexibility", className: "is-positive" }
+    : { label: "More pressure", className: "is-negative" };
 }
 
-function ExperimentTimeline({
-  currentAge,
-  retirementAge,
-  statePensionAge,
-  extraContributionAge,
-  downturnAge,
-}: {
-  currentAge: number;
-  retirementAge: number;
-  statePensionAge: number;
-  extraContributionAge?: number;
-  downturnAge?: number;
-}) {
-  const ages = [currentAge, retirementAge, statePensionAge];
-  if (extraContributionAge !== undefined) ages.push(extraContributionAge);
-  if (downturnAge !== undefined) ages.push(downturnAge);
+function createExplanation(
+  experiment: ExperimentId,
+  pensionDifference: number,
+  incomeDifference: number,
+): string {
+  const direction = incomeDifference > 0 ? "increases" : incomeDifference < 0 ? "reduces" : "barely changes";
+  const pensionDirection = pensionDifference > 0 ? "larger" : pensionDifference < 0 ? "smaller" : "similar";
 
-  const minimum = Math.min(...ages);
-  const maximum = Math.max(...ages, minimum + 1);
-  const position = (age: number) => `${((age - minimum) / (maximum - minimum)) * 100}%`;
-  const markers: TimelineMarker[] = [
-    { key: "today", age: currentAge, label: "Today", icon: AppIcons.user },
-    { key: "retirement", age: retirementAge, label: "Retire", icon: AppIcons.retirement },
-    { key: "state", age: statePensionAge, label: "State Pension", icon: AppIcons.pension },
-  ];
-
-  if (extraContributionAge !== undefined) {
-    markers.push({
-      key: "extra",
-      age: extraContributionAge,
-      label: "Extra saving",
-      icon: AppIcons.plus,
-    });
+  switch (experiment) {
+    case "retirement-age":
+      return `Changing retirement age ${direction} the illustrated retirement income and leaves a ${pensionDirection} pension pot at retirement.`;
+    case "contributions":
+      return `Changing contributions leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income.`;
+    case "spending":
+      return "A higher spending target can improve retirement lifestyle, but it also asks more of the pension. Open the details below to see the effect on sustainable spending and headroom.";
+    case "fees":
+      return `The fee change leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income.`;
+    case "returns":
+      return `The return assumption leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income. Returns are an assumption, not a guaranteed outcome.`;
+    case "inflation":
+      return `The inflation assumption ${direction} the spending power illustrated by the plan. The comparison is shown in today's-money terms where possible.`;
+    case "state-pension":
+      return `The State Pension change ${direction} the income available in retirement and changes how much needs to come from the private pension.`;
+    case "market-downturn":
+      return `The market fall leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income.`;
   }
-  if (downturnAge !== undefined) {
-    markers.push({
-      key: "downturn",
-      age: downturnAge,
-      label: "Market fall",
-      icon: AppIcons.warning,
-    });
-  }
-  markers.sort((left, right) => left.age - right.age);
-
-  return (
-    <article className="what-if-timeline-panel">
-      <div>
-        <p className="planner-eyebrow">Plan timeline</p>
-        <h3>When the key events happen</h3>
-      </div>
-      <div className="what-if-timeline" aria-label="Experiment timeline">
-        <div className="what-if-timeline-line" />
-        {markers.map((marker) => (
-          <div
-            key={marker.key}
-            className="what-if-timeline-marker"
-            style={{ left: position(marker.age) }}
-          >
-            <span aria-hidden="true">
-              <FontAwesomeIcon icon={marker.icon} />
-            </span>
-            <strong>{marker.age}</strong>
-            <small>{marker.label}</small>
-          </div>
-        ))}
-      </div>
-    </article>
-  );
 }
 
 function statusLabel(status: RetirementSpendingOutcome["status"]): string {
@@ -398,88 +261,19 @@ function statusLabel(status: RetirementSpendingOutcome["status"]): string {
   return "Shortfall";
 }
 
-function livingStandardLabel(
-  level: RetirementSpendingOutcome["livingStandard"],
-): string {
+function livingStandardLabel(level: RetirementSpendingOutcome["livingStandard"]): string {
   if (level === null) return "Below Minimum";
   return level.charAt(0).toUpperCase() + level.slice(1);
 }
 
-function getHealth(score: number) {
-  if (score >= 100) {
-    return {
-      label: "On track",
-      description: "The illustrated income meets or exceeds the chosen target.",
-      className: "is-good",
-    };
-  }
-  if (score >= 85) {
-    return {
-      label: "Close",
-      description: "The plan is near the chosen target, but a modest gap remains.",
-      className: "is-close",
-    };
-  }
-  return {
-    label: "Needs attention",
-    description: "The illustrated income remains below the chosen target.",
-    className: "is-warning",
-  };
-}
-
-function getSensitivity(...changes: number[]) {
-  const largest = Math.max(...changes.map(Math.abs));
-  if (largest >= 0.25) {
-    return {
-      level: 5,
-      label: "Very high",
-      description: "This lever materially changes the retirement outcome.",
-    };
-  }
-  if (largest >= 0.15) {
-    return {
-      level: 4,
-      label: "High",
-      description: "This lever has a strong effect on the plan.",
-    };
-  }
-  if (largest >= 0.08) {
-    return {
-      level: 3,
-      label: "Moderate",
-      description: "This lever produces a noticeable change.",
-    };
-  }
-  if (largest >= 0.03) {
-    return {
-      level: 2,
-      label: "Low",
-      description: "This lever moves the plan, but less than the major decisions.",
-    };
-  }
-  return {
-    level: 1,
-    label: "Very low",
-    description: "This lever has only a small effect under the current assumptions.",
-  };
-}
-
-function relativeChange(change: number, baseline: number): number {
-  return baseline === 0 ? (change === 0 ? 0 : 1) : Math.abs(change / baseline);
-}
-
 function formatSignedCurrency(value: number): string {
-  if (Math.abs(value) < 0.5) return "No change";
-  return `${value > 0 ? "+" : "−"}${formatCurrency(Math.abs(value))}`;
+  if (Math.abs(value) < 0.5) return "£0";
+  const prefix = value > 0 ? "+" : "−";
+  return `${prefix}${formatCurrency(Math.abs(value))}`;
 }
 
-function formatSignedPercentage(value: number): string {
-  if (Math.abs(value) < 0.5) return "No change";
-  return `${value > 0 ? "+" : "−"}${Math.abs(Math.round(value))}%`;
-}
-
-function toneClass(value: number): string | undefined {
+function toneClass(value: number): string {
   if (value > 0.5) return "is-positive";
   if (value < -0.5) return "is-negative";
-  return undefined;
+  return "";
 }
