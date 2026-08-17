@@ -1,12 +1,14 @@
 .drawdown-headroom-panel,
-.drawdown-living-standards-panel {
+.drawdown-living-standards-panel,
+.drawdown-ending-balance-panel {
   display: grid;
   gap: 1.25rem;
 }
 
 .drawdown-decision-grid,
 .drawdown-lifestyle-progression,
-.drawdown-benchmark-grid {
+.drawdown-benchmark-grid,
+.drawdown-ending-balance-options {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
@@ -133,11 +135,60 @@
   line-height: 1.55;
 }
 
+.drawdown-ending-balance-options .scenario-drawdown-option {
+  min-height: 100%;
+}
+
+.drawdown-ending-balance-percentage,
+.drawdown-ending-balance-summary {
+  display: grid;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 0.9rem;
+  background: var(--colour-surface-tertiary);
+}
+
+.drawdown-ending-balance-percentage {
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 0.4fr);
+}
+
+.drawdown-ending-balance-percentage label {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.drawdown-ending-balance-percentage label > span,
+.drawdown-ending-balance-summary > span {
+  color: var(--colour-text);
+  font-weight: 700;
+}
+
+.drawdown-ending-balance-percentage label > small,
+.drawdown-ending-balance-summary > small {
+  color: var(--colour-text-muted);
+  line-height: 1.45;
+}
+
+.drawdown-ending-balance-summary {
+  grid-template-columns: minmax(10rem, 0.5fr) minmax(8rem, 0.3fr) minmax(0, 1fr);
+}
+
+.drawdown-ending-balance-summary > strong {
+  color: var(--colour-text);
+  font-size: 1.25rem;
+}
+
 @media (max-width: 820px) {
   .drawdown-decision-grid,
   .drawdown-lifestyle-progression,
   .drawdown-benchmark-grid,
-  .drawdown-lifestyle-story {
+  .drawdown-lifestyle-story,
+  .drawdown-ending-balance-options,
+  .drawdown-ending-balance-percentage,
+  .drawdown-ending-balance-summary {
     grid-template-columns: 1fr;
   }
 
