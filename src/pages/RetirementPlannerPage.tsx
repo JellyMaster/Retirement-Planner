@@ -6,7 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
-import { GuidedPensionInputsForm } from "../components/inputs/guided";
+import { EssentialAdvancedPensionInputsForm } from "../components/inputs/guided";
 import { useScenarios } from "../components/scenarios";
 import { createDefaultPensionInputs } from "../config/defaultPensionInputs";
 import type { PensionInputs } from "../engine/models/PensionInputs";
@@ -50,11 +50,11 @@ function RetirementPlannerPageContent({
     if (searchParams.get("step") !== "income") return;
 
     const stepFrame = window.requestAnimationFrame(() => {
-      const retirementStep = document.querySelector<HTMLButtonElement>(
-        'button[aria-label="Retirement"]',
+      const retirementIncome = document.querySelector<HTMLButtonElement>(
+        'button[aria-label="Retirement income"]',
       );
-      retirementStep?.click();
-      retirementStep?.focus();
+      retirementIncome?.click();
+      retirementIncome?.focus();
 
       const requestedSection = incomeSectionIds[searchParams.get("section") ?? ""];
       if (!requestedSection) return;
@@ -98,8 +98,8 @@ function RetirementPlannerPageContent({
           <p className="planner-eyebrow">My Plan · {activeScenario.name}</p>
           <h1>Build your retirement plan</h1>
           <p>
-            Keep the assumptions, contributions and retirement-income choices for
-            the active plan in one place.
+            Start with the essentials, then fine-tune advanced assumptions only when
+            you need them.
           </p>
         </div>
 
@@ -147,7 +147,7 @@ function RetirementPlannerPageContent({
           <strong>{planComplete ? "Complete" : "Needs attention"}</strong>
           <small>
             {planComplete
-              ? "All required sections are usable"
+              ? "Essential plan information is usable"
               : "Review the highlighted fields"}
           </small>
           <small>Updated {formatUpdatedDate(activeScenario.updatedAt)}</small>
@@ -155,7 +155,7 @@ function RetirementPlannerPageContent({
       </section>
 
       <section className="my-plan-editor-region" aria-label="Edit retirement plan">
-        <GuidedPensionInputsForm
+        <EssentialAdvancedPensionInputsForm
           idPrefix="current"
           value={inputs}
           errors={scenario.errors}
