@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 import type { ExperimentId } from "../ExperimentLauncher";
+import type { RetirementSpendingOutcome } from "../../../engine/drawdown/createRetirementSpendingOutcome";
 import { AppIcons } from "../../../icons";
 import { formatCurrency } from "../../../utils/formatters";
 
@@ -13,6 +14,8 @@ interface ExperimentInsightsProps {
   annualIncome: number;
   baselinePreparedness: number;
   preparedness: number;
+  baselineRetirementOutcome?: RetirementSpendingOutcome | null;
+  retirementOutcome?: RetirementSpendingOutcome | null;
   currentAge: number;
   retirementAge: number;
   statePensionAge: number;
@@ -59,6 +62,8 @@ export function ExperimentInsights({
   annualIncome,
   baselinePreparedness,
   preparedness,
+  baselineRetirementOutcome,
+  retirementOutcome,
   currentAge,
   retirementAge,
   statePensionAge,
@@ -145,6 +150,14 @@ export function ExperimentInsights({
         </article>
       </div>
 
+      {baselineRetirementOutcome && retirementOutcome && (
+        <RetirementSpendingImpact
+          baseline={baselineRetirementOutcome}
+          outcome={retirementOutcome}
+          hasChanged={hasChanged}
+        />
+      )}
+
       <div className="what-if-insight-grid">
         <article className="what-if-shared-panel">
           <p className="planner-eyebrow">What changed?</p>
@@ -203,6 +216,89 @@ export function ExperimentInsights({
         </button>
       </article>
     </section>
+  );
+}
+
+function RetirementSpendingImpact({
+  baseline,
+  outcome,
+  hasChanged,
+}: {
+  baseline: RetirementSpendingOutcome;
+  outcome: RetirementSpendingOutcome;
+  hasChanged: boolean;
+}) {
+  const sustainableDifference =
+    outcome.sustainableNetSpending - baseline.sustainableNetSpending;
+  const headroomDifference = outcome.annualHeadroom - baseline.annualHeadroom;
+  const reserveDifference = outcome.targetEndingBalance - baseline.targetEndingBalance;
+
+  return (
+    <article className="what-if-retirement-impact">
+      <div className="what-if-retirement-impact-heading">
+        <div>
+          <p className="planner-eyebrow">Retirement spending impact</p>
+          <h3>What does this mean once you retire?</h3>
+        </div>
+        <p>
+          {hasChanged
+            ? "Drawdown outcomes using the same ending-balance goal as your active plan."
+            : "These drawdown measures currently match your saved plan."}
+        </p>
+      </div>
+
+      <div className="what-if-retirement-impact-grid">
+        <ImpactCard
+          label="Sustainable net spending"
+          value={`${formatCurrency(outcome.sustainableNetSpending)}/year`}
+          difference={`${formatSignedCurrency(sustainableDifference)}/year`}
+          tone={toneClass(sustainableDifference)}
+        />
+        <ImpactCard
+          label="Annual headroom"
+          value={formatSignedCurrency(outcome.annualHeadroom)}
+          difference={`${formatSignedCurrency(headroomDifference)} vs saved plan`}
+          tone={toneClass(headroomDifference)}
+          detail={`Status: ${statusLabel(outcome.status)}`}
+        />
+        <ImpactCard
+          label="Target pot reserve"
+          value={formatCurrency(outcome.targetEndingBalance)}
+          difference={formatSignedCurrency(reserveDifference)}
+          tone={toneClass(reserveDifference)}
+          detail={`Modelled end: ${formatCurrency(outcome.modelledEndingBalance)}`}
+        />
+        <ImpactCard
+          label="Living Standard supported"
+          value={livingStandardLabel(outcome.livingStandard)}
+          difference={`${livingStandardLabel(baseline.livingStandard)} → ${livingStandardLabel(outcome.livingStandard)}`}
+          detail="2026 Retirement Living Standards"
+        />
+      </div>
+    </article>
+  );
+}
+
+function ImpactCard({
+  label,
+  value,
+  difference,
+  detail,
+  tone,
+}: {
+  label: string;
+  value: string;
+  difference: string;
+  detail?: string;
+  tone?: string;
+}) {
+  return (
+    <div className="what-if-retirement-impact-card">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <em className={tone}>{difference}</em>
+      {detail && <small>{detail}</small>}
+    </div>
   );
 }
 
@@ -294,6 +390,19 @@ function ExperimentTimeline({
       </div>
     </article>
   );
+}
+
+function statusLabel(status: RetirementSpendingOutcome["status"]): string {
+  if (status === "comfortable") return "Comfortable";
+  if (status === "tight") return "Tight";
+  return "Shortfall";
+}
+
+function livingStandardLabel(
+  level: RetirementSpendingOutcome["livingStandard"],
+): string {
+  if (level === null) return "Below Minimum";
+  return level.charAt(0).toUpperCase() + level.slice(1);
 }
 
 function getHealth(score: number) {
