@@ -8,8 +8,7 @@
   box-shadow: var(--shadow-panel);
 }
 
-.what-if-insights-header,
-.what-if-next-card {
+.what-if-insights-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,46 +21,22 @@
 }
 
 .what-if-insights-header p:not(.planner-eyebrow),
-.what-if-shared-panel > p:not(.planner-eyebrow),
-.what-if-next-card p:not(.planner-eyebrow),
-.what-if-health-card p {
+.what-if-verdict > p,
+.what-if-details > p {
   margin: var(--space-2) 0 0;
   color: var(--colour-text-muted);
   line-height: 1.5;
 }
 
-.what-if-health-badge {
-  flex: 0 0 auto;
-  padding: 0.5rem 0.8rem;
-  border-radius: 999px;
-  font-size: var(--ui-font-size-xs);
-  font-weight: 800;
-}
-
-.what-if-health-badge.is-good {
-  color: var(--status-good-text);
-  background: var(--status-good-background);
-}
-
-.what-if-health-badge.is-close {
-  color: var(--colour-warning, #9a6700);
-  background: color-mix(in srgb, var(--colour-warning, #d99a00) 14%, transparent);
-}
-
-.what-if-health-badge.is-warning {
-  color: var(--colour-negative, #c2414b);
-  background: color-mix(in srgb, var(--colour-negative, #c2414b) 12%, transparent);
-}
-
-.what-if-summary-grid {
+.what-if-before-after-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
 }
 
-.what-if-summary-card,
-.what-if-shared-panel,
-.what-if-timeline-panel {
+.what-if-before-after-card {
+  display: grid;
+  gap: var(--space-3);
   min-width: 0;
   padding: var(--space-4);
   border: 1px solid var(--colour-border);
@@ -69,79 +44,115 @@
   background: var(--colour-surface-secondary);
 }
 
-.what-if-summary-card {
-  display: grid;
-  align-content: start;
-  gap: var(--space-2);
-}
-
-.what-if-summary-card > span {
+.what-if-before-after-card > span {
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-sm);
   font-weight: 800;
 }
 
-.what-if-summary-card > strong {
-  overflow-wrap: anywhere;
-  font-size: clamp(1.25rem, 2vw, 1.7rem);
+.what-if-before-after-values {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
 }
 
-.what-if-summary-card > em {
-  font-size: var(--ui-font-size-xs);
+.what-if-before-after-values > div {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.what-if-before-after-values small {
+  color: var(--colour-text-muted);
+}
+
+.what-if-before-after-values strong {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+}
+
+.what-if-before-after-values > span {
+  color: var(--colour-text-muted);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.what-if-before-after-card > em {
+  font-size: var(--ui-font-size-sm);
   font-style: normal;
   font-weight: 800;
 }
 
-.what-if-summary-card .is-positive,
-.what-if-ranked-changes .is-positive,
-.what-if-retirement-impact-card .is-positive {
+.what-if-before-after-card .is-positive,
+.what-if-detail-card .is-positive {
   color: var(--colour-positive, #16845b);
 }
 
-.what-if-summary-card .is-negative,
-.what-if-ranked-changes .is-negative,
-.what-if-retirement-impact-card .is-negative {
+.what-if-before-after-card .is-negative,
+.what-if-detail-card .is-negative {
   color: var(--colour-negative, #c2414b);
 }
 
-.what-if-retirement-impact {
+.what-if-verdict {
   display: grid;
-  gap: var(--space-4);
+  grid-template-columns: minmax(12rem, 0.35fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-5);
   padding: var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--colour-primary) 35%, var(--colour-border));
+  border: 1px solid var(--colour-border);
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--colour-primary) 5%, var(--colour-surface-secondary));
+  background: var(--colour-surface-secondary);
 }
 
-.what-if-retirement-impact-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: var(--space-4);
+.what-if-verdict.is-positive {
+  border-color: color-mix(in srgb, var(--colour-positive, #16845b) 35%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-positive, #16845b) 6%, var(--colour-surface));
 }
 
-.what-if-retirement-impact-heading > div {
+.what-if-verdict.is-negative {
+  border-color: color-mix(in srgb, var(--colour-negative, #c2414b) 35%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-negative, #c2414b) 6%, var(--colour-surface));
+}
+
+.what-if-verdict.is-similar {
+  border-color: color-mix(in srgb, var(--colour-primary) 30%, var(--colour-border));
+}
+
+.what-if-verdict > div {
   display: grid;
   gap: var(--space-1);
 }
 
-.what-if-retirement-impact-heading > p {
-  max-width: 34rem;
+.what-if-verdict h3 {
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+}
+
+.what-if-verdict > p {
   margin: 0;
-  color: var(--colour-text-muted);
-  line-height: 1.5;
-  text-align: right;
 }
 
-.what-if-retirement-impact-grid {
+.what-if-details {
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.what-if-details > summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.what-if-details-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
+  margin-top: var(--space-4);
 }
 
-.what-if-retirement-impact-card {
+.what-if-detail-card {
   display: grid;
-  align-content: start;
   gap: var(--space-2);
   min-width: 0;
   padding: var(--space-3);
@@ -150,184 +161,27 @@
   background: var(--colour-surface);
 }
 
-.what-if-retirement-impact-card > span,
-.what-if-retirement-impact-card > strong,
-.what-if-retirement-impact-card > em,
-.what-if-retirement-impact-card > small {
-  display: block;
-}
-
-.what-if-retirement-impact-card > span {
+.what-if-detail-card > span {
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-sm);
   font-weight: 800;
 }
 
-.what-if-retirement-impact-card > strong {
-  overflow-wrap: anywhere;
-  font-size: clamp(1.1rem, 1.8vw, 1.45rem);
-}
-
-.what-if-retirement-impact-card > em {
-  font-size: var(--ui-font-size-xs);
-  font-style: normal;
-  font-weight: 800;
-}
-
-.what-if-retirement-impact-card > small {
-  color: var(--colour-text-muted);
-  line-height: 1.45;
-}
-
-.what-if-insight-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
-.what-if-ranked-changes {
-  display: grid;
-  gap: var(--space-3);
-  margin: var(--space-4) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.what-if-ranked-changes li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-3);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--colour-border);
-}
-
-.what-if-ranked-changes li:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.what-if-ranked-changes svg {
-  color: var(--colour-primary);
-}
-
-.what-if-ranked-changes span {
-  color: var(--colour-text-muted);
-}
-
-.what-if-sensitivity-track {
-  overflow: hidden;
-  height: 0.7rem;
-  margin-top: var(--space-4);
-  border-radius: 999px;
-  background: var(--colour-surface);
-}
-
-.what-if-sensitivity-track > span {
+.what-if-detail-card > small,
+.what-if-detail-card > strong {
   display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--colour-primary);
-  transition: width 180ms ease;
-}
-
-.what-if-timeline-panel {
-  display: grid;
-  gap: var(--space-5);
-}
-
-.what-if-timeline {
-  position: relative;
-  min-height: 7rem;
-  margin: 0 2rem;
-}
-
-.what-if-timeline-line {
-  position: absolute;
-  top: 1.25rem;
-  right: 0;
-  left: 0;
-  height: 2px;
-  background: var(--colour-border);
-}
-
-.what-if-timeline-marker {
-  position: absolute;
-  top: 0;
-  display: grid;
-  justify-items: center;
-  width: 6.5rem;
-  transform: translateX(-50%);
-  text-align: center;
-}
-
-.what-if-timeline-marker > span {
-  display: grid;
-  width: 2.5rem;
-  height: 2.5rem;
-  place-items: center;
-  border: 2px solid var(--colour-surface);
-  border-radius: 50%;
-  background: var(--colour-primary);
-  color: var(--colour-on-primary, white);
-  box-shadow: 0 0 0 1px var(--colour-border);
-}
-
-.what-if-timeline-marker strong {
-  margin-top: var(--space-2);
-}
-
-.what-if-timeline-marker small {
-  color: var(--colour-text-muted);
-}
-
-.what-if-next-card {
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--colour-primary) 7%, var(--colour-surface));
-}
-
-.what-if-next-card > div {
-  min-width: 0;
-  flex: 1;
-}
-
-@media (max-width: 1100px) {
-  .what-if-summary-grid,
-  .what-if-retirement-impact-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 800px) {
   .what-if-insights-header,
-  .what-if-next-card,
-  .what-if-retirement-impact-heading {
+  .what-if-verdict {
     align-items: stretch;
-    flex-direction: column;
-  }
-
-  .what-if-retirement-impact-heading > p {
-    max-width: none;
-    text-align: left;
-  }
-
-  .what-if-health-badge {
-    width: fit-content;
-  }
-
-  .what-if-insight-grid {
     grid-template-columns: 1fr;
   }
 
-  .what-if-next-card .ui-button {
-    width: 100%;
-  }
-
-  .what-if-timeline {
-    overflow-x: auto;
-    min-height: 8rem;
-    margin-inline: 0;
+  .what-if-before-after-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -336,16 +190,16 @@
     padding: var(--space-4);
   }
 
-  .what-if-summary-grid,
-  .what-if-retirement-impact-grid {
+  .what-if-before-after-values {
     grid-template-columns: 1fr;
   }
 
-  .what-if-ranked-changes li {
-    grid-template-columns: auto minmax(0, 1fr);
+  .what-if-before-after-values > span {
+    transform: rotate(90deg);
+    justify-self: start;
   }
 
-  .what-if-ranked-changes strong {
-    grid-column: 2;
+  .what-if-details-grid {
+    grid-template-columns: 1fr;
   }
 }
