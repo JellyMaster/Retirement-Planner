@@ -104,11 +104,13 @@ export function DrawdownPlannerPage() {
                   <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownRetirementJourney inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+                  <DrawdownEndingBalanceGoalControl
+                    inputs={inputs}
+                    drawdown={activeScenario.drawdown}
+                    onChange={updateDrawdownPreferences}
+                  />
                   {inputs.withdrawalStrategy === "target-income" && (
-                    <>
-                      <DrawdownEndingBalanceGoalControl inputs={inputs} drawdown={activeScenario.drawdown} onChange={updateDrawdownPreferences} />
-                      <DrawdownSustainableIncomeHeadroom inputs={inputs} drawdown={activeScenario.drawdown} />
-                    </>
+                    <DrawdownSustainableIncomeHeadroom inputs={inputs} drawdown={activeScenario.drawdown} />
                   )}
                   <DrawdownLivingStandardsComparison inputs={inputs} drawdown={activeScenario.drawdown} onChange={updateDrawdownPreferences} />
                   <DrawdownRetirementTimeline inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
