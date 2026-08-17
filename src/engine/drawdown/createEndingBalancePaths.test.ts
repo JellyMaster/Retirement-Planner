@@ -93,6 +93,25 @@ describe("createEndingBalancePaths", () => {
     );
   });
 
+  it("reports average, highest and lowest private-pension withdrawals", () => {
+    const path = createEndingBalancePaths(realisticInputs, 0.5).reserve;
+    const withdrawals = path.result.years.map((year) => year.pensionWithdrawal);
+    const expectedAverage =
+      withdrawals.reduce((sum, amount) => sum + amount, 0) / withdrawals.length;
+    const expectedHighest = Math.max(...withdrawals);
+    const expectedLowest = Math.min(...withdrawals);
+
+    expect(path.withdrawals.averageAnnualWithdrawal).toBeCloseTo(expectedAverage, 6);
+    expect(path.withdrawals.highestWithdrawal.amount).toBe(expectedHighest);
+    expect(path.withdrawals.lowestWithdrawal.amount).toBe(expectedLowest);
+    expect(path.withdrawals.highestWithdrawal.age).toBeGreaterThanOrEqual(
+      realisticInputs.retirementAge,
+    );
+    expect(path.withdrawals.lowestWithdrawal.age).toBeLessThan(
+      realisticInputs.endAge,
+    );
+  });
+
   it("does not let saved retirement chapters cap the ending-balance comparison", () => {
     const withChapters: DrawdownInputs = {
       ...realisticInputs,
