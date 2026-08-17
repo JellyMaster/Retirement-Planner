@@ -50,11 +50,11 @@ function RetirementPlannerPageContent({
     if (searchParams.get("step") !== "income") return;
 
     const stepFrame = window.requestAnimationFrame(() => {
-      const incomeStep = document.querySelector<HTMLButtonElement>(
-        'button[aria-label="Retirement income"]',
+      const retirementStep = document.querySelector<HTMLButtonElement>(
+        'button[aria-label="Retirement"]',
       );
-      incomeStep?.click();
-      incomeStep?.focus();
+      retirementStep?.click();
+      retirementStep?.focus();
 
       const requestedSection = incomeSectionIds[searchParams.get("section") ?? ""];
       if (!requestedSection) return;
@@ -154,10 +154,7 @@ function RetirementPlannerPageContent({
         </div>
       </section>
 
-      <section
-        className="my-plan-editor-region"
-        aria-label="Edit retirement plan"
-      >
+      <section className="my-plan-editor-region" aria-label="Edit retirement plan">
         <GuidedPensionInputsForm
           idPrefix="current"
           value={inputs}
