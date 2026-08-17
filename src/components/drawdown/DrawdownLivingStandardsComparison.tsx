@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 
-import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
+import {
+  createDefaultScenarioDrawdownPreferences,
+  type ScenarioDrawdownPreferences,
+} from "../../domain/scenarios";
 import { calculateSustainableTargetIncome } from "../../engine/drawdown/calculateSustainableTargetIncome";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import {
@@ -13,7 +16,7 @@ import { formatCurrency } from "../../utils/formatters";
 
 interface DrawdownLivingStandardsComparisonProps {
   inputs: DrawdownInputs;
-  drawdown: ScenarioDrawdownPreferences;
+  drawdown?: ScenarioDrawdownPreferences;
   onChange: (drawdown: ScenarioDrawdownPreferences) => void;
 }
 
@@ -22,8 +25,9 @@ export function DrawdownLivingStandardsComparison({
   drawdown,
   onChange,
 }: DrawdownLivingStandardsComparisonProps) {
-  const household = drawdown.retirementLivingStandardsHousehold ?? "one-person";
-  const region = drawdown.retirementLivingStandardsRegion ?? "uk";
+  const preferences = drawdown ?? createDefaultScenarioDrawdownPreferences();
+  const household = preferences.retirementLivingStandardsHousehold ?? "one-person";
+  const region = preferences.retirementLivingStandardsRegion ?? "uk";
   const standards = getRetirementLivingStandards(household, region);
 
   const sustainableNetIncome = useMemo(
@@ -46,11 +50,11 @@ export function DrawdownLivingStandardsComparison({
           : "Below Minimum";
 
   function updateHousehold(next: RetirementLivingStandardHousehold) {
-    onChange({ ...drawdown, retirementLivingStandardsHousehold: next });
+    onChange({ ...preferences, retirementLivingStandardsHousehold: next });
   }
 
   function updateRegion(next: RetirementLivingStandardRegion) {
-    onChange({ ...drawdown, retirementLivingStandardsRegion: next });
+    onChange({ ...preferences, retirementLivingStandardsRegion: next });
   }
 
   return (
