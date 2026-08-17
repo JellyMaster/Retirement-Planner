@@ -3,6 +3,10 @@ import type {
   IncomeTargetMode,
   WithdrawalStrategy,
 } from "../../engine/drawdown/models/DrawdownInputs";
+import type {
+  RetirementLivingStandardHousehold,
+  RetirementLivingStandardRegion,
+} from "../../engine/drawdown/retirementLivingStandards";
 
 export interface ScenarioDrawdownPreferences {
   planningAge: number;
@@ -12,6 +16,8 @@ export interface ScenarioDrawdownPreferences {
   incomeTargetMode: IncomeTargetMode;
   spendingPhases?: DrawdownSpendingPhase[];
   taxFreeCash: number;
+  retirementLivingStandardsHousehold?: RetirementLivingStandardHousehold;
+  retirementLivingStandardsRegion?: RetirementLivingStandardRegion;
   includeStatePension?: boolean;
   statePensionAnnualAmount?: number;
   statePensionAge?: number;
@@ -27,5 +33,7 @@ export function createDefaultScenarioDrawdownPreferences(
     desiredAnnualIncome,
     incomeTargetMode: "net",
     taxFreeCash: 0,
+    retirementLivingStandardsHousehold: "one-person",
+    retirementLivingStandardsRegion: "uk",
   };
 }
