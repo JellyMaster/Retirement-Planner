@@ -5,6 +5,9 @@ import type { ProjectionResult } from "../../models/ProjectionResult";
 import type { DrawdownInputs } from "../models/DrawdownInputs";
 import { createDefaultDrawdownInputs } from "./createDefaultDrawdownInputs";
 
+const STANDARD_LUMP_SUM_ALLOWANCE = 268_275;
+const TAX_FREE_CASH_RATE = 0.25;
+
 export interface CreateDrawdownInputsFromPlanOptions {
   pensionInputs: PensionInputs;
   projection: ProjectionResult;
@@ -19,13 +22,21 @@ export function createDrawdownInputsFromPlan({
   drawdown,
 }: CreateDrawdownInputsFromPlanOptions): DrawdownInputs {
   const defaults = createDefaultDrawdownInputs();
+  const startingBalance = Math.max(0, projection.finalBalance.real);
   const spendingPhases = drawdown?.spendingPhases
     ?.filter((phase) => phase.startAge >= pensionInputs.retirementAge)
     .sort((left, right) => left.startAge - right.startAge);
+  const maximumTaxFreeCash = Math.floor(
+    Math.min(startingBalance * TAX_FREE_CASH_RATE, STANDARD_LUMP_SUM_ALLOWANCE),
+  );
+  const taxFreeCash =
+    drawdown?.taxFreeCashMode === "maximum"
+      ? maximumTaxFreeCash
+      : (drawdown?.taxFreeCash ?? defaults.taxFreeCash);
 
   return {
     ...defaults,
-    startingBalance: Math.max(0, projection.finalBalance.real),
+    startingBalance,
     retirementAge: pensionInputs.retirementAge,
     endAge: drawdown?.planningAge ?? defaults.endAge,
     withdrawalStrategy:
@@ -35,7 +46,7 @@ export function createDrawdownInputsFromPlan({
       drawdown?.desiredAnnualIncome ?? retirementGoals.desiredAnnualIncome,
     incomeTargetMode: drawdown?.incomeTargetMode ?? defaults.incomeTargetMode,
     ...(spendingPhases?.length ? { spendingPhases } : {}),
-    taxFreeCash: drawdown?.taxFreeCash ?? defaults.taxFreeCash,
+    taxFreeCash,
     annualStatePension: retirementGoals.includeStatePension
       ? retirementGoals.statePensionAnnualAmount
       : 0,
