@@ -184,124 +184,6 @@
   line-height: 1.55;
 }
 
-.drawdown-ending-balance-options .scenario-drawdown-option {
-  min-height: 100%;
-}
-
-.drawdown-ending-balance-option {
-  position: relative;
-  display: grid;
-  align-content: start;
-  gap: 0.55rem;
-  text-align: left;
-}
-
-.drawdown-ending-balance-option.is-selected {
-  border-width: 2px;
-  border-color: var(--colour-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--colour-primary) 14%, transparent);
-}
-
-.drawdown-ending-balance-option-state {
-  width: fit-content;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  background: var(--colour-surface-tertiary);
-  color: var(--colour-text-muted);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.drawdown-ending-balance-option.is-selected .drawdown-ending-balance-option-state {
-  background: var(--colour-primary);
-  color: white;
-}
-
-.drawdown-ending-balance-percentage,
-.drawdown-ending-balance-summary,
-.drawdown-ending-balance-impact {
-  display: grid;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--colour-border);
-  border-radius: 0.9rem;
-  background: var(--colour-surface-tertiary);
-}
-
-.drawdown-ending-balance-percentage {
-  grid-template-columns: minmax(0, 1fr) minmax(10rem, 0.4fr);
-}
-
-.drawdown-ending-balance-percentage label {
-  display: grid;
-  gap: 0.3rem;
-  min-width: 0;
-}
-
-.drawdown-ending-balance-percentage label > span,
-.drawdown-ending-balance-summary > span {
-  color: var(--colour-text);
-  font-weight: 700;
-}
-
-.drawdown-ending-balance-percentage label > small,
-.drawdown-ending-balance-summary > small {
-  color: var(--colour-text-muted);
-  line-height: 1.45;
-}
-
-.drawdown-ending-balance-summary {
-  grid-template-columns: minmax(10rem, 0.5fr) minmax(8rem, 0.3fr) minmax(0, 1fr);
-}
-
-.drawdown-ending-balance-summary > strong {
-  color: var(--colour-text);
-  font-size: 1.25rem;
-}
-
-.drawdown-ending-balance-impact {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.drawdown-ending-balance-impact > div {
-  display: grid;
-  gap: 0.35rem;
-  min-width: 0;
-}
-
-.drawdown-ending-balance-impact span,
-.drawdown-ending-balance-impact strong,
-.drawdown-ending-balance-impact small {
-  display: block;
-}
-
-.drawdown-ending-balance-impact span {
-  color: var(--colour-text-muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.drawdown-ending-balance-impact strong {
-  color: var(--colour-text);
-  font-size: clamp(1.2rem, 2vw, 1.55rem);
-}
-
-.drawdown-ending-balance-impact small,
-.drawdown-ending-balance-explainer {
-  color: var(--colour-text-muted);
-  line-height: 1.5;
-}
-
-.drawdown-ending-balance-explainer {
-  margin: 0;
-  padding: 0.9rem 1rem;
-  border-left: 3px solid var(--colour-primary);
-  background: var(--colour-surface-tertiary);
-}
-
 /* Balance chart path explorer */
 .drawdown-balance-chart-explorer {
   display: grid;
@@ -397,9 +279,9 @@
 .drawdown-ending-path-option {
   display: grid;
   align-content: start;
-  gap: 0.4rem;
+  gap: 0.45rem;
   min-width: 0;
-  padding: 0.9rem 1rem;
+  padding: 1rem;
   border: 1px solid var(--colour-border);
   border-radius: 0.85rem;
   background: var(--colour-surface-tertiary);
@@ -429,6 +311,49 @@
   line-height: 1.4;
 }
 
+.drawdown-ending-path-metric-label {
+  margin-top: 0.2rem;
+}
+
+.drawdown-ending-path-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0.35rem 0;
+}
+
+.drawdown-ending-path-range > div {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 0.6rem;
+  background: var(--colour-surface);
+}
+
+.drawdown-ending-path-range span,
+.drawdown-ending-path-range strong,
+.drawdown-ending-path-range small {
+  display: block;
+}
+
+.drawdown-ending-path-range span {
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.drawdown-ending-path-range strong {
+  color: var(--colour-text);
+  font-size: 0.9rem;
+}
+
+.drawdown-ending-path-range small {
+  color: var(--colour-text-muted);
+  font-size: 0.7rem;
+}
+
 .drawdown-ending-path-option.is-selected {
   border: 2px solid var(--colour-primary);
   background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface-tertiary));
@@ -449,13 +374,9 @@
   .drawdown-lifestyle-progression,
   .drawdown-benchmark-grid,
   .drawdown-lifestyle-story,
-  .drawdown-ending-balance-options,
-  .drawdown-ending-balance-percentage,
-  .drawdown-ending-balance-summary,
-  .drawdown-ending-balance-impact,
-  .drawdown-planning-decision-banner,
   .drawdown-ending-path-heading,
-  .drawdown-ending-path-options {
+  .drawdown-ending-path-options,
+  .drawdown-ending-path-range {
     grid-template-columns: 1fr;
   }
 
