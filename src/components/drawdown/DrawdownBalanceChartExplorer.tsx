@@ -51,25 +51,46 @@ export function DrawdownBalanceChartExplorer({
 }: DrawdownBalanceChartExplorerProps) {
   const [view, setView] = useState<ChartView>("plan");
 
+  if (inputs.withdrawalStrategy !== "target-income") {
+    return (
+      <DrawdownBalanceChart
+        years={result.years}
+        depletionAge={result.depletionAge}
+        inflationRate={inputs.inflationRate}
+        displayMode={displayMode}
+        spendingPhases={inputs.spendingPhases}
+        statePensionAge={
+          inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined
+        }
+      />
+    );
+  }
+
   return (
     <section className="drawdown-balance-chart-explorer">
-      <div className="drawdown-chart-view-toggle" role="group" aria-label="Balance chart view">
-        <button
-          type="button"
-          className={view === "plan" ? "is-active" : undefined}
-          aria-pressed={view === "plan"}
-          onClick={() => setView("plan")}
-        >
-          Your plan
-        </button>
-        <button
-          type="button"
-          className={view === "ending-balance" ? "is-active" : undefined}
-          aria-pressed={view === "ending-balance"}
-          onClick={() => setView("ending-balance")}
-        >
-          Ending balance options
-        </button>
+      <div className="drawdown-chart-view-header">
+        <div>
+          <span>Balance chart view</span>
+          <small>Switch between your saved plan and sustainable ending-balance paths.</small>
+        </div>
+        <div className="drawdown-chart-view-toggle" role="group" aria-label="Balance chart view">
+          <button
+            type="button"
+            className={view === "plan" ? "is-active" : undefined}
+            aria-pressed={view === "plan"}
+            onClick={() => setView("plan")}
+          >
+            Your plan
+          </button>
+          <button
+            type="button"
+            className={view === "ending-balance" ? "is-active" : undefined}
+            aria-pressed={view === "ending-balance"}
+            onClick={() => setView("ending-balance")}
+          >
+            Ending balance options
+          </button>
+        </div>
       </div>
 
       {view === "plan" ? (
@@ -104,7 +125,9 @@ function EndingBalanceComparisonChart({
   const chartColours = useChartTheme();
   const preferences = drawdown ?? createFallbackPreferences(inputs);
   const selectedMode = preferences.endingBalanceMode ?? "preserve";
-  const reservePercentage = preferences.endingBalancePercentage ?? 0.5;
+  const savedPercentage = preferences.endingBalancePercentage ?? 0.5;
+  const reservePercentage =
+    savedPercentage > 0 && savedPercentage < 1 ? savedPercentage : 0.5;
 
   const paths = useMemo(() => {
     const preserve = createPath(inputs, { mode: "preserve", percentage: 1 });
@@ -140,18 +163,17 @@ function EndingBalanceComparisonChart({
     spend: spendYears[index]?.closingBalance ?? 0,
   }));
 
+  const displayedEndingBalances = {
+    preserve: preserveYears.at(-1)?.closingBalance ?? 0,
+    reserve: reserveYears.at(-1)?.closingBalance ?? 0,
+    spend: spendYears.at(-1)?.closingBalance ?? 0,
+  };
+
   function selectMode(mode: EndingBalanceMode) {
     onChange({
       ...preferences,
       endingBalanceMode: mode,
-      endingBalancePercentage:
-        mode === "preserve"
-          ? 1
-          : mode === "spend-to-zero"
-            ? 0
-            : reservePercentage > 0 && reservePercentage < 1
-              ? reservePercentage
-              : 0.5,
+      endingBalancePercentage: reservePercentage,
     });
   }
 
@@ -159,7 +181,7 @@ function EndingBalanceComparisonChart({
     onChange({
       ...preferences,
       endingBalanceMode: "percentage",
-      endingBalancePercentage: Math.min(1, Math.max(0, value)),
+      endingBalancePercentage: Math.min(0.99, Math.max(0.01, value)),
     });
   }
 
@@ -167,22 +189,23 @@ function EndingBalanceComparisonChart({
     <section className="panel drawdown-ending-path-chart">
       <div className="panel-heading drawdown-ending-path-heading">
         <div>
-          <p className="panel-eyebrow">Ending balance options</p>
-          <h2>Compare how much pension you could keep</h2>
+          <p className="panel-eyebrow">Ending balance paths</p>
+          <h2>See the income-versus-reserve trade-off</h2>
           <p>
-            Each line shows the pension balance if income is set at the maximum
-            modelled sustainable level for that ending-balance goal.
+            Each line uses the highest modelled sustainable income that still
+            reaches the selected ending-balance goal at age {inputs.endAge}.
           </p>
         </div>
         <label className="drawdown-reserve-control" htmlFor="drawdown-reserve-percentage">
           <span>Pot reserve at age {inputs.endAge}</span>
+          <small>Adjust the middle path.</small>
           <PercentageInput
             id="drawdown-reserve-percentage"
             value={reservePercentage}
-            min={0}
-            max={100}
+            min={1}
+            max={99}
             step={5}
-            onValueChange={(value) => changeReserve(value ?? 0)}
+            onValueChange={(value) => changeReserve(value ?? 0.5)}
           />
         </label>
       </div>
@@ -192,28 +215,29 @@ function EndingBalanceComparisonChart({
           selected={selectedMode === "preserve"}
           label="Preserve 100%"
           income={paths.preserve.income}
-          endingBalance={paths.preserve.result.finalBalance}
+          endingBalance={displayedEndingBalances.preserve}
           onSelect={() => selectMode("preserve")}
         />
         <PathOption
           selected={selectedMode === "percentage"}
           label={`Reserve ${(reservePercentage * 100).toFixed(0)}%`}
           income={paths.reserve.income}
-          endingBalance={paths.reserve.result.finalBalance}
+          endingBalance={displayedEndingBalances.reserve}
           onSelect={() => selectMode("percentage")}
         />
         <PathOption
           selected={selectedMode === "spend-to-zero"}
           label="Spend to £0"
           income={paths.spend.income}
-          endingBalance={paths.spend.result.finalBalance}
+          endingBalance={displayedEndingBalances.spend}
           onSelect={() => selectMode("spend-to-zero")}
         />
       </div>
 
       <p className="drawdown-ending-path-note">
-        Selecting a path sets the ending-balance goal used by the sustainable-income,
-        headroom and Retirement Living Standards figures on the Overview.
+        The highlighted path is the goal used by the sustainable-income, headroom
+        and Retirement Living Standards figures on the Overview. The chart itself
+        does not overwrite your saved retirement-income target.
       </p>
 
       <div className="drawdown-chart">
@@ -355,6 +379,6 @@ function createFallbackPreferences(inputs: DrawdownInputs): ScenarioDrawdownPref
     incomeTargetMode: inputs.incomeTargetMode,
     taxFreeCash: inputs.taxFreeCash,
     endingBalanceMode: "preserve",
-    endingBalancePercentage: 1,
+    endingBalancePercentage: 0.5,
   };
 }
