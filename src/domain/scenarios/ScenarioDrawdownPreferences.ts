@@ -3,6 +3,7 @@ import type {
   IncomeTargetMode,
   WithdrawalStrategy,
 } from "../../engine/drawdown/models/DrawdownInputs";
+import type { DrawdownEndingBalanceMode } from "../../engine/drawdown/models/DrawdownEndingBalanceGoal";
 import type {
   RetirementLivingStandardHousehold,
   RetirementLivingStandardRegion,
@@ -16,6 +17,8 @@ export interface ScenarioDrawdownPreferences {
   incomeTargetMode: IncomeTargetMode;
   spendingPhases?: DrawdownSpendingPhase[];
   taxFreeCash: number;
+  endingBalanceMode?: DrawdownEndingBalanceMode;
+  endingBalancePercentage?: number;
   retirementLivingStandardsHousehold?: RetirementLivingStandardHousehold;
   retirementLivingStandardsRegion?: RetirementLivingStandardRegion;
   includeStatePension?: boolean;
@@ -33,6 +36,8 @@ export function createDefaultScenarioDrawdownPreferences(
     desiredAnnualIncome,
     incomeTargetMode: "net",
     taxFreeCash: 0,
+    endingBalanceMode: "preserve",
+    endingBalancePercentage: 1,
     retirementLivingStandardsHousehold: "one-person",
     retirementLivingStandardsRegion: "uk",
   };
