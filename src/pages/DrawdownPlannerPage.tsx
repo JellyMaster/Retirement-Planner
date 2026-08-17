@@ -4,6 +4,7 @@ import { Info, PoundSterling, TrendingUp } from "lucide-react";
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
 import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
 import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStory";
+import { DrawdownEndingBalanceGoalControl } from "../components/drawdown/DrawdownEndingBalanceGoalControl";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
@@ -63,7 +64,7 @@ export function DrawdownPlannerPage() {
     setIsEditingPlan(false);
   }
 
-  function updateLivingStandardsPreferences(drawdown: ScenarioDrawdownPreferences) {
+  function updateDrawdownPreferences(drawdown: ScenarioDrawdownPreferences) {
     updateScenarioPlan(activeScenario.id, activeScenario.inputs, drawdown);
   }
 
@@ -104,9 +105,12 @@ export function DrawdownPlannerPage() {
                   <DrawdownRetirementJourney inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   {inputs.withdrawalStrategy === "target-income" && (
-                    <DrawdownSustainableIncomeHeadroom inputs={inputs} drawdown={activeScenario.drawdown} />
+                    <>
+                      <DrawdownEndingBalanceGoalControl inputs={inputs} drawdown={activeScenario.drawdown} onChange={updateDrawdownPreferences} />
+                      <DrawdownSustainableIncomeHeadroom inputs={inputs} drawdown={activeScenario.drawdown} />
+                    </>
                   )}
-                  <DrawdownLivingStandardsComparison inputs={inputs} drawdown={activeScenario.drawdown} onChange={updateLivingStandardsPreferences} />
+                  <DrawdownLivingStandardsComparison inputs={inputs} drawdown={activeScenario.drawdown} onChange={updateDrawdownPreferences} />
                   <DrawdownRetirementTimeline inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   <DrawdownInsights result={result} />
                 </div>
