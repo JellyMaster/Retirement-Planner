@@ -2,9 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Info, PoundSterling, TrendingUp } from "lucide-react";
 
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
-import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
+import { DrawdownBalanceChartExplorer } from "../components/drawdown/DrawdownBalanceChartExplorer";
 import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStory";
-import { DrawdownEndingBalanceGoalControl } from "../components/drawdown/DrawdownEndingBalanceGoalControl";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
@@ -104,11 +103,6 @@ export function DrawdownPlannerPage() {
                   <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownRetirementJourney inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
-                  <DrawdownEndingBalanceGoalControl
-                    inputs={inputs}
-                    drawdown={activeScenario.drawdown}
-                    onChange={updateDrawdownPreferences}
-                  />
                   {inputs.withdrawalStrategy === "target-income" && (
                     <DrawdownSustainableIncomeHeadroom inputs={inputs} drawdown={activeScenario.drawdown} />
                   )}
@@ -128,10 +122,16 @@ export function DrawdownPlannerPage() {
               )}
               {activeSection === "balance" && (
                 <div className="drawdown-workspace-section" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
-                  <SectionHeading eyebrow="Pension balance" title="How does your pension change through retirement?" description="See how income from your pension, investment growth, fees and retirement chapters affect what remains." />
+                  <SectionHeading eyebrow="Pension balance" title="How does your pension change through retirement?" description="See your current plan or compare alternative ending-balance paths to understand the trade-off between retirement income and money left later." />
                   <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
                   <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} />
-                  <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel"><div className="dashboard-chart-stage"><DrawdownBalanceChart years={result.years} depletionAge={result.depletionAge} inflationRate={inputs.inflationRate} displayMode={displayMode} spendingPhases={inputs.spendingPhases} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} /></div></section>
+                  <DrawdownBalanceChartExplorer
+                    inputs={inputs}
+                    result={result}
+                    displayMode={displayMode}
+                    drawdown={activeScenario.drawdown}
+                    onChange={updateDrawdownPreferences}
+                  />
                 </div>
               )}
               {activeSection === "details" && (
