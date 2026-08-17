@@ -19,6 +19,10 @@ export {
   type LivingStandardsProgression,
   type LivingStandardsValues,
 } from "./createLivingStandardsProgression";
+export {
+  createRetirementSpendingOutcome,
+  type RetirementSpendingOutcome,
+} from "./createRetirementSpendingOutcome";
 export { createDefaultDrawdownInputs } from "./factories/createDefaultDrawdownInputs";
 export {
   DEFAULT_DRAWDOWN_ENDING_BALANCE_GOAL,
