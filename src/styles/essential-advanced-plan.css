@@ -153,9 +153,58 @@
 
 .essential-plan-card-fields > .scenario-drawdown-fields,
 .essential-plan-card-fields > .drawdown-guided-sections,
+.essential-plan-card-fields > .scenario-edit-section,
 .essential-plan-card-fields > .advanced-plan-note,
-.essential-plan-card-fields > .secondary-button {
+.essential-plan-card-fields > .secondary-button,
+.essential-plan-card-fields > .essential-retirement-income-fields {
   grid-column: 1 / -1;
+}
+
+.essential-retirement-income-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--ui-space-4);
+  align-items: start;
+}
+
+.essential-retirement-income-intro,
+.essential-retirement-income-note {
+  grid-column: 1 / -1;
+}
+
+.essential-retirement-income-intro strong {
+  display: block;
+  margin-bottom: var(--ui-space-1);
+  color: var(--colour-text);
+}
+
+.essential-retirement-income-intro p,
+.essential-state-pension p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.essential-retirement-income-note {
+  display: grid;
+  gap: var(--ui-space-1);
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-warning-background);
+  color: var(--colour-warning-text);
+}
+
+.essential-retirement-income-note span {
+  line-height: 1.45;
+}
+
+.essential-state-pension {
+  display: grid;
+  gap: var(--ui-space-2);
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
 }
 
 .advanced-plan-group {
@@ -191,7 +240,8 @@
     grid-row: 1 / 3;
   }
 
-  .essential-plan-card-fields {
+  .essential-plan-card-fields,
+  .essential-retirement-income-fields {
     grid-template-columns: 1fr;
   }
 }
