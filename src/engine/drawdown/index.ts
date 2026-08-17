@@ -8,6 +8,11 @@ export {
   type IncomeHeadroomAssessment,
   type IncomeHeadroomStatus,
 } from "./createIncomeHeadroomAssessment";
+export {
+  createLivingStandardsProgression,
+  type LivingStandardsProgression,
+  type LivingStandardsValues,
+} from "./createLivingStandardsProgression";
 export { createDefaultDrawdownInputs } from "./factories/createDefaultDrawdownInputs";
 export type { DrawdownInputs } from "./models/DrawdownInputs";
 export type { DrawdownResult } from "./models/DrawdownResult";
