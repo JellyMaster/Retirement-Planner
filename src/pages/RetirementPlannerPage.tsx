@@ -14,12 +14,10 @@ import { usePensionProjection } from "../hooks/usePensionProjection";
 import { AppIcons } from "../icons";
 import { savePensionInputs } from "../state/planStorage";
 
-const incomeSectionIds: Record<string, string> = {
-  "income-target": "income-target",
+const advancedIncomeSectionIds: Record<string, string> = {
   chapters: "retirement-chapters",
   "retirement-chapters": "retirement-chapters",
   "tax-free-cash": "tax-free-cash",
-  "state-pension": "state-pension",
 };
 
 export function RetirementPlannerPage() {
@@ -50,22 +48,43 @@ function RetirementPlannerPageContent({
     if (searchParams.get("step") !== "income") return;
 
     const stepFrame = window.requestAnimationFrame(() => {
+      const requestedSection = searchParams.get("section") ?? "";
+      const advancedSection = advancedIncomeSectionIds[requestedSection];
+
+      if (advancedSection) {
+        const strategy = document.querySelector<HTMLButtonElement>(
+          'button[aria-label="Retirement strategy"]',
+        );
+        strategy?.click();
+        strategy?.focus();
+
+        window.requestAnimationFrame(() => {
+          const tab = document.getElementById(
+            `current-drawdown-${advancedSection}-tab`,
+          ) as HTMLButtonElement | null;
+          tab?.click();
+          tab?.focus();
+          tab?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+        });
+        return;
+      }
+
       const retirementIncome = document.querySelector<HTMLButtonElement>(
         'button[aria-label="Retirement income"]',
       );
       retirementIncome?.click();
       retirementIncome?.focus();
 
-      const requestedSection = incomeSectionIds[searchParams.get("section") ?? ""];
-      if (!requestedSection) return;
-
       window.requestAnimationFrame(() => {
-        const tab = document.getElementById(
-          `current-drawdown-${requestedSection}-tab`,
-        ) as HTMLButtonElement | null;
-        tab?.click();
-        tab?.focus();
-        tab?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+        const targetId =
+          requestedSection === "state-pension"
+            ? "current-essential-income-statePension"
+            : requestedSection === "income-target"
+              ? "current-essential-income-desiredAnnualIncome"
+              : null;
+        const target = targetId ? document.getElementById(targetId) : null;
+        target?.focus();
+        target?.scrollIntoView?.({ behavior: "smooth", block: "center" });
       });
     });
 
