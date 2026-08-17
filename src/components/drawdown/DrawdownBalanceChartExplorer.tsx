@@ -12,6 +12,7 @@ import {
 
 import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
 import { createEndingBalancePaths } from "../../engine/drawdown/createEndingBalancePaths";
+import type { EndingBalancePath } from "../../engine/drawdown/createEndingBalancePaths";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
 import { useChartTheme } from "../../theme/useChartTheme";
@@ -147,9 +148,9 @@ function EndingBalanceComparisonChart({
           <p className="panel-eyebrow">Ending balance paths</p>
           <h2>See the income-versus-reserve trade-off</h2>
           <p>
-            The retirement pot is the anchor. Each path solves for the annual
-            spending level that aims to finish at its selected share of that pot
-            at age {inputs.endAge}.
+            The retirement pot is the anchor. Each path solves for a sustainable
+            spending target, while the actual amount taken from the private pension
+            can vary by year as State Pension and tax change.
           </p>
           {inputs.withdrawalStrategy === "percentage" && (
             <p className="drawdown-ending-path-strategy-note">
@@ -185,34 +186,27 @@ function EndingBalanceComparisonChart({
         <PathOption
           selected={selectedMode === "preserve"}
           label="Preserve 100%"
-          income={paths.preserve.income}
-          targetEndingBalance={paths.preserve.targetEndingBalance}
-          actualEndingBalance={paths.preserve.result.finalBalance}
+          path={paths.preserve}
           onSelect={() => selectMode("preserve")}
         />
         <PathOption
           selected={selectedMode === "percentage"}
           label={`Reserve ${(reservePercentage * 100).toFixed(0)}%`}
-          income={paths.reserve.income}
-          targetEndingBalance={paths.reserve.targetEndingBalance}
-          actualEndingBalance={paths.reserve.result.finalBalance}
+          path={paths.reserve}
           onSelect={() => selectMode("percentage")}
         />
         <PathOption
           selected={selectedMode === "spend-to-zero"}
           label="Spend to £0"
-          income={paths.spend.income}
-          targetEndingBalance={paths.spend.targetEndingBalance}
-          actualEndingBalance={paths.spend.result.finalBalance}
+          path={paths.spend}
           onSelect={() => selectMode("spend-to-zero")}
         />
       </div>
 
       <p className="drawdown-ending-path-note">
-        The comparison is shown on the same pound-value basis as the pot entering
-        retirement, so the end points can be compared directly with the reserve
-        targets. The highlighted path is also used by the sustainable-income and
-        lifestyle comparison figures on the Overview.
+        Average, highest and lowest drawdown figures refer to withdrawals from the
+        private pension only. State Pension is modelled separately, which is why
+        private-pension withdrawals can fall after State Pension starts.
       </p>
 
       <div className="drawdown-chart">
@@ -299,16 +293,12 @@ function EndingBalanceComparisonChart({
 function PathOption({
   selected,
   label,
-  income,
-  targetEndingBalance,
-  actualEndingBalance,
+  path,
   onSelect,
 }: {
   selected: boolean;
   label: string;
-  income: number;
-  targetEndingBalance: number;
-  actualEndingBalance: number;
+  path: EndingBalancePath;
   onSelect: () => void;
 }) {
   return (
@@ -324,9 +314,29 @@ function PathOption({
       onClick={onSelect}
     >
       <span>{label}</span>
-      <strong>{formatCurrency(income)} / year</strong>
-      <small>Target reserve {formatCurrency(targetEndingBalance)}</small>
-      <small>Modelled end {formatCurrency(actualEndingBalance)}</small>
+      <span className="drawdown-ending-path-metric-label">
+        Average private-pension drawdown
+      </span>
+      <strong>
+        {formatCurrency(path.withdrawals.averageAnnualWithdrawal)} / year
+      </strong>
+      <small>
+        Spending target {formatCurrency(path.income)} / year
+      </small>
+      <div className="drawdown-ending-path-range">
+        <div>
+          <span>Highest drawdown</span>
+          <strong>{formatCurrency(path.withdrawals.highestWithdrawal.amount)}</strong>
+          <small>Age {path.withdrawals.highestWithdrawal.age}</small>
+        </div>
+        <div>
+          <span>Lowest drawdown</span>
+          <strong>{formatCurrency(path.withdrawals.lowestWithdrawal.amount)}</strong>
+          <small>Age {path.withdrawals.lowestWithdrawal.age}</small>
+        </div>
+      </div>
+      <small>Target reserve {formatCurrency(path.targetEndingBalance)}</small>
+      <small>Modelled end {formatCurrency(path.result.finalBalance)}</small>
     </button>
   );
 }
