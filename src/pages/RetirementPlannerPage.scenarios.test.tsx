@@ -35,7 +35,7 @@ vi.mock("../hooks/usePensionProjection", () => ({
   }),
 }));
 vi.mock("../components/inputs/guided", () => ({
-  GuidedPensionInputsForm: ({ value, onChange, onReset }: {
+  EssentialAdvancedPensionInputsForm: ({ value, onChange, onReset }: {
     value: PensionInputs;
     onChange: (inputs: PensionInputs) => void;
     onReset: () => void;
