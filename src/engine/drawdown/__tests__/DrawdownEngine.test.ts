@@ -57,7 +57,7 @@ describe("DrawdownEngine core calculations", () => {
     ]);
   });
 
-  it("uses rising State Pension to reduce private withdrawals while respecting the income cap", () => {
+  it("inflates both the income target and State Pension to preserve spending power", () => {
     const result = new DrawdownEngine().calculate({
       ...baseInputs,
       desiredAnnualIncome: 30_000,
@@ -68,6 +68,12 @@ describe("DrawdownEngine core calculations", () => {
     });
 
     expect(result.years).toHaveLength(4);
+    expect(result.years.map((year) => year.desiredIncome)).toEqual([
+      30_000,
+      30_750,
+      31_518.75,
+      32_306.72,
+    ]);
     expect(result.years.map((year) => year.statePensionIncome)).toEqual([
       12_000,
       12_300,
@@ -76,9 +82,9 @@ describe("DrawdownEngine core calculations", () => {
     ]);
     expect(result.years.map((year) => year.requiredPensionWithdrawal)).toEqual([
       18_000,
-      17_700,
-      17_392.5,
-      17_077.31,
+      18_450,
+      18_911.25,
+      19_384.03,
     ]);
 
     for (const year of result.years) {
