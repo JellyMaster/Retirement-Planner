@@ -64,8 +64,8 @@
 }
 
 .polaris-overview-journey-badge.is-enabled {
-  border-color: color-mix(in srgb, var(--colour-success) 28%, var(--colour-border));
-  background: color-mix(in srgb, var(--colour-success-background) 68%, var(--colour-surface));
+  border-color: color-mix(in srgb, var(--colour-success) 34%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-success-background) 76%, var(--colour-surface));
 }
 
 .polaris-overview-journey-badge.is-enabled strong {
@@ -73,21 +73,21 @@
 }
 
 .polaris-overview-journey-badge.is-disabled {
-  border-color: color-mix(in srgb, var(--colour-warning) 30%, var(--colour-border));
-  background: color-mix(in srgb, var(--colour-warning-background) 65%, var(--colour-surface));
+  border-color: color-mix(in srgb, var(--colour-danger) 38%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-danger-background) 78%, var(--colour-surface));
 }
 
 .polaris-overview-journey-badge.is-disabled strong {
-  color: var(--colour-warning-text);
+  color: var(--colour-danger-text);
 }
 
 .polaris-overview-journey-badge.is-changed {
-  border-color: color-mix(in srgb, var(--colour-primary) 32%, var(--colour-border));
-  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+  border-color: color-mix(in srgb, var(--colour-warning) 36%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-warning-background) 74%, var(--colour-surface));
 }
 
 .polaris-overview-journey-badge.is-changed strong {
-  color: var(--colour-text-strong);
+  color: var(--colour-warning-text);
 }
 
 @media (max-width: 760px) {
