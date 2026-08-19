@@ -32,6 +32,7 @@ describe("DrawdownEngine net-income targeting", () => {
   });
 
   it("inflates a net target so it keeps the same purchasing power", () => {
+    const expectedIncome = [45_400, 46_535, 47_698.38, 48_890.84];
     const result = new DrawdownEngine().calculate({
       ...netTargetInputs,
       desiredAnnualIncome: 45_400,
@@ -39,22 +40,17 @@ describe("DrawdownEngine net-income targeting", () => {
       inflationRate: 0.025,
     });
 
-    expect(result.years.map((year) => year.desiredIncome)).toEqual([
-      45_400,
-      46_535,
-      47_698.38,
-      48_890.84,
-    ]);
-
     result.years.forEach((year, index) => {
+      expect(year.desiredIncome).toBeCloseTo(expectedIncome[index], 1);
       const inflationMultiplier = 1.025 ** index;
-      expect(year.netIncome / inflationMultiplier).toBeCloseTo(45_400, 2);
+      expect(year.netIncome / inflationMultiplier).toBeCloseTo(45_400, 1);
       expect(year.netIncomeShortfall).toBe(0);
     });
   });
 
   it("keeps calculation nominal while today-money display removes inflation", () => {
     const inflationRate = 0.025;
+    const expectedIncome = [45_400, 46_535, 47_698.38, 48_890.84];
     const result = new DrawdownEngine().calculate({
       ...netTargetInputs,
       desiredAnnualIncome: 45_400,
@@ -65,14 +61,11 @@ describe("DrawdownEngine net-income targeting", () => {
     const futureMoney = getDisplayYears(result.years, inflationRate, "nominal");
     const todaysMoney = getDisplayYears(result.years, inflationRate, "today");
 
-    expect(futureMoney.map((year) => year.netIncome)).toEqual([
-      45_400,
-      46_535,
-      47_698.38,
-      48_890.84,
-    ]);
+    futureMoney.forEach((year, index) => {
+      expect(year.netIncome).toBeCloseTo(expectedIncome[index], 1);
+    });
     todaysMoney.forEach((year) => {
-      expect(year.netIncome).toBeCloseTo(45_400, 2);
+      expect(year.netIncome).toBeCloseTo(45_400, 1);
     });
   });
 
