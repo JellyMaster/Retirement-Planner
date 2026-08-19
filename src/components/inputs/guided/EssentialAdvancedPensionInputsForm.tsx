@@ -69,6 +69,11 @@ export function EssentialAdvancedPensionInputsForm({
   const usesMaximumTaxFreeCash =
     drawdown.taxFreeCashMode === "maximum" ||
     (drawdown.taxFreeCashMode === undefined && drawdown.taxFreeCash === 0);
+  const taxFreeCashSummary = usesMaximumTaxFreeCash
+    ? "25% tax-free cash included"
+    : drawdown.taxFreeCash > 0
+      ? "Custom tax-free cash included"
+      : "No tax-free cash";
 
   function fieldId(name: string) {
     return `${idPrefix}-${name}`;
@@ -158,7 +163,7 @@ export function EssentialAdvancedPensionInputsForm({
           </FormField>
         </EssentialCard>
 
-        <EssentialCard title="Retirement income" summary={`${formatCurrency(drawdown.desiredAnnualIncome)}/year spending target · ${retirementGoals.includeStatePension ? "State Pension included" : "State Pension not included"}`} icon={AppIcons.money} complete={incomeComplete} open={openEssential === "income"} ariaLabel="Retirement income" onToggle={() => toggleEssential("income")}>
+        <EssentialCard title="Retirement income" summary={`${formatCurrency(drawdown.desiredAnnualIncome)}/year spending target · ${retirementGoals.includeStatePension ? "State Pension included" : "State Pension not included"} · ${taxFreeCashSummary}`} icon={AppIcons.money} complete={incomeComplete} open={openEssential === "income"} ariaLabel="Retirement income" onToggle={() => toggleEssential("income")}>
           <EssentialRetirementIncomeFields idPrefix={fieldId("essential-income")} value={drawdown} onChange={updateDrawdown} />
         </EssentialCard>
       </section>
