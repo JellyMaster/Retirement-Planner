@@ -2,6 +2,7 @@ import { UK_INCOME_TAX_2026_27 } from "../tax/config/ukIncomeTaxYears";
 import type { UkIncomeTaxResult } from "../tax/models/UkIncomeTaxModels";
 import { UkIncomeTaxEngine } from "../tax/UkIncomeTaxEngine";
 import { validateDrawdownInputs } from "../drawdown/validators/DrawdownInputsValidator";
+import type { DrawdownInputs } from "../drawdown/models/DrawdownInputs";
 import { NormalDistribution } from "../monte-carlo/NormalDistribution";
 import { SeededRandom } from "../monte-carlo/SeededRandom";
 import { calculateMonteCarloDrawdownStatistics } from "./MonteCarloDrawdownStatistics";
@@ -19,6 +20,26 @@ const DEFAULT_MAXIMUM_RETURN = 1;
 
 function roundMoney(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+function roundRate(value: number): number {
+  return Math.round((value + Number.EPSILON) * 10_000) / 10_000;
+}
+
+function getActivePhase(inputs: DrawdownInputs, age: number) {
+  return inputs.spendingPhases
+    ?.filter((candidate) => candidate.startAge <= age)
+    .at(-1);
+}
+
+function getIncomeTarget(inputs: DrawdownInputs, age: number): number {
+  const phase = getActivePhase(inputs, age);
+  return roundMoney(phase?.annualIncome ?? inputs.desiredAnnualIncome);
+}
+
+function getWithdrawalRate(inputs: DrawdownInputs, age: number): number {
+  const phase = getActivePhase(inputs, age);
+  return roundRate(phase?.withdrawalRate ?? inputs.withdrawalRate);
 }
 
 function validateConfig(config: MonteCarloDrawdownConfig): Required<
@@ -155,14 +176,19 @@ export class MonteCarloDrawdownEngine {
     let totalIncomeShortfall = 0;
     const balancesByAge: number[] = [];
 
-    for (let age = inputs.retirementAge, year = 1; age < inputs.endAge; age += 1, year += 1) {
+    // Keep the stochastic engine aligned with the deterministic drawdown engine:
+    // planning age is inclusive and target-income amounts are entered in today's money.
+    for (let age = inputs.retirementAge, year = 1; age <= inputs.endAge; age += 1, year += 1) {
       const inflationMultiplier = (1 + inputs.inflationRate) ** (year - 1);
       const statePensionIncome =
         age >= inputs.statePensionAge
           ? roundMoney(inputs.annualStatePension * inflationMultiplier)
           : 0;
-      const percentageWithdrawal = roundMoney(openingBalance * inputs.withdrawalRate);
-      const fixedIncomeTarget = roundMoney(inputs.desiredAnnualIncome);
+      const withdrawalRate = getWithdrawalRate(inputs, age);
+      const percentageWithdrawal = roundMoney(openingBalance * withdrawalRate);
+      const fixedIncomeTarget = roundMoney(
+        getIncomeTarget(inputs, age) * inflationMultiplier,
+      );
       const requiredPensionWithdrawal =
         inputs.withdrawalStrategy === "percentage"
           ? percentageWithdrawal
