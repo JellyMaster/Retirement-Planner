@@ -122,7 +122,6 @@ export function DrawdownPlannerPage() {
 
                 <DrawdownJourneyChart
                   years={result.years}
-                  endAge={inputs.endAge}
                   inflationRate={inputs.inflationRate}
                   displayMode={displayMode}
                   spendingPhases={inputs.spendingPhases}
