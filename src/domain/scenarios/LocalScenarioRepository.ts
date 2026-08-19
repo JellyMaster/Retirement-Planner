@@ -54,11 +54,14 @@ function isPensionInputs(value: unknown): value is PensionInputs {
 function normaliseSpendingPhases(value: unknown): DrawdownSpendingPhase[] | undefined {
   if (!Array.isArray(value)) return undefined;
 
-  const phases = value.flatMap((candidate) => {
+  const phases = value.flatMap((candidate): DrawdownSpendingPhase[] => {
     if (!candidate || typeof candidate !== "object") return [];
     const phase = candidate as Partial<DrawdownSpendingPhase>;
+    const startAge = phase.startAge;
+
     if (
-      !Number.isInteger(phase.startAge) ||
+      !isFiniteNumber(startAge) ||
+      !Number.isInteger(startAge) ||
       !isFiniteNumber(phase.annualIncome) ||
       typeof phase.label !== "string" ||
       phase.label.trim().length === 0 ||
@@ -69,7 +72,7 @@ function normaliseSpendingPhases(value: unknown): DrawdownSpendingPhase[] | unde
 
     return [
       {
-        startAge: phase.startAge,
+        startAge,
         annualIncome: phase.annualIncome,
         ...(phase.withdrawalRate !== undefined
           ? { withdrawalRate: phase.withdrawalRate }
