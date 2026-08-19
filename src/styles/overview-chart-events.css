@@ -1,0 +1,134 @@
+.polaris-overview-chart-experience {
+  display: grid;
+  gap: var(--ui-space-3);
+}
+
+.polaris-overview-chart-events {
+  display: flex;
+  gap: var(--ui-space-2);
+  overflow-x: auto;
+  padding: 2px 1px var(--ui-space-1);
+  scrollbar-width: thin;
+}
+
+.polaris-overview-chart-event {
+  display: grid;
+  gap: 2px;
+  min-width: max-content;
+  padding: 8px 11px;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--ui-duration-fast) var(--ui-ease-standard),
+    background var(--ui-duration-fast) var(--ui-ease-standard),
+    transform var(--ui-duration-fast) var(--ui-ease-standard);
+}
+
+.polaris-overview-chart-event:hover {
+  border-color: var(--colour-border-strong);
+  transform: translateY(-1px);
+}
+
+.polaris-overview-chart-event:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.polaris-overview-chart-event span {
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.polaris-overview-chart-event small {
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.polaris-overview-chart-event.is-selected {
+  border-color: var(--colour-primary);
+  background: color-mix(in srgb, var(--colour-primary) 9%, var(--colour-surface));
+}
+
+.polaris-overview-chart-event.is-state-pension.is-selected {
+  border-color: var(--colour-success);
+  background: color-mix(in srgb, var(--colour-success-background) 70%, var(--colour-surface));
+}
+
+.polaris-overview-chart-event.is-cash.is-selected {
+  border-color: var(--colour-warning);
+  background: color-mix(in srgb, var(--colour-warning-background) 70%, var(--colour-surface));
+}
+
+.polaris-overview-chart-event-detail {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) minmax(0, 1fr) auto;
+  gap: var(--ui-space-3);
+  align-items: center;
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.polaris-overview-chart-event-detail > div {
+  display: grid;
+  gap: 1px;
+}
+
+.polaris-overview-chart-event-detail small {
+  color: var(--colour-text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.polaris-overview-chart-event-detail strong {
+  font-size: 0.9rem;
+}
+
+.polaris-overview-chart-event-detail p {
+  margin: 0;
+  color: var(--colour-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.polaris-overview-chart-event-detail > span {
+  color: var(--colour-text-strong);
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.polaris-overview-chart-event-detail.is-state-pension {
+  border-color: color-mix(in srgb, var(--colour-success) 30%, var(--colour-border));
+}
+
+.polaris-overview-chart-event-detail.is-cash {
+  border-color: color-mix(in srgb, var(--colour-warning) 35%, var(--colour-border));
+}
+
+@media (max-width: 860px) {
+  .polaris-overview-chart-event-detail {
+    grid-template-columns: 1fr;
+    gap: var(--ui-space-2);
+  }
+
+  .polaris-overview-chart-event-detail > span {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .polaris-overview-chart-event {
+    transition: none;
+  }
+}
