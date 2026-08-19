@@ -83,6 +83,47 @@ describe("createDrawdownInputsFromPlan", () => {
     );
   });
 
+  it("uses State Pension overrides saved with the scenario", () => {
+    const inputs = createDrawdownInputsFromPlan({
+      pensionInputs: createDefaultPensionInputs(),
+      projection: createProjection(),
+      retirementGoals: defaultRetirementGoals,
+      drawdown: {
+        planningAge: 95,
+        withdrawalStrategy: "target-income",
+        withdrawalRate: 0.04,
+        desiredAnnualIncome: 30_000,
+        incomeTargetMode: "net",
+        taxFreeCash: 0,
+        includeStatePension: true,
+        statePensionAnnualAmount: 14_500,
+        statePensionAge: 69,
+      },
+    });
+
+    expect(inputs.annualStatePension).toBe(14_500);
+    expect(inputs.statePensionAge).toBe(69);
+  });
+
+  it("allows the scenario to disable State Pension", () => {
+    const inputs = createDrawdownInputsFromPlan({
+      pensionInputs: createDefaultPensionInputs(),
+      projection: createProjection(),
+      retirementGoals: defaultRetirementGoals,
+      drawdown: {
+        planningAge: 95,
+        withdrawalStrategy: "target-income",
+        withdrawalRate: 0.04,
+        desiredAnnualIncome: 30_000,
+        incomeTargetMode: "net",
+        taxFreeCash: 0,
+        includeStatePension: false,
+      },
+    });
+
+    expect(inputs.annualStatePension).toBe(0);
+  });
+
   it("excludes State Pension when it is disabled in saved goals", () => {
     const inputs = createDrawdownInputsFromPlan({
       pensionInputs: createDefaultPensionInputs(),
