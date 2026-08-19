@@ -35,6 +35,11 @@ export function createDrawdownInputsFromPlan({
   const taxFreeCash = usesMaximumTaxFreeCash
     ? maximumTaxFreeCash
     : (drawdown?.taxFreeCash ?? defaults.taxFreeCash);
+  const includeStatePension =
+    drawdown?.includeStatePension ?? retirementGoals.includeStatePension;
+  const statePensionAnnualAmount =
+    drawdown?.statePensionAnnualAmount ?? retirementGoals.statePensionAnnualAmount;
+  const statePensionAge = drawdown?.statePensionAge ?? retirementGoals.statePensionAge;
 
   return {
     ...defaults,
@@ -49,10 +54,8 @@ export function createDrawdownInputsFromPlan({
     incomeTargetMode: drawdown?.incomeTargetMode ?? defaults.incomeTargetMode,
     ...(spendingPhases?.length ? { spendingPhases } : {}),
     taxFreeCash,
-    annualStatePension: retirementGoals.includeStatePension
-      ? retirementGoals.statePensionAnnualAmount
-      : 0,
-    statePensionAge: retirementGoals.statePensionAge,
+    annualStatePension: includeStatePension ? statePensionAnnualAmount : 0,
+    statePensionAge,
     annualReturn: pensionInputs.annualReturn,
     annualFee: pensionInputs.annualFee,
     inflationRate: pensionInputs.inflation,
