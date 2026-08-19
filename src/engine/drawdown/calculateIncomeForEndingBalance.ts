@@ -11,18 +11,15 @@ export function calculateIncomeForEndingBalance(
   inputs: DrawdownInputs,
   targetEndingBalance: number,
 ): { annualIncome: number; result: ReturnType<DrawdownEngine["calculate"]> } {
-  const { spendingPhases: _spendingPhases, ...withoutSpendingPhases } = inputs;
-
   // The retirement pot entering drawdown is already expressed in today's money.
   // Run this comparison on the same real-money basis so that preserving 100%
   // literally means ending with the same pound value that entered drawdown.
   const realReturn =
-    (1 + withoutSpendingPhases.annualReturn) /
-      (1 + withoutSpendingPhases.inflationRate) -
-    1;
+    (1 + inputs.annualReturn) / (1 + inputs.inflationRate) - 1;
 
   const comparisonInputs: DrawdownInputs = {
-    ...withoutSpendingPhases,
+    ...inputs,
+    spendingPhases: undefined,
     withdrawalStrategy: "target-income",
     annualReturn: realReturn,
     inflationRate: 0,
@@ -44,7 +41,7 @@ export function calculateIncomeForEndingBalance(
     result.finalBalance >= target;
 
   let low = 0;
-  let lowResult = calculate(low);
+  const lowResult = calculate(low);
 
   if (!meetsGoal(lowResult)) {
     return { annualIncome: 0, result: lowResult };
@@ -55,7 +52,6 @@ export function calculateIncomeForEndingBalance(
 
   while (high < MAX_SEARCH_INCOME && meetsGoal(highResult)) {
     low = high;
-    lowResult = highResult;
     high = Math.min(high * 2, MAX_SEARCH_INCOME);
     highResult = calculate(high);
   }
@@ -74,7 +70,6 @@ export function calculateIncomeForEndingBalance(
 
     if (meetsGoal(midpointResult)) {
       low = midpoint;
-      lowResult = midpointResult;
     } else {
       high = midpoint;
     }
