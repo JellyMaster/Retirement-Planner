@@ -18,7 +18,6 @@ const sections: Array<{
   queryValue: string;
   label: string;
 }> = [
-  { id: "overview", queryValue: "overview", label: "Overview" },
   { id: "income", queryValue: "income", label: "Income" },
   { id: "balance", queryValue: "balance", label: "Balance" },
   { id: "details", queryValue: "timeline", label: "Timeline" },
@@ -102,7 +101,7 @@ function DrawdownWorkspaceNavigationContent({
     <div
       className="drawdown-workspace-navigation"
       role="tablist"
-      aria-label="Drawdown analysis"
+      aria-label="Detailed drawdown analysis"
     >
       {sections.map((section, index) => {
         const active = value === section.id;
@@ -134,7 +133,6 @@ function DrawdownWorkspaceNavigationContent({
 
 function parseSection(value: string | null): DrawdownWorkspaceSection | null {
   switch (value) {
-    case "overview":
     case "income":
     case "balance":
     case "assumptions":
