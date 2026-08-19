@@ -192,7 +192,7 @@ describe("OverviewPage", () => {
 
     expect(screen.getByRole("heading", { name: "Needs attention" })).toBeInTheDocument();
     expect(screen.getByText("Not added yet")).toBeInTheDocument();
-    expect(screen.getByText("£0")).toBeInTheDocument();
+    expect(screen.getAllByText("£0").length).toBeGreaterThanOrEqual(2);
     expect(screen.getByRole("link", { name: "Review plan details" })).toHaveAttribute("href", "/plan");
   });
 
