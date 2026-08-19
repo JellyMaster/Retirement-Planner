@@ -70,11 +70,13 @@ export function OverviewPage() {
     drawdownResult?.taxFreeCashTaken ?? 0,
   );
   const endingPotChoice = createEndingPotChoice(endingBalanceGoal);
-  const spendingPlanValue = `${hasTieredSpending ? "Tiered" : "Standard"} · ${
-    drawdownInputs.withdrawalStrategy === "percentage"
-      ? "Percentage based"
-      : "£ target based"
-  }`;
+  const spendingPlanChoice = createSpendingPlanChoice({
+    hasTieredSpending,
+    withdrawalStrategy: drawdownInputs.withdrawalStrategy,
+    incomeGoalSource: activeScenario.drawdown?.incomeGoalSource,
+    retirementLivingStandardLevel:
+      activeScenario.drawdown?.retirementLivingStandardLevel,
+  });
 
   return (
     <main className="planner-page polaris-overview-page">
@@ -206,8 +208,8 @@ export function OverviewPage() {
             />
             <JourneyBadge
               label="Spending plan"
-              value={spendingPlanValue}
-              tone={hasTieredSpending ? "changed" : "neutral"}
+              value={spendingPlanChoice.value}
+              tone={spendingPlanChoice.tone}
             />
             <JourneyBadge
               label="Pot at the end"
@@ -289,6 +291,39 @@ function createTaxFreeCashChoice(
   }
 
   return { value: "Maximum", tone: "enabled" };
+}
+
+function createSpendingPlanChoice({
+  hasTieredSpending,
+  withdrawalStrategy,
+  incomeGoalSource,
+  retirementLivingStandardLevel,
+}: {
+  hasTieredSpending: boolean;
+  withdrawalStrategy: "target-income" | "percentage";
+  incomeGoalSource?: "custom" | "living-standards";
+  retirementLivingStandardLevel?: "minimum" | "moderate" | "comfortable";
+}): { value: string; tone: JourneyBadgeTone } {
+  if (hasTieredSpending) {
+    return {
+      value: `Tiered · ${withdrawalStrategy === "percentage" ? "Percentage based" : "£ target based"}`,
+      tone: "changed",
+    };
+  }
+
+  if (withdrawalStrategy === "percentage") {
+    return { value: "Standard · Percentage based", tone: "neutral" };
+  }
+
+  if (incomeGoalSource === "living-standards") {
+    const level = retirementLivingStandardLevel ?? "moderate";
+    return {
+      value: `Lifestyle · ${level.charAt(0).toUpperCase()}${level.slice(1)}`,
+      tone: "enabled",
+    };
+  }
+
+  return { value: "Standard · £ target based", tone: "neutral" };
 }
 
 function createEndingPotChoice(
