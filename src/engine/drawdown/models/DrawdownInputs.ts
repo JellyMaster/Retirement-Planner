@@ -4,6 +4,7 @@ export type WithdrawalStrategy = "target-income" | "percentage";
 export interface DrawdownSpendingPhase {
   startAge: number;
   annualIncome: number;
+  withdrawalRate?: number;
   label: string;
 }
 
