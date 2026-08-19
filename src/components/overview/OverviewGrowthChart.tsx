@@ -19,6 +19,8 @@ interface OverviewGrowthChartProps {
   currentPot: number;
   retirementAge: number;
   planningAge: number;
+  inflationRate: number;
+  retirementStartingBalance?: number;
   projectionYears: ProjectionYear[];
   drawdownYears?: DrawdownYear[];
 }
@@ -38,13 +40,18 @@ export function OverviewGrowthChart({
   currentPot,
   retirementAge,
   planningAge,
+  inflationRate,
+  retirementStartingBalance,
   projectionYears,
   drawdownYears = [],
 }: OverviewGrowthChartProps) {
   const data = createJourneyData({
     currentAge,
     currentPot,
+    retirementAge,
     planningAge,
+    inflationRate,
+    retirementStartingBalance,
     projectionYears,
     drawdownYears,
   });
@@ -133,13 +140,19 @@ export function OverviewGrowthChart({
 function createJourneyData({
   currentAge,
   currentPot,
+  retirementAge,
   planningAge,
+  inflationRate,
+  retirementStartingBalance,
   projectionYears,
   drawdownYears,
 }: {
   currentAge: number;
   currentPot: number;
+  retirementAge: number;
   planningAge: number;
+  inflationRate: number;
+  retirementStartingBalance?: number;
   projectionYears: ProjectionYear[];
   drawdownYears: DrawdownYear[];
 }): JourneyPoint[] {
@@ -152,10 +165,17 @@ function createJourneyData({
     }
   });
 
+  if (retirementStartingBalance !== undefined) {
+    byAge.set(retirementAge, Math.max(0, retirementStartingBalance));
+  }
+
   drawdownYears.forEach((year) => {
     const closingAge = year.age + 1;
     if (closingAge <= planningAge) {
-      byAge.set(closingAge, Math.max(0, year.closingBalance));
+      const inflationMultiplier = (1 + inflationRate) ** year.year;
+      const realClosingBalance =
+        inflationMultiplier > 0 ? year.closingBalance / inflationMultiplier : year.closingBalance;
+      byAge.set(closingAge, Math.max(0, realClosingBalance));
     }
   });
 
