@@ -1,6 +1,6 @@
 # 🗺️ Polaris Retirement Planner Roadmap
 
-> **Version 1.0.0**
+> **Current version: 1.1.0**
 
 ---
 
@@ -18,223 +18,89 @@ Every release builds upon three core principles:
 
 ---
 
-# Product Strategy
-
-Polaris is being developed in carefully planned stages.
-
-Each version expands the platform without compromising usability.
-
-```
-                 Better Understanding
-                         ▲
-                         │
-      Intelligence ──────┼────── Visualisation
-                         │
-                         ▼
-                  Retirement Planning
-```
-
----
-
 # Current Release
 
-# ✅ Version 1.0.0
+# ✅ Version 1.1.0
 
-Status
+**Theme:** Retirement Journey and Income Strategy  
+**Status:** Released  
+**Release date:** 19 August 2026
 
-Released
+## Major achievements
 
-August 2026
+✔ Essential and Advanced plan creation
 
----
+✔ Custom or Retirement Living Standards income goals
 
-## Major Achievements
+✔ Minimum, Moderate and Comfortable lifestyle choices
 
-✔ Guided Retirement Planner
+✔ Question-led retirement strategy
 
-✔ Scenario Management
+✔ Stable and Flexible income approaches
 
-✔ What If? Decision Lab
+✔ Consistent or tiered retirement spending
 
-✔ Drawdown Planner
+✔ Strategy-aware State Pension and tax-free cash choices
 
-✔ Retirement Income Chapters
+✔ Full pension journey chart through the planning age
 
-✔ Explore Learning Centre
+✔ Pension milestones and interactive retirement events
 
-✔ Guidance Centre
+✔ Improved Overview funding status and plan-choice summaries
 
-✔ Responsive Design
+✔ Percentage and tiered drawdown improvements
 
-✔ Accessibility Improvements
+✔ Scenario persistence and legacy-data hardening
 
-✔ Dark Mode
-
-✔ Comprehensive Automated Testing
-
----
-
-# Version 1.1
-
-# Visual Intelligence
-
-Status
-
-Planned
-
----
-
-## Goal
-
-Transform financial calculations into visual stories.
-
-Rather than presenting only numbers, Polaris will show users **why** projections change.
-
----
-
-## Planned Features
-
-### Interactive Pension Growth Chart
-
-Visualise
-
-- Contributions
-- Investment growth
-- Fees
-- Retirement
-- Tax-Free Cash
-- State Pension
-
----
-
-### Drawdown Visualisation
-
-Interactive charts showing
-
-- Balance
-- Withdrawals
-- Growth
-- State Pension
-- Spending phases
-
----
-
-### Unified Retirement Timeline
-
-One shared timeline used throughout Polaris.
-
-Example
-
-```
-Today
-
-↓
-
-Extra Contributions
-
-↓
-
-Mortgage Paid
-
-↓
-
-Retirement
-
-↓
-
-State Pension
-
-↓
-
-Later Life
-
-↓
-
-Planning Horizon
-```
-
----
-
-### Better Scenario Comparison
-
-Visual
-
-- Waterfall charts
-- Difference charts
-- Growth comparisons
-
----
-
-### Richer Guidance
-
-Guidance cards become interactive.
-
-Users can explore recommendations directly.
-
----
-
-## Expected Outcome
-
-Version 1.1 should make Polaris significantly easier to understand without changing the underlying planning engine.
+✔ Full lint, type-check, automated-test and production-build release verification
 
 ---
 
 # Version 1.2
 
-# Professional Planning
+# Strategy-aware Decision Support
 
-Status
-
-Planned
-
----
+**Status:** Planned
 
 ## Goal
 
-Enable users to produce professional retirement plans suitable for long-term review.
+Carry the retirement-strategy model introduced in 1.1 through the remaining decision-support areas of Polaris.
 
----
+## Planned focus
 
-## Planned Features
+### Compare retirement outcomes
 
-### PDF Retirement Reports
+Move comparison beyond accumulation-only metrics and include:
 
-Generate printable reports including
+- Retirement income strategy
+- Lifestyle goal
+- Average and lowest retirement income
+- Income shortfalls
+- Pension depletion
+- State Pension and tax-free cash choices
+- Pension remaining at the planning age
 
-- Plan summary
-- Charts
-- Assumptions
-- Recommendations
+### Expand What If?
 
----
+Add experiments for questions such as:
 
-### Cashflow Planning
+- What if I choose another retirement lifestyle?
+- What if I switch between Stable and Flexible income?
+- What if I spend more early in retirement?
+- What if I leave a percentage of the pension?
+- What if I preserve the retirement pot?
 
-Visual annual cashflow.
+### Refine Drawdown
 
----
+Make Drawdown primarily an explanation of the saved plan rather than another configuration surface.
 
-### Retirement Summary
+### Strategy-aware Explore and Guidance
 
-Professional planning overview.
+Ensure educational examples and recommendations understand custom targets, Retirement Living Standards, percentage withdrawals and tiered strategies.
 
----
+### Reporting
 
-### Printable Scenario Comparison
-
-Compare multiple plans.
-
----
-
-### Better Guidance
-
-Improved explanations.
-
----
-
-## Expected Outcome
-
-Move Polaris closer to adviser-quality planning.
+Continue toward printable retirement summaries and PDF retirement reports.
 
 ---
 
@@ -242,48 +108,20 @@ Move Polaris closer to adviser-quality planning.
 
 # Connected Data
 
-Status
-
-Planned
-
----
+**Status:** Planned
 
 ## Goal
 
-Introduce persistence.
+Introduce stronger persistence and portability.
 
----
+## Planned focus
 
-## Planned Features
-
-- Local database
-- Import
-- Export
+- Local database support
+- Import / Export
 - Version history
 - Autosave
 - Backup
-
----
-
-## Architecture
-
-```
-Planner
-
-↓
-
-Repository
-
-↓
-
-Local Storage
-
-↓
-
-Database
-```
-
-This creates the foundation for cloud synchronisation.
+- Offline persistence
 
 ---
 
@@ -291,77 +129,20 @@ This creates the foundation for cloud synchronisation.
 
 # Polaris Cloud
 
-Status
-
-Vision
-
----
+**Status:** Vision
 
 ## Goal
 
 Transform Polaris into a connected retirement planning platform.
 
----
+Potential capabilities include:
 
-## Planned Features
-
-### User Accounts
-
-Secure login.
-
----
-
-### Cloud Synchronisation
-
-Plans available on multiple devices.
-
----
-
-### Adviser Mode
-
-Financial advisers can review plans.
-
----
-
-### Shared Plans
-
-Families can collaborate.
-
----
-
-### Secure Backup
-
-Automatic cloud storage.
-
----
-
-### Notifications
-
-Retirement reminders.
-
----
-
-## Architecture
-
-```
-Client
-
-↓
-
-Authentication
-
-↓
-
-API
-
-↓
-
-Cloud Database
-
-↓
-
-Analytics
-```
+- User accounts
+- Cloud synchronisation
+- Adviser mode
+- Shared retirement plans
+- Secure backups
+- Notifications
 
 ---
 
@@ -369,34 +150,9 @@ Analytics
 
 # Retirement Intelligence
 
-Future Vision
+**Status:** Future vision
 
----
-
-## Artificial Intelligence
-
-Introduce AI-assisted planning.
-
-Examples
-
-- Explain projections
-- Suggest improvements
-- Detect planning risks
-- Recommend experiments
-
----
-
-## Smart Guidance
-
-Instead of fixed recommendations
-
-Polaris will analyse
-
-- Progress
-- Contributions
-- Retirement goals
-
-to generate personalised advice.
+Potential capabilities include AI-assisted explanations, planning-risk detection, suggested experiments and more personalised guidance.
 
 ---
 
@@ -404,130 +160,48 @@ to generate personalised advice.
 
 # Complete Retirement Platform
 
-Long-Term Vision
+**Status:** Long-term vision
 
----
-
-Polaris becomes a complete retirement ecosystem.
-
-Potential features include
-
-### Investment Tracking
-
-### Pension Consolidation
-
-### Mortgage Planning
-
-### ISA Planning
-
-### Tax Optimisation
-
-### Estate Planning
-
-### Retirement Healthcare Planning
-
-### Family Retirement Planning
+Potential areas include investment tracking, pension consolidation, ISA planning, tax optimisation, estate planning, retirement healthcare planning and family retirement planning.
 
 ---
 
 # Design Principles
 
-Every future feature should satisfy at least one of these goals.
+Every future feature should satisfy at least one of these goals:
 
-## Improve Understanding
-
-Help users understand retirement.
-
----
-
-## Reduce Complexity
-
-Keep interfaces simple.
-
----
-
-## Encourage Experimentation
-
-Support exploration.
-
----
-
-## Explain Calculations
-
-No unexplained numbers.
-
----
-
-## Build Confidence
-
-Help users make informed decisions.
-
----
-
-# Features That Will Not Be Added
-
-To keep Polaris focused, the following are currently out of scope.
-
-- Share trading
-- Cryptocurrency portfolios
-- Budgeting
-- Banking
-- Loan comparison
-- Insurance comparison
-
-These may integrate in the future but will not become core functionality.
+- **Improve understanding** — help users understand retirement.
+- **Reduce complexity** — keep interfaces simple.
+- **Encourage experimentation** — support exploration without damaging the saved plan.
+- **Explain calculations** — avoid unexplained numbers.
+- **Build confidence** — help users make informed planning decisions.
 
 ---
 
 # Technical Direction
 
-Future architecture priorities.
+Future architecture priorities remain:
 
-## Improve Visualisation
-
-More charts.
-
----
-
-## Improve Performance
-
-Optimise calculations.
+- Improve visualisation
+- Improve performance
+- Improve automated testing
+- Maintain accessibility
+- Improve responsiveness
+- Keep scenario and retirement-strategy data consistent across pages
 
 ---
 
-## Improve Testing
+# Release Timeline
 
-Increase automated coverage.
-
----
-
-## Improve Accessibility
-
-Maintain WCAG compliance.
-
----
-
-## Improve Responsiveness
-
-Support larger and smaller screens.
-
----
-
-# Success Criteria
-
-Polaris should continue to evolve while remaining:
-
-✔ Easy to understand
-
-✔ Educational
-
-✔ Accurate
-
-✔ Fast
-
-✔ Accessible
-
-✔ Enjoyable to use
+| Version | Theme | Status |
+|---|---|---|
+| 1.0.0 | Complete Retirement Planning | Released |
+| 1.1.0 | Retirement Journey and Income Strategy | ✅ Current |
+| 1.2 | Strategy-aware Decision Support | Planned |
+| 1.3 | Connected Data | Planned |
+| 2.0 | Polaris Cloud | Vision |
+| 2.5 | Retirement Intelligence | Vision |
+| 3.0 | Complete Retirement Platform | Long-term vision |
 
 ---
 
@@ -539,24 +213,7 @@ Every release should move the application closer to achieving this goal.
 
 ---
 
-# Release Timeline
-
-| Version | Theme |
-|----------|----------------------------|
-| 1.0 | Complete Retirement Planning |
-| 1.1 | Visual Intelligence |
-| 1.2 | Professional Planning |
-| 1.3 | Connected Data |
-| 2.0 | Polaris Cloud |
-| 2.5 | Retirement Intelligence |
-| 3.0 | Complete Retirement Platform |
-
----
-
-**Polaris Retirement Planner**
-
-Product Roadmap
-
-Version **1.0.0**
-
-August 2026
+**Polaris Retirement Planner**  
+Product Roadmap  
+Current version **1.1.0**  
+19 August 2026
