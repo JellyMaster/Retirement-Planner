@@ -1,4 +1,8 @@
 import type { ScenarioDrawdownPreferences } from "../../../domain/scenarios";
+import {
+  getRetirementLivingStandards,
+  type RetirementLivingStandardLevel,
+} from "../../../engine/drawdown/retirementLivingStandards";
 import { useStoredRetirementGoals } from "../../../hooks/useStoredRetirementGoals";
 import { formatCurrency, formatPercentage } from "../../../utils/formatters";
 import { CurrencyInput, FormField } from "../../forms";
@@ -8,6 +12,24 @@ interface EssentialRetirementIncomeFieldsProps {
   value: ScenarioDrawdownPreferences;
   onChange: (value: ScenarioDrawdownPreferences) => void;
 }
+
+const LIFESTYLE_COPY: Record<
+  RetirementLivingStandardLevel,
+  { title: string; description: string }
+> = {
+  minimum: {
+    title: "Minimum",
+    description: "Covers essential needs with some room for everyday leisure.",
+  },
+  moderate: {
+    title: "Moderate",
+    description: "Provides more financial security and flexibility for leisure and holidays.",
+  },
+  comfortable: {
+    title: "Comfortable",
+    description: "Allows greater flexibility for travel, leisure and larger discretionary spending.",
+  },
+};
 
 export function EssentialRetirementIncomeFields({
   idPrefix,
@@ -19,30 +41,72 @@ export function EssentialRetirementIncomeFields({
   const usesAdvancedSpendingPlan =
     value.withdrawalStrategy === "percentage" || Boolean(value.spendingPhases?.length);
   const advancedSpendingSummary = createAdvancedSpendingSummary(value);
+  const incomeGoalSource = value.retirementIncomeGoalSource ?? "custom";
+  const household = value.retirementLivingStandardsHousehold ?? "one-person";
+  const region = value.retirementLivingStandardsRegion ?? "uk";
+  const livingStandards = getRetirementLivingStandards(household, region);
 
-  function updateDesiredIncome(nextValue: number | undefined) {
-    const desiredAnnualIncome = Math.max(0, nextValue ?? 0);
-    const next: ScenarioDrawdownPreferences = {
+  function applyDesiredIncome(
+    desiredAnnualIncome: number,
+    updates: Partial<ScenarioDrawdownPreferences>,
+  ) {
+    onChange({
       ...value,
       withdrawalStrategy: "target-income",
       incomeTargetMode: "net",
       desiredAnnualIncome,
-    };
-
-    onChange(next);
+      ...updates,
+    });
     setRetirementGoals({
       ...retirementGoals,
       desiredAnnualIncome,
     });
   }
 
+  function updateDesiredIncome(nextValue: number | undefined) {
+    const desiredAnnualIncome = Math.max(0, nextValue ?? 0);
+    applyDesiredIncome(desiredAnnualIncome, {
+      retirementIncomeGoalSource: "custom",
+      customDesiredAnnualIncome: desiredAnnualIncome,
+    });
+  }
+
+  function selectCustomIncomeGoal() {
+    const customDesiredAnnualIncome =
+      value.customDesiredAnnualIncome ?? value.desiredAnnualIncome;
+    applyDesiredIncome(customDesiredAnnualIncome, {
+      retirementIncomeGoalSource: "custom",
+      customDesiredAnnualIncome,
+    });
+  }
+
+  function selectLivingStandardsGoal() {
+    onChange({
+      ...value,
+      retirementIncomeGoalSource: "living-standard",
+      customDesiredAnnualIncome:
+        value.retirementIncomeGoalSource === "custom"
+          ? value.desiredAnnualIncome
+          : value.customDesiredAnnualIncome ?? value.desiredAnnualIncome,
+    });
+  }
+
+  function selectLifestyle(level: RetirementLivingStandardLevel) {
+    applyDesiredIncome(livingStandards[level], {
+      retirementIncomeGoalSource: "living-standard",
+      retirementLivingStandardsLevel: level,
+      customDesiredAnnualIncome:
+        value.customDesiredAnnualIncome ?? value.desiredAnnualIncome,
+    });
+  }
+
   return (
     <div className="essential-retirement-income-fields">
       <div className="essential-retirement-income-intro">
-        <strong>What would you like to spend each year in retirement?</strong>
+        <strong>How would you like to set your retirement income goal?</strong>
         <p>
-          Enter the amount you would like available to spend, in today&apos;s money.
-          The planner will work out how much needs to come from your pension.
+          Enter your own annual spending target, or use a Retirement Living Standard
+          as a starting point for the lifestyle you would like in retirement.
         </p>
       </div>
 
@@ -52,32 +116,108 @@ export function EssentialRetirementIncomeFields({
           <span>{advancedSpendingSummary}</span>
           <span>
             Change this under <strong>Advanced → Retirement strategy</strong>. The
-            simple annual spending field is disabled while the advanced plan is active.
+            simple retirement income goal is disabled while the advanced plan is active.
           </span>
         </div>
       )}
 
-      <FormField
-        id={`${idPrefix}-desiredAnnualIncome`}
-        label="Desired annual spending"
-        hint={
-          usesAdvancedSpendingPlan
-            ? "This simple spending target is not used while an advanced spending plan is active."
-            : "The amount you want available to spend after tax, in today's money."
-        }
+      <div
+        className="essential-retirement-income-source"
+        role="radiogroup"
+        aria-label="Retirement income goal source"
       >
-        {(id, describedBy) => (
-          <CurrencyInput
-            id={id}
-            aria-describedby={describedBy}
-            value={value.desiredAnnualIncome}
-            min={0}
-            step={500}
-            disabled={usesAdvancedSpendingPlan}
-            onValueChange={updateDesiredIncome}
-          />
-        )}
-      </FormField>
+        <button
+          type="button"
+          role="radio"
+          aria-checked={incomeGoalSource === "custom"}
+          className={incomeGoalSource === "custom" ? "is-selected" : undefined}
+          disabled={usesAdvancedSpendingPlan}
+          onClick={selectCustomIncomeGoal}
+        >
+          <strong>I know how much I want to spend</strong>
+          <span>Enter the annual amount you would like available after tax.</span>
+        </button>
+        <button
+          type="button"
+          role="radio"
+          aria-checked={incomeGoalSource === "living-standard"}
+          className={incomeGoalSource === "living-standard" ? "is-selected" : undefined}
+          disabled={usesAdvancedSpendingPlan}
+          onClick={selectLivingStandardsGoal}
+        >
+          <strong>Use Retirement Living Standards</strong>
+          <span>Choose a lifestyle benchmark to set the annual income target.</span>
+        </button>
+      </div>
+
+      {incomeGoalSource === "custom" ? (
+        <FormField
+          id={`${idPrefix}-desiredAnnualIncome`}
+          label="Desired annual retirement income"
+          hint={
+            usesAdvancedSpendingPlan
+              ? "This simple spending target is not used while an advanced spending plan is active."
+              : "The amount you want available to spend after tax, in today's money."
+          }
+        >
+          {(id, describedBy) => (
+            <CurrencyInput
+              id={id}
+              aria-describedby={describedBy}
+              value={value.customDesiredAnnualIncome ?? value.desiredAnnualIncome}
+              min={0}
+              step={500}
+              disabled={usesAdvancedSpendingPlan}
+              onValueChange={updateDesiredIncome}
+            />
+          )}
+        </FormField>
+      ) : (
+        <div className="essential-retirement-lifestyle-picker">
+          <div>
+            <strong>Which retirement lifestyle would you like?</strong>
+            <p>
+              Choose the benchmark that best matches the retirement you want to plan for.
+            </p>
+          </div>
+          <div
+            className="essential-retirement-lifestyle-options"
+            role="radiogroup"
+            aria-label="Retirement lifestyle standard"
+          >
+            {(["minimum", "moderate", "comfortable"] as const).map((level) => (
+              <button
+                key={level}
+                type="button"
+                role="radio"
+                aria-checked={value.retirementLivingStandardsLevel === level}
+                className={
+                  value.retirementLivingStandardsLevel === level ? "is-selected" : undefined
+                }
+                disabled={usesAdvancedSpendingPlan}
+                onClick={() => selectLifestyle(level)}
+              >
+                <strong>{LIFESTYLE_COPY[level].title}</strong>
+                <span>{LIFESTYLE_COPY[level].description}</span>
+                <small>{formatCurrency(livingStandards[level])}/year</small>
+              </button>
+            ))}
+          </div>
+          {value.retirementLivingStandardsLevel && (
+            <div className="essential-retirement-lifestyle-summary" role="note">
+              <strong>
+                {LIFESTYLE_COPY[value.retirementLivingStandardsLevel].title} lifestyle selected
+              </strong>
+              <span>
+                The plan is using {formatCurrency(value.desiredAnnualIncome)} a year in
+                today&apos;s money, based on the current {household === "one-person" ? "one-person" : "two-person"}{" "}
+                {region === "london" ? "London" : "UK"} Retirement Living Standard.
+              </span>
+              <span>You can switch back to your own amount without losing it.</span>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="essential-retirement-defaults" id={`${idPrefix}-statePension`}>
         <div className="essential-retirement-default-item">
