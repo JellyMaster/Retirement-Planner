@@ -37,6 +37,7 @@ describe("EssentialAdvancedPensionInputsForm", () => {
     expect(screen.queryByRole("radio", { name: /withdraw a percentage/i })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Retirement strategy" }));
+    await user.click(screen.getByRole("button", { name: /Income strategy/i }));
 
     expect(screen.getByRole("radio", { name: /spend a target amount each year/i })).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /withdraw a percentage of the pension/i })).toBeInTheDocument();
