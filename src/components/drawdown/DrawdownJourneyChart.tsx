@@ -27,6 +27,7 @@ import {
 
 interface DrawdownJourneyChartProps {
   years: DrawdownYear[];
+  endAge: number;
   inflationRate: number;
   displayMode: MoneyDisplayMode;
   spendingPhases: DrawdownSpendingPhase[] | undefined;
@@ -37,13 +38,14 @@ interface DrawdownJourneyChartProps {
 interface JourneyPoint {
   age: number;
   closingBalance: number;
-  pensionWithdrawal: number;
-  statePensionIncome: number;
-  netIncome: number;
+  pensionWithdrawal: number | null;
+  statePensionIncome: number | null;
+  netIncome: number | null;
 }
 
 export function DrawdownJourneyChart({
   years,
+  endAge,
   inflationRate,
   displayMode,
   spendingPhases,
@@ -55,17 +57,29 @@ export function DrawdownJourneyChart({
     () => getDisplayYears(years, inflationRate, displayMode),
     [displayMode, inflationRate, years],
   );
-  const chartData: JourneyPoint[] = useMemo(
-    () =>
-      displayYears.map((year) => ({
-        age: year.age,
-        closingBalance: year.closingBalance,
-        pensionWithdrawal: year.pensionWithdrawal,
-        statePensionIncome: year.statePensionIncome,
-        netIncome: year.netIncome,
-      })),
-    [displayYears],
-  );
+  const chartData: JourneyPoint[] = useMemo(() => {
+    const annualPoints = displayYears.map((year) => ({
+      age: year.age,
+      closingBalance: year.closingBalance,
+      pensionWithdrawal: year.pensionWithdrawal,
+      statePensionIncome: year.statePensionIncome,
+      netIncome: year.netIncome,
+    }));
+    const finalYear = displayYears.at(-1);
+
+    if (!finalYear || finalYear.age >= endAge) return annualPoints;
+
+    return [
+      ...annualPoints,
+      {
+        age: endAge,
+        closingBalance: finalYear.closingBalance,
+        pensionWithdrawal: null,
+        statePensionIncome: null,
+        netIncome: null,
+      },
+    ];
+  }, [displayYears, endAge]);
   const lastIndex = Math.max(0, chartData.length - 1);
   const [range, setRange] = useState({ startIndex: 0, endIndex: lastIndex });
   const chapters = spendingPhases ?? [];
@@ -223,6 +237,17 @@ export function DrawdownJourneyChart({
                 }}
               />
             )}
+            <ReferenceLine
+              x={endAge}
+              yAxisId="balance"
+              stroke={chartColours.grid}
+              strokeDasharray="2 5"
+              label={{
+                value: "Plan age",
+                position: "insideTopRight",
+                fill: chartColours.text,
+              }}
+            />
 
             <Bar
               yAxisId="income"
@@ -260,6 +285,7 @@ export function DrawdownJourneyChart({
               strokeDasharray="6 4"
               dot={false}
               activeDot={{ r: 4 }}
+              connectNulls={false}
             />
             <Brush
               dataKey="age"
