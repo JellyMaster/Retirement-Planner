@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  Bar,
   Brush,
   CartesianGrid,
   ComposedChart,
@@ -36,6 +37,8 @@ interface DrawdownJourneyChartProps {
 interface JourneyPoint {
   age: number;
   closingBalance: number;
+  pensionWithdrawal: number;
+  statePensionIncome: number;
   netIncome: number;
 }
 
@@ -57,6 +60,8 @@ export function DrawdownJourneyChart({
       displayYears.map((year) => ({
         age: year.age,
         closingBalance: year.closingBalance,
+        pensionWithdrawal: year.pensionWithdrawal,
+        statePensionIncome: year.statePensionIncome,
         netIncome: year.netIncome,
       })),
     [displayYears],
@@ -102,8 +107,9 @@ export function DrawdownJourneyChart({
           <p className="panel-eyebrow">Retirement journey</p>
           <h2 id="drawdown-journey-chart-title">Your pension and income through retirement</h2>
           <p>
-            Follow the pension you have left alongside the income available to spend.
-            Values are shown in {displayMode === "today" ? "today’s money" : "future money"}.
+            Follow the pension you have left and see how private-pension withdrawals
+            and State Pension combine to provide retirement income. Values are shown
+            in {displayMode === "today" ? "today’s money" : "future money"}.
           </p>
         </div>
         <div className="drawdown-chart-zoom" role="group" aria-label="Retirement journey chart zoom">
@@ -186,7 +192,7 @@ export function DrawdownJourneyChart({
                 stroke={chartColours.tertiary}
                 strokeDasharray="4 4"
                 label={{
-                  value: "State Pension",
+                  value: "State Pension starts",
                   position: "insideTopRight",
                   fill: chartColours.text,
                 }}
@@ -218,6 +224,22 @@ export function DrawdownJourneyChart({
               />
             )}
 
+            <Bar
+              yAxisId="income"
+              dataKey="pensionWithdrawal"
+              name="Private pension"
+              stackId="retirement-income"
+              fill={chartColours.secondary}
+              opacity={0.72}
+            />
+            <Bar
+              yAxisId="income"
+              dataKey="statePensionIncome"
+              name="State Pension"
+              stackId="retirement-income"
+              fill={chartColours.tertiary}
+              opacity={0.82}
+            />
             <Line
               yAxisId="balance"
               type="monotone"
@@ -232,11 +254,12 @@ export function DrawdownJourneyChart({
               yAxisId="income"
               type="monotone"
               dataKey="netIncome"
-              name="Net retirement income"
-              stroke={chartColours.secondary}
-              strokeWidth={3}
+              name="Net income"
+              stroke={chartColours.text}
+              strokeWidth={2}
+              strokeDasharray="6 4"
               dot={false}
-              activeDot={{ r: 5 }}
+              activeDot={{ r: 4 }}
             />
             <Brush
               dataKey="age"
