@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, vi } from "vitest";
 
@@ -111,7 +111,7 @@ describe("OverviewPage", () => {
     );
   }
 
-  it("shows the active retirement dashboard and modelled retirement journey", () => {
+  it("shows the active retirement dashboard and high-level retirement choices", () => {
     mockActiveScenario(createScenario());
     mockProjection(750_000);
 
@@ -127,11 +127,13 @@ describe("OverviewPage", () => {
         name: "Projected pension growth by age in today's money",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "How this plan is set to work" })).toBeInTheDocument();
-    expect(screen.getByText("Income strategy")).toBeInTheDocument();
-    expect(screen.getByText("Tax-free cash")).toBeInTheDocument();
-    expect(screen.getByText("State Pension")).toBeInTheDocument();
-    expect(screen.getByText("Spending pattern")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Plan choices at a glance" })).toBeInTheDocument();
+
+    const choices = screen.getByLabelText("Retirement plan choices");
+    expect(within(choices).getByText("State Pension")).toBeInTheDocument();
+    expect(within(choices).getByText("Tax-free cash")).toBeInTheDocument();
+    expect(within(choices).getByText("Spending plan")).toBeInTheDocument();
+    expect(within(choices).getByText("Standard")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Edit My Plan" })).toHaveAttribute("href", "/plan");
   });
 
@@ -145,10 +147,12 @@ describe("OverviewPage", () => {
 
     renderPage();
 
-    expect(screen.getByText("Not included")).toBeInTheDocument();
+    const choices = screen.getByLabelText("Retirement plan choices");
+    expect(within(choices).getByText("Not included")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "State Pension is not included" })).toBeInTheDocument();
   });
 
-  it("uses advanced retirement strategy values from the active scenario", () => {
+  it("uses advanced retirement choices from the active scenario", () => {
     const scenario = createScenario("Percentage plan");
     scenario.drawdown = {
       planningAge: 100,
@@ -182,11 +186,10 @@ describe("OverviewPage", () => {
     renderPage();
 
     expect(screen.getByText("Age 100")).toBeInTheDocument();
-    expect(screen.getByText(/4.5% of the remaining pension each year/i)).toBeInTheDocument();
-    expect(screen.getByText("£14,500/year from age 69")).toBeInTheDocument();
-    expect(screen.getByText("Not taken")).toBeInTheDocument();
-    expect(screen.getByText(/Active retirement from 68 · Later life from 80/i)).toBeInTheDocument();
-    expect(screen.getByText(/Percentage drawdown · average across retirement/i)).toBeInTheDocument();
+    const choices = screen.getByLabelText("Retirement plan choices");
+    expect(within(choices).getByText("Included")).toBeInTheDocument();
+    expect(within(choices).getByText("Not taken")).toBeInTheDocument();
+    expect(within(choices).getByText("Tiered")).toBeInTheDocument();
   });
 
   it("uses the non-baseline active scenario in the dashboard", () => {
@@ -209,7 +212,7 @@ describe("OverviewPage", () => {
     expect(screen.getByText("Overview · Retire at 65")).toBeInTheDocument();
     expect(screen.getAllByText("Age 65").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("£820,000")).toBeInTheDocument();
-    expect(screen.getByText(/Target spending · average across retirement/i)).toBeInTheDocument();
+    expect(screen.getByText(/Average modelled net income across retirement/i)).toBeInTheDocument();
   });
 
   it("shows incomplete guidance when there is no usable retirement projection", () => {
