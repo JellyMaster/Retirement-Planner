@@ -12,7 +12,14 @@ import { ScenarioSpendingPhaseFields } from "../../scenarios/ScenarioSpendingPha
 const STANDARD_LUMP_SUM_ALLOWANCE = 268_275;
 const TAX_FREE_CASH_RATE = 0.25;
 
-type StrategySection = "income" | "state-pension" | "tax-free-cash" | "spending";
+type StrategySection =
+  | "income"
+  | "state-pension"
+  | "tax-free-cash"
+  | "ending-pot"
+  | "spending";
+
+type EndingPotChoice = "zero" | "ten-percent" | "custom" | "preserve";
 
 interface AdvancedRetirementStrategyFieldsProps {
   idPrefix: string;
@@ -49,6 +56,25 @@ export function AdvancedRetirementStrategyFields({
     : value.withdrawalStrategy === "percentage"
       ? "One withdrawal rate throughout"
       : "Level spending";
+
+  const endingBalanceMode = value.endingBalanceMode ?? "preserve";
+  const endingBalancePercentage = value.endingBalancePercentage ?? 1;
+  const endingPotChoice: EndingPotChoice =
+    endingBalanceMode === "spend-to-zero"
+      ? "zero"
+      : endingBalanceMode === "preserve"
+        ? "preserve"
+        : Math.abs(endingBalancePercentage - 0.1) < 0.0001
+          ? "ten-percent"
+          : "custom";
+  const endingPotSummary =
+    endingPotChoice === "zero"
+      ? "Spend the pension to £0"
+      : endingPotChoice === "preserve"
+        ? "Preserve the retirement pot"
+        : endingPotChoice === "ten-percent"
+          ? "Keep 10% of the retirement pot"
+          : `Keep ${formatPercentage(endingBalancePercentage)} of the retirement pot`;
 
   function update<K extends keyof ScenarioDrawdownPreferences>(
     field: K,
@@ -117,6 +143,46 @@ export function AdvancedRetirementStrategyFields({
         value.taxFreeCash > 0
           ? value.taxFreeCash
           : Math.min(10_000, maximumTaxFreeCash),
+    });
+  }
+
+  function setEndingPotChoice(choice: EndingPotChoice) {
+    if (choice === "zero") {
+      onChange({
+        ...value,
+        endingBalanceMode: "spend-to-zero",
+        endingBalancePercentage: 0,
+      });
+      return;
+    }
+
+    if (choice === "preserve") {
+      onChange({
+        ...value,
+        endingBalanceMode: "preserve",
+        endingBalancePercentage: 1,
+      });
+      return;
+    }
+
+    if (choice === "ten-percent") {
+      onChange({
+        ...value,
+        endingBalanceMode: "percentage",
+        endingBalancePercentage: 0.1,
+      });
+      return;
+    }
+
+    onChange({
+      ...value,
+      endingBalanceMode: "percentage",
+      endingBalancePercentage:
+        endingBalanceMode === "percentage" &&
+        endingBalancePercentage > 0 &&
+        Math.abs(endingBalancePercentage - 0.1) >= 0.0001
+          ? endingBalancePercentage
+          : 0.25,
     });
   }
 
@@ -397,6 +463,95 @@ export function AdvancedRetirementStrategyFields({
           The illustrated maximum is currently {formatCurrency(maximumTaxFreeCash)},
           based on the projected pension at retirement and the modelled lump-sum
           allowance.
+        </p>
+      </StrategyCard>
+
+      <StrategyCard
+        title="Pot at the end"
+        summary={endingPotSummary}
+        open={openSection === "ending-pot"}
+        onToggle={() => toggle("ending-pot")}
+      >
+        <div
+          className="retirement-strategy-choice-grid is-two-by-two"
+          role="radiogroup"
+          aria-label="Pension pot at the end of the plan"
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={endingPotChoice === "zero"}
+            className={endingPotChoice === "zero" ? "is-selected" : undefined}
+            onClick={() => setEndingPotChoice("zero")}
+          >
+            <strong>Spend the pension to £0</strong>
+            <span>Use the full retirement pot across the planning period.</span>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={endingPotChoice === "ten-percent"}
+            className={endingPotChoice === "ten-percent" ? "is-selected" : undefined}
+            onClick={() => setEndingPotChoice("ten-percent")}
+          >
+            <strong>Keep 10%</strong>
+            <span>Finish with 10% of the pension available for drawdown at retirement.</span>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={endingPotChoice === "custom"}
+            className={endingPotChoice === "custom" ? "is-selected" : undefined}
+            onClick={() => setEndingPotChoice("custom")}
+          >
+            <strong>Keep a custom percentage</strong>
+            <span>Choose how much of the retirement drawdown pot you want left.</span>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={endingPotChoice === "preserve"}
+            className={endingPotChoice === "preserve" ? "is-selected" : undefined}
+            onClick={() => setEndingPotChoice("preserve")}
+          >
+            <strong>Preserve the retirement pot</strong>
+            <span>Finish with the same pension value that was available for drawdown at retirement.</span>
+            <small>Default</small>
+          </button>
+        </div>
+
+        {endingPotChoice === "custom" && (
+          <div className="retirement-strategy-fields">
+            <FormField
+              id={`${idPrefix}-endingBalancePercentage`}
+              label="Percentage of retirement pot to keep"
+              hint="This percentage is based on the pension available for drawdown at retirement, after tax-free cash."
+            >
+              {(id, describedBy) => (
+                <PercentageInput
+                  id={id}
+                  aria-describedby={describedBy}
+                  value={endingBalancePercentage}
+                  min={0}
+                  max={100}
+                  step={1}
+                  onValueChange={(next) =>
+                    onChange({
+                      ...value,
+                      endingBalanceMode: "percentage",
+                      endingBalancePercentage: Math.min(1, Math.max(0, next ?? 0)),
+                    })
+                  }
+                />
+              )}
+            </FormField>
+          </div>
+        )}
+
+        <p className="advanced-plan-note">
+          This sets the pension reserve you want left at the planning age. It is anchored
+          to the pension available for drawdown at retirement and does not grow with
+          inflation.
         </p>
       </StrategyCard>
 
