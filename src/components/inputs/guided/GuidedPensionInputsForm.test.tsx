@@ -34,10 +34,10 @@ describe("GuidedPensionInputsForm", () => {
       screen.getByRole("heading", { name: "Plan your retirement" }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /Income strategy/i }));
-    expect(
-      screen.getByRole("radio", { name: /spend a target amount each year/i }),
-    ).toBeChecked();
+    await user.click(
+      screen.getByRole("button", { name: /How should your retirement income work/i }),
+    );
+    expect(screen.getByRole("radio", { name: /Stable income/i })).toBeChecked();
 
     await user.click(screen.getByRole("button", { name: "Review plan" }));
 
