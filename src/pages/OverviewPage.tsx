@@ -5,12 +5,16 @@ import { OverviewGrowthChart } from "../components/overview/OverviewGrowthChart"
 import { useScenarios } from "../components/scenarios";
 import { DrawdownEngine } from "../engine/drawdown/DrawdownEngine";
 import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
+import {
+  getEndingBalanceTarget,
+  type DrawdownEndingBalanceGoal,
+} from "../engine/drawdown/models/DrawdownEndingBalanceGoal";
 import type { DrawdownResult } from "../engine/drawdown/models/DrawdownResult";
 import { validateDrawdownInputs } from "../engine/drawdown/validators/DrawdownInputsValidator";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import { AppIcons } from "../icons";
-import { formatCurrency } from "../utils/formatters";
+import { formatCurrency, formatPercentage } from "../utils/formatters";
 
 const drawdownEngine = new DrawdownEngine();
 
@@ -37,17 +41,35 @@ export function OverviewPage() {
   const drawdownResult = hasUsableProjection
     ? drawdownEngine.calculate(drawdownInputs)
     : null;
-  const retirementSummary = createRetirementSummary(drawdownResult, drawdownInputs.endAge);
+  const endingBalanceGoal: DrawdownEndingBalanceGoal = {
+    mode: activeScenario.drawdown?.endingBalanceMode ?? "preserve",
+    percentage: activeScenario.drawdown?.endingBalancePercentage ?? 1,
+  };
+  const endingBalanceTarget = drawdownResult
+    ? getEndingBalanceTarget(
+        drawdownResult.balanceAfterTaxFreeCash,
+        drawdownInputs.inflationRate,
+        drawdownInputs.endAge - drawdownInputs.retirementAge,
+        endingBalanceGoal,
+      )
+    : 0;
+  const retirementSummary = createRetirementSummary(
+    drawdownResult,
+    drawdownInputs.endAge,
+    endingBalanceTarget,
+  );
   const nextStep = createNextStep({
     hasProjection: hasUsableProjection,
     drawdownResult,
     includeStatePension: drawdownInputs.annualStatePension > 0,
+    endingBalanceTarget,
   });
   const hasTieredSpending = Boolean(activeScenario.drawdown?.spendingPhases?.length);
   const taxFreeCashChoice = createTaxFreeCashChoice(
     activeScenario.drawdown?.taxFreeCashMode,
     drawdownResult?.taxFreeCashTaken ?? 0,
   );
+  const endingPotChoice = createEndingPotChoice(endingBalanceGoal);
   const spendingPlanValue = `${hasTieredSpending ? "Tiered" : "Standard"} · ${
     drawdownInputs.withdrawalStrategy === "percentage"
       ? "Percentage based"
@@ -187,6 +209,11 @@ export function OverviewPage() {
               value={spendingPlanValue}
               tone={hasTieredSpending ? "changed" : "neutral"}
             />
+            <JourneyBadge
+              label="Pot at the end"
+              value={endingPotChoice.value}
+              tone={endingPotChoice.tone}
+            />
           </div>
 
           <Link className="ui-button ui-button-secondary ui-button-medium" to="/plan">
@@ -264,7 +291,32 @@ function createTaxFreeCashChoice(
   return { value: "Maximum", tone: "enabled" };
 }
 
-function createRetirementSummary(result: DrawdownResult | null, planningAge: number) {
+function createEndingPotChoice(
+  goal: DrawdownEndingBalanceGoal,
+): { value: string; tone: JourneyBadgeTone } {
+  if (goal.mode === "spend-to-zero") {
+    return { value: "Spend to £0", tone: "neutral" };
+  }
+
+  if (goal.mode === "preserve") {
+    return { value: "Preserve retirement pot", tone: "enabled" };
+  }
+
+  if (Math.abs(goal.percentage - 0.1) < 0.0001) {
+    return { value: "Keep 10%", tone: "changed" };
+  }
+
+  return {
+    value: `Keep ${formatPercentage(Math.min(1, Math.max(0, goal.percentage)))}`,
+    tone: "changed",
+  };
+}
+
+function createRetirementSummary(
+  result: DrawdownResult | null,
+  planningAge: number,
+  endingBalanceTarget: number,
+) {
   if (!result || result.years.length === 0) {
     return {
       title: "Complete your plan",
@@ -303,9 +355,20 @@ function createRetirementSummary(result: DrawdownResult | null, planningAge: num
     };
   }
 
+  if (result.finalBalance + 1 < endingBalanceTarget) {
+    return {
+      title: "Needs Attention",
+      description: `The pension is modelled to finish with ${formatCurrency(result.finalBalance)}, below the selected ending-pot target of ${formatCurrency(endingBalanceTarget)}.`,
+      tone: "attention" as const,
+      averageIncome,
+      highestIncome,
+      lowestIncome,
+    };
+  }
+
   return {
     title: "Successfully Funded",
-    description: `The current retirement strategy is modelled without an income shortfall through to age ${planningAge}.`,
+    description: `The current retirement strategy is modelled without an income shortfall through to age ${planningAge} and meets the selected ending-pot target.`,
     tone: "success" as const,
     averageIncome,
     highestIncome,
@@ -324,10 +387,12 @@ function createNextStep({
   hasProjection,
   drawdownResult,
   includeStatePension,
+  endingBalanceTarget,
 }: {
   hasProjection: boolean;
   drawdownResult: DrawdownResult | null;
   includeStatePension: boolean;
+  endingBalanceTarget: number;
 }): {
   title: string;
   description: string;
@@ -346,11 +411,15 @@ function createNextStep({
     };
   }
 
-  if (drawdownResult.depletionAge !== null || drawdownResult.firstNetIncomeShortfallAge !== null) {
+  if (
+    drawdownResult.depletionAge !== null ||
+    drawdownResult.firstNetIncomeShortfallAge !== null ||
+    drawdownResult.finalBalance + 1 < endingBalanceTarget
+  ) {
     return {
       title: "Review the retirement spending strategy",
       description:
-        "The current retirement journey contains a modelled shortfall. Review the strategy or test a change before making a decision.",
+        "The current retirement journey contains a modelled shortfall or misses the selected ending-pot target. Review the strategy or test a change before making a decision.",
       actionLabel: "Review Drawdown",
       to: "/drawdown",
       tone: "attention",
