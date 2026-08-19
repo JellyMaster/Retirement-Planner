@@ -14,10 +14,10 @@ import { usePensionProjection } from "../hooks/usePensionProjection";
 import { AppIcons } from "../icons";
 import { savePensionInputs } from "../state/planStorage";
 
-const advancedIncomeSectionIds: Record<string, string> = {
-  chapters: "retirement-chapters",
-  "retirement-chapters": "retirement-chapters",
-  "tax-free-cash": "tax-free-cash",
+const advancedIncomeSectionLabels: Record<string, string> = {
+  chapters: "Spending pattern",
+  "retirement-chapters": "Spending pattern",
+  "tax-free-cash": "Tax-free cash",
 };
 
 export function RetirementPlannerPage() {
@@ -49,9 +49,9 @@ function RetirementPlannerPageContent({
 
     const stepFrame = window.requestAnimationFrame(() => {
       const requestedSection = searchParams.get("section") ?? "";
-      const advancedSection = advancedIncomeSectionIds[requestedSection];
+      const advancedSectionLabel = advancedIncomeSectionLabels[requestedSection];
 
-      if (advancedSection) {
+      if (advancedSectionLabel) {
         const strategy = document.querySelector<HTMLButtonElement>(
           'button[aria-label="Retirement strategy"]',
         );
@@ -59,12 +59,17 @@ function RetirementPlannerPageContent({
         strategy?.focus();
 
         window.requestAnimationFrame(() => {
-          const tab = document.getElementById(
-            `current-drawdown-${advancedSection}-tab`,
-          ) as HTMLButtonElement | null;
-          tab?.click();
-          tab?.focus();
-          tab?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+          const strategyButtons = Array.from(
+            document.querySelectorAll<HTMLButtonElement>(
+              ".retirement-strategy-card-toggle",
+            ),
+          );
+          const target = strategyButtons.find((button) =>
+            button.textContent?.includes(advancedSectionLabel),
+          );
+          target?.click();
+          target?.focus();
+          target?.scrollIntoView?.({ behavior: "smooth", block: "center" });
         });
         return;
       }
