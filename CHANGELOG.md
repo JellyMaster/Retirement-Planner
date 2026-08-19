@@ -6,19 +6,95 @@ The format is based on **Keep a Changelog** and follows **Semantic Versioning (S
 
 ---
 
+# [1.1.0] - 2026-08-19
+
+## Retirement Journey and Income Strategy
+
+Version **1.1.0** focuses on making retirement planning easier to understand and making the Overview reflect the retirement strategy actually selected by the user.
+
+## Added
+
+### Retirement income goals
+
+- Added two simple ways to set a retirement income goal: a custom annual amount or the Retirement Living Standards.
+- Added Minimum, Moderate and Comfortable Retirement Living Standards choices.
+- Persisted the selected income-goal source and retained the user's custom target when switching between goal types.
+- Added lifestyle-aware summaries across My Plan and the Overview.
+
+### Retirement strategy
+
+- Remodelled Advanced Retirement Strategy around plain-English retirement questions.
+- Added clear Stable income and Flexible income choices.
+- Added a question-led choice for whether spending remains broadly consistent or changes through retirement.
+- Consolidated State Pension and tax-free cash decisions into a clearer retirement-strategy journey.
+- Improved support for target-income, percentage-withdrawal and tiered spending strategies.
+
+### Retirement journey chart
+
+- Extended the Overview pension chart from the current age through the full planning age.
+- Added pension milestones including £100k, £250k, £500k, £1m and larger dynamically reached milestones.
+- Added retirement, tax-free cash, State Pension, spending-change and plan-age events.
+- Added interactive event explanations using the active plan's values.
+- Corrected post-retirement chart values to use a consistent today's-money basis.
+
+## Changed
+
+### Overview
+
+- Simplified the Overview into a clearer retirement dashboard.
+- Added funding states for Successfully Funded, Needs Attention, Needs Urgent Attention and incomplete plans.
+- Improved key-fact layout and retirement-income labelling.
+- Updated plan-choice badges to show State Pension, tax-free cash and the effective spending strategy.
+- Added Retirement Living Standards labels such as Lifestyle · Moderate and Lifestyle · Comfortable.
+- Improved handling of incomplete and zero-value projections so they are not incorrectly reported as urgent funding failures.
+
+### My Plan
+
+- Reorganised plan creation into Essential and Advanced sections.
+- Reduced duplicated controls and explanations.
+- Added plan-name editing directly in the plan editor.
+- Simplified future saving changes into separately enabled annual increases and additional future contributions.
+- Improved summaries so advanced changes are visible without opening every section.
+
+### Drawdown modelling
+
+- Improved percentage and tiered withdrawal handling across saved scenarios.
+- Corrected retirement balance plotting around tax-free cash and year-end drawdown values.
+- Hardened sustainable-income and ending-balance calculations.
+- Kept ending-pot optimisation as an experimental/What If? concern rather than a core funding-status rule.
+
+### Scenario persistence
+
+- Extended stored drawdown preferences for the new retirement-income goal metadata and strategy choices.
+- Added safer normalisation of legacy and stored scenario data.
+- Preserved backward compatibility with existing version-one scenario storage.
+
+## Fixed
+
+- Fixed stale Overview lifestyle labels caused by mismatched persisted field names.
+- Fixed active-scenario form state mirroring that triggered React set-state-in-effect lint errors.
+- Fixed stored spending-phase type narrowing and required planning-age handling.
+- Fixed stale deep links and tests after the retirement-strategy wording redesign.
+- Improved accessible chart and event assertions to match the interactive retirement journey.
+
+## Quality
+
+- Release gate verified with lint, TypeScript type checking, automated tests and production build.
+- GitHub Pages workflow uses Node 22 and the current Pages deployment actions.
+
+---
+
 # [1.0.0] - 2026-08-02
 
 ## 🎉 Initial Stable Release
 
 Version **1.0.0** marks the first stable public release of Polaris Retirement Planner.
 
-Polaris has evolved from a simple pension projection tool into a complete retirement planning platform capable of helping users understand, model and improve every stage of retirement planning.
+Polaris evolved from a simple pension projection tool into a complete retirement planning platform capable of helping users understand, model and improve every stage of retirement planning.
 
----
+## Added
 
-# Added
-
-## 🏠 Overview Dashboard
+### 🏠 Overview Dashboard
 
 Introduced a personalised dashboard providing:
 
@@ -30,334 +106,80 @@ Introduced a personalised dashboard providing:
 - Quick navigation
 - Recommended next actions
 
----
+### 📝 My Plan
 
-## 📝 My Plan
+Introduced a complete guided planning experience with personal details, pension details, contribution planning, investment assumptions, retirement goals, State Pension planning and tax-free cash planning.
 
-Introduced a complete guided planning experience.
+### Retirement Income Planning
 
-Added:
+Introduced flexible retirement income planning with Active Retirement, Settled Retirement and Later Life spending phases.
 
-- Guided retirement planner
-- Personal details
-- Pension details
-- Contribution planning
-- Investment assumptions
-- Retirement goals
-- State Pension planning
-- Tax-Free Cash planning
+### 🧪 What If? Decision Lab
 
----
+Introduced experiments for Retirement Age, Save More, Spend More, Lower Fees, Inflation, State Pension and Market Downturn, with the ability to save experiments as scenarios.
 
-## Retirement Income Planning
+### ⚖ Scenario Comparison
 
-Introduced flexible retirement income planning.
+Added multiple retirement plans, active scenario switching, side-by-side comparisons, comparison charts and comparison tables.
 
-Added support for:
+### 💷 Drawdown Planner
 
-- Active Retirement
-- Settled Retirement
-- Later Life
+Added lifetime balance projection, withdrawal planning, spending phases, retirement timeline, State Pension integration and sustainability analysis.
 
-Users can now model changing income requirements throughout retirement.
+### 🎓 Explore
 
----
+Introduced personalised retirement education covering investment growth, retirement timing, inflation, pension fees, sequence-of-returns risk and market downturns.
 
-## 🧪 What If? Decision Lab
+### 🧭 Guidance
 
-Introduced a dedicated experimentation environment.
+Added personalised planning recommendations, areas requiring attention, suggested next actions and direct navigation into relevant planning sections.
 
-Experiments include:
+## User Experience
 
-- Retirement Age
-- Save More
-- Spend More
-- Lower Fees
-- Inflation
-- State Pension
-- Market Downturn
+Added responsive layouts, Dark Mode, connected page journeys, guided editing, accessible navigation, keyboard navigation improvements and improved mobile support.
 
-Each experiment can be saved as a scenario.
+## Scenario System
 
----
+Added multiple scenarios, active plan management, scenario editing, duplication, comparison and baseline-plan preservation.
 
-## ⚖ Scenario Comparison
+## Technical
 
-Added support for:
+Application rebuilt using React 19, TypeScript and Vite with shared planning models, shared scenario architecture, context providers, improved routing, a shared design system, theme support and extensive automated testing.
 
-- Multiple retirement plans
-- Active scenario switching
-- Side-by-side comparisons
-- Comparison charts
-- Comparison tables
+## Accessibility
 
----
+Improved keyboard navigation, tab navigation, focus management, modal accessibility, screen-reader compatibility and responsive layouts.
 
-## 💷 Drawdown Planner
+## Known Limitations
 
-Added comprehensive retirement drawdown planning.
-
-Features include:
-
-- Lifetime balance projection
-- Withdrawal planning
-- Spending phases
-- Retirement timeline
-- State Pension integration
-- Sustainability analysis
-
----
-
-## 🎓 Explore
-
-Introduced an educational learning centre.
-
-Topics include:
-
-- Investment growth
-- Retirement timing
-- Inflation
-- Pension fees
-- Sequence of Returns Risk
-- Market downturns
-
-Learning is personalised using the user's own retirement plan.
-
----
-
-## 🧭 Guidance
-
-Added a personalised guidance centre.
-
-Recommendations include:
-
-- Planning improvements
-- Areas requiring attention
-- Suggested next actions
-- Direct navigation into relevant planning sections
-
----
-
-# User Experience
-
-Added
-
-- Responsive layouts
-- Dark Mode
-- Connected page journeys
-- Guided editing
-- Accessible navigation
-- Keyboard navigation improvements
-- Improved mobile experience
-
----
-
-# Scenario System
-
-Introduced a complete scenario architecture.
-
-Added support for:
-
-- Multiple scenarios
-- Active plan management
-- Scenario editing
-- Scenario duplication
-- Scenario comparison
-- Baseline plan preservation
-
----
-
-# Retirement Planning
-
-Added support for:
-
-- Retirement age planning
-- Contribution modelling
-- Pension growth projections
-- Retirement income modelling
-- Drawdown planning
-- State Pension integration
-- Tax-Free Cash
-- Retirement chapters
-
----
-
-# Technical
-
-Application rebuilt using
-
-- React 19
-- TypeScript
-- Vite
-
-Added
-
-- Shared planning models
-- Shared scenario architecture
-- Context providers
-- Improved routing
-- Shared design system
-- Theme support
-- Extensive automated testing
-
----
-
-# Accessibility
-
-Improved
-
-- Keyboard navigation
-- Tab navigation
-- Focus management
-- Modal accessibility
-- Screen reader compatibility
-- Responsive layouts
-
----
-
-# Testing
-
-Introduced comprehensive automated testing.
-
-Coverage includes:
-
-- Components
-- Pages
-- Scenarios
-- Navigation
-- Drawdown
-- What If? experiments
-- Guidance
-- Explore
-- Retirement planning
-
----
-
-# Documentation
-
-Created project documentation including:
-
-- README
-- Changelog
-- Roadmap
-- Architecture
-- Features
-- Testing
-- Contributing
-- Releases
-
----
-
-# Performance
-
-Improved
-
-- Rendering efficiency
-- Shared state management
-- Component reuse
-- Navigation performance
-
----
-
-# Security
-
-General improvements include:
-
-- Dependency updates
-- React Router security updates
-- Improved validation
-- Better state consistency
-
----
-
-# Known Limitations
-
-Version 1.0.0 intentionally focuses on single-user retirement planning.
-
-The following are planned for future releases:
-
-- Cloud accounts
-- Database persistence
-- Multi-device synchronisation
-- PDF retirement reports
-- Advanced investment analytics
-- Enhanced visualisations
-
----
-
-# Upgrade Notes
-
-This is the first stable release.
-
-No upgrade steps are required.
+Version 1.0.0 intentionally focused on single-user retirement planning. Cloud accounts, database persistence, multi-device synchronisation, PDF retirement reports and advanced investment analytics remain future work.
 
 ---
 
 # Future Releases
 
-## Version 1.1
-
-Visual Intelligence
-
-Planned features include:
-
-- Interactive charts
-- Unified retirement timeline
-- Improved visual analytics
-- Richer scenario comparisons
-
----
-
 ## Version 1.2
 
-Professional Planning
+### Professional Planning
 
-Planned:
-
-- PDF retirement reports
-- Cashflow planning
-- Printable retirement plans
-- Enhanced guidance
-
----
+Planned areas include richer retirement-outcome comparisons, strategy-aware What If? experiments, further Drawdown UX refinement, PDF retirement reports and enhanced guidance.
 
 ## Version 1.3
 
-Connected Data
+### Connected Data
 
-Planned:
-
-- Local database
-- Import / Export
-- Version history
-- Offline persistence
-
----
+Planned areas include local database support, import/export, version history and offline persistence.
 
 ## Version 2.0
 
-Polaris Cloud
+### Polaris Cloud
 
-Future vision:
-
-- User accounts
-- Cloud synchronisation
-- Adviser mode
-- Shared retirement plans
-- Secure backups
-
----
-
-# Contributors
-
-Version 1.0.0 represents the culmination of a significant redesign and expansion of Polaris Retirement Planner into a comprehensive retirement planning application.
+Future vision includes user accounts, cloud synchronisation, adviser mode, shared retirement plans and secure backups.
 
 ---
 
 **Polaris Retirement Planner**
 
-**Version 1.0.0**
+Current release: **Version 1.1.0**
 
-Released
-
-**2 August 2026**
+Released **19 August 2026**
