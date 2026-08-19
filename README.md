@@ -8,6 +8,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
 ![Vite](https://img.shields.io/badge/Vite-7.x-646CFF?logo=vite)
 ![License](https://img.shields.io/badge/license-Private-red)
+[![Deploy Retirement Planner to GitHub Pages](https://github.com/JellyMaster/Retirement-Planner/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/JellyMaster/Retirement-Planner/actions/workflows/deploy-pages.yml)
 
 ---
 
