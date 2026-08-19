@@ -116,6 +116,73 @@
   line-height: 1.55;
 }
 
+.drawdown-view-controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.drawdown-view-controls h2 {
+  margin: 0 0 var(--space-1);
+}
+
+.drawdown-view-controls > div:first-child > p:last-child {
+  margin: 0;
+  color: var(--colour-text-muted);
+}
+
+.drawdown-view-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  flex: 0 0 auto;
+}
+
+.drawdown-view-mode-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  min-width: 230px;
+  padding: 4px;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-view-mode-toggle button {
+  min-height: 42px;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: calc(var(--radius-md) - 4px);
+  background: transparent;
+  color: var(--colour-text-muted);
+  font: inherit;
+  font-size: var(--ui-font-size-sm);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.drawdown-view-mode-toggle button:hover {
+  color: var(--colour-text);
+  background: var(--colour-surface);
+}
+
+.drawdown-view-mode-toggle button.is-active {
+  background: var(--colour-primary);
+  color: var(--colour-on-primary, #fff);
+}
+
+.drawdown-detailed-toolbar {
+  margin-bottom: var(--space-4);
+}
+
+.drawdown-detailed-view {
+  display: grid;
+  gap: var(--space-4);
+}
+
 .drawdown-v12-dashboard {
   display: grid;
   gap: var(--space-4);
@@ -205,6 +272,16 @@
     grid-row: 1;
   }
 
+  .drawdown-view-controls,
+  .drawdown-view-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .drawdown-view-mode-toggle {
+    min-width: 0;
+  }
+
   .drawdown-v12-primary-grid,
   .drawdown-v12-secondary-grid {
     grid-template-columns: 1fr;
@@ -243,5 +320,9 @@
 
   .drawdown-plan-context-collapsible[open] .drawdown-plan-context-toggle-label .when-open {
     display: none;
+  }
+
+  .drawdown-view-mode-toggle {
+    grid-template-columns: 1fr;
   }
 }
