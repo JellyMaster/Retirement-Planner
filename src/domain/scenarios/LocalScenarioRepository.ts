@@ -111,6 +111,21 @@ function normaliseDrawdownPreferences(
       preferences.incomeTargetMode === "net"
         ? preferences.incomeTargetMode
         : defaults.incomeTargetMode,
+    retirementIncomeGoalSource:
+      preferences.retirementIncomeGoalSource === "living-standard" ||
+      preferences.retirementIncomeGoalSource === "custom"
+        ? preferences.retirementIncomeGoalSource
+        : defaults.retirementIncomeGoalSource,
+    customDesiredAnnualIncome: isFiniteNumber(preferences.customDesiredAnnualIncome)
+      ? preferences.customDesiredAnnualIncome
+      : isFiniteNumber(preferences.desiredAnnualIncome)
+        ? preferences.desiredAnnualIncome
+        : defaults.customDesiredAnnualIncome,
+    ...(preferences.retirementLivingStandardsLevel === "minimum" ||
+    preferences.retirementLivingStandardsLevel === "moderate" ||
+    preferences.retirementLivingStandardsLevel === "comfortable"
+      ? { retirementLivingStandardsLevel: preferences.retirementLivingStandardsLevel }
+      : {}),
     ...(spendingPhases ? { spendingPhases } : {}),
     taxFreeCash: isFiniteNumber(preferences.taxFreeCash)
       ? preferences.taxFreeCash
