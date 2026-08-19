@@ -7,7 +7,6 @@ import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStor
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
-import { DrawdownLivingStandardsComparison } from "../components/drawdown/DrawdownLivingStandardsComparison";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
 import { DrawdownRetirementChapters } from "../components/drawdown/DrawdownRetirementChapters";
@@ -15,8 +14,6 @@ import { DrawdownRetirementJourney } from "../components/drawdown/DrawdownRetire
 import { DrawdownRetirementTimeline } from "../components/drawdown/DrawdownRetirementTimeline";
 import { DrawdownSummary } from "../components/drawdown/DrawdownSummary";
 import { DrawdownSummaryRibbon } from "../components/drawdown/DrawdownSummaryRibbon";
-import { DrawdownSustainabilityDashboard } from "../components/drawdown/DrawdownSustainabilityDashboard";
-import { DrawdownSustainableIncomeHeadroom } from "../components/drawdown/DrawdownSustainableIncomeHeadroom";
 import {
   DrawdownWorkspaceNavigation,
   type DrawdownWorkspaceSection,
@@ -73,7 +70,7 @@ export function DrawdownPlannerPage() {
         <div>
           <p className="planner-eyebrow">Your retirement</p>
           <h1>Your Retirement</h1>
-          <p>See how the active plan could provide income through each chapter of retirement.</p>
+          <p>Follow how your income, pension and key retirement events could develop after you stop working.</p>
         </div>
       </header>
 
@@ -82,9 +79,9 @@ export function DrawdownPlannerPage() {
       <section className="drawdown-results-workspace" aria-labelledby="drawdown-results-title">
         <div className="drawdown-guided-section-heading drawdown-outcome-heading">
           <div>
-            <p className="panel-eyebrow">Retirement outcome</p>
-            <h2 id="drawdown-results-title">Review your retirement</h2>
-            <p>Move between the views below to understand the complete story.</p>
+            <p className="panel-eyebrow">Retirement story</p>
+            <h2 id="drawdown-results-title">What happens after you retire?</h2>
+            <p>Start with the complete retirement journey, then use the detailed views when you want to inspect a specific part of the plan.</p>
           </div>
           <MoneyDisplayToggle value={displayMode} onChange={setDisplayMode} />
         </div>
@@ -96,21 +93,68 @@ export function DrawdownPlannerPage() {
         <section className="drawdown-workspace-content" aria-live="polite">
           {result ? (
             <>
-              <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
               {activeSection === "overview" && (
-                <div className="drawdown-workspace-section" id="drawdown-overview-section" role="tabpanel" aria-labelledby="drawdown-tab-overview" tabIndex={0}>
-                  <SectionHeading eyebrow="Retirement outlook" title="What could retirement look like?" description="Start with the key questions and retirement chapters, then follow the journey and sustainability measures behind them." />
-                  <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
+                <div className="drawdown-workspace-section drawdown-retirement-story" id="drawdown-overview-section" role="tabpanel" aria-labelledby="drawdown-tab-overview" tabIndex={0}>
+                  <SectionHeading
+                    eyebrow="At a glance"
+                    title="Your retirement summary"
+                    description="Start with the outcome of the active plan before following the journey year by year."
+                  />
+                  <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
+
+                  <SectionHeading
+                    eyebrow="Your journey"
+                    title="How does retirement unfold?"
+                    description="Follow retirement, tax-free cash, State Pension and changes in spending across the planning period."
+                  />
                   <DrawdownRetirementJourney inputs={inputs} result={result} displayMode={displayMode} />
-                  <DrawdownSustainabilityDashboard inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
-                  {inputs.withdrawalStrategy === "target-income" && (
-                    <DrawdownSustainableIncomeHeadroom inputs={inputs} drawdown={activeScenario.drawdown} />
-                  )}
-                  <DrawdownLivingStandardsComparison inputs={inputs} drawdown={activeScenario.drawdown} onChange={updateDrawdownPreferences} />
                   <DrawdownRetirementTimeline inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+
+                  <SectionHeading
+                    eyebrow="Your income"
+                    title="How much could you receive through retirement?"
+                    description="See how the amount available to spend changes as your retirement progresses."
+                  />
+                  <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
+                  <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
+                    <div className="dashboard-chart-stage">
+                      <DrawdownIncomeChart
+                        years={result.years}
+                        inflationRate={inputs.inflationRate}
+                        displayMode={displayMode}
+                        spendingPhases={inputs.spendingPhases}
+                        statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
+                      />
+                    </div>
+                  </section>
+
+                  <SectionHeading
+                    eyebrow="Income sources"
+                    title="Where does your retirement income come from?"
+                    description="Understand how pension withdrawals and State Pension combine to support your spending."
+                  />
+                  <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
+
+                  <SectionHeading
+                    eyebrow="Your pension"
+                    title="What happens to the pension balance?"
+                    description="See how withdrawals, investment growth and fees affect the pension that remains through retirement."
+                  />
+                  <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} />
+
+                  <SectionHeading
+                    eyebrow="What this means"
+                    title="Key retirement insights"
+                    description="Finish with the most important outcomes from the current retirement plan."
+                  />
                   <DrawdownInsights result={result} />
                 </div>
               )}
+
+              {activeSection !== "overview" && (
+                <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
+              )}
+
               {activeSection === "income" && (
                 <div className="drawdown-workspace-section" id="drawdown-income-section" role="tabpanel" aria-labelledby="drawdown-tab-income" tabIndex={0}>
                   <SectionHeading eyebrow="Income and tax" title="Where does retirement income come from?" description="Review income from your pension, State Pension, tax and any modelled gaps across each retirement chapter." />
