@@ -37,6 +37,37 @@ describe("DrawdownEngine spending phases", () => {
     expect(result.years.find((year) => year.age === 85)?.desiredIncome).toBe(28_000);
   });
 
+  it("uses the withdrawal rate from the active phase for percentage drawdown", () => {
+    const result = new DrawdownEngine().calculate({
+      ...baseInputs,
+      startingBalance: 100_000,
+      retirementAge: 65,
+      endAge: 68,
+      withdrawalStrategy: "percentage",
+      withdrawalRate: 0.04,
+      annualReturn: 0,
+      annualFee: 0,
+      inflationRate: 0,
+      spendingPhases: [
+        {
+          startAge: 65,
+          annualIncome: 40_000,
+          withdrawalRate: 0.04,
+          label: "Active years",
+        },
+        {
+          startAge: 66,
+          annualIncome: 40_000,
+          withdrawalRate: 0.02,
+          label: "Settled years",
+        },
+      ],
+    });
+
+    expect(result.years.find((year) => year.age === 65)?.pensionWithdrawal).toBe(4_000);
+    expect(result.years.find((year) => year.age === 66)?.pensionWithdrawal).toBe(1_920);
+  });
+
   it("continues to use the flat target when no phases are saved", () => {
     const result = new DrawdownEngine().calculate(baseInputs);
 
