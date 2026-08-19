@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Info, PoundSterling, TrendingUp } from "lucide-react";
 
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
-import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
 import { DrawdownBalanceChartExplorer } from "../components/drawdown/DrawdownBalanceChartExplorer";
 import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStory";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
+import { DrawdownJourneyChart } from "../components/drawdown/DrawdownJourneyChart";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
 import { DrawdownRetirementChapters } from "../components/drawdown/DrawdownRetirementChapters";
@@ -120,35 +120,14 @@ export function DrawdownPlannerPage() {
               <div className="drawdown-workspace-section drawdown-retirement-story drawdown-v12-dashboard" id="drawdown-simple-section">
                 <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
 
-                <div className="drawdown-v12-primary-grid">
-                  <DrawdownBalanceChart
-                    years={result.years}
-                    depletionAge={result.depletionAge}
-                    inflationRate={inputs.inflationRate}
-                    displayMode={displayMode}
-                    spendingPhases={inputs.spendingPhases}
-                    statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
-                  />
-
-                  <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel drawdown-v12-income-panel">
-                    <div className="panel-heading dashboard-panel-heading">
-                      <div>
-                        <p className="panel-eyebrow">Income through retirement</p>
-                        <h2>How much could you receive?</h2>
-                        <p>Follow the annual income available as the plan moves through retirement.</p>
-                      </div>
-                    </div>
-                    <div className="dashboard-chart-stage">
-                      <DrawdownIncomeChart
-                        years={result.years}
-                        inflationRate={inputs.inflationRate}
-                        displayMode={displayMode}
-                        spendingPhases={inputs.spendingPhases}
-                        statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
-                      />
-                    </div>
-                  </section>
-                </div>
+                <DrawdownJourneyChart
+                  years={result.years}
+                  inflationRate={inputs.inflationRate}
+                  displayMode={displayMode}
+                  spendingPhases={inputs.spendingPhases}
+                  statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
+                  depletionAge={result.depletionAge}
+                />
 
                 <div className="drawdown-v12-secondary-grid">
                   <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
