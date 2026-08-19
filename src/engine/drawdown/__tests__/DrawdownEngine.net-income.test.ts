@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { getDisplayYears } from "../../../utils/drawdownDisplayValues";
 import { DrawdownEngine } from "../DrawdownEngine";
 import type { DrawdownInputs } from "../models/DrawdownInputs";
 
@@ -50,6 +51,32 @@ describe("DrawdownEngine net-income targeting", () => {
       expect(year.netIncome / inflationMultiplier).toBeCloseTo(45_400, 2);
       expect(year.netIncomeShortfall).toBe(0);
     });
+  });
+
+  it("keeps calculation nominal while today-money display removes inflation", () => {
+    const inflationRate = 0.025;
+    const result = new DrawdownEngine().calculate({
+      ...netTargetInputs,
+      desiredAnnualIncome: 45_400,
+      endAge: 71,
+      inflationRate,
+    });
+
+    const futureMoney = getDisplayYears(result.years, inflationRate, "nominal");
+    const todaysMoney = getDisplayYears(result.years, inflationRate, "today");
+
+    expect(futureMoney.map((year) => year.netIncome)).toEqual([
+      45_400,
+      46_535,
+      47_698.38,
+      48_890.84,
+    ]);
+    expect(todaysMoney.map((year) => year.netIncome)).toEqual([
+      45_400,
+      45_400,
+      45_400,
+      45_400,
+    ]);
   });
 
   it("does not withdraw private pension when State Pension alone meets the net target", () => {
