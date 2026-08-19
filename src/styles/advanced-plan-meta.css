@@ -1,0 +1,90 @@
+.plan-name-editor {
+  display: grid;
+  grid-template-columns: minmax(14rem, 0.45fr) minmax(0, 1fr);
+  align-items: end;
+  gap: var(--ui-space-4);
+  padding: var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.plan-name-editor > label {
+  display: grid;
+  gap: var(--ui-space-1);
+}
+
+.plan-name-editor > label strong {
+  color: var(--colour-text);
+}
+
+.plan-name-editor > label span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.45;
+}
+
+.plan-name-editor-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ui-space-2);
+  align-items: center;
+}
+
+.plan-name-editor-controls input {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--colour-border-strong, var(--colour-border));
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  font: inherit;
+}
+
+.plan-name-editor-controls input:focus {
+  outline: 2px solid color-mix(in srgb, var(--colour-primary) 35%, transparent);
+  outline-offset: 1px;
+  border-color: var(--colour-primary);
+}
+
+.advanced-plan-card-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ui-space-2);
+}
+
+.advanced-plan-changed-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--colour-primary) 28%, transparent);
+  border-radius: var(--ui-radius-pill);
+  background: color-mix(in srgb, var(--colour-primary) 10%, var(--colour-surface));
+  color: var(--colour-primary);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .plan-name-editor {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .plan-name-editor-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-name-editor-controls .ui-button {
+    width: 100%;
+  }
+
+  .advanced-plan-card-meta {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+  }
+}
