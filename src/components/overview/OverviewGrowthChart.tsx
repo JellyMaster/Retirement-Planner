@@ -14,6 +14,11 @@ import type { DrawdownYear } from "../../engine/drawdown/models/DrawdownYear";
 import type { ProjectionYear } from "../../engine/models/ProjectionYear";
 import { formatCurrency } from "../../utils/formatters";
 
+interface SpendingPhaseMarker {
+  startAge: number;
+  label?: string;
+}
+
 interface OverviewGrowthChartProps {
   currentAge: number;
   currentPot: number;
@@ -21,6 +26,9 @@ interface OverviewGrowthChartProps {
   planningAge: number;
   inflationRate: number;
   retirementStartingBalance?: number;
+  taxFreeCashTaken?: number;
+  statePensionAge?: number;
+  spendingPhases?: SpendingPhaseMarker[];
   projectionYears: ProjectionYear[];
   drawdownYears?: DrawdownYear[];
 }
@@ -35,6 +43,12 @@ interface MilestonePoint extends JourneyPoint {
   label: string;
 }
 
+interface JourneyEvent extends JourneyPoint {
+  key: string;
+  label: string;
+  kind: "retirement" | "cash" | "state-pension" | "spending" | "planning";
+}
+
 export function OverviewGrowthChart({
   currentAge,
   currentPot,
@@ -42,6 +56,9 @@ export function OverviewGrowthChart({
   planningAge,
   inflationRate,
   retirementStartingBalance,
+  taxFreeCashTaken = 0,
+  statePensionAge,
+  spendingPhases = [],
   projectionYears,
   drawdownYears = [],
 }: OverviewGrowthChartProps) {
@@ -65,15 +82,26 @@ export function OverviewGrowthChart({
   }
 
   const milestones = findMilestones(data);
+  const retirementPot = findRetirementPot(projectionYears, retirementAge);
+  const events = createJourneyEvents({
+    data,
+    retirementAge,
+    retirementPot,
+    retirementStartingBalance,
+    taxFreeCashTaken,
+    statePensionAge,
+    spendingPhases,
+    planningAge,
+  });
 
   return (
     <div
       className="polaris-overview-chart-canvas"
       role="img"
-      aria-label={`Projected pension journey from age ${currentAge} to age ${planningAge} in today's money`}
+      aria-label={`Projected pension journey from age ${currentAge} to age ${planningAge} in today's money, including retirement events and pension milestones`}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 24, right: 24, left: 0, bottom: 0 }}>
+        <LineChart data={data} margin={{ top: 34, right: 28, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis
             dataKey="age"
@@ -97,12 +125,6 @@ export function OverviewGrowthChart({
             x={retirementAge}
             stroke="var(--colour-text-muted)"
             strokeDasharray="4 4"
-            label={{
-              value: "Retirement",
-              position: "insideTopRight",
-              fill: "var(--colour-text-muted)",
-              fontSize: 11,
-            }}
           />
           <Line
             type="monotone"
@@ -115,7 +137,7 @@ export function OverviewGrowthChart({
           />
           {milestones.map((milestone) => (
             <ReferenceDot
-              key={milestone.threshold}
+              key={`milestone-${milestone.threshold}`}
               x={milestone.age}
               y={milestone.balance}
               r={5}
@@ -127,6 +149,24 @@ export function OverviewGrowthChart({
                 position: "top",
                 fill: "var(--colour-text-strong)",
                 fontSize: 11,
+                fontWeight: 700,
+              }}
+            />
+          ))}
+          {events.map((event) => (
+            <ReferenceDot
+              key={event.key}
+              x={event.age}
+              y={event.balance}
+              r={event.kind === "retirement" || event.kind === "cash" ? 6 : 4}
+              fill="var(--colour-surface)"
+              stroke={eventStroke(event.kind)}
+              strokeWidth={3}
+              label={{
+                value: event.label,
+                position: eventLabelPosition(event.kind),
+                fill: "var(--colour-text-strong)",
+                fontSize: 10,
                 fontWeight: 700,
               }}
             />
@@ -182,6 +222,109 @@ function createJourneyData({
   return Array.from(byAge.entries())
     .map(([age, balance]) => ({ age, balance }))
     .sort((left, right) => left.age - right.age);
+}
+
+function createJourneyEvents({
+  data,
+  retirementAge,
+  retirementPot,
+  retirementStartingBalance,
+  taxFreeCashTaken,
+  statePensionAge,
+  spendingPhases,
+  planningAge,
+}: {
+  data: JourneyPoint[];
+  retirementAge: number;
+  retirementPot?: number;
+  retirementStartingBalance?: number;
+  taxFreeCashTaken: number;
+  statePensionAge?: number;
+  spendingPhases: SpendingPhaseMarker[];
+  planningAge: number;
+}): JourneyEvent[] {
+  const events: JourneyEvent[] = [];
+
+  if (retirementPot !== undefined) {
+    events.push({
+      key: "retirement",
+      age: retirementAge,
+      balance: retirementPot,
+      label: "Retirement pot",
+      kind: "retirement",
+    });
+  }
+
+  if (taxFreeCashTaken > 0 && retirementStartingBalance !== undefined) {
+    events.push({
+      key: "tax-free-cash",
+      age: retirementAge,
+      balance: retirementStartingBalance,
+      label: "After tax-free cash",
+      kind: "cash",
+    });
+  }
+
+  if (statePensionAge !== undefined && statePensionAge >= retirementAge && statePensionAge <= planningAge) {
+    const point = findPointAtAge(data, statePensionAge);
+    if (point) {
+      events.push({
+        key: "state-pension",
+        ...point,
+        label: "State Pension starts",
+        kind: "state-pension",
+      });
+    }
+  }
+
+  spendingPhases
+    .filter((phase) => phase.startAge > retirementAge && phase.startAge <= planningAge)
+    .forEach((phase, index) => {
+      const point = findPointAtAge(data, phase.startAge);
+      if (point) {
+        events.push({
+          key: `spending-${phase.startAge}-${index}`,
+          ...point,
+          label: phase.label ? `${phase.label} starts` : "Spending changes",
+          kind: "spending",
+        });
+      }
+    });
+
+  const planningPoint = findPointAtAge(data, planningAge);
+  if (planningPoint) {
+    events.push({
+      key: "planning-age",
+      ...planningPoint,
+      label: "Plan age",
+      kind: "planning",
+    });
+  }
+
+  return events;
+}
+
+function findRetirementPot(projectionYears: ProjectionYear[], retirementAge: number): number | undefined {
+  const retirementYear = projectionYears.find((year) => year.age === retirementAge);
+  return retirementYear?.closingBalance.real;
+}
+
+function findPointAtAge(data: JourneyPoint[], age: number): JourneyPoint | undefined {
+  return data.find((point) => point.age === age);
+}
+
+function eventStroke(kind: JourneyEvent["kind"]): string {
+  if (kind === "cash") return "var(--colour-warning)";
+  if (kind === "state-pension") return "var(--colour-success)";
+  if (kind === "spending") return "var(--colour-primary)";
+  if (kind === "planning") return "var(--colour-text-muted)";
+  return "var(--colour-text-strong)";
+}
+
+function eventLabelPosition(kind: JourneyEvent["kind"]): "top" | "bottom" | "right" {
+  if (kind === "cash") return "bottom";
+  if (kind === "planning") return "right";
+  return "top";
 }
 
 function findMilestones(data: JourneyPoint[]): MilestonePoint[] {
