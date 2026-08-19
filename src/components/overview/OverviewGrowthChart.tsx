@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   CartesianGrid,
   Line,
@@ -17,6 +18,8 @@ import { formatCurrency } from "../../utils/formatters";
 interface SpendingPhaseMarker {
   startAge: number;
   label?: string;
+  annualIncome?: number;
+  withdrawalRate?: number;
 }
 
 interface OverviewGrowthChartProps {
@@ -28,6 +31,8 @@ interface OverviewGrowthChartProps {
   retirementStartingBalance?: number;
   taxFreeCashTaken?: number;
   statePensionAge?: number;
+  statePensionAnnualAmount?: number;
+  withdrawalStrategy?: "target-income" | "percentage";
   spendingPhases?: SpendingPhaseMarker[];
   projectionYears: ProjectionYear[];
   drawdownYears?: DrawdownYear[];
@@ -47,6 +52,7 @@ interface JourneyEvent extends JourneyPoint {
   key: string;
   label: string;
   kind: "retirement" | "cash" | "state-pension" | "spending" | "planning";
+  description: string;
 }
 
 export function OverviewGrowthChart({
@@ -58,6 +64,8 @@ export function OverviewGrowthChart({
   retirementStartingBalance,
   taxFreeCashTaken = 0,
   statePensionAge,
+  statePensionAnnualAmount = 0,
+  withdrawalStrategy = "target-income",
   spendingPhases = [],
   projectionYears,
   drawdownYears = [],
@@ -73,15 +81,7 @@ export function OverviewGrowthChart({
     drawdownYears,
   });
 
-  if (data.length === 0) {
-    return (
-      <div className="polaris-overview-chart-empty">
-        Add valid plan inputs to see your pension journey over time.
-      </div>
-    );
-  }
-
-  const milestones = findMilestones(data);
+  const milestones = data.length > 0 ? findMilestones(data) : [];
   const retirementPot = findRetirementPot(projectionYears, retirementAge);
   const events = createJourneyEvents({
     data,
@@ -90,89 +90,134 @@ export function OverviewGrowthChart({
     retirementStartingBalance,
     taxFreeCashTaken,
     statePensionAge,
+    statePensionAnnualAmount,
+    withdrawalStrategy,
     spendingPhases,
     planningAge,
   });
+  const [selectedEventKey, setSelectedEventKey] = useState("retirement");
+  const selectedEvent =
+    events.find((event) => event.key === selectedEventKey) ?? events[0];
+
+  if (data.length === 0) {
+    return (
+      <div className="polaris-overview-chart-empty">
+        Add valid plan inputs to see your pension journey over time.
+      </div>
+    );
+  }
 
   return (
-    <div
-      className="polaris-overview-chart-canvas"
-      role="img"
-      aria-label={`Projected pension journey from age ${currentAge} to age ${planningAge} in today's money, including retirement events and pension milestones`}
-    >
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 34, right: 28, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis
-            dataKey="age"
-            type="number"
-            domain={[currentAge, planningAge]}
-            allowDecimals={false}
-            tickLine={false}
-            axisLine={false}
-          />
-          <YAxis
-            width={62}
-            tickLine={false}
-            axisLine={false}
-            tickFormatter={formatCompactCurrency}
-          />
-          <Tooltip
-            formatter={(value) => [formatCurrency(Number(value)), "Pension value"]}
-            labelFormatter={(age) => `Age ${age}`}
-          />
-          <ReferenceLine
-            x={retirementAge}
-            stroke="var(--colour-text-muted)"
-            strokeDasharray="4 4"
-          />
-          <Line
-            type="monotone"
-            dataKey="balance"
-            name="Pension value"
-            stroke="var(--colour-primary)"
-            strokeWidth={3}
-            dot={false}
-            activeDot={{ r: 4 }}
-          />
-          {milestones.map((milestone) => (
-            <ReferenceDot
-              key={`milestone-${milestone.threshold}`}
-              x={milestone.age}
-              y={milestone.balance}
-              r={5}
-              fill="var(--colour-surface)"
+    <div className="polaris-overview-chart-experience">
+      <div
+        className="polaris-overview-chart-canvas"
+        role="img"
+        aria-label={`Projected pension journey from age ${currentAge} to age ${planningAge} in today's money, including retirement events and pension milestones`}
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 34, right: 28, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="age"
+              type="number"
+              domain={[currentAge, planningAge]}
+              allowDecimals={false}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              width={62}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={formatCompactCurrency}
+            />
+            <Tooltip
+              formatter={(value) => [formatCurrency(Number(value)), "Pension value"]}
+              labelFormatter={(age) => `Age ${age}`}
+            />
+            <ReferenceLine
+              x={retirementAge}
+              stroke="var(--colour-text-muted)"
+              strokeDasharray="4 4"
+            />
+            <Line
+              type="monotone"
+              dataKey="balance"
+              name="Pension value"
               stroke="var(--colour-primary)"
               strokeWidth={3}
-              label={{
-                value: milestone.label,
-                position: "top",
-                fill: "var(--colour-text-strong)",
-                fontSize: 11,
-                fontWeight: 700,
-              }}
+              dot={false}
+              activeDot={{ r: 4 }}
             />
-          ))}
+            {milestones.map((milestone) => (
+              <ReferenceDot
+                key={`milestone-${milestone.threshold}`}
+                x={milestone.age}
+                y={milestone.balance}
+                r={5}
+                fill="var(--colour-surface)"
+                stroke="var(--colour-primary)"
+                strokeWidth={3}
+                label={{
+                  value: milestone.label,
+                  position: "top",
+                  fill: "var(--colour-text-strong)",
+                  fontSize: 11,
+                  fontWeight: 700,
+                }}
+              />
+            ))}
+            {events.map((event) => (
+              <ReferenceDot
+                key={event.key}
+                x={event.age}
+                y={event.balance}
+                r={event.key === selectedEvent?.key ? 7 : event.kind === "retirement" || event.kind === "cash" ? 6 : 4}
+                fill="var(--colour-surface)"
+                stroke={eventStroke(event.kind)}
+                strokeWidth={event.key === selectedEvent?.key ? 4 : 3}
+                label={{
+                  value: event.label,
+                  position: eventLabelPosition(event.kind),
+                  fill: "var(--colour-text-strong)",
+                  fontSize: 10,
+                  fontWeight: 700,
+                }}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {events.length > 0 && (
+        <div className="polaris-overview-chart-events" aria-label="Retirement journey events">
           {events.map((event) => (
-            <ReferenceDot
-              key={event.key}
-              x={event.age}
-              y={event.balance}
-              r={event.kind === "retirement" || event.kind === "cash" ? 6 : 4}
-              fill="var(--colour-surface)"
-              stroke={eventStroke(event.kind)}
-              strokeWidth={3}
-              label={{
-                value: event.label,
-                position: eventLabelPosition(event.kind),
-                fill: "var(--colour-text-strong)",
-                fontSize: 10,
-                fontWeight: 700,
-              }}
-            />
+            <button
+              key={`event-button-${event.key}`}
+              type="button"
+              className={`polaris-overview-chart-event is-${event.kind}${
+                selectedEvent?.key === event.key ? " is-selected" : ""
+              }`}
+              aria-pressed={selectedEvent?.key === event.key}
+              onClick={() => setSelectedEventKey(event.key)}
+            >
+              <span>{event.label}</span>
+              <small>Age {event.age}</small>
+            </button>
           ))}
-        </LineChart>
-      </ResponsiveContainer>
+        </div>
+      )}
+
+      {selectedEvent && (
+        <div className={`polaris-overview-chart-event-detail is-${selectedEvent.kind}`} aria-live="polite">
+          <div>
+            <small>Age {selectedEvent.age}</small>
+            <strong>{selectedEvent.label}</strong>
+          </div>
+          <p>{selectedEvent.description}</p>
+          <span>{formatCurrency(selectedEvent.balance)} pension balance</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -231,6 +276,8 @@ function createJourneyEvents({
   retirementStartingBalance,
   taxFreeCashTaken,
   statePensionAge,
+  statePensionAnnualAmount,
+  withdrawalStrategy,
   spendingPhases,
   planningAge,
 }: {
@@ -240,6 +287,8 @@ function createJourneyEvents({
   retirementStartingBalance?: number;
   taxFreeCashTaken: number;
   statePensionAge?: number;
+  statePensionAnnualAmount: number;
+  withdrawalStrategy: "target-income" | "percentage";
   spendingPhases: SpendingPhaseMarker[];
   planningAge: number;
 }): JourneyEvent[] {
@@ -250,8 +299,9 @@ function createJourneyEvents({
       key: "retirement",
       age: retirementAge,
       balance: retirementPot,
-      label: "Retirement pot",
+      label: "Retirement",
       kind: "retirement",
+      description: `The plan reaches retirement with a projected pension of ${formatCurrency(retirementPot)} in today's money.`,
     });
   }
 
@@ -260,12 +310,18 @@ function createJourneyEvents({
       key: "tax-free-cash",
       age: retirementAge,
       balance: retirementStartingBalance,
-      label: "After tax-free cash",
+      label: "Tax-free cash",
       kind: "cash",
+      description: `${formatCurrency(taxFreeCashTaken)} is taken as tax-free cash at retirement, leaving ${formatCurrency(retirementStartingBalance)} invested before retirement withdrawals begin.`,
     });
   }
 
-  if (statePensionAge !== undefined && statePensionAge >= retirementAge && statePensionAge <= planningAge) {
+  if (
+    statePensionAge !== undefined &&
+    statePensionAge >= retirementAge &&
+    statePensionAge <= planningAge &&
+    statePensionAnnualAmount > 0
+  ) {
     const point = findPointAtAge(data, statePensionAge);
     if (point) {
       events.push({
@@ -273,6 +329,7 @@ function createJourneyEvents({
         ...point,
         label: "State Pension starts",
         kind: "state-pension",
+        description: `State Pension of ${formatCurrency(statePensionAnnualAmount)} a year starts at age ${statePensionAge}, reducing how much income needs to come from the private pension.`,
       });
     }
   }
@@ -285,8 +342,9 @@ function createJourneyEvents({
         events.push({
           key: `spending-${phase.startAge}-${index}`,
           ...point,
-          label: phase.label ? `${phase.label} starts` : "Spending changes",
+          label: phase.label || "Spending changes",
           kind: "spending",
+          description: createSpendingPhaseDescription(phase, withdrawalStrategy),
         });
       }
     });
@@ -298,10 +356,26 @@ function createJourneyEvents({
       ...planningPoint,
       label: "Plan age",
       kind: "planning",
+      description: `The retirement plan is modelled through to age ${planningAge}, with ${formatCurrency(planningPoint.balance)} remaining in today's money at this point.`,
     });
   }
 
   return events;
+}
+
+function createSpendingPhaseDescription(
+  phase: SpendingPhaseMarker,
+  withdrawalStrategy: "target-income" | "percentage",
+): string {
+  if (withdrawalStrategy === "percentage" && phase.withdrawalRate !== undefined) {
+    return `${phase.label || "A new retirement phase"} begins at age ${phase.startAge}, using a ${(phase.withdrawalRate * 100).toFixed(1)}% annual withdrawal rate from this point.`;
+  }
+
+  if (phase.annualIncome !== undefined) {
+    return `${phase.label || "A new retirement phase"} begins at age ${phase.startAge}, with planned annual spending of ${formatCurrency(phase.annualIncome)} from this point.`;
+  }
+
+  return `${phase.label || "A new retirement phase"} begins at age ${phase.startAge}, changing the retirement spending pattern from this point.`;
 }
 
 function findRetirementPot(projectionYears: ProjectionYear[], retirementAge: number): number | undefined {
