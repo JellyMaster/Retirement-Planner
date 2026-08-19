@@ -15,9 +15,9 @@ import { AppIcons } from "../icons";
 import { savePensionInputs } from "../state/planStorage";
 
 const advancedIncomeSectionLabels: Record<string, string> = {
-  chapters: "Spending pattern",
-  "retirement-chapters": "Spending pattern",
-  "tax-free-cash": "Tax-free cash",
+  chapters: "Will your spending change during retirement?",
+  "retirement-chapters": "Will your spending change during retirement?",
+  "tax-free-cash": "What income and cash should the plan include?",
 };
 
 export function RetirementPlannerPage() {
