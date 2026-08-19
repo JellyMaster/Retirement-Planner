@@ -52,6 +52,73 @@ describe("LocalScenarioRepository", () => {
     );
   });
 
+  it("persists the complete retirement strategy including percentage phases", () => {
+    const repository = new LocalScenarioRepository(
+      localStorage,
+      createDefaultPensionInputs(),
+      dependencies,
+    );
+    const state = repository.load();
+    const baseline = state.scenarios[0];
+
+    repository.save({
+      ...state,
+      scenarios: [
+        {
+          ...baseline,
+          drawdown: {
+            ...baseline.drawdown,
+            withdrawalStrategy: "percentage",
+            withdrawalRate: 0.04,
+            spendingPhases: [
+              {
+                startAge: 68,
+                annualIncome: 30_000,
+                withdrawalRate: 0.05,
+                label: "Active retirement",
+              },
+              {
+                startAge: 78,
+                annualIncome: 30_000,
+                withdrawalRate: 0.035,
+                label: "Settled retirement",
+              },
+            ],
+            taxFreeCashMode: "custom",
+            taxFreeCash: 20_000,
+            endingBalanceMode: "spend-to-zero",
+            endingBalancePercentage: 0,
+            retirementLivingStandardsHousehold: "two-person",
+            retirementLivingStandardsRegion: "london",
+          },
+        },
+      ],
+    });
+
+    const reloaded = repository.load();
+
+    expect(reloaded.scenarios[0].drawdown).toEqual(
+      expect.objectContaining({
+        withdrawalStrategy: "percentage",
+        taxFreeCashMode: "custom",
+        taxFreeCash: 20_000,
+        endingBalanceMode: "spend-to-zero",
+        retirementLivingStandardsHousehold: "two-person",
+        retirementLivingStandardsRegion: "london",
+        spendingPhases: [
+          expect.objectContaining({
+            startAge: 68,
+            withdrawalRate: 0.05,
+          }),
+          expect.objectContaining({
+            startAge: 78,
+            withdrawalRate: 0.035,
+          }),
+        ],
+      }),
+    );
+  });
+
   it("migrates the existing saved baseline plan", () => {
     const defaults = createDefaultPensionInputs();
     const savedInputs = {
