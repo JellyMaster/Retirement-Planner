@@ -20,15 +20,15 @@ const inputs: DrawdownInputs = {
 };
 
 describe("DrawdownEngine edge cases", () => {
-  it("returns one row for each age from retirementAge up to but excluding endAge", () => {
+  it("returns one row for each age from retirementAge through endAge", () => {
     const result = new DrawdownEngine().calculate({
       ...inputs,
       retirementAge: 60,
       endAge: 65,
     });
 
-    expect(result.years.map((year) => year.age)).toEqual([60, 61, 62, 63, 64]);
-    expect(result.years.map((year) => year.year)).toEqual([1, 2, 3, 4, 5]);
+    expect(result.years.map((year) => year.age)).toEqual([60, 61, 62, 63, 64, 65]);
+    expect(result.years.map((year) => year.year)).toEqual([1, 2, 3, 4, 5, 6]);
   });
 
   it("requires no private withdrawal when State Pension meets the income target", () => {
@@ -91,7 +91,7 @@ describe("DrawdownEngine edge cases", () => {
 
     expect(result.finalBalance).toBe(0);
     expect(result.totalPensionWithdrawals).toBe(0);
-    expect(result.totalIncomeShortfall).toBe(60_000);
+    expect(result.totalIncomeShortfall).toBe(80_000);
     expect(result.depletionAge).toBe(65);
     expect(result.firstShortfallAge).toBe(65);
   });
@@ -110,6 +110,7 @@ describe("DrawdownEngine edge cases", () => {
       25_000,
       12_500,
       6_250,
+      3_125,
     ]);
     expect(result.years.every((year) => year.closingBalance >= 0)).toBe(true);
   });
