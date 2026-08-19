@@ -25,11 +25,11 @@ describe("GuidedPensionInputsForm", () => {
     localStorage.clear();
   });
 
-  it("includes retirement income in the journey and review", async () => {
+  it("includes retirement income in the retirement step and review", async () => {
     const user = userEvent.setup();
     renderForm();
 
-    await user.click(screen.getByRole("button", { name: "Retirement income" }));
+    await user.click(screen.getByRole("button", { name: "Retirement" }));
     expect(
       screen.getByRole("heading", { name: "Plan your retirement income" }),
     ).toBeInTheDocument();
