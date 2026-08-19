@@ -73,9 +73,10 @@ export function OverviewPage() {
   const spendingPlanChoice = createSpendingPlanChoice({
     hasTieredSpending,
     withdrawalStrategy: drawdownInputs.withdrawalStrategy,
-    incomeGoalSource: activeScenario.drawdown?.incomeGoalSource,
-    retirementLivingStandardLevel:
-      activeScenario.drawdown?.retirementLivingStandardLevel,
+    retirementIncomeGoalSource:
+      activeScenario.drawdown?.retirementIncomeGoalSource,
+    retirementLivingStandardsLevel:
+      activeScenario.drawdown?.retirementLivingStandardsLevel,
   });
 
   return (
@@ -296,13 +297,13 @@ function createTaxFreeCashChoice(
 function createSpendingPlanChoice({
   hasTieredSpending,
   withdrawalStrategy,
-  incomeGoalSource,
-  retirementLivingStandardLevel,
+  retirementIncomeGoalSource,
+  retirementLivingStandardsLevel,
 }: {
   hasTieredSpending: boolean;
   withdrawalStrategy: "target-income" | "percentage";
-  incomeGoalSource?: "custom" | "living-standards";
-  retirementLivingStandardLevel?: "minimum" | "moderate" | "comfortable";
+  retirementIncomeGoalSource?: "custom" | "living-standard";
+  retirementLivingStandardsLevel?: "minimum" | "moderate" | "comfortable";
 }): { value: string; tone: JourneyBadgeTone } {
   if (hasTieredSpending) {
     return {
@@ -315,8 +316,8 @@ function createSpendingPlanChoice({
     return { value: "Standard · Percentage based", tone: "neutral" };
   }
 
-  if (incomeGoalSource === "living-standards") {
-    const level = retirementLivingStandardLevel ?? "moderate";
+  if (retirementIncomeGoalSource === "living-standard") {
+    const level = retirementLivingStandardsLevel ?? "moderate";
     return {
       value: `Lifestyle · ${level.charAt(0).toUpperCase()}${level.slice(1)}`,
       tone: "enabled",
