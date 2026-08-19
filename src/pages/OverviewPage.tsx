@@ -31,13 +31,16 @@ export function OverviewPage() {
     drawdown: activeScenario.drawdown,
   });
   const drawdownValidation = validateDrawdownInputs(drawdownInputs);
-  const drawdownResult =
-    hasProjection && drawdownValidation.isValid
-      ? drawdownEngine.calculate(drawdownInputs)
-      : null;
+  const hasUsableProjection =
+    hasProjection &&
+    scenario.projection.finalBalance.real > 0 &&
+    drawdownValidation.isValid;
+  const drawdownResult = hasUsableProjection
+    ? drawdownEngine.calculate(drawdownInputs)
+    : null;
   const retirementSummary = createRetirementSummary(drawdownResult, drawdownInputs.endAge);
   const nextStep = createNextStep({
-    hasProjection,
+    hasProjection: hasUsableProjection,
     drawdownResult,
     includeStatePension: drawdownInputs.annualStatePension > 0,
   });
@@ -108,12 +111,16 @@ export function OverviewPage() {
         <OverviewFact
           label="Projected pension"
           value={
-            hasProjection
+            hasUsableProjection
               ? formatCurrency(scenario.projection.finalBalance.real)
               : "Unavailable"
           }
-          detail="At retirement in today’s money"
-          incomplete={!hasProjection}
+          detail={
+            hasUsableProjection
+              ? "At retirement in today’s money"
+              : "Complete the plan to project a retirement pension"
+          }
+          incomplete={!hasUsableProjection}
         />
         <OverviewFact
           label="Retirement income"
