@@ -247,7 +247,7 @@
 
 .drawdown-v12-secondary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
   gap: var(--space-4);
   align-items: stretch;
 }
@@ -264,6 +264,13 @@
 
 .drawdown-v12-secondary-grid .dashboard-insights {
   align-content: start;
+}
+
+.drawdown-insights-money-basis {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .drawdown-v12-dashboard .panel-heading h2 {
