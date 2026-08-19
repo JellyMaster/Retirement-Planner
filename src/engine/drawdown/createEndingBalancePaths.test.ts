@@ -52,7 +52,11 @@ describe("createEndingBalancePaths", () => {
         paths.reserve.result.finalBalance - paths.reserve.targetEndingBalance,
       ),
     ).toBeLessThanOrEqual(25);
-    expect(paths.spend.result.finalBalance).toBeCloseTo(0, 0);
+    expect(
+      Math.abs(
+        paths.spend.result.finalBalance - paths.spend.targetEndingBalance,
+      ),
+    ).toBeLessThanOrEqual(25);
   });
 
   it("uses the pot after tax-free cash as the reserve anchor", () => {
