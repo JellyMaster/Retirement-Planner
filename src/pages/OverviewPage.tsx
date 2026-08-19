@@ -16,6 +16,8 @@ const drawdownEngine = new DrawdownEngine();
 
 type FundingStatusTone = "success" | "attention" | "urgent" | "incomplete";
 
+type JourneyBadgeTone = "enabled" | "disabled" | "neutral" | "changed";
+
 export function OverviewPage() {
   const { activeScenario } = useScenarios();
   const [retirementGoals] = useStoredRetirementGoals();
@@ -40,6 +42,15 @@ export function OverviewPage() {
     includeStatePension: drawdownInputs.annualStatePension > 0,
   });
   const hasTieredSpending = Boolean(activeScenario.drawdown?.spendingPhases?.length);
+  const taxFreeCashChoice = createTaxFreeCashChoice(
+    activeScenario.drawdown?.taxFreeCashMode,
+    drawdownResult?.taxFreeCashTaken ?? 0,
+  );
+  const spendingPlanValue = `${hasTieredSpending ? "Tiered" : "Standard"} · ${
+    drawdownInputs.withdrawalStrategy === "percentage"
+      ? "Percentage based"
+      : "£ target based"
+  }`;
 
   return (
     <main className="planner-page polaris-overview-page">
@@ -152,20 +163,12 @@ export function OverviewPage() {
             />
             <JourneyBadge
               label="Tax-free cash"
-              value={
-                drawdownResult && drawdownResult.taxFreeCashTaken > 0
-                  ? "Taken"
-                  : "Not taken"
-              }
-              tone={
-                drawdownResult && drawdownResult.taxFreeCashTaken > 0
-                  ? "enabled"
-                  : "neutral"
-              }
+              value={taxFreeCashChoice.value}
+              tone={taxFreeCashChoice.tone}
             />
             <JourneyBadge
               label="Spending plan"
-              value={hasTieredSpending ? "Tiered" : "Standard"}
+              value={spendingPlanValue}
               tone={hasTieredSpending ? "changed" : "neutral"}
             />
           </div>
@@ -222,7 +225,7 @@ function JourneyBadge({
 }: {
   label: string;
   value: string;
-  tone: "enabled" | "disabled" | "neutral" | "changed";
+  tone: JourneyBadgeTone;
 }) {
   return (
     <div className={`polaris-overview-journey-badge is-${tone}`}>
@@ -230,6 +233,19 @@ function JourneyBadge({
       <strong>{value}</strong>
     </div>
   );
+}
+
+function createTaxFreeCashChoice(
+  mode: "maximum" | "custom" | undefined,
+  taxFreeCashTaken: number,
+): { value: string; tone: JourneyBadgeTone } {
+  if (mode === "custom") {
+    return taxFreeCashTaken > 0
+      ? { value: "Custom amount", tone: "changed" }
+      : { value: "Not included", tone: "disabled" };
+  }
+
+  return { value: "Maximum", tone: "enabled" };
 }
 
 function createRetirementSummary(result: DrawdownResult | null, planningAge: number) {
@@ -272,7 +288,7 @@ function createRetirementSummary(result: DrawdownResult | null, planningAge: num
   }
 
   return {
-    title: "Successfully funded",
+    title: "Successfully Funded",
     description: `The current retirement strategy is modelled without an income shortfall through to age ${planningAge}.`,
     tone: "success" as const,
     averageIncome,
