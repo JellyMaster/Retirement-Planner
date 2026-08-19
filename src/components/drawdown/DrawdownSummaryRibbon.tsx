@@ -21,6 +21,9 @@ export function DrawdownSummaryRibbon({
     ? display.totalNetIncomeShortfall
     : display.totalIncomeShortfall;
   const isSustainable = result.depletionAge === null && shortfall === 0;
+  const averageAnnualNetIncome = result.years.length > 0
+    ? display.totalNetIncome / result.years.length
+    : 0;
 
   return (
     <section className="drawdown-summary-ribbon" aria-label="Drawdown summary">
@@ -47,9 +50,9 @@ export function DrawdownSummaryRibbon({
       <article className="drawdown-summary-item">
         <span className="drawdown-summary-icon" aria-hidden="true"><ReceiptText size={19} /></span>
         <span>
-          <small>Lifetime net income</small>
-          <strong>{formatCurrency(display.totalNetIncome)}</strong>
-          <em>{formatCurrency(display.totalIncomeTax)} estimated tax</em>
+          <small>Average annual net income</small>
+          <strong>{formatCurrency(averageAnnualNetIncome)}</strong>
+          <em>{displayMode === "today" ? "In today’s money" : "Across future money values"}</em>
         </span>
       </article>
 
