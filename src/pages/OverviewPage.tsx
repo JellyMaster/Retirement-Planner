@@ -151,6 +151,8 @@ export function OverviewPage() {
             currentPot={inputs.currentPot}
             retirementAge={inputs.retirementAge}
             planningAge={drawdownInputs.endAge}
+            inflationRate={drawdownInputs.inflationRate}
+            retirementStartingBalance={drawdownResult?.balanceAfterTaxFreeCash}
             projectionYears={scenario.projection.years}
             drawdownYears={drawdownResult?.years}
           />
