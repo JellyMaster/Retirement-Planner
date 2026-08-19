@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 
 import { OverviewGrowthChart } from "../components/overview/OverviewGrowthChart";
 import { useScenarios } from "../components/scenarios";
-import { defaultPensionInputs } from "../config/defaultPensionInputs";
 import { DrawdownEngine } from "../engine/drawdown/DrawdownEngine";
 import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
 import type { DrawdownResult } from "../engine/drawdown/models/DrawdownResult";
@@ -11,9 +10,11 @@ import { validateDrawdownInputs } from "../engine/drawdown/validators/DrawdownIn
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import { AppIcons } from "../icons";
-import { formatCurrency, formatPercentage } from "../utils/formatters";
+import { formatCurrency } from "../utils/formatters";
 
 const drawdownEngine = new DrawdownEngine();
+
+type FundingStatusTone = "success" | "attention" | "urgent" | "incomplete";
 
 export function OverviewPage() {
   const { activeScenario } = useScenarios();
@@ -38,14 +39,7 @@ export function OverviewPage() {
     drawdownResult,
     includeStatePension: drawdownInputs.annualStatePension > 0,
   });
-  const spendingPattern = createSpendingPatternSummary(activeScenario.drawdown?.spendingPhases);
-  const assumptionsChanged =
-    inputs.annualReturn !== defaultPensionInputs.annualReturn ||
-    inputs.annualFee !== defaultPensionInputs.annualFee ||
-    inputs.inflation !== defaultPensionInputs.inflation;
-  const futureSavingChanged =
-    inputs.annualContributionIncrease > 0 ||
-    (inputs.extraMonthlyContribution ?? 0) > 0;
+  const hasTieredSpending = Boolean(activeScenario.drawdown?.spendingPhases?.length);
 
   return (
     <main className="planner-page polaris-overview-page">
@@ -54,7 +48,8 @@ export function OverviewPage() {
           <p className="planner-eyebrow">Overview · {activeScenario.name}</p>
           <h1>Your retirement</h1>
           <p>
-            See how the active plan is expected to work from today through retirement.
+            See where the active plan could take you and whether the retirement strategy
+            is currently funded through the full planning horizon.
           </p>
         </div>
         <Link className="ui-button ui-button-secondary ui-button-medium" to="/plan">
@@ -68,7 +63,7 @@ export function OverviewPage() {
         aria-labelledby="overview-story-title"
       >
         <div className="polaris-overview-story-copy">
-          <p className="planner-eyebrow">Plan health</p>
+          <p className="planner-eyebrow">Plan funding status</p>
           <h2 id="overview-story-title">{retirementSummary.title}</h2>
           <p>{retirementSummary.description}</p>
           {drawdownResult && (
@@ -84,15 +79,7 @@ export function OverviewPage() {
         </div>
 
         <span className="polaris-overview-story-icon" aria-hidden="true">
-          <FontAwesomeIcon
-            icon={
-              retirementSummary.tone === "needs-attention"
-                ? AppIcons.status.warning
-                : retirementSummary.tone === "incomplete"
-                  ? AppIcons.status.information
-                  : AppIcons.status.success
-            }
-          />
+          <FontAwesomeIcon icon={fundingStatusIcon(retirementSummary.tone)} />
         </span>
       </section>
 
@@ -126,7 +113,7 @@ export function OverviewPage() {
           }
           detail={
             drawdownResult
-              ? `${drawdownInputs.withdrawalStrategy === "percentage" ? "Percentage drawdown" : spendingPattern === "Level spending" ? "Target spending" : "Custom spending plan"} · average across retirement`
+              ? "Average modelled net income across retirement"
               : "Complete the plan to estimate income"
           }
           incomplete={!drawdownResult}
@@ -148,54 +135,41 @@ export function OverviewPage() {
           <OverviewGrowthChart years={scenario.projection.years} />
         </article>
 
-        <article className="polaris-overview-meaning-panel">
+        <article className="polaris-overview-meaning-panel polaris-overview-journey-summary">
           <div>
             <p className="planner-eyebrow">Retirement journey</p>
-            <h2>How this plan is set to work</h2>
+            <h2>Plan choices at a glance</h2>
+            <p className="polaris-overview-journey-intro">
+              The key retirement choices currently applied to this plan.
+            </p>
           </div>
-          <div className="polaris-overview-meaning-list">
-            <StoryPoint
-              icon={AppIcons.concepts.income}
-              title="Income strategy"
-              description={createIncomeStrategySummary(drawdownInputs.withdrawalStrategy, drawdownInputs.withdrawalRate, drawdownInputs.desiredAnnualIncome, spendingPattern)}
+
+          <div className="polaris-overview-journey-badges" aria-label="Retirement plan choices">
+            <JourneyBadge
+              label="State Pension"
+              value={drawdownInputs.annualStatePension > 0 ? "Included" : "Not included"}
+              tone={drawdownInputs.annualStatePension > 0 ? "enabled" : "disabled"}
             />
-            <StoryPoint
-              icon={AppIcons.concepts.pension}
-              title="Tax-free cash"
-              description={
+            <JourneyBadge
+              label="Tax-free cash"
+              value={
                 drawdownResult && drawdownResult.taxFreeCashTaken > 0
-                  ? `${formatCurrency(drawdownResult.taxFreeCashTaken)} at retirement`
+                  ? "Taken"
                   : "Not taken"
               }
-            />
-            <StoryPoint
-              icon={AppIcons.concepts.retirement}
-              title="State Pension"
-              description={
-                drawdownInputs.annualStatePension > 0
-                  ? `${formatCurrency(drawdownInputs.annualStatePension)}/year from age ${drawdownInputs.statePensionAge}`
-                  : "Not included"
+              tone={
+                drawdownResult && drawdownResult.taxFreeCashTaken > 0
+                  ? "enabled"
+                  : "neutral"
               }
-              incomplete={drawdownInputs.annualStatePension <= 0}
             />
-            <StoryPoint
-              icon={AppIcons.concepts.income}
-              title="Spending pattern"
-              description={spendingPattern}
+            <JourneyBadge
+              label="Spending plan"
+              value={hasTieredSpending ? "Tiered" : "Standard"}
+              tone={hasTieredSpending ? "changed" : "neutral"}
             />
-            {(futureSavingChanged || assumptionsChanged) && (
-              <StoryPoint
-                icon={AppIcons.concepts.pension}
-                title="Advanced plan changes"
-                description={[
-                  futureSavingChanged ? "Future saving changes active" : null,
-                  assumptionsChanged ? "Investment assumptions changed" : null,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              />
-            )}
           </div>
+
           <Link className="ui-button ui-button-secondary ui-button-medium" to="/plan">
             Review plan details
           </Link>
@@ -241,26 +215,19 @@ function OverviewFact({
   );
 }
 
-function StoryPoint({
-  icon,
-  title,
-  description,
-  incomplete = false,
+function JourneyBadge({
+  label,
+  value,
+  tone,
 }: {
-  icon: (typeof AppIcons.concepts)[keyof typeof AppIcons.concepts];
-  title: string;
-  description: string;
-  incomplete?: boolean;
+  label: string;
+  value: string;
+  tone: "enabled" | "disabled" | "neutral" | "changed";
 }) {
   return (
-    <div className={`polaris-overview-story-point${incomplete ? " is-incomplete" : ""}`}>
-      <span aria-hidden="true">
-        <FontAwesomeIcon icon={icon} fixedWidth />
-      </span>
-      <div>
-        <strong>{title}</strong>
-        <p>{description}</p>
-      </div>
+    <div className={`polaris-overview-journey-badge is-${tone}`}>
+      <small>{label}</small>
+      <strong>{value}</strong>
     </div>
   );
 }
@@ -284,9 +251,9 @@ function createRetirementSummary(result: DrawdownResult | null, planningAge: num
 
   if (result.depletionAge !== null) {
     return {
-      title: `Pension runs out at age ${result.depletionAge}`,
-      description: `The current retirement strategy does not maintain a pension balance through the full plan to age ${planningAge}.`,
-      tone: "needs-attention" as const,
+      title: "Needs Urgent Attention",
+      description: `The pension is modelled to run out at age ${result.depletionAge}, before the plan reaches age ${planningAge}.`,
+      tone: "urgent" as const,
       averageIncome,
       highestIncome,
       lowestIncome,
@@ -295,9 +262,9 @@ function createRetirementSummary(result: DrawdownResult | null, planningAge: num
 
   if (result.firstNetIncomeShortfallAge !== null) {
     return {
-      title: `Income shortfall from age ${result.firstNetIncomeShortfallAge}`,
-      description: `The pension remains invested, but the current strategy cannot provide all of the planned spend through to age ${planningAge}.`,
-      tone: "needs-attention" as const,
+      title: "Needs Attention",
+      description: `The plan develops a modelled income shortfall from age ${result.firstNetIncomeShortfallAge}. Review the retirement strategy before relying on this outcome.`,
+      tone: "attention" as const,
       averageIncome,
       highestIncome,
       lowestIncome,
@@ -305,45 +272,20 @@ function createRetirementSummary(result: DrawdownResult | null, planningAge: num
   }
 
   return {
-    title: `Plan modelled through age ${planningAge}`,
-    description:
-      result.withdrawalStrategy === "percentage"
-        ? `The plan follows the saved percentage-withdrawal strategy while the pension balance changes over retirement.`
-        : "The modelled pension supports the saved retirement spending pattern across the full planning horizon.",
-    tone: "on-track" as const,
+    title: "Successfully funded",
+    description: `The current retirement strategy is modelled without an income shortfall through to age ${planningAge}.`,
+    tone: "success" as const,
     averageIncome,
     highestIncome,
     lowestIncome,
   };
 }
 
-function createIncomeStrategySummary(
-  strategy: "target-income" | "percentage",
-  withdrawalRate: number,
-  desiredAnnualIncome: number,
-  spendingPattern: string,
-): string {
-  if (strategy === "percentage") {
-    return `${formatPercentage(withdrawalRate)} of the remaining pension each year`;
-  }
-  if (spendingPattern !== "Level spending") {
-    return "Custom spending targets by retirement phase";
-  }
-  return `${formatCurrency(desiredAnnualIncome)}/year target spending`;
-}
-
-function createSpendingPatternSummary(
-  phases:
-    | Array<{ startAge: number; annualIncome: number; label?: string; withdrawalRate?: number }>
-    | undefined,
-): string {
-  if (!phases?.length) return "Level spending";
-
-  return phases
-    .slice()
-    .sort((left, right) => left.startAge - right.startAge)
-    .map((phase) => `${phase.label ?? `Age ${phase.startAge}`} from ${phase.startAge}`)
-    .join(" · ");
+function fundingStatusIcon(tone: FundingStatusTone) {
+  if (tone === "urgent") return AppIcons.status.danger;
+  if (tone === "attention") return AppIcons.status.warning;
+  if (tone === "incomplete") return AppIcons.status.information;
+  return AppIcons.status.success;
 }
 
 function createNextStep({
