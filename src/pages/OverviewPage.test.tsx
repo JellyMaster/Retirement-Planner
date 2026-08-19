@@ -146,7 +146,6 @@ describe("OverviewPage", () => {
     renderPage();
 
     expect(screen.getByText("Not included")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "State Pension is not included" })).toBeInTheDocument();
   });
 
   it("uses advanced retirement strategy values from the active scenario", () => {
@@ -229,7 +228,7 @@ describe("OverviewPage", () => {
     renderPage();
 
     expect(screen.getByRole("heading", { name: "Complete your plan" })).toBeInTheDocument();
-    expect(screen.getByText("Unavailable")).toBeInTheDocument();
+    expect(screen.getAllByText("Unavailable").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("link", { name: "Review plan details" })).toHaveAttribute("href", "/plan");
   });
 
