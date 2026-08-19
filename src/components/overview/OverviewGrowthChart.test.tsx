@@ -49,14 +49,14 @@ describe("OverviewGrowthChart", () => {
 
     expect(screen.getByText(/projected pension of £400,000/i)).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /tax-free cash age 65/i }));
+    await user.click(screen.getByRole("button", { name: /tax-free cash/i }));
     expect(screen.getByText(/£100,000 is taken as tax-free cash/i)).toBeInTheDocument();
     expect(screen.getByText("£300,000 pension balance")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /state pension starts age 67/i }));
+    await user.click(screen.getByRole("button", { name: /state pension starts/i }));
     expect(screen.getByText(/State Pension of £12,000 a year starts at age 67/i)).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /settled retirement age 75/i }));
+    await user.click(screen.getByRole("button", { name: /settled retirement/i }));
     expect(screen.getByText(/planned annual spending of £30,000/i)).toBeInTheDocument();
   });
 });
