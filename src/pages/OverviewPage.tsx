@@ -15,7 +15,6 @@ import { formatCurrency } from "../utils/formatters";
 const drawdownEngine = new DrawdownEngine();
 
 type FundingStatusTone = "success" | "attention" | "urgent" | "incomplete";
-
 type JourneyBadgeTone = "enabled" | "disabled" | "neutral" | "changed";
 
 export function OverviewPage() {
@@ -129,11 +128,7 @@ export function OverviewPage() {
               ? `${formatCurrency(retirementSummary.averageIncome)}/year`
               : "Unavailable"
           }
-          detail={
-            drawdownResult
-              ? "Average modelled net income across retirement"
-              : "Complete the plan to estimate income"
-          }
+          detail={drawdownResult ? "Average across retirement" : "Complete the plan to estimate income"}
           incomplete={!drawdownResult}
         />
       </section>
@@ -143,23 +138,28 @@ export function OverviewPage() {
           <div className="polaris-overview-panel-heading">
             <div>
               <p className="planner-eyebrow">Your journey</p>
-              <h2>How your pension could grow</h2>
+              <h2>Your pension through retirement</h2>
               <p>
-                From age {inputs.currentAge} to retirement at age {inputs.retirementAge}.
+                From age {inputs.currentAge} through to the plan at age {drawdownInputs.endAge},
+                with key pension milestones marked as they are reached.
               </p>
             </div>
             <span>Today&apos;s money</span>
           </div>
-          <OverviewGrowthChart years={scenario.projection.years} />
+          <OverviewGrowthChart
+            currentAge={inputs.currentAge}
+            currentPot={inputs.currentPot}
+            retirementAge={inputs.retirementAge}
+            planningAge={drawdownInputs.endAge}
+            projectionYears={scenario.projection.years}
+            drawdownYears={drawdownResult?.years}
+          />
         </article>
 
         <article className="polaris-overview-meaning-panel polaris-overview-journey-summary">
           <div>
             <p className="planner-eyebrow">Retirement journey</p>
             <h2>Plan choices at a glance</h2>
-            <p className="polaris-overview-journey-intro">
-              The key retirement choices currently applied to this plan.
-            </p>
           </div>
 
           <div className="polaris-overview-journey-badges" aria-label="Retirement plan choices">
