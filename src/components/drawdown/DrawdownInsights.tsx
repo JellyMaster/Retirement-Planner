@@ -1,14 +1,26 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { AppIcons } from "../../icons";
+import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
+import { AppIcons } from "../../icons";
+import {
+  getDisplaySummary,
+  type MoneyDisplayMode,
+} from "../../utils/drawdownDisplayValues";
 import { formatCurrency, formatPercentage } from "../../utils/formatters";
 
 interface DrawdownInsightsProps {
+  inputs: DrawdownInputs;
   result: DrawdownResult;
+  displayMode: MoneyDisplayMode;
 }
 
-export function DrawdownInsights({ result }: DrawdownInsightsProps) {
+export function DrawdownInsights({
+  inputs,
+  result,
+  displayMode,
+}: DrawdownInsightsProps) {
+  const display = getDisplaySummary(result, inputs.inflationRate, displayMode);
   const shortfallAge = result.incomeTargetMode === "net"
     ? result.firstNetIncomeShortfallAge
     : result.firstShortfallAge;
@@ -18,8 +30,11 @@ export function DrawdownInsights({ result }: DrawdownInsightsProps) {
       <div className="panel-heading dashboard-panel-heading">
         <div>
           <p className="panel-eyebrow">At a glance</p>
-          <h2 id="drawdown-insights-heading">Key insights</h2>
+          <h2 id="drawdown-insights-heading">What this means</h2>
         </div>
+        <span className="drawdown-insights-money-basis">
+          {displayMode === "today" ? "Today’s money" : "Future money"}
+        </span>
       </div>
       <ul className="insights-list">
         <Insight
@@ -31,8 +46,8 @@ export function DrawdownInsights({ result }: DrawdownInsightsProps) {
           title={shortfallAge === null ? "Income target is fully funded" : `First income shortfall at age ${shortfallAge}`}
         />
         <Insight title={`${formatPercentage(result.averageEffectiveTaxRate)} average effective tax rate`} />
-        <Insight title={`${formatCurrency(result.totalIncomeTax)} projected lifetime income tax`} />
-        <Insight title={`${formatCurrency(result.finalBalance)} remaining at planning age`} />
+        <Insight title={`${formatCurrency(display.totalIncomeTax)} projected lifetime income tax`} />
+        <Insight title={`${formatCurrency(display.finalBalance)} remaining at planning age`} />
       </ul>
     </section>
   );
