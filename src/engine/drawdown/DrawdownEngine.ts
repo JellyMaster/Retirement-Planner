@@ -79,7 +79,9 @@ export class DrawdownEngine {
     const years: DrawdownYear[] = [];
     let openingBalance = balanceAfterTaxFreeCash;
 
-    for (let age = inputs.retirementAge, year = 1; age < inputs.endAge; age += 1, year += 1) {
+    // Planning age is inclusive: a plan to age 95 includes a genuine age-95
+    // retirement year with income, withdrawals, investment growth and fees.
+    for (let age = inputs.retirementAge, year = 1; age <= inputs.endAge; age += 1, year += 1) {
       const inflationMultiplier = (1 + inputs.inflationRate) ** (year - 1);
       const statePensionIncome = age >= inputs.statePensionAge
         ? roundMoney(inputs.annualStatePension * inflationMultiplier)
