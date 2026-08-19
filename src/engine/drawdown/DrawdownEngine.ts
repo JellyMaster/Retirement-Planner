@@ -18,11 +18,20 @@ function sum(years: DrawdownYear[], selector: (year: DrawdownYear) => number): n
   return roundMoney(years.reduce((total, year) => total + selector(year), 0));
 }
 
-function getIncomeTarget(inputs: DrawdownInputs, age: number): number {
-  const phase = inputs.spendingPhases
+function getActivePhase(inputs: DrawdownInputs, age: number) {
+  return inputs.spendingPhases
     ?.filter((candidate) => candidate.startAge <= age)
     .at(-1);
+}
+
+function getIncomeTarget(inputs: DrawdownInputs, age: number): number {
+  const phase = getActivePhase(inputs, age);
   return roundMoney(phase?.annualIncome ?? inputs.desiredAnnualIncome);
+}
+
+function getWithdrawalRate(inputs: DrawdownInputs, age: number): number {
+  const phase = getActivePhase(inputs, age);
+  return roundRate(phase?.withdrawalRate ?? inputs.withdrawalRate);
 }
 
 export class DrawdownEngine {
@@ -76,7 +85,8 @@ export class DrawdownEngine {
         ? roundMoney(inputs.annualStatePension * inflationMultiplier)
         : 0;
 
-      const percentageWithdrawal = roundMoney(openingBalance * inputs.withdrawalRate);
+      const withdrawalRate = getWithdrawalRate(inputs, age);
+      const percentageWithdrawal = roundMoney(openingBalance * withdrawalRate);
       const fixedIncomeTarget = getIncomeTarget(inputs, age);
       const requiredPensionWithdrawal = inputs.withdrawalStrategy === "percentage"
         ? percentageWithdrawal
