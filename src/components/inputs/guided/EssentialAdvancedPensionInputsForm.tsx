@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { defaultPensionInputs } from "../../../config/defaultPensionInputs";
@@ -56,10 +56,16 @@ export function EssentialAdvancedPensionInputsForm({
 }: EssentialAdvancedPensionInputsFormProps) {
   const { activeScenario, renameScenario, updateScenarioPlan } = useScenarios();
   const [retirementGoals] = useStoredRetirementGoals();
-  const [drawdown, setDrawdown] = useState<ScenarioDrawdownPreferences>(() => ({
-    ...(activeScenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
-  }));
-  const [planName, setPlanName] = useState(activeScenario.name);
+  const drawdown =
+    activeScenario.drawdown ?? createDefaultScenarioDrawdownPreferences();
+  const [planNameDraft, setPlanNameDraft] = useState<{
+    scenarioId: string;
+    value: string;
+  } | null>(null);
+  const planName =
+    planNameDraft?.scenarioId === activeScenario.id
+      ? planNameDraft.value
+      : activeScenario.name;
   const [openEssential, setOpenEssential] = useState<EssentialSection | null>(
     "retirement",
   );
@@ -72,13 +78,6 @@ export function EssentialAdvancedPensionInputsForm({
       value.extraContributionAge !== undefined ||
       value.extraMonthlyContribution !== undefined,
   );
-
-  useEffect(() => {
-    setPlanName(activeScenario.name);
-    setDrawdown({
-      ...(activeScenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
-    });
-  }, [activeScenario.id, activeScenario.name, activeScenario.drawdown]);
 
   const totalMonthly =
     value.monthlyEmployeeContribution + value.monthlyEmployerContribution;
@@ -158,7 +157,6 @@ export function EssentialAdvancedPensionInputsForm({
   }
 
   function updateDrawdown(next: ScenarioDrawdownPreferences) {
-    setDrawdown(next);
     updateScenarioPlan(activeScenario.id, activeScenario.inputs, next);
   }
 
@@ -173,6 +171,7 @@ export function EssentialAdvancedPensionInputsForm({
   function savePlanName() {
     if (!planNameChanged) return;
     renameScenario(activeScenario.id, trimmedPlanName);
+    setPlanNameDraft(null);
   }
 
   function restorePlanningAssumptions() {
@@ -229,7 +228,12 @@ export function EssentialAdvancedPensionInputsForm({
             type="text"
             value={planName}
             maxLength={80}
-            onChange={(event) => setPlanName(event.target.value)}
+            onChange={(event) =>
+              setPlanNameDraft({
+                scenarioId: activeScenario.id,
+                value: event.target.value,
+              })
+            }
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
