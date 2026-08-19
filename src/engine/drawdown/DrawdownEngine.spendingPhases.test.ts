@@ -20,7 +20,7 @@ const baseInputs: DrawdownInputs = {
 };
 
 describe("DrawdownEngine spending phases", () => {
-  it("changes the desired income when each saved phase begins", () => {
+  it("changes the real spending target when each saved phase begins", () => {
     const result = new DrawdownEngine().calculate({
       ...baseInputs,
       spendingPhases: [
@@ -30,11 +30,15 @@ describe("DrawdownEngine spending phases", () => {
       ],
     });
 
-    expect(result.years.find((year) => year.age === 65)?.desiredIncome).toBe(40_000);
-    expect(result.years.find((year) => year.age === 74)?.desiredIncome).toBe(40_000);
-    expect(result.years.find((year) => year.age === 75)?.desiredIncome).toBe(34_000);
-    expect(result.years.find((year) => year.age === 84)?.desiredIncome).toBe(34_000);
-    expect(result.years.find((year) => year.age === 85)?.desiredIncome).toBe(28_000);
+    const desiredAt = (age: number) =>
+      result.years.find((year) => year.age === age)?.desiredIncome;
+    const inflationAt = (age: number) => 1.02 ** (age - 65);
+
+    expect(desiredAt(65)).toBeCloseTo(40_000 * inflationAt(65), 2);
+    expect(desiredAt(74)).toBeCloseTo(40_000 * inflationAt(74), 2);
+    expect(desiredAt(75)).toBeCloseTo(34_000 * inflationAt(75), 2);
+    expect(desiredAt(84)).toBeCloseTo(34_000 * inflationAt(84), 2);
+    expect(desiredAt(85)).toBeCloseTo(28_000 * inflationAt(85), 2);
   });
 
   it("uses the withdrawal rate from the active phase for percentage drawdown", () => {
@@ -68,9 +72,15 @@ describe("DrawdownEngine spending phases", () => {
     expect(result.years.find((year) => year.age === 66)?.pensionWithdrawal).toBe(1_920);
   });
 
-  it("continues to use the flat target when no phases are saved", () => {
+  it("inflates the flat target when no phases are saved", () => {
     const result = new DrawdownEngine().calculate(baseInputs);
 
-    expect(result.years.every((year) => year.desiredIncome === 40_000)).toBe(true);
+    for (const year of result.years) {
+      const inflationMultiplier = 1.02 ** (year.age - baseInputs.retirementAge);
+      expect(year.desiredIncome).toBeCloseTo(
+        baseInputs.desiredAnnualIncome * inflationMultiplier,
+        2,
+      );
+    }
   });
 });
