@@ -33,12 +33,12 @@ describe("EssentialAdvancedPensionInputsForm", () => {
     await user.click(screen.getByRole("button", { name: "Retirement income" }));
 
     expect(screen.getByLabelText(/desired annual spending/i)).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: /include state pension/i })).toBeInTheDocument();
-    expect(screen.queryByRole("radio", { name: /percentage withdrawal/i })).not.toBeInTheDocument();
+    expect(screen.getByText(/State Pension assumption/i)).toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: /withdraw a percentage/i })).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Retirement strategy" }));
 
-    expect(screen.getByRole("radio", { name: /target annual income/i })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /percentage withdrawal/i })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /spend a target amount each year/i })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /withdraw a percentage of the pension/i })).toBeInTheDocument();
   });
 });
