@@ -1,19 +1,14 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
-import { AppIcons } from "../../icons";
 import { formatCurrency, formatPercentage } from "../../utils/formatters";
 
 interface DrawdownPlanContextProps {
   activePlanName: string;
   value: DrawdownInputs;
-  onEdit: () => void;
 }
 
 export function DrawdownPlanContext({
   activePlanName,
   value,
-  onEdit,
 }: DrawdownPlanContextProps) {
   return (
     <section
@@ -25,26 +20,15 @@ export function DrawdownPlanContext({
           <p className="panel-eyebrow">Active retirement income plan</p>
           <div className="drawdown-plan-context-title-row">
             <h2 id="drawdown-plan-context-title">{activePlanName}</h2>
-            <button
-              type="button"
-              className="drawdown-plan-context-edit"
-              aria-label={`Edit ${activePlanName}`}
-              title="Edit active plan"
-              onClick={onEdit}
-            >
-              <FontAwesomeIcon icon={AppIcons.edit} aria-hidden="true" />
-            </button>
           </div>
           <p>
             These saved plan values and income choices are used for the drawdown
-            projection below.
+            projection below. Make any changes from My Plan.
           </p>
         </div>
       </div>
 
       <div className="drawdown-plan-context-sections">
-       
-
         <section
           className="drawdown-plan-details-summary"
           aria-labelledby="drawdown-plan-details-title"
@@ -74,7 +58,7 @@ export function DrawdownPlanContext({
             />
           </dl>
         </section>
-         <section
+        <section
           className="drawdown-income-strategy-summary"
           aria-labelledby="drawdown-income-strategy-title"
         >
