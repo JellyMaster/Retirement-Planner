@@ -37,7 +37,7 @@ export function calculateSustainableTargetIncome(
   }
 
   const engine = new DrawdownEngine();
-  const retirementYears = inputs.endAge - inputs.retirementAge;
+  const retirementYears = inputs.endAge - inputs.retirementAge + 1;
   const startingBalanceAfterCash = Math.max(
     0,
     inputs.startingBalance - inputs.taxFreeCash,
