@@ -16,19 +16,15 @@ describe("RetirementPlannerPage route selection", () => {
     });
 
     renderWithAppProviders(<RetirementPlannerPage />, {
-      initialEntries: [
-        "/plan?step=income&section=retirement-chapters",
-      ],
+      initialEntries: ["/plan?step=income&section=retirement-chapters"],
     });
 
     await waitFor(() =>
       expect(
-        screen.getByRole("tab", { name: "Retirement chapters" }),
-      ).toHaveAttribute("aria-selected", "true"),
+        screen.getByRole("button", { name: /Spending pattern/i }),
+      ).toHaveAttribute("aria-expanded", "true"),
     );
 
-    expect(
-      screen.getByRole("tabpanel", { name: "Retirement chapters" }),
-    ).toBeVisible();
+    expect(screen.getByText(/Create a custom spending plan/i)).toBeInTheDocument();
   });
 });
