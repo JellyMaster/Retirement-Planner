@@ -7,6 +7,7 @@ import {
   SCENARIO_STORAGE_KEY,
 } from "./LocalScenarioRepository";
 import type { ScenarioDependencies } from "./Scenario";
+import { createDefaultScenarioDrawdownPreferences } from "./ScenarioDrawdownPreferences";
 
 const dependencies: ScenarioDependencies = {
   createId: () => "baseline-id",
@@ -20,11 +21,7 @@ describe("LocalScenarioRepository", () => {
 
   it("creates and persists a baseline scenario from factory defaults", () => {
     const defaults = createDefaultPensionInputs();
-    const repository = new LocalScenarioRepository(
-      localStorage,
-      defaults,
-      dependencies,
-    );
+    const repository = new LocalScenarioRepository(localStorage, defaults, dependencies);
 
     const state = repository.load();
 
@@ -45,10 +42,7 @@ describe("LocalScenarioRepository", () => {
     ]);
 
     expect(JSON.parse(localStorage.getItem(SCENARIO_STORAGE_KEY) ?? "")).toEqual(
-      expect.objectContaining({
-        version: 2,
-        activeScenarioId: "baseline-id",
-      }),
+      expect.objectContaining({ version: 2, activeScenarioId: "baseline-id" }),
     );
   });
 
@@ -67,6 +61,7 @@ describe("LocalScenarioRepository", () => {
         {
           ...baseline,
           drawdown: {
+            ...createDefaultScenarioDrawdownPreferences(),
             ...baseline.drawdown,
             withdrawalStrategy: "percentage",
             withdrawalRate: 0.04,
@@ -106,14 +101,8 @@ describe("LocalScenarioRepository", () => {
         retirementLivingStandardsHousehold: "two-person",
         retirementLivingStandardsRegion: "london",
         spendingPhases: [
-          expect.objectContaining({
-            startAge: 68,
-            withdrawalRate: 0.05,
-          }),
-          expect.objectContaining({
-            startAge: 78,
-            withdrawalRate: 0.035,
-          }),
+          expect.objectContaining({ startAge: 68, withdrawalRate: 0.05 }),
+          expect.objectContaining({ startAge: 78, withdrawalRate: 0.035 }),
         ],
       }),
     );
@@ -129,12 +118,7 @@ describe("LocalScenarioRepository", () => {
     };
     localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(savedInputs));
 
-    const repository = new LocalScenarioRepository(
-      localStorage,
-      defaults,
-      dependencies,
-    );
-
+    const repository = new LocalScenarioRepository(localStorage, defaults, dependencies);
     const state = repository.load();
 
     expect(state.scenarios[0].inputs).toEqual(savedInputs);
@@ -174,12 +158,7 @@ describe("LocalScenarioRepository", () => {
       }),
     );
 
-    const repository = new LocalScenarioRepository(
-      localStorage,
-      defaults,
-      dependencies,
-    );
-
+    const repository = new LocalScenarioRepository(localStorage, defaults, dependencies);
     const state = repository.load();
 
     expect(state.activeScenarioId).toBe("early");
@@ -205,7 +184,6 @@ describe("LocalScenarioRepository", () => {
       createDefaultPensionInputs(),
       dependencies,
     );
-
     const state = repository.load();
 
     expect(state.activeScenarioId).toBe("baseline-id");
