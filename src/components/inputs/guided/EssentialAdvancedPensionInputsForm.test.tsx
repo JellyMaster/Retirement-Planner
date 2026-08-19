@@ -55,14 +55,26 @@ describe("EssentialAdvancedPensionInputsForm", () => {
     expect(screen.getAllByText(/£32,700/).length).toBeGreaterThanOrEqual(1);
   });
 
-  it("keeps detailed retirement strategy choices in advanced settings", async () => {
+  it("frames detailed retirement strategy choices as user questions", async () => {
     const user = userEvent.setup();
     renderForm();
 
     await user.click(screen.getByRole("button", { name: "Retirement strategy" }));
-    await user.click(screen.getByRole("button", { name: /Income strategy/i }));
+    await user.click(
+      screen.getByRole("button", { name: /How should your retirement income work/i }),
+    );
 
-    expect(screen.getByRole("radio", { name: /spend a target amount each year/i })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /withdraw a percentage of the pension/i })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /Stable income/i })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /Flexible income/i })).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: /Will your spending change during retirement/i }),
+    );
+    expect(
+      screen.getByRole("radio", { name: /Keep it broadly consistent/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /Use different stages of retirement/i }),
+    ).toBeInTheDocument();
   });
 });
