@@ -33,7 +33,7 @@ export function calculateMonteCarloDrawdownStatistics({
   const depletionAges = depletedPaths.map((path) => path.depletionAge as number);
   const ageStatistics: MonteCarloDrawdownAgeStatistics[] = [];
 
-  for (let age = retirementAge; age < endAge; age += 1) {
+  for (let age = retirementAge; age <= endAge; age += 1) {
     const yearIndex = age - retirementAge;
     const balances = paths.map((path) => path.balancesByAge[yearIndex] ?? 0);
     const depletedByAge = paths.filter(
