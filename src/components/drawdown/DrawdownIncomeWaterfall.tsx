@@ -24,7 +24,7 @@ export function DrawdownIncomeWaterfall({
   );
   const selectedAges = new Set<number>([
     inputs.retirementAge,
-    inputs.endAge - 1,
+    inputs.endAge,
     ...(inputs.annualStatePension > 0 ? [inputs.statePensionAge] : []),
     ...(inputs.spendingPhases?.slice(1).map((phase) => phase.startAge) ?? []),
   ]);
@@ -37,13 +37,13 @@ export function DrawdownIncomeWaterfall({
     >
       <header>
         <div>
-          <p className="panel-eyebrow">Income by source</p>
+          <p className="panel-eyebrow">Income at key ages</p>
           <h3 id="drawdown-income-waterfall-title">
-            How each stage of retirement is funded
+            Where your retirement income comes from
           </h3>
           <p>
-            See how private-pension withdrawals and State Pension combine before
-            tax to support the selected income target.
+            Key points show how private-pension withdrawals and State Pension combine,
+            with tax deducted to reach the income available to spend.
           </p>
         </div>
         <span>{displayMode === "today" ? "Today’s money" : "Future money"}</span>
@@ -67,7 +67,7 @@ export function DrawdownIncomeWaterfall({
               <div className="drawdown-waterfall-card-heading">
                 <div>
                   <span>Age {year.age}</span>
-                  <strong>{formatCurrency(year.desiredIncome)}/year target</strong>
+                  <strong>{formatCurrency(year.netIncome)}/year available</strong>
                 </div>
                 {shortfall > 0 && <small>Shortfall {formatCurrency(shortfall)}</small>}
               </div>
