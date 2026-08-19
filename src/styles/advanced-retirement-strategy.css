@@ -116,9 +116,40 @@
   grid-column: 1 / -1;
 }
 
+.retirement-strategy-current-choice,
+.retirement-strategy-what-if-note {
+  display: grid;
+  gap: var(--ui-space-1);
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.retirement-strategy-current-choice span,
+.retirement-strategy-what-if-note p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.retirement-strategy-source-section {
+  display: grid;
+  gap: var(--ui-space-3);
+}
+
+.retirement-strategy-source-section + .retirement-strategy-source-section {
+  padding-top: var(--ui-space-4);
+  border-top: 1px solid var(--colour-border);
+}
+
 .retirement-strategy-spending-editor {
   padding-top: var(--ui-space-2);
   border-top: 1px solid var(--colour-border);
+}
+
+.retirement-strategy-what-if-note {
+  border-style: dashed;
 }
 
 @media (max-width: 900px) {
