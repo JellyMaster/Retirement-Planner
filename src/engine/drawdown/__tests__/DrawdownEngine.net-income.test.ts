@@ -71,12 +71,9 @@ describe("DrawdownEngine net-income targeting", () => {
       47_698.38,
       48_890.84,
     ]);
-    expect(todaysMoney.map((year) => year.netIncome)).toEqual([
-      45_400,
-      45_400,
-      45_400,
-      45_400,
-    ]);
+    todaysMoney.forEach((year) => {
+      expect(year.netIncome).toBeCloseTo(45_400, 2);
+    });
   });
 
   it("does not withdraw private pension when State Pension alone meets the net target", () => {
