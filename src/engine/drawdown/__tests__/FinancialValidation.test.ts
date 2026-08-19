@@ -55,7 +55,7 @@ describe("Drawdown financial validation", () => {
     expect(result.years[0].openingBalance).toBe(722_183.25);
   });
 
-  it("keeps purchasing power constant when nominal return equals inflation and there are no withdrawals", () => {
+  it("keeps real opening value constant when nominal return equals inflation and there are no withdrawals", () => {
     const inflationRate = 0.025;
     const result = new DrawdownEngine().calculate(
       createInputs({
@@ -75,7 +75,8 @@ describe("Drawdown financial validation", () => {
 
     const todayMoney = getDisplayYears(result.years, inflationRate, "today");
     todayMoney.forEach((year) => {
-      expect(year.closingBalance).toBeCloseTo(100_000, 1);
+      expect(year.openingBalance).toBeCloseTo(100_000, 1);
+      expect(year.closingBalance).toBeCloseTo(102_500, 1);
     });
   });
 
