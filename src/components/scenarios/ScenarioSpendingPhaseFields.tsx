@@ -1,12 +1,13 @@
 import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
 import type { DrawdownSpendingPhase } from "../../engine/drawdown/models/DrawdownInputs";
-import { CurrencyInput, FormField, NumberInput } from "../forms";
+import { CurrencyInput, FormField, NumberInput, PercentageInput } from "../forms";
 
 interface ScenarioSpendingPhaseFieldsProps {
   idPrefix: string;
   retirementAge: number;
   value: ScenarioDrawdownPreferences;
   onChange: (value: ScenarioDrawdownPreferences) => void;
+  showEnableToggle?: boolean;
 }
 
 const phaseLabels = ["Active retirement", "Settled retirement", "Later life"] as const;
@@ -16,20 +17,25 @@ export function ScenarioSpendingPhaseFields({
   retirementAge,
   value,
   onChange,
+  showEnableToggle = true,
 }: ScenarioSpendingPhaseFieldsProps) {
-  const enabled = Boolean(value.spendingPhases?.length);
-  const phases = enabled
+  const hasStoredPhases = Boolean(value.spendingPhases?.length);
+  const enabled = showEnableToggle ? hasStoredPhases : true;
+  const phases = hasStoredPhases
     ? normalisePhases(
         value.spendingPhases ?? [],
         retirementAge,
         value.planningAge,
         value.desiredAnnualIncome,
+        value.withdrawalRate,
       )
     : createDefaultPhases(
         retirementAge,
         value.planningAge,
         value.desiredAnnualIncome,
+        value.withdrawalRate,
       );
+  const usesPercentage = value.withdrawalStrategy === "percentage";
 
   function setEnabled(nextEnabled: boolean) {
     const next = { ...value };
@@ -40,7 +46,7 @@ export function ScenarioSpendingPhaseFields({
 
   function updatePhase(
     index: number,
-    field: "startAge" | "annualIncome",
+    field: "startAge" | "annualIncome" | "withdrawalRate",
     nextValue: number | undefined,
   ) {
     const nextPhases = phases.map((phase, phaseIndex) =>
@@ -49,7 +55,11 @@ export function ScenarioSpendingPhaseFields({
             ...phase,
             [field]:
               nextValue ??
-              (field === "startAge" ? phase.startAge : 0),
+              (field === "startAge"
+                ? phase.startAge
+                : field === "withdrawalRate"
+                  ? phase.withdrawalRate ?? value.withdrawalRate
+                  : 0),
           }
         : phase,
     );
@@ -58,21 +68,27 @@ export function ScenarioSpendingPhaseFields({
 
   return (
     <fieldset className="scenario-edit-section scenario-spending-phases">
-      <legend>Retirement chapters</legend>
+      <legend>Retirement phases</legend>
       <p className="scenario-edit-section-copy">
-        Model a higher income during active retirement, followed by lower targets
-        during settled retirement and later life. Leave this off to use one annual
-        target throughout.
+        {usesPercentage
+          ? "Set a different percentage withdrawal rate for each stage of retirement."
+          : "Set a different spendable income target for each stage of retirement."}
       </p>
 
-      <label className="retirement-goals-checkbox">
-        <input
-          type="checkbox"
-          checked={enabled}
-          onChange={(event) => setEnabled(event.target.checked)}
-        />
-        <span>Use different income targets at different ages</span>
-      </label>
+      {showEnableToggle && (
+        <label className="retirement-goals-checkbox">
+          <input
+            type="checkbox"
+            checked={enabled}
+            onChange={(event) => setEnabled(event.target.checked)}
+          />
+          <span>
+            {usesPercentage
+              ? "Use different withdrawal rates at different ages"
+              : "Use different income targets at different ages"}
+          </span>
+        </label>
+      )}
 
       {enabled && (
         <div className="scenario-spending-phase-grid">
@@ -87,7 +103,7 @@ export function ScenarioSpendingPhaseFields({
             return (
               <section key={phase.label} className="scenario-spending-phase-card">
                 <div>
-                  <span>Chapter {index + 1}</span>
+                  <span>Phase {index + 1}</span>
                   <h3>{phase.label}</h3>
                 </div>
                 <div className="scenario-edit-grid">
@@ -96,7 +112,7 @@ export function ScenarioSpendingPhaseFields({
                     label="Starts at age"
                     hint={
                       index === 0
-                        ? "The first chapter begins at retirement."
+                        ? "The first phase begins at retirement."
                         : `Must be after age ${phases[index - 1].startAge}.`
                     }
                   >
@@ -115,24 +131,47 @@ export function ScenarioSpendingPhaseFields({
                       />
                     )}
                   </FormField>
-                  <FormField
-                    id={`${idPrefix}-phase-${index}-income`}
-                    label="Annual income target"
-                    hint="Uses the selected gross or net basis from the retirement-income section."
-                  >
-                    {(id, describedBy) => (
-                      <CurrencyInput
-                        id={id}
-                        aria-describedby={describedBy}
-                        value={phase.annualIncome}
-                        min={0}
-                        step={500}
-                        onValueChange={(nextValue) =>
-                          updatePhase(index, "annualIncome", nextValue)
-                        }
-                      />
-                    )}
-                  </FormField>
+
+                  {usesPercentage ? (
+                    <FormField
+                      id={`${idPrefix}-phase-${index}-rate`}
+                      label="Annual withdrawal rate"
+                      hint="Percentage of the remaining pension withdrawn each year in this phase."
+                    >
+                      {(id, describedBy) => (
+                        <PercentageInput
+                          id={id}
+                          aria-describedby={describedBy}
+                          value={phase.withdrawalRate ?? value.withdrawalRate}
+                          min={0}
+                          max={100}
+                          step={0.1}
+                          onValueChange={(nextValue) =>
+                            updatePhase(index, "withdrawalRate", nextValue)
+                          }
+                        />
+                      )}
+                    </FormField>
+                  ) : (
+                    <FormField
+                      id={`${idPrefix}-phase-${index}-income`}
+                      label="Annual spending target"
+                      hint="The spendable annual income target for this phase, in today's money."
+                    >
+                      {(id, describedBy) => (
+                        <CurrencyInput
+                          id={id}
+                          aria-describedby={describedBy}
+                          value={phase.annualIncome}
+                          min={0}
+                          step={500}
+                          onValueChange={(nextValue) =>
+                            updatePhase(index, "annualIncome", nextValue)
+                          }
+                        />
+                      )}
+                    </FormField>
+                  )}
                 </div>
               </section>
             );
@@ -147,6 +186,7 @@ function createDefaultPhases(
   retirementAge: number,
   planningAge: number,
   annualIncome: number,
+  withdrawalRate: number,
 ): DrawdownSpendingPhase[] {
   const retirementYears = Math.max(3, planningAge - retirementAge);
   const slowerAge = Math.min(
@@ -159,15 +199,22 @@ function createDefaultPhases(
   );
 
   return [
-    { startAge: retirementAge, annualIncome, label: phaseLabels[0] },
+    {
+      startAge: retirementAge,
+      annualIncome,
+      withdrawalRate,
+      label: phaseLabels[0],
+    },
     {
       startAge: slowerAge,
       annualIncome: Math.round((annualIncome * 0.85) / 500) * 500,
+      withdrawalRate,
       label: phaseLabels[1],
     },
     {
       startAge: laterAge,
       annualIncome: Math.round((annualIncome * 0.7) / 500) * 500,
+      withdrawalRate,
       label: phaseLabels[2],
     },
   ];
@@ -178,13 +225,21 @@ function normalisePhases(
   retirementAge: number,
   planningAge: number,
   annualIncome: number,
+  withdrawalRate: number,
 ): DrawdownSpendingPhase[] {
-  const defaults = createDefaultPhases(retirementAge, planningAge, annualIncome);
+  const defaults = createDefaultPhases(
+    retirementAge,
+    planningAge,
+    annualIncome,
+    withdrawalRate,
+  );
   return phaseLabels.map((label, index) => ({
     label,
     startAge: index === 0
       ? retirementAge
       : phases[index]?.startAge ?? defaults[index].startAge,
     annualIncome: phases[index]?.annualIncome ?? defaults[index].annualIncome,
+    withdrawalRate:
+      phases[index]?.withdrawalRate ?? defaults[index].withdrawalRate,
   }));
 }
