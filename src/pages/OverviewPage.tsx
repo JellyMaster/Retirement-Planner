@@ -141,7 +141,7 @@ export function OverviewPage() {
               <h2>Your pension through retirement</h2>
               <p>
                 From age {inputs.currentAge} through to the plan at age {drawdownInputs.endAge},
-                with key pension milestones marked as they are reached.
+                with key retirement events and pension milestones marked along the way.
               </p>
             </div>
             <span>Today&apos;s money</span>
@@ -153,6 +153,11 @@ export function OverviewPage() {
             planningAge={drawdownInputs.endAge}
             inflationRate={drawdownInputs.inflationRate}
             retirementStartingBalance={drawdownResult?.balanceAfterTaxFreeCash}
+            taxFreeCashTaken={drawdownResult?.taxFreeCashTaken}
+            statePensionAge={
+              drawdownInputs.annualStatePension > 0 ? drawdownInputs.statePensionAge : undefined
+            }
+            spendingPhases={activeScenario.drawdown?.spendingPhases}
             projectionYears={scenario.projection.years}
             drawdownYears={drawdownResult?.years}
           />
