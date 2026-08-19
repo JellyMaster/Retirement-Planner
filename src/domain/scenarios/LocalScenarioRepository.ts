@@ -123,7 +123,7 @@ function normaliseDrawdownPreferences(
     endingBalanceMode:
       preferences.endingBalanceMode === "preserve" ||
       preferences.endingBalanceMode === "percentage" ||
-      preferences.endingBalanceMode === "zero"
+      preferences.endingBalanceMode === "spend-to-zero"
         ? preferences.endingBalanceMode
         : defaults.endingBalanceMode,
     endingBalancePercentage: isFiniteNumber(preferences.endingBalancePercentage)
