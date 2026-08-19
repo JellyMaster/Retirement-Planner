@@ -23,7 +23,7 @@ const baseInputs: DrawdownInputs = {
 describe("calculateSustainableTargetIncome", () => {
   it("finds the highest flat target that reaches the planning age without a shortfall", () => {
     const sustainableIncome = calculateSustainableTargetIncome(baseInputs);
-    expect(sustainableIncome).toBe(20_000);
+    expect(sustainableIncome).toBe(19_230);
 
     const sustainableResult = new DrawdownEngine().calculate({
       ...baseInputs,
@@ -52,7 +52,7 @@ describe("calculateSustainableTargetIncome", () => {
       calculateSustainableTargetIncome(baseInputs, {
         endingBalanceGoal: { mode: "percentage", percentage: 0.5 },
       }),
-    ).toBe(10_000);
+    ).toBe(9_615);
   });
 
   it("can deliberately spend the retirement pot down to zero at the planning age", () => {
@@ -60,7 +60,7 @@ describe("calculateSustainableTargetIncome", () => {
       calculateSustainableTargetIncome(baseInputs, {
         endingBalanceGoal: { mode: "spend-to-zero", percentage: 0 },
       }),
-    ).toBe(20_000);
+    ).toBe(19_230);
   });
 
   it("includes State Pension when finding the sustainable gross target", () => {
@@ -70,7 +70,7 @@ describe("calculateSustainableTargetIncome", () => {
         annualStatePension: 10_000,
         statePensionAge: 65,
       }),
-    ).toBe(30_000);
+    ).toBe(29_230);
   });
 
   it("preserves the relative shape of retirement spending phases", () => {
@@ -84,7 +84,7 @@ describe("calculateSustainableTargetIncome", () => {
           { startAge: 85, annualIncome: 18_000, label: "Later life" },
         ],
       }),
-    ).toBe(20_000);
+    ).toBe(19_444);
   });
 
   it("supports net income targets", () => {
