@@ -172,6 +172,8 @@
 
 .essential-retirement-income-intro,
 .essential-retirement-income-note,
+.essential-retirement-income-source,
+.essential-retirement-lifestyle-picker,
 .essential-retirement-defaults {
   grid-column: 1 / -1;
 }
@@ -199,6 +201,82 @@
 
 .essential-retirement-income-note span {
   line-height: 1.45;
+}
+
+.essential-retirement-income-source,
+.essential-retirement-lifestyle-options {
+  display: grid;
+  gap: var(--ui-space-3);
+}
+
+.essential-retirement-income-source {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.essential-retirement-lifestyle-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.essential-retirement-income-source > button,
+.essential-retirement-lifestyle-options > button {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-space-1);
+  min-height: 6.5rem;
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  text-align: left;
+}
+
+.essential-retirement-income-source > button:hover:not(:disabled),
+.essential-retirement-lifestyle-options > button:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--colour-primary) 35%, var(--colour-border));
+  background: var(--colour-surface-hover);
+}
+
+.essential-retirement-income-source > button.is-selected,
+.essential-retirement-lifestyle-options > button.is-selected {
+  border-color: color-mix(in srgb, var(--colour-primary) 60%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--colour-primary) 25%, transparent);
+}
+
+.essential-retirement-income-source > button:disabled,
+.essential-retirement-lifestyle-options > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.essential-retirement-income-source span,
+.essential-retirement-lifestyle-options span,
+.essential-retirement-lifestyle-picker p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  line-height: 1.45;
+}
+
+.essential-retirement-lifestyle-picker {
+  display: grid;
+  gap: var(--ui-space-3);
+}
+
+.essential-retirement-lifestyle-options small {
+  margin-top: auto;
+  color: var(--colour-primary);
+  font-weight: 800;
+}
+
+.essential-retirement-lifestyle-summary {
+  display: grid;
+  gap: var(--ui-space-1);
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid color-mix(in srgb, var(--colour-success-text) 22%, var(--colour-border));
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-success-background);
+  color: var(--colour-success-text);
 }
 
 .essential-retirement-defaults {
@@ -368,6 +446,12 @@
   border-top: 1px solid var(--colour-border);
 }
 
+@media (max-width: 900px) {
+  .essential-retirement-lifestyle-options {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 760px) {
   .essential-plan-editor-header,
   .essential-plan-group-heading,
@@ -392,6 +476,7 @@
 
   .essential-plan-card-fields,
   .essential-retirement-income-fields,
+  .essential-retirement-income-source,
   .essential-retirement-defaults,
   .advanced-future-saving-fields {
     grid-template-columns: 1fr;
