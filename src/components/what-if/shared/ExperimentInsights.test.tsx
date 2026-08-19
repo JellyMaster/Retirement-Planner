@@ -52,19 +52,23 @@ describe("ExperimentInsights", () => {
 
   it("shows retirement impact details when drawdown outcomes are supplied", () => {
     const baseline = {
-      status: "tight" as const,
+      targetNetSpending: 30_000,
       sustainableNetSpending: 28_000,
       annualHeadroom: -2_000,
-      modelledEndingBalance: 100_000,
+      headroomPercent: -2_000 / 30_000,
+      status: "shortfall" as const,
       targetEndingBalance: 100_000,
+      modelledEndingBalance: 100_000,
       livingStandard: "minimum" as const,
     };
     const outcome = {
+      targetNetSpending: 29_500,
+      sustainableNetSpending: 33_000,
+      annualHeadroom: 3_500,
+      headroomPercent: 3_500 / 29_500,
       status: "comfortable" as const,
-      sustainableNetSpending: 30_000,
-      annualHeadroom: 500,
-      modelledEndingBalance: 110_000,
       targetEndingBalance: 100_000,
+      modelledEndingBalance: 110_000,
       livingStandard: "moderate" as const,
     };
 
