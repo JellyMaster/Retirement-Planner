@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { ExperimentInsights } from "./ExperimentInsights";
@@ -29,7 +28,7 @@ function renderInsights(
 }
 
 describe("ExperimentInsights", () => {
-  it("shows a consistent decision summary and plan health", () => {
+  it("shows the decision summary and before-after result", () => {
     renderInsights();
 
     expect(
@@ -37,32 +36,40 @@ describe("ExperimentInsights", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("£725,000")).toBeInTheDocument();
     expect(screen.getByText("£29,000/year")).toBeInTheDocument();
-    expect(screen.getAllByText("Close").length).toBeGreaterThan(0);
+    expect(screen.getByRole("heading", { name: "More flexibility" })).toBeInTheDocument();
+    expect(screen.getByText("+£25,000")).toBeInTheDocument();
+    expect(screen.getByText("+£1,000/year")).toBeInTheDocument();
+  });
+
+  it("shows the saved-plan state before an experiment changes", () => {
+    renderInsights({ hasChanged: false, projectedPension: 700_000, annualIncome: 28_000 });
+
+    expect(screen.getByRole("heading", { name: "Your saved plan" })).toBeInTheDocument();
     expect(
-      screen.getByRole("meter", { name: "Impact of this decision" }),
-    ).toHaveAttribute("aria-valuetext");
+      screen.getByText("Move an experiment control to compare it with the saved plan."),
+    ).toBeInTheDocument();
   });
 
-  it("shows the plan timeline", () => {
-    renderInsights({ downturnAge: 60, activeExperiment: "market-downturn" });
+  it("shows retirement impact details when drawdown outcomes are supplied", () => {
+    const baseline = {
+      status: "tight" as const,
+      sustainableNetSpending: 28_000,
+      annualHeadroom: -2_000,
+      modelledEndingBalance: 100_000,
+      targetEndingBalance: 100_000,
+      livingStandard: "minimum" as const,
+    };
+    const outcome = {
+      status: "comfortable" as const,
+      sustainableNetSpending: 30_000,
+      annualHeadroom: 500,
+      modelledEndingBalance: 110_000,
+      targetEndingBalance: 100_000,
+      livingStandard: "moderate" as const,
+    };
 
-    expect(screen.getByLabelText("Experiment timeline")).toBeInTheDocument();
-    expect(screen.getByText("Today")).toBeInTheDocument();
-    expect(screen.getByText("Extra saving")).toBeInTheDocument();
-    expect(screen.getByText("Market fall")).toBeInTheDocument();
-    expect(screen.getByText("Retire")).toBeInTheDocument();
-    expect(screen.getByText("State Pension")).toBeInTheDocument();
-  });
+    renderInsights({ baselineRetirementOutcome: baseline, retirementOutcome: outcome });
 
-  it("opens the recommended next experiment", async () => {
-    const user = userEvent.setup();
-    const onSelectExperiment = vi.fn();
-    renderInsights({ onSelectExperiment });
-
-    await user.click(
-      screen.getByRole("button", { name: "Open experiment" }),
-    );
-
-    expect(onSelectExperiment).toHaveBeenCalledWith("returns");
+    expect(screen.getByText("See retirement impact details")).toBeInTheDocument();
   });
 });
