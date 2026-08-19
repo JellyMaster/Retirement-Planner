@@ -229,9 +229,9 @@ describe("OverviewPage", () => {
       incomeTargetMode: "net",
       taxFreeCash: 0,
       taxFreeCashMode: "maximum",
-      incomeGoalSource: "living-standards",
+      retirementIncomeGoalSource: "living-standard",
       customDesiredAnnualIncome: 35_000,
-      retirementLivingStandardLevel: "comfortable",
+      retirementLivingStandardsLevel: "comfortable",
       retirementLivingStandardsHousehold: "one-person",
       retirementLivingStandardsRegion: "uk",
     };
