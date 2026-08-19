@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Info, PoundSterling, TrendingUp } from "lucide-react";
 
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
+import { DrawdownBalanceChart } from "../components/drawdown/DrawdownBalanceChart";
 import { DrawdownBalanceChartExplorer } from "../components/drawdown/DrawdownBalanceChartExplorer";
 import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStory";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
@@ -10,8 +11,6 @@ import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
 import { DrawdownRetirementChapters } from "../components/drawdown/DrawdownRetirementChapters";
-import { DrawdownRetirementJourney } from "../components/drawdown/DrawdownRetirementJourney";
-import { DrawdownRetirementTimeline } from "../components/drawdown/DrawdownRetirementTimeline";
 import { DrawdownSummary } from "../components/drawdown/DrawdownSummary";
 import { DrawdownSummaryRibbon } from "../components/drawdown/DrawdownSummaryRibbon";
 import {
@@ -62,8 +61,8 @@ export function DrawdownPlannerPage() {
       <header className="planner-header dashboard-header drawdown-workspace-header">
         <div>
           <p className="planner-eyebrow">Your retirement</p>
-          <h1>Your Retirement</h1>
-          <p>Follow how your income, pension and key retirement events could develop after you stop working.</p>
+          <h1>Drawdown</h1>
+          <p>See how your retirement income and pension could evolve over time.</p>
         </div>
       </header>
 
@@ -74,7 +73,7 @@ export function DrawdownPlannerPage() {
           <div>
             <p className="panel-eyebrow">Retirement story</p>
             <h2 id="drawdown-results-title">What happens after you retire?</h2>
-            <p>Start with the complete retirement journey, then use the detailed views when you want to inspect a specific part of the plan.</p>
+            <p>Start with the key outcomes, then use the detailed views when you want to inspect one part of the plan.</p>
           </div>
           <MoneyDisplayToggle value={displayMode} onChange={setDisplayMode} />
         </div>
@@ -87,60 +86,44 @@ export function DrawdownPlannerPage() {
           {result ? (
             <>
               {activeSection === "overview" && (
-                <div className="drawdown-workspace-section drawdown-retirement-story" id="drawdown-overview-section" role="tabpanel" aria-labelledby="drawdown-tab-overview" tabIndex={0}>
-                  <SectionHeading
-                    eyebrow="At a glance"
-                    title="Your retirement summary"
-                    description="Start with the outcome of the active plan before following the journey year by year."
-                  />
+                <div className="drawdown-workspace-section drawdown-retirement-story drawdown-v12-dashboard" id="drawdown-overview-section" role="tabpanel" aria-labelledby="drawdown-tab-overview" tabIndex={0}>
                   <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
 
-                  <SectionHeading
-                    eyebrow="Your journey"
-                    title="How does retirement unfold?"
-                    description="Follow retirement, tax-free cash, State Pension and changes in spending across the planning period."
-                  />
-                  <DrawdownRetirementJourney inputs={inputs} result={result} displayMode={displayMode} />
-                  <DrawdownRetirementTimeline inputs={inputs} result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+                  <div className="drawdown-v12-primary-grid">
+                    <DrawdownBalanceChart
+                      years={result.years}
+                      depletionAge={result.depletionAge}
+                      inflationRate={inputs.inflationRate}
+                      displayMode={displayMode}
+                      spendingPhases={inputs.spendingPhases}
+                      statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
+                    />
 
-                  <SectionHeading
-                    eyebrow="Your income"
-                    title="How much could you receive through retirement?"
-                    description="See how the amount available to spend changes as your retirement progresses."
-                  />
-                  <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
-                  <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel">
-                    <div className="dashboard-chart-stage">
-                      <DrawdownIncomeChart
-                        years={result.years}
-                        inflationRate={inputs.inflationRate}
-                        displayMode={displayMode}
-                        spendingPhases={inputs.spendingPhases}
-                        statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
-                      />
-                    </div>
-                  </section>
+                    <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel drawdown-v12-income-panel">
+                      <div className="panel-heading dashboard-panel-heading">
+                        <div>
+                          <p className="panel-eyebrow">Income through retirement</p>
+                          <h2>How much could you receive?</h2>
+                          <p>Follow the annual income available as the plan moves through retirement.</p>
+                        </div>
+                      </div>
+                      <div className="dashboard-chart-stage">
+                        <DrawdownIncomeChart
+                          years={result.years}
+                          inflationRate={inputs.inflationRate}
+                          displayMode={displayMode}
+                          spendingPhases={inputs.spendingPhases}
+                          statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
+                        />
+                      </div>
+                    </section>
+                  </div>
 
-                  <SectionHeading
-                    eyebrow="Income sources"
-                    title="Where does your retirement income come from?"
-                    description="Understand how pension withdrawals and State Pension combine to support your spending."
-                  />
-                  <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
-
-                  <SectionHeading
-                    eyebrow="Your pension"
-                    title="What happens to the pension balance?"
-                    description="See how withdrawals, investment growth and fees affect the pension that remains through retirement."
-                  />
-                  <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} />
-
-                  <SectionHeading
-                    eyebrow="What this means"
-                    title="Key retirement insights"
-                    description="Finish with the most important outcomes from the current retirement plan."
-                  />
-                  <DrawdownInsights result={result} />
+                  <div className="drawdown-v12-secondary-grid">
+                    <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
+                    <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} />
+                    <DrawdownInsights result={result} />
+                  </div>
                 </div>
               )}
 
