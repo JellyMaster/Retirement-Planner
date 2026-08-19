@@ -1,0 +1,139 @@
+.advanced-retirement-strategy {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: var(--ui-space-3);
+}
+
+.advanced-retirement-strategy-heading {
+  margin-bottom: var(--ui-space-1);
+}
+
+.retirement-strategy-card {
+  overflow: hidden;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.retirement-strategy-card.is-open {
+  border-color: color-mix(in srgb, var(--colour-primary) 35%, var(--colour-border));
+  background: var(--colour-surface);
+}
+
+.retirement-strategy-card-toggle {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 0;
+  background: transparent;
+  color: var(--colour-text);
+  text-align: left;
+}
+
+.retirement-strategy-card-toggle:hover {
+  background: var(--colour-surface-hover);
+}
+
+.retirement-strategy-card-toggle > span:first-child {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.retirement-strategy-card-toggle strong {
+  font-size: var(--ui-font-size-md);
+}
+
+.retirement-strategy-card-toggle small {
+  overflow-wrap: anywhere;
+  color: var(--colour-text-muted);
+  line-height: 1.4;
+}
+
+.retirement-strategy-card-body {
+  display: grid;
+  gap: var(--ui-space-4);
+  padding: var(--ui-space-4);
+  border-top: 1px solid var(--colour-border);
+}
+
+.retirement-strategy-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-3);
+}
+
+.retirement-strategy-choice-grid.is-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.retirement-strategy-choice-grid > button {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-space-1);
+  min-height: 7rem;
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+  text-align: left;
+}
+
+.retirement-strategy-choice-grid > button:hover {
+  border-color: color-mix(in srgb, var(--colour-primary) 35%, var(--colour-border));
+  background: var(--colour-surface-hover);
+}
+
+.retirement-strategy-choice-grid > button.is-selected {
+  border-color: color-mix(in srgb, var(--colour-primary) 60%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--colour-primary) 25%, transparent);
+}
+
+.retirement-strategy-choice-grid > button span,
+.retirement-strategy-choice-grid > button small {
+  color: var(--colour-text-muted);
+  line-height: 1.45;
+}
+
+.retirement-strategy-choice-grid > button small {
+  margin-top: auto;
+  color: var(--colour-primary);
+  font-weight: 800;
+}
+
+.retirement-strategy-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-4);
+}
+
+.retirement-strategy-field-wide {
+  grid-column: 1 / -1;
+}
+
+.retirement-strategy-spending-editor {
+  padding-top: var(--ui-space-2);
+  border-top: 1px solid var(--colour-border);
+}
+
+@media (max-width: 900px) {
+  .retirement-strategy-choice-grid.is-three {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .retirement-strategy-choice-grid,
+  .retirement-strategy-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .retirement-strategy-field-wide {
+    grid-column: 1;
+  }
+}
