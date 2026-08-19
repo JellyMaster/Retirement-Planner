@@ -83,13 +83,17 @@ export function validateDrawdownInputs(
         phase.startAge >= inputs.endAge ||
         !isFiniteNumber(phase.annualIncome) ||
         phase.annualIncome < 0 ||
+        (phase.withdrawalRate !== undefined &&
+          (!isFiniteNumber(phase.withdrawalRate) ||
+            phase.withdrawalRate < 0 ||
+            phase.withdrawalRate > 1)) ||
         phase.label.trim().length === 0 ||
         (index > 0 && sorted[index - 1].startAge === phase.startAge),
     );
 
     if (hasInvalidPhase) {
       errors.spendingPhases =
-        "Spending phases must use unique whole ages within retirement and non-negative income targets.";
+        "Spending phases must use unique whole ages within retirement and valid non-negative income or withdrawal targets.";
     }
   }
 
