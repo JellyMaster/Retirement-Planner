@@ -12,14 +12,7 @@ import { ScenarioSpendingPhaseFields } from "../../scenarios/ScenarioSpendingPha
 const STANDARD_LUMP_SUM_ALLOWANCE = 268_275;
 const TAX_FREE_CASH_RATE = 0.25;
 
-type StrategySection =
-  | "income"
-  | "state-pension"
-  | "tax-free-cash"
-  | "ending-pot"
-  | "spending";
-
-type EndingPotChoice = "zero" | "ten-percent" | "custom" | "preserve";
+type StrategySection = "income" | "spending" | "sources";
 
 interface AdvancedRetirementStrategyFieldsProps {
   idPrefix: string;
@@ -48,33 +41,12 @@ export function AdvancedRetirementStrategyFields({
   const usesMaximumTaxFreeCash =
     value.taxFreeCashMode === "maximum" ||
     (value.taxFreeCashMode === undefined && value.taxFreeCash === 0);
+  const taxFreeCashChoice = usesMaximumTaxFreeCash
+    ? "maximum"
+    : value.taxFreeCash > 0
+      ? "custom"
+      : "none";
   const hasCustomSpending = Boolean(value.spendingPhases?.length);
-  const spendingPattern = hasCustomSpending
-    ? value.withdrawalStrategy === "percentage"
-      ? "Custom withdrawal-rate pattern"
-      : "Custom spending plan"
-    : value.withdrawalStrategy === "percentage"
-      ? "One withdrawal rate throughout"
-      : "Level spending";
-
-  const endingBalanceMode = value.endingBalanceMode ?? "preserve";
-  const endingBalancePercentage = value.endingBalancePercentage ?? 1;
-  const endingPotChoice: EndingPotChoice =
-    endingBalanceMode === "spend-to-zero"
-      ? "zero"
-      : endingBalanceMode === "preserve"
-        ? "preserve"
-        : Math.abs(endingBalancePercentage - 0.1) < 0.0001
-          ? "ten-percent"
-          : "custom";
-  const endingPotSummary =
-    endingPotChoice === "zero"
-      ? "Spend the pension to £0"
-      : endingPotChoice === "preserve"
-        ? "Preserve the retirement pot"
-        : endingPotChoice === "ten-percent"
-          ? "Keep 10% of the retirement pot"
-          : `Keep ${formatPercentage(endingBalancePercentage)} of the retirement pot`;
 
   function update<K extends keyof ScenarioDrawdownPreferences>(
     field: K,
@@ -102,16 +74,11 @@ export function AdvancedRetirementStrategyFields({
   }
 
   function selectIncomeStrategy(strategy: WithdrawalStrategy) {
-    if (strategy === "target-income") {
-      onChange({
-        ...value,
-        withdrawalStrategy: strategy,
-        incomeTargetMode: "net",
-      });
-      return;
-    }
-
-    onChange({ ...value, withdrawalStrategy: strategy });
+    onChange({
+      ...value,
+      withdrawalStrategy: strategy,
+      ...(strategy === "target-income" ? { incomeTargetMode: "net" as const } : {}),
+    });
   }
 
   function updateRetirementGoal<K extends keyof typeof retirementGoals>(
@@ -146,46 +113,6 @@ export function AdvancedRetirementStrategyFields({
     });
   }
 
-  function setEndingPotChoice(choice: EndingPotChoice) {
-    if (choice === "zero") {
-      onChange({
-        ...value,
-        endingBalanceMode: "spend-to-zero",
-        endingBalancePercentage: 0,
-      });
-      return;
-    }
-
-    if (choice === "preserve") {
-      onChange({
-        ...value,
-        endingBalanceMode: "preserve",
-        endingBalancePercentage: 1,
-      });
-      return;
-    }
-
-    if (choice === "ten-percent") {
-      onChange({
-        ...value,
-        endingBalanceMode: "percentage",
-        endingBalancePercentage: 0.1,
-      });
-      return;
-    }
-
-    onChange({
-      ...value,
-      endingBalanceMode: "percentage",
-      endingBalancePercentage:
-        endingBalanceMode === "percentage" &&
-        endingBalancePercentage > 0 &&
-        Math.abs(endingBalancePercentage - 0.1) >= 0.0001
-          ? endingBalancePercentage
-          : 0.25,
-    });
-  }
-
   function enableCustomSpending() {
     if (value.spendingPhases?.length) return;
 
@@ -202,36 +129,46 @@ export function AdvancedRetirementStrategyFields({
     });
   }
 
-  const taxFreeCashChoice = usesMaximumTaxFreeCash
-    ? "maximum"
-    : value.taxFreeCash > 0
-      ? "custom"
-      : "none";
+  const incomeSummary =
+    value.withdrawalStrategy === "target-income"
+      ? `Stable income · ${formatCurrency(value.desiredAnnualIncome)}/year target`
+      : `Flexible income · ${formatPercentage(value.withdrawalRate)}/year`;
+
+  const spendingSummary = hasCustomSpending
+    ? value.withdrawalStrategy === "percentage"
+      ? "Different withdrawal rates through retirement"
+      : "Different spending stages through retirement"
+    : "Keep it broadly consistent";
+
+  const sourcesSummary = [
+    retirementGoals.includeStatePension ? "State Pension included" : "No State Pension",
+    usesMaximumTaxFreeCash
+      ? "Maximum tax-free cash"
+      : value.taxFreeCash > 0
+        ? "Custom tax-free cash"
+        : "No tax-free cash",
+  ].join(" · ");
 
   return (
     <div className="advanced-retirement-strategy">
       <div className="advanced-settings-subheading advanced-retirement-strategy-heading">
-        <strong>Choose how your retirement income should be modelled</strong>
+        <strong>Make the key retirement drawdown decisions</strong>
         <p>
-          These settings describe how you expect to use your pension. Most people only
-          need to review them once.
+          Answer the questions below in everyday terms. The planner uses your choices to
+          configure the drawdown model behind the scenes.
         </p>
       </div>
 
       <StrategyCard
-        title="Income strategy"
-        summary={
-          value.withdrawalStrategy === "target-income"
-            ? `Target spending · ${formatCurrency(value.desiredAnnualIncome)}/year`
-            : `${formatPercentage(value.withdrawalRate)} of the remaining pension each year`
-        }
+        title="How should your retirement income work?"
+        summary={incomeSummary}
         open={openSection === "income"}
         onToggle={() => toggle("income")}
       >
         <div
           className="retirement-strategy-choice-grid"
           role="radiogroup"
-          aria-label="Income strategy"
+          aria-label="How should your retirement income work?"
         >
           <button
             type="button"
@@ -240,9 +177,11 @@ export function AdvancedRetirementStrategyFields({
             className={value.withdrawalStrategy === "target-income" ? "is-selected" : undefined}
             onClick={() => selectIncomeStrategy("target-income")}
           >
-            <strong>Spend a target amount each year</strong>
-            <span>Plan around the net amount you would like available to spend.</span>
-            <small>Recommended for most plans</small>
+            <strong>Stable income</strong>
+            <span>
+              Aim for a chosen amount of spendable income. Pension withdrawals adjust to
+              help meet that target.
+            </span>
           </button>
           <button
             type="button"
@@ -251,30 +190,24 @@ export function AdvancedRetirementStrategyFields({
             className={value.withdrawalStrategy === "percentage" ? "is-selected" : undefined}
             onClick={() => selectIncomeStrategy("percentage")}
           >
-            <strong>Withdraw a percentage of the pension</strong>
-            <span>Income rises and falls with the remaining pension value.</span>
+            <strong>Flexible income</strong>
+            <span>
+              Withdraw a percentage of the remaining pension. Your income can rise or
+              fall as the pension value changes.
+            </span>
           </button>
         </div>
 
-        <div className="retirement-strategy-fields">
-          {value.withdrawalStrategy === "target-income" ? (
-            <FormField
-              id={`${idPrefix}-desiredAnnualIncome`}
-              label="Desired annual spending"
-              hint="The net amount you would like available to spend each year, in today's money."
-            >
-              {(id, describedBy) => (
-                <CurrencyInput
-                  id={id}
-                  aria-describedby={describedBy}
-                  value={value.desiredAnnualIncome}
-                  min={0}
-                  step={500}
-                  onValueChange={(next) => update("desiredAnnualIncome", next ?? 0)}
-                />
-              )}
-            </FormField>
-          ) : (
+        {value.withdrawalStrategy === "target-income" ? (
+          <div className="retirement-strategy-current-choice" role="note">
+            <strong>Your income goal is {formatCurrency(value.desiredAnnualIncome)}/year.</strong>
+            <span>
+              Change the amount or choose a Retirement Living Standard in the Essential
+              Retirement income section.
+            </span>
+          </div>
+        ) : (
+          <div className="retirement-strategy-fields">
             <FormField
               id={`${idPrefix}-withdrawalRate`}
               label="Annual withdrawal rate"
@@ -292,279 +225,20 @@ export function AdvancedRetirementStrategyFields({
                 />
               )}
             </FormField>
-          )}
-        </div>
-      </StrategyCard>
-
-      <StrategyCard
-        title="State Pension"
-        summary={
-          retirementGoals.includeStatePension
-            ? `Included from age ${retirementGoals.statePensionAge} · ${formatCurrency(retirementGoals.statePensionAnnualAmount)}/year`
-            : "Not included"
-        }
-        open={openSection === "state-pension"}
-        onToggle={() => toggle("state-pension")}
-      >
-        <div
-          className="retirement-strategy-choice-grid"
-          role="radiogroup"
-          aria-label="State Pension choice"
-        >
-          <button
-            type="button"
-            role="radio"
-            aria-checked={retirementGoals.includeStatePension}
-            className={retirementGoals.includeStatePension ? "is-selected" : undefined}
-            onClick={() => updateRetirementGoal("includeStatePension", true)}
-          >
-            <strong>Include State Pension</strong>
-            <span>Include the expected State Pension once it begins.</span>
-            <small>Default</small>
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={!retirementGoals.includeStatePension}
-            className={!retirementGoals.includeStatePension ? "is-selected" : undefined}
-            onClick={() => updateRetirementGoal("includeStatePension", false)}
-          >
-            <strong>Do not include State Pension</strong>
-            <span>Model retirement income using the private pension only.</span>
-          </button>
-        </div>
-
-        {retirementGoals.includeStatePension && (
-          <div className="retirement-strategy-fields">
-            <FormField
-              id={`${idPrefix}-statePensionAnnualAmount`}
-              label="Expected annual State Pension"
-              hint="Enter the annual amount in today's money."
-            >
-              {(id, describedBy) => (
-                <CurrencyInput
-                  id={id}
-                  aria-describedby={describedBy}
-                  value={retirementGoals.statePensionAnnualAmount}
-                  min={0}
-                  step={100}
-                  onValueChange={(next) =>
-                    updateRetirementGoal("statePensionAnnualAmount", next ?? 0)
-                  }
-                />
-              )}
-            </FormField>
-            <FormField
-              id={`${idPrefix}-statePensionAge`}
-              label="State Pension starts at age"
-              hint="The age when State Pension begins in the projection."
-            >
-              {(id, describedBy) => (
-                <NumberInput
-                  id={id}
-                  aria-describedby={describedBy}
-                  value={retirementGoals.statePensionAge}
-                  min={55}
-                  max={100}
-                  suffix="years"
-                  onValueChange={(next) =>
-                    updateRetirementGoal(
-                      "statePensionAge",
-                      next ?? retirementGoals.statePensionAge,
-                    )
-                  }
-                />
-              )}
-            </FormField>
           </div>
         )}
       </StrategyCard>
 
       <StrategyCard
-        title="Tax-free cash"
-        summary={
-          usesMaximumTaxFreeCash
-            ? `Maximum available · currently ${formatCurrency(maximumTaxFreeCash)}`
-            : value.taxFreeCash > 0
-              ? `Custom amount · ${formatCurrency(value.taxFreeCash)}`
-              : "No tax-free cash"
-        }
-        open={openSection === "tax-free-cash"}
-        onToggle={() => toggle("tax-free-cash")}
-      >
-        <div
-          className="retirement-strategy-choice-grid is-three"
-          role="radiogroup"
-          aria-label="Tax-free cash choice"
-        >
-          <button
-            type="button"
-            role="radio"
-            aria-checked={taxFreeCashChoice === "maximum"}
-            className={taxFreeCashChoice === "maximum" ? "is-selected" : undefined}
-            onClick={() => setTaxFreeCashChoice("maximum")}
-          >
-            <strong>Take maximum available</strong>
-            <span>
-              Uses up to 25% of the pension being accessed, subject to the modelled
-              allowance.
-            </span>
-            <small>Default</small>
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={taxFreeCashChoice === "custom"}
-            className={taxFreeCashChoice === "custom" ? "is-selected" : undefined}
-            onClick={() => setTaxFreeCashChoice("custom")}
-          >
-            <strong>Choose a custom amount</strong>
-            <span>Take less than the illustrated maximum.</span>
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={taxFreeCashChoice === "none"}
-            className={taxFreeCashChoice === "none" ? "is-selected" : undefined}
-            onClick={() => setTaxFreeCashChoice("none")}
-          >
-            <strong>Take no tax-free cash</strong>
-            <span>Leave the full pension invested for retirement income.</span>
-          </button>
-        </div>
-
-        {taxFreeCashChoice === "custom" && (
-          <div className="retirement-strategy-fields">
-            <FormField
-              id={`${idPrefix}-taxFreeCash`}
-              label="Custom tax-free cash amount"
-              hint={`Enter up to the illustrated maximum of ${formatCurrency(maximumTaxFreeCash)}.`}
-            >
-              {(id, describedBy) => (
-                <CurrencyInput
-                  id={id}
-                  aria-describedby={describedBy}
-                  value={value.taxFreeCash}
-                  min={0}
-                  max={maximumTaxFreeCash}
-                  step={100}
-                  onValueChange={(next) =>
-                    update(
-                      "taxFreeCash",
-                      Math.min(Math.max(0, next ?? 0), maximumTaxFreeCash),
-                    )
-                  }
-                />
-              )}
-            </FormField>
-          </div>
-        )}
-        <p className="advanced-plan-note">
-          The illustrated maximum is currently {formatCurrency(maximumTaxFreeCash)},
-          based on the projected pension at retirement and the modelled lump-sum
-          allowance.
-        </p>
-      </StrategyCard>
-
-      <StrategyCard
-        title="Pot at the end"
-        summary={endingPotSummary}
-        open={openSection === "ending-pot"}
-        onToggle={() => toggle("ending-pot")}
-      >
-        <div
-          className="retirement-strategy-choice-grid is-two-by-two"
-          role="radiogroup"
-          aria-label="Pension pot at the end of the plan"
-        >
-          <button
-            type="button"
-            role="radio"
-            aria-checked={endingPotChoice === "zero"}
-            className={endingPotChoice === "zero" ? "is-selected" : undefined}
-            onClick={() => setEndingPotChoice("zero")}
-          >
-            <strong>Spend the pension to £0</strong>
-            <span>Use the full retirement pot across the planning period.</span>
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={endingPotChoice === "ten-percent"}
-            className={endingPotChoice === "ten-percent" ? "is-selected" : undefined}
-            onClick={() => setEndingPotChoice("ten-percent")}
-          >
-            <strong>Keep 10%</strong>
-            <span>Finish with 10% of the pension available for drawdown at retirement.</span>
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={endingPotChoice === "custom"}
-            className={endingPotChoice === "custom" ? "is-selected" : undefined}
-            onClick={() => setEndingPotChoice("custom")}
-          >
-            <strong>Keep a custom percentage</strong>
-            <span>Choose how much of the retirement drawdown pot you want left.</span>
-          </button>
-          <button
-            type="button"
-            role="radio"
-            aria-checked={endingPotChoice === "preserve"}
-            className={endingPotChoice === "preserve" ? "is-selected" : undefined}
-            onClick={() => setEndingPotChoice("preserve")}
-          >
-            <strong>Preserve the retirement pot</strong>
-            <span>Finish with the same pension value that was available for drawdown at retirement.</span>
-            <small>Default</small>
-          </button>
-        </div>
-
-        {endingPotChoice === "custom" && (
-          <div className="retirement-strategy-fields">
-            <FormField
-              id={`${idPrefix}-endingBalancePercentage`}
-              label="Percentage of retirement pot to keep"
-              hint="This percentage is based on the pension available for drawdown at retirement, after tax-free cash."
-            >
-              {(id, describedBy) => (
-                <PercentageInput
-                  id={id}
-                  aria-describedby={describedBy}
-                  value={endingBalancePercentage}
-                  min={0}
-                  max={100}
-                  step={1}
-                  onValueChange={(next) =>
-                    onChange({
-                      ...value,
-                      endingBalanceMode: "percentage",
-                      endingBalancePercentage: Math.min(1, Math.max(0, next ?? 0)),
-                    })
-                  }
-                />
-              )}
-            </FormField>
-          </div>
-        )}
-
-        <p className="advanced-plan-note">
-          This sets the pension reserve you want left at the planning age. It is anchored
-          to the pension available for drawdown at retirement and does not grow with
-          inflation.
-        </p>
-      </StrategyCard>
-
-      <StrategyCard
-        title="Spending pattern"
-        summary={spendingPattern}
+        title="Will your spending change during retirement?"
+        summary={spendingSummary}
         open={openSection === "spending"}
         onToggle={() => toggle("spending")}
       >
         <div
           className="retirement-strategy-choice-grid"
           role="radiogroup"
-          aria-label="Spending pattern"
+          aria-label="Will your spending change during retirement?"
         >
           <button
             type="button"
@@ -573,15 +247,11 @@ export function AdvancedRetirementStrategyFields({
             className={!hasCustomSpending ? "is-selected" : undefined}
             onClick={() => update("spendingPhases", undefined)}
           >
-            <strong>
-              {value.withdrawalStrategy === "percentage"
-                ? "Keep one withdrawal rate"
-                : "Keep spending level"}
-            </strong>
+            <strong>Keep it broadly consistent</strong>
             <span>
               {value.withdrawalStrategy === "percentage"
-                ? "Use the same percentage withdrawal rate throughout retirement."
-                : "Use the same spending target throughout retirement."}
+                ? "Use the same withdrawal percentage throughout retirement."
+                : "Keep the same spending goal throughout retirement."}
             </span>
           </button>
           <button
@@ -591,15 +261,11 @@ export function AdvancedRetirementStrategyFields({
             className={hasCustomSpending ? "is-selected" : undefined}
             onClick={enableCustomSpending}
           >
-            <strong>
-              {value.withdrawalStrategy === "percentage"
-                ? "Use different withdrawal rates"
-                : "Create a custom spending plan"}
-            </strong>
+            <strong>Use different stages of retirement</strong>
             <span>
               {value.withdrawalStrategy === "percentage"
-                ? "Set different percentage withdrawal rates at different stages of retirement."
-                : "Set different spending targets at different stages of retirement."}
+                ? "Set different withdrawal rates for different stages of retirement."
+                : "Plan for spending to change as your retirement lifestyle changes."}
             </span>
           </button>
         </div>
@@ -616,6 +282,180 @@ export function AdvancedRetirementStrategyFields({
           </div>
         )}
       </StrategyCard>
+
+      <StrategyCard
+        title="What income and cash should the plan include?"
+        summary={sourcesSummary}
+        open={openSection === "sources"}
+        onToggle={() => toggle("sources")}
+      >
+        <section className="retirement-strategy-source-section">
+          <div className="advanced-settings-subheading">
+            <strong>Should we include your State Pension?</strong>
+            <p>
+              Include it if you expect to receive State Pension as part of your retirement
+              income.
+            </p>
+          </div>
+          <div
+            className="retirement-strategy-choice-grid"
+            role="radiogroup"
+            aria-label="Should we include your State Pension?"
+          >
+            <button
+              type="button"
+              role="radio"
+              aria-checked={retirementGoals.includeStatePension}
+              className={retirementGoals.includeStatePension ? "is-selected" : undefined}
+              onClick={() => updateRetirementGoal("includeStatePension", true)}
+            >
+              <strong>Yes, include it</strong>
+              <span>Use State Pension as an income source once it begins.</span>
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={!retirementGoals.includeStatePension}
+              className={!retirementGoals.includeStatePension ? "is-selected" : undefined}
+              onClick={() => updateRetirementGoal("includeStatePension", false)}
+            >
+              <strong>No, leave it out</strong>
+              <span>Model retirement using the private pension without State Pension.</span>
+            </button>
+          </div>
+
+          {retirementGoals.includeStatePension && (
+            <div className="retirement-strategy-fields">
+              <FormField
+                id={`${idPrefix}-statePensionAnnualAmount`}
+                label="Expected annual State Pension"
+                hint="Enter the annual amount in today's money."
+              >
+                {(id, describedBy) => (
+                  <CurrencyInput
+                    id={id}
+                    aria-describedby={describedBy}
+                    value={retirementGoals.statePensionAnnualAmount}
+                    min={0}
+                    step={100}
+                    onValueChange={(next) =>
+                      updateRetirementGoal("statePensionAnnualAmount", next ?? 0)
+                    }
+                  />
+                )}
+              </FormField>
+              <FormField
+                id={`${idPrefix}-statePensionAge`}
+                label="State Pension starts at age"
+                hint="The age when State Pension begins in the projection."
+              >
+                {(id, describedBy) => (
+                  <NumberInput
+                    id={id}
+                    aria-describedby={describedBy}
+                    value={retirementGoals.statePensionAge}
+                    min={55}
+                    max={100}
+                    suffix="years"
+                    onValueChange={(next) =>
+                      updateRetirementGoal(
+                        "statePensionAge",
+                        next ?? retirementGoals.statePensionAge,
+                      )
+                    }
+                  />
+                )}
+              </FormField>
+            </div>
+          )}
+        </section>
+
+        <section className="retirement-strategy-source-section">
+          <div className="advanced-settings-subheading">
+            <strong>Would you like to take tax-free cash when you retire?</strong>
+            <p>
+              Choose whether the illustration takes the maximum available, a custom
+              amount, or leaves the pension invested.
+            </p>
+          </div>
+          <div
+            className="retirement-strategy-choice-grid is-three"
+            role="radiogroup"
+            aria-label="Would you like to take tax-free cash when you retire?"
+          >
+            <button
+              type="button"
+              role="radio"
+              aria-checked={taxFreeCashChoice === "maximum"}
+              className={taxFreeCashChoice === "maximum" ? "is-selected" : undefined}
+              onClick={() => setTaxFreeCashChoice("maximum")}
+            >
+              <strong>Take the maximum</strong>
+              <span>Use the maximum illustrated tax-free cash available at retirement.</span>
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={taxFreeCashChoice === "custom"}
+              className={taxFreeCashChoice === "custom" ? "is-selected" : undefined}
+              onClick={() => setTaxFreeCashChoice("custom")}
+            >
+              <strong>Choose an amount</strong>
+              <span>Take less than the illustrated maximum.</span>
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={taxFreeCashChoice === "none"}
+              className={taxFreeCashChoice === "none" ? "is-selected" : undefined}
+              onClick={() => setTaxFreeCashChoice("none")}
+            >
+              <strong>Leave it invested</strong>
+              <span>Take no tax-free cash in this illustration.</span>
+            </button>
+          </div>
+
+          {taxFreeCashChoice === "custom" && (
+            <div className="retirement-strategy-fields">
+              <FormField
+                id={`${idPrefix}-taxFreeCash`}
+                label="Custom tax-free cash amount"
+                hint={`Enter up to the illustrated maximum of ${formatCurrency(maximumTaxFreeCash)}.`}
+              >
+                {(id, describedBy) => (
+                  <CurrencyInput
+                    id={id}
+                    aria-describedby={describedBy}
+                    value={value.taxFreeCash}
+                    min={0}
+                    max={maximumTaxFreeCash}
+                    step={100}
+                    onValueChange={(next) =>
+                      update(
+                        "taxFreeCash",
+                        Math.min(Math.max(0, next ?? 0), maximumTaxFreeCash),
+                      )
+                    }
+                  />
+                )}
+              </FormField>
+            </div>
+          )}
+          <p className="advanced-plan-note">
+            The illustrated maximum is currently {formatCurrency(maximumTaxFreeCash)}.
+          </p>
+        </section>
+      </StrategyCard>
+
+      <div className="retirement-strategy-what-if-note" role="note">
+        <strong>What if your priorities conflict?</strong>
+        <p>
+          Questions such as spending the pension to £0, keeping a percentage of the pot,
+          preserving the retirement value, or testing different market outcomes are best
+          explored as alternatives rather than baked into the core plan. Use What If? to
+          compare those trade-offs without changing your saved retirement strategy.
+        </p>
+      </div>
     </div>
   );
 }
