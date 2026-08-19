@@ -21,10 +21,12 @@ describe("RetirementPlannerPage route selection", () => {
 
     await waitFor(() =>
       expect(
-        screen.getByRole("button", { name: /Spending pattern/i }),
+        screen.getByRole("button", {
+          name: /Will your spending change during retirement/i,
+        }),
       ).toHaveAttribute("aria-expanded", "true"),
     );
 
-    expect(screen.getByText(/Create a custom spending plan/i)).toBeInTheDocument();
+    expect(screen.getByText(/Use different stages of retirement/i)).toBeInTheDocument();
   });
 });
