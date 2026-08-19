@@ -1,4 +1,5 @@
 import type { PensionInputs } from "../../engine/models/PensionInputs";
+import type { DrawdownSpendingPhase } from "../../engine/drawdown/models/DrawdownInputs";
 import { PLAN_STORAGE_KEY } from "../../state/planStorage";
 import {
   createBaselineScenario,
@@ -50,6 +51,37 @@ function isPensionInputs(value: unknown): value is PensionInputs {
   );
 }
 
+function normaliseSpendingPhases(value: unknown): DrawdownSpendingPhase[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  const phases = value.flatMap((candidate) => {
+    if (!candidate || typeof candidate !== "object") return [];
+    const phase = candidate as Partial<DrawdownSpendingPhase>;
+    if (
+      !Number.isInteger(phase.startAge) ||
+      !isFiniteNumber(phase.annualIncome) ||
+      typeof phase.label !== "string" ||
+      phase.label.trim().length === 0 ||
+      (phase.withdrawalRate !== undefined && !isFiniteNumber(phase.withdrawalRate))
+    ) {
+      return [];
+    }
+
+    return [
+      {
+        startAge: phase.startAge,
+        annualIncome: phase.annualIncome,
+        ...(phase.withdrawalRate !== undefined
+          ? { withdrawalRate: phase.withdrawalRate }
+          : {}),
+        label: phase.label,
+      },
+    ];
+  });
+
+  return phases.length > 0 ? phases : undefined;
+}
+
 function normaliseDrawdownPreferences(
   value: unknown,
 ): ScenarioDrawdownPreferences {
@@ -57,6 +89,8 @@ function normaliseDrawdownPreferences(
   if (!value || typeof value !== "object") return defaults;
 
   const preferences = value as Partial<ScenarioDrawdownPreferences>;
+  const spendingPhases = normaliseSpendingPhases(preferences.spendingPhases);
+
   return {
     planningAge: isFiniteNumber(preferences.planningAge)
       ? preferences.planningAge
@@ -77,9 +111,43 @@ function normaliseDrawdownPreferences(
       preferences.incomeTargetMode === "net"
         ? preferences.incomeTargetMode
         : defaults.incomeTargetMode,
+    ...(spendingPhases ? { spendingPhases } : {}),
     taxFreeCash: isFiniteNumber(preferences.taxFreeCash)
       ? preferences.taxFreeCash
       : defaults.taxFreeCash,
+    taxFreeCashMode:
+      preferences.taxFreeCashMode === "maximum" ||
+      preferences.taxFreeCashMode === "custom"
+        ? preferences.taxFreeCashMode
+        : defaults.taxFreeCashMode,
+    endingBalanceMode:
+      preferences.endingBalanceMode === "preserve" ||
+      preferences.endingBalanceMode === "percentage" ||
+      preferences.endingBalanceMode === "zero"
+        ? preferences.endingBalanceMode
+        : defaults.endingBalanceMode,
+    endingBalancePercentage: isFiniteNumber(preferences.endingBalancePercentage)
+      ? preferences.endingBalancePercentage
+      : defaults.endingBalancePercentage,
+    retirementLivingStandardsHousehold:
+      preferences.retirementLivingStandardsHousehold === "one-person" ||
+      preferences.retirementLivingStandardsHousehold === "two-person"
+        ? preferences.retirementLivingStandardsHousehold
+        : defaults.retirementLivingStandardsHousehold,
+    retirementLivingStandardsRegion:
+      preferences.retirementLivingStandardsRegion === "uk" ||
+      preferences.retirementLivingStandardsRegion === "london"
+        ? preferences.retirementLivingStandardsRegion
+        : defaults.retirementLivingStandardsRegion,
+    ...(typeof preferences.includeStatePension === "boolean"
+      ? { includeStatePension: preferences.includeStatePension }
+      : {}),
+    ...(isFiniteNumber(preferences.statePensionAnnualAmount)
+      ? { statePensionAnnualAmount: preferences.statePensionAnnualAmount }
+      : {}),
+    ...(isFiniteNumber(preferences.statePensionAge)
+      ? { statePensionAge: preferences.statePensionAge }
+      : {}),
   };
 }
 
