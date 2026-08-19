@@ -30,6 +30,28 @@ describe("DrawdownEngine net-income targeting", () => {
     expect(year.netIncomeShortfall).toBe(0);
   });
 
+  it("inflates a net target so it keeps the same purchasing power", () => {
+    const result = new DrawdownEngine().calculate({
+      ...netTargetInputs,
+      desiredAnnualIncome: 45_400,
+      endAge: 71,
+      inflationRate: 0.025,
+    });
+
+    expect(result.years.map((year) => year.desiredIncome)).toEqual([
+      45_400,
+      46_535,
+      47_698.38,
+      48_890.84,
+    ]);
+
+    result.years.forEach((year, index) => {
+      const inflationMultiplier = 1.025 ** index;
+      expect(year.netIncome / inflationMultiplier).toBeCloseTo(45_400, 2);
+      expect(year.netIncomeShortfall).toBe(0);
+    });
+  });
+
   it("does not withdraw private pension when State Pension alone meets the net target", () => {
     const year = new DrawdownEngine().calculate({
       ...netTargetInputs,
