@@ -100,6 +100,11 @@ export function EssentialAdvancedPensionInputsForm({
     : drawdown.taxFreeCash > 0
       ? "Custom tax-free cash included"
       : "No tax-free cash";
+  const incomeGoalSummary =
+    drawdown.retirementIncomeGoalSource === "living-standard" &&
+    drawdown.retirementLivingStandardsLevel
+      ? `${capitalise(drawdown.retirementLivingStandardsLevel)} lifestyle · ${formatCurrency(drawdown.desiredAnnualIncome)}/year`
+      : `Custom target · ${formatCurrency(drawdown.desiredAnnualIncome)}/year`;
   const futureSavingSummary = createFutureSavingSummary(value);
   const investmentAssumptionsChanged =
     value.annualReturn !== defaultPensionInputs.annualReturn ||
@@ -302,7 +307,7 @@ export function EssentialAdvancedPensionInputsForm({
 
         <EssentialCard
           title="Retirement income"
-          summary={`${formatCurrency(drawdown.desiredAnnualIncome)}/year spending target · ${retirementGoals.includeStatePension ? "State Pension included" : "State Pension not included"} · ${taxFreeCashSummary}`}
+          summary={`${incomeGoalSummary} · ${retirementGoals.includeStatePension ? "State Pension included" : "State Pension not included"} · ${taxFreeCashSummary}`}
           icon={AppIcons.money}
           complete={incomeComplete}
           open={openEssential === "income"}
@@ -465,6 +470,10 @@ function createFutureSavingSummary(value: PensionInputs): string {
     summaries.push(`${formatCurrency(value.extraMonthlyContribution)}/month extra from age ${value.extraContributionAge ?? "—"}`);
   }
   return summaries.length > 0 ? summaries.join(" · ") : "No future changes planned";
+}
+
+function capitalise(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function safeNumber(value: number): string {
