@@ -157,6 +157,8 @@ export function OverviewPage() {
             statePensionAge={
               drawdownInputs.annualStatePension > 0 ? drawdownInputs.statePensionAge : undefined
             }
+            statePensionAnnualAmount={drawdownInputs.annualStatePension}
+            withdrawalStrategy={drawdownInputs.withdrawalStrategy}
             spendingPhases={activeScenario.drawdown?.spendingPhases}
             projectionYears={scenario.projection.years}
             drawdownYears={drawdownResult?.years}
