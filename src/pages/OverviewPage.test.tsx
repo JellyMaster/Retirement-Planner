@@ -219,6 +219,32 @@ describe("OverviewPage", () => {
     expect(within(choices).getByText("Standard · £ target based")).toBeInTheDocument();
   });
 
+  it("shows the selected retirement lifestyle as the spending plan", () => {
+    const scenario = createScenario("Comfortable lifestyle");
+    scenario.drawdown = {
+      planningAge: 95,
+      withdrawalStrategy: "target-income",
+      withdrawalRate: 0.04,
+      desiredAnnualIncome: 45_400,
+      incomeTargetMode: "net",
+      taxFreeCash: 0,
+      taxFreeCashMode: "maximum",
+      incomeGoalSource: "living-standards",
+      customDesiredAnnualIncome: 35_000,
+      retirementLivingStandardLevel: "comfortable",
+      retirementLivingStandardsHousehold: "one-person",
+      retirementLivingStandardsRegion: "uk",
+    };
+    mockActiveScenario(scenario);
+    mockProjection(750_000);
+
+    renderPage();
+
+    const choices = screen.getByLabelText("Retirement plan choices");
+    expect(within(choices).getByText("Lifestyle · Comfortable")).toBeInTheDocument();
+    expect(within(choices).queryByText("Standard · £ target based")).not.toBeInTheDocument();
+  });
+
   it("uses the non-baseline active scenario in the dashboard", () => {
     mockActiveScenario(
       createScenario(
