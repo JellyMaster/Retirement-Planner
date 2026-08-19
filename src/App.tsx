@@ -31,9 +31,9 @@ interface NavigationItem {
 const navigationItems: readonly NavigationItem[] = [
   { to: "/", label: "Overview", icon: AppIcons.navigation.overview, end: true },
   { to: "/plan", label: "My Plan", icon: AppIcons.navigation.plan },
+  { to: "/drawdown", label: "Drawdown", icon: AppIcons.navigation.drawdown },
   { to: "/what-if", label: "What If?", icon: AppIcons.navigation.explore },
   { to: "/compare", label: "Compare", icon: AppIcons.navigation.compare },
-  { to: "/drawdown", label: "Drawdown", icon: AppIcons.navigation.drawdown },
   { to: "/explore", label: "Explore", icon: AppIcons.navigation.explore },
   { to: "/guidance", label: "Guidance", icon: AppIcons.navigation.guidance },
 ];
