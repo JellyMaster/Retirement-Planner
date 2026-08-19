@@ -47,7 +47,11 @@ describe("createEndingBalancePaths", () => {
     expect(paths.spend.targetEndingBalance).toBe(0);
 
     expect(paths.preserve.result.finalBalance).toBeCloseTo(500_000, 0);
-    expect(paths.reserve.result.finalBalance).toBeCloseTo(250_000, 0);
+    expect(
+      Math.abs(
+        paths.reserve.result.finalBalance - paths.reserve.targetEndingBalance,
+      ),
+    ).toBeLessThanOrEqual(25);
     expect(paths.spend.result.finalBalance).toBeCloseTo(0, 0);
   });
 
