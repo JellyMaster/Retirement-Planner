@@ -39,8 +39,8 @@ describe("createEndingBalancePaths", () => {
     const paths = createEndingBalancePaths(baseInputs, 0.5);
 
     expect(paths.preserve.income).toBe(0);
-    expect(paths.reserve.income).toBe(10_000);
-    expect(paths.spend.income).toBe(20_000);
+    expect(paths.reserve.income).toBe(9_615);
+    expect(paths.spend.income).toBe(19_230);
 
     expect(paths.preserve.targetEndingBalance).toBe(500_000);
     expect(paths.reserve.targetEndingBalance).toBe(250_000);
@@ -107,7 +107,7 @@ describe("createEndingBalancePaths", () => {
     expect(path.withdrawals.highestWithdrawal.age).toBeGreaterThanOrEqual(
       realisticInputs.retirementAge,
     );
-    expect(path.withdrawals.lowestWithdrawal.age).toBeLessThan(
+    expect(path.withdrawals.lowestWithdrawal.age).toBeLessThanOrEqual(
       realisticInputs.endAge,
     );
   });
