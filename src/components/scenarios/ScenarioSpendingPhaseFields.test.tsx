@@ -10,7 +10,7 @@ import {
 import { ScenarioSpendingPhaseFields } from "./ScenarioSpendingPhaseFields";
 
 describe("ScenarioSpendingPhaseFields", () => {
-  it("creates active, settled and later-life chapters when enabled", async () => {
+  it("creates active, settled and later-life phases when enabled", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     const value = {
@@ -48,7 +48,7 @@ describe("ScenarioSpendingPhaseFields", () => {
     );
   });
 
-  it("passes a changed later-life income target back to the plan", async () => {
+  it("passes a changed later-life spending target back to the plan", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     const initialValue: ScenarioDrawdownPreferences = {
@@ -84,10 +84,10 @@ describe("ScenarioSpendingPhaseFields", () => {
     const laterLifeCard = screen
       .getByRole("heading", { name: "Later life" })
       .closest("section");
-    if (!laterLifeCard) throw new Error("Later-life chapter card not found.");
+    if (!laterLifeCard) throw new Error("Later-life phase card not found.");
 
     const income = within(laterLifeCard).getByRole("spinbutton", {
-      name: "Annual income target",
+      name: "Annual spending target",
     });
 
     await user.clear(income);
