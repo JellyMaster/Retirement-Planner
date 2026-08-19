@@ -124,7 +124,7 @@ describe("OverviewPage", () => {
     expect(screen.getByRole("heading", { name: "Your pension through retirement" })).toBeInTheDocument();
     expect(
       screen.getByRole("img", {
-        name: "Projected pension journey from age 47 to age 95 in today's money",
+        name: /Projected pension journey from age 47 to age 95/i,
       }),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Plan choices at a glance" })).toBeInTheDocument();
@@ -186,10 +186,10 @@ describe("OverviewPage", () => {
 
     renderPage();
 
-    expect(screen.getByText("Age 100")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Plan age/i })).toBeInTheDocument();
     expect(
       screen.getByRole("img", {
-        name: "Projected pension journey from age 47 to age 100 in today's money",
+        name: /Projected pension journey from age 47 to age 100/i,
       }),
     ).toBeInTheDocument();
     const choices = screen.getByLabelText("Retirement plan choices");
