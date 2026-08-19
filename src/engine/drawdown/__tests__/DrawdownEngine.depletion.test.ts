@@ -51,14 +51,15 @@ describe("DrawdownEngine depletion and shortfall", () => {
     expect(result.firstShortfallAge).toBe(67);
   });
 
-  it("continues reporting shortfalls after the pot has depleted", () => {
+  it("continues reporting shortfalls after the pot has depleted through the planning age", () => {
     const result = new DrawdownEngine().calculate(inputs);
 
     expect(result.years.slice(3).map((year) => year.incomeShortfall)).toEqual([
       20_000,
       20_000,
+      20_000,
     ]);
-    expect(result.totalIncomeShortfall).toBe(50_000);
+    expect(result.totalIncomeShortfall).toBe(70_000);
   });
 
   it("allows State Pension to reduce shortfall after depletion", () => {
