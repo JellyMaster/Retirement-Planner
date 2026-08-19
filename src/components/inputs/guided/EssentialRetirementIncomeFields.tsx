@@ -1,6 +1,6 @@
 import type { ScenarioDrawdownPreferences } from "../../../domain/scenarios";
 import { useStoredRetirementGoals } from "../../../hooks/useStoredRetirementGoals";
-import { formatCurrency } from "../../../utils/formatters";
+import { formatCurrency, formatPercentage } from "../../../utils/formatters";
 import { CurrencyInput, FormField } from "../../forms";
 
 interface EssentialRetirementIncomeFieldsProps {
@@ -15,8 +15,10 @@ export function EssentialRetirementIncomeFields({
   onChange,
 }: EssentialRetirementIncomeFieldsProps) {
   const [retirementGoals, setRetirementGoals] = useStoredRetirementGoals();
-  const usesAdvancedPercentageStrategy = value.withdrawalStrategy === "percentage";
   const usesMaximumTaxFreeCash = value.taxFreeCashMode === "maximum";
+  const usesAdvancedSpendingPlan =
+    value.withdrawalStrategy === "percentage" || Boolean(value.spendingPhases?.length);
+  const advancedSpendingSummary = createAdvancedSpendingSummary(value);
 
   function updateDesiredIncome(nextValue: number | undefined) {
     const desiredAnnualIncome = Math.max(0, nextValue ?? 0);
@@ -25,11 +27,6 @@ export function EssentialRetirementIncomeFields({
       withdrawalStrategy: "target-income",
       incomeTargetMode: "net",
       desiredAnnualIncome,
-      spendingPhases: value.spendingPhases?.length
-        ? value.spendingPhases.map((phase, index) =>
-            index === 0 ? { ...phase, annualIncome: desiredAnnualIncome } : phase,
-          )
-        : value.spendingPhases,
     };
 
     onChange(next);
@@ -49,12 +46,13 @@ export function EssentialRetirementIncomeFields({
         </p>
       </div>
 
-      {usesAdvancedPercentageStrategy && (
+      {usesAdvancedSpendingPlan && (
         <div className="essential-retirement-income-note" role="note">
-          <strong>Advanced percentage withdrawal is currently active.</strong>
+          <strong>Advanced retirement spending is controlling this plan.</strong>
+          <span>{advancedSpendingSummary}</span>
           <span>
-            Changing the spending target below will switch this plan back to the
-            simpler net annual income approach.
+            Change this under <strong>Advanced → Retirement strategy</strong>. The
+            simple annual spending field is disabled while the advanced plan is active.
           </span>
         </div>
       )}
@@ -62,7 +60,11 @@ export function EssentialRetirementIncomeFields({
       <FormField
         id={`${idPrefix}-desiredAnnualIncome`}
         label="Desired annual spending"
-        hint="The amount you want available to spend after tax, in today's money."
+        hint={
+          usesAdvancedSpendingPlan
+            ? "This simple spending target is not used while an advanced spending plan is active."
+            : "The amount you want available to spend after tax, in today's money."
+        }
       >
         {(id, describedBy) => (
           <CurrencyInput
@@ -71,6 +73,7 @@ export function EssentialRetirementIncomeFields({
             value={value.desiredAnnualIncome}
             min={0}
             step={500}
+            disabled={usesAdvancedSpendingPlan}
             onValueChange={updateDesiredIncome}
           />
         )}
@@ -117,4 +120,33 @@ export function EssentialRetirementIncomeFields({
       </div>
     </div>
   );
+}
+
+function createAdvancedSpendingSummary(value: ScenarioDrawdownPreferences): string {
+  const phases = value.spendingPhases ?? [];
+
+  if (value.withdrawalStrategy === "percentage") {
+    if (phases.length === 0) {
+      return `The plan withdraws ${formatPercentage(value.withdrawalRate)} of the remaining pension each year.`;
+    }
+
+    const phaseSummary = phases
+      .map(
+        (phase) =>
+          `${formatPercentage(phase.withdrawalRate ?? value.withdrawalRate)} from age ${phase.startAge}`,
+      )
+      .join(" · ");
+
+    return `Custom percentage spending plan: ${phaseSummary}.`;
+  }
+
+  if (phases.length > 0) {
+    const phaseSummary = phases
+      .map((phase) => `${formatCurrency(phase.annualIncome)} from age ${phase.startAge}`)
+      .join(" · ");
+
+    return `Custom spending plan: ${phaseSummary}.`;
+  }
+
+  return "The advanced retirement strategy is controlling the spending plan.";
 }
