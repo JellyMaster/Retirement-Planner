@@ -121,10 +121,10 @@ describe("OverviewPage", () => {
     expect(screen.getByText("Overview · Baseline Plan")).toBeInTheDocument();
     expect(screen.getAllByText("Age 68").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("£750,000")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "How your pension could grow" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your pension through retirement" })).toBeInTheDocument();
     expect(
       screen.getByRole("img", {
-        name: "Projected pension growth by age in today's money",
+        name: "Projected pension journey from age 47 to age 95 in today's money",
       }),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Plan choices at a glance" })).toBeInTheDocument();
@@ -187,6 +187,11 @@ describe("OverviewPage", () => {
     renderPage();
 
     expect(screen.getByText("Age 100")).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", {
+        name: "Projected pension journey from age 47 to age 100 in today's money",
+      }),
+    ).toBeInTheDocument();
     const choices = screen.getByLabelText("Retirement plan choices");
     expect(within(choices).getByText("Included")).toBeInTheDocument();
     expect(within(choices).getByText("Not included")).toBeInTheDocument();
@@ -234,7 +239,7 @@ describe("OverviewPage", () => {
     expect(screen.getByText("Overview · Retire at 65")).toBeInTheDocument();
     expect(screen.getAllByText("Age 65").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("£820,000")).toBeInTheDocument();
-    expect(screen.getByText(/Average modelled net income across retirement/i)).toBeInTheDocument();
+    expect(screen.getByText("Average across retirement")).toBeInTheDocument();
   });
 
   it("shows incomplete guidance when there is no usable retirement projection", () => {
