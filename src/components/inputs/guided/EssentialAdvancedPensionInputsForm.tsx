@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { defaultPensionInputs } from "../../../config/defaultPensionInputs";
@@ -17,7 +17,8 @@ import {
   NumberInput,
   PercentageInput,
 } from "../../forms";
-import { ScenarioDrawdownFields, useScenarios } from "../../scenarios";
+import { useScenarios } from "../../scenarios";
+import { AdvancedRetirementStrategyFields } from "./AdvancedRetirementStrategyFields";
 import { EssentialRetirementIncomeFields } from "./EssentialRetirementIncomeFields";
 
 interface EssentialAdvancedPensionInputsFormProps {
@@ -43,6 +44,9 @@ type PercentageField =
   | "inflation"
   | "annualContributionIncrease";
 
+const DEFAULT_STATE_PENSION_AMOUNT = 12_000;
+const DEFAULT_STATE_PENSION_AGE = 67;
+
 export function EssentialAdvancedPensionInputsForm({
   idPrefix = "pension",
   value,
@@ -50,11 +54,12 @@ export function EssentialAdvancedPensionInputsForm({
   onChange,
   onReset,
 }: EssentialAdvancedPensionInputsFormProps) {
-  const { activeScenario, updateScenarioPlan } = useScenarios();
+  const { activeScenario, renameScenario, updateScenarioPlan } = useScenarios();
   const [retirementGoals] = useStoredRetirementGoals();
   const [drawdown, setDrawdown] = useState<ScenarioDrawdownPreferences>(() => ({
     ...(activeScenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
   }));
+  const [planName, setPlanName] = useState(activeScenario.name);
   const [openEssential, setOpenEssential] = useState<EssentialSection | null>(
     "retirement",
   );
@@ -67,6 +72,13 @@ export function EssentialAdvancedPensionInputsForm({
       value.extraContributionAge !== undefined ||
       value.extraMonthlyContribution !== undefined,
   );
+
+  useEffect(() => {
+    setPlanName(activeScenario.name);
+    setDrawdown({
+      ...(activeScenario.drawdown ?? createDefaultScenarioDrawdownPreferences()),
+    });
+  }, [activeScenario.id, activeScenario.name, activeScenario.drawdown]);
 
   const totalMonthly =
     value.monthlyEmployeeContribution + value.monthlyEmployerContribution;
@@ -89,6 +101,40 @@ export function EssentialAdvancedPensionInputsForm({
       ? "Custom tax-free cash included"
       : "No tax-free cash";
   const futureSavingSummary = createFutureSavingSummary(value);
+  const investmentAssumptionsChanged =
+    value.annualReturn !== defaultPensionInputs.annualReturn ||
+    value.inflation !== defaultPensionInputs.inflation ||
+    value.annualFee !== defaultPensionInputs.annualFee;
+  const futureSavingChanged =
+    value.annualContributionIncrease > 0 ||
+    value.extraContributionAge !== undefined ||
+    value.extraMonthlyContribution !== undefined;
+  const retirementStrategyChanged =
+    drawdown.withdrawalStrategy !== "target-income" ||
+    drawdown.incomeTargetMode !== "net" ||
+    Boolean(drawdown.spendingPhases?.length) ||
+    !usesMaximumTaxFreeCash ||
+    drawdown.endingBalanceMode !== "preserve" ||
+    (drawdown.endingBalancePercentage ?? 1) !== 1 ||
+    !retirementGoals.includeStatePension ||
+    retirementGoals.statePensionAnnualAmount !== DEFAULT_STATE_PENSION_AMOUNT ||
+    retirementGoals.statePensionAge !== DEFAULT_STATE_PENSION_AGE;
+  const retirementStrategySummary = [
+    drawdown.withdrawalStrategy === "target-income"
+      ? "Target income"
+      : `${formatPercentage(drawdown.withdrawalRate)} withdrawal`,
+    retirementGoals.includeStatePension
+      ? "State Pension included"
+      : "No State Pension",
+    usesMaximumTaxFreeCash
+      ? "Maximum tax-free cash"
+      : drawdown.taxFreeCash > 0
+        ? "Custom tax-free cash"
+        : "No tax-free cash",
+  ].join(" · ");
+  const trimmedPlanName = planName.trim();
+  const planNameChanged =
+    trimmedPlanName.length > 0 && trimmedPlanName !== activeScenario.name;
 
   function fieldId(name: string) {
     return `${idPrefix}-${name}`;
@@ -119,12 +165,9 @@ export function EssentialAdvancedPensionInputsForm({
     setOpenAdvanced((current) => (current === section ? null : section));
   }
 
-  function setMaximumTaxFreeCash(enabled: boolean) {
-    updateDrawdown({
-      ...drawdown,
-      taxFreeCashMode: enabled ? "maximum" : "custom",
-      taxFreeCash: enabled ? drawdown.taxFreeCash : 0,
-    });
+  function savePlanName() {
+    if (!planNameChanged) return;
+    renameScenario(activeScenario.id, trimmedPlanName);
   }
 
   function restorePlanningAssumptions() {
@@ -170,6 +213,36 @@ export function EssentialAdvancedPensionInputsForm({
         </button>
       </header>
 
+      <div className="plan-name-editor">
+        <label htmlFor={fieldId("planName")}>
+          <strong>Plan name</strong>
+          <span>Give this saved plan a name that makes it easy to recognise and compare.</span>
+        </label>
+        <div className="plan-name-editor-controls">
+          <input
+            id={fieldId("planName")}
+            type="text"
+            value={planName}
+            maxLength={80}
+            onChange={(event) => setPlanName(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                savePlanName();
+              }
+            }}
+          />
+          <button
+            type="button"
+            className="ui-button ui-button-secondary ui-button-small"
+            disabled={!planNameChanged}
+            onClick={savePlanName}
+          >
+            Save name
+          </button>
+        </div>
+      </div>
+
       <section className="essential-plan-group" aria-labelledby="essential-plan-title">
         <div className="essential-plan-group-heading">
           <div>
@@ -196,71 +269,14 @@ export function EssentialAdvancedPensionInputsForm({
           ariaLabel="You and retirement"
           onToggle={() => toggleEssential("retirement")}
         >
-          <FormField
-            id={fieldId("currentAge")}
-            label="Current age"
-            hint="Your age today."
-            error={errors.currentAge}
-          >
-            {(id, describedBy) => (
-              <NumberInput
-                id={id}
-                aria-describedby={describedBy}
-                value={Number.isFinite(value.currentAge) ? value.currentAge : ""}
-                min={18}
-                max={100}
-                suffix="years"
-                error={Boolean(errors.currentAge)}
-                onValueChange={(next) => updateRequired("currentAge", next)}
-              />
-            )}
+          <FormField id={fieldId("currentAge")} label="Current age" hint="Your age today." error={errors.currentAge}>
+            {(id, describedBy) => <NumberInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.currentAge) ? value.currentAge : ""} min={18} max={100} suffix="years" error={Boolean(errors.currentAge)} onValueChange={(next) => updateRequired("currentAge", next)} />}
           </FormField>
-          <FormField
-            id={fieldId("retirementAge")}
-            label="Retirement age"
-            hint="When you expect regular pension contributions to stop."
-            error={errors.retirementAge}
-          >
-            {(id, describedBy) => (
-              <NumberInput
-                id={id}
-                aria-describedby={describedBy}
-                value={Number.isFinite(value.retirementAge) ? value.retirementAge : ""}
-                min={18}
-                max={100}
-                suffix="years"
-                error={Boolean(errors.retirementAge)}
-                onValueChange={(next) => updateRequired("retirementAge", next)}
-              />
-            )}
+          <FormField id={fieldId("retirementAge")} label="Retirement age" hint="When you expect regular pension contributions to stop." error={errors.retirementAge}>
+            {(id, describedBy) => <NumberInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.retirementAge) ? value.retirementAge : ""} min={18} max={100} suffix="years" error={Boolean(errors.retirementAge)} onValueChange={(next) => updateRequired("retirementAge", next)} />}
           </FormField>
-          <FormField
-            id={fieldId("planningAge")}
-            label="Plan income to age"
-            hint="How long should this retirement plan provide income?"
-            error={
-              !planningAgeValid
-                ? "Planning age must be after retirement and no more than 120."
-                : undefined
-            }
-          >
-            {(id, describedBy) => (
-              <NumberInput
-                id={id}
-                aria-describedby={describedBy}
-                value={drawdown.planningAge}
-                min={value.retirementAge + 1}
-                max={120}
-                suffix="years"
-                error={!planningAgeValid}
-                onValueChange={(next) =>
-                  updateDrawdown({
-                    ...drawdown,
-                    planningAge: next ?? drawdown.planningAge,
-                  })
-                }
-              />
-            )}
+          <FormField id={fieldId("planningAge")} label="Plan income to age" hint="How long should this retirement plan provide income?" error={!planningAgeValid ? "Planning age must be after retirement and no more than 120." : undefined}>
+            {(id, describedBy) => <NumberInput id={id} aria-describedby={describedBy} value={drawdown.planningAge} min={value.retirementAge + 1} max={120} suffix="years" error={!planningAgeValid} onValueChange={(next) => updateDrawdown({ ...drawdown, planningAge: next ?? drawdown.planningAge })} />}
           </FormField>
         </EssentialCard>
 
@@ -273,68 +289,14 @@ export function EssentialAdvancedPensionInputsForm({
           ariaLabel="Your pension"
           onToggle={() => toggleEssential("pension")}
         >
-          <FormField
-            id={fieldId("currentPot")}
-            label="Current pension pot"
-            hint="The combined value of pensions included in this plan."
-            error={errors.currentPot}
-          >
-            {(id, describedBy) => (
-              <CurrencyInput
-                id={id}
-                aria-describedby={describedBy}
-                value={Number.isFinite(value.currentPot) ? value.currentPot : ""}
-                step={100}
-                error={Boolean(errors.currentPot)}
-                onValueChange={(next) => updateRequired("currentPot", next)}
-              />
-            )}
+          <FormField id={fieldId("currentPot")} label="Current pension pot" hint="The combined value of pensions included in this plan." error={errors.currentPot}>
+            {(id, describedBy) => <CurrencyInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.currentPot) ? value.currentPot : ""} step={100} error={Boolean(errors.currentPot)} onValueChange={(next) => updateRequired("currentPot", next)} />}
           </FormField>
-          <FormField
-            id={fieldId("employeeContribution")}
-            label="Your monthly contribution"
-            hint="The amount paid from you each month."
-            error={errors.monthlyEmployeeContribution}
-          >
-            {(id, describedBy) => (
-              <CurrencyInput
-                id={id}
-                aria-describedby={describedBy}
-                value={
-                  Number.isFinite(value.monthlyEmployeeContribution)
-                    ? value.monthlyEmployeeContribution
-                    : ""
-                }
-                step={10}
-                error={Boolean(errors.monthlyEmployeeContribution)}
-                onValueChange={(next) =>
-                  updateRequired("monthlyEmployeeContribution", next)
-                }
-              />
-            )}
+          <FormField id={fieldId("employeeContribution")} label="Your monthly contribution" hint="The amount paid from you each month." error={errors.monthlyEmployeeContribution}>
+            {(id, describedBy) => <CurrencyInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.monthlyEmployeeContribution) ? value.monthlyEmployeeContribution : ""} step={10} error={Boolean(errors.monthlyEmployeeContribution)} onValueChange={(next) => updateRequired("monthlyEmployeeContribution", next)} />}
           </FormField>
-          <FormField
-            id={fieldId("employerContribution")}
-            label="Employer monthly contribution"
-            hint="The amount your employer pays in each month."
-            error={errors.monthlyEmployerContribution}
-          >
-            {(id, describedBy) => (
-              <CurrencyInput
-                id={id}
-                aria-describedby={describedBy}
-                value={
-                  Number.isFinite(value.monthlyEmployerContribution)
-                    ? value.monthlyEmployerContribution
-                    : ""
-                }
-                step={10}
-                error={Boolean(errors.monthlyEmployerContribution)}
-                onValueChange={(next) =>
-                  updateRequired("monthlyEmployerContribution", next)
-                }
-              />
-            )}
+          <FormField id={fieldId("employerContribution")} label="Employer monthly contribution" hint="The amount your employer pays in each month." error={errors.monthlyEmployerContribution}>
+            {(id, describedBy) => <CurrencyInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.monthlyEmployerContribution) ? value.monthlyEmployerContribution : ""} step={10} error={Boolean(errors.monthlyEmployerContribution)} onValueChange={(next) => updateRequired("monthlyEmployerContribution", next)} />}
           </FormField>
         </EssentialCard>
 
@@ -347,11 +309,7 @@ export function EssentialAdvancedPensionInputsForm({
           ariaLabel="Retirement income"
           onToggle={() => toggleEssential("income")}
         >
-          <EssentialRetirementIncomeFields
-            idPrefix={fieldId("essential-income")}
-            value={drawdown}
-            onChange={updateDrawdown}
-          />
+          <EssentialRetirementIncomeFields idPrefix={fieldId("essential-income")} value={drawdown} onChange={updateDrawdown} />
         </EssentialCard>
       </section>
 
@@ -368,6 +326,7 @@ export function EssentialAdvancedPensionInputsForm({
           title="Investment assumptions"
           summary={`${formatPercentage(value.annualReturn)} return · ${formatPercentage(value.inflation)} inflation · ${formatPercentage(value.annualFee)} fee`}
           icon={AppIcons.growth}
+          changed={investmentAssumptionsChanged}
           open={openAdvanced === "assumptions"}
           ariaLabel="Investment assumptions"
           onToggle={() => toggleAdvanced("assumptions")}
@@ -375,74 +334,18 @@ export function EssentialAdvancedPensionInputsForm({
           <div className="advanced-settings-intro">
             <div>
               <strong>Planning assumptions</strong>
-              <p>
-                These figures drive the long-term illustration. They are assumptions,
-                not predictions, and can be changed to explore different outcomes.
-              </p>
+              <p>These figures drive the long-term illustration. They are assumptions, not predictions, and can be changed to explore different outcomes.</p>
             </div>
-            <button
-              type="button"
-              className="ui-button ui-button-secondary ui-button-small"
-              onClick={restorePlanningAssumptions}
-            >
-              Restore planning assumptions
-            </button>
+            <button type="button" className="ui-button ui-button-secondary ui-button-small" onClick={restorePlanningAssumptions}>Restore planning assumptions</button>
           </div>
-
-          <FormField
-            id={fieldId("annualReturn")}
-            label="Expected annual return"
-            hint="Investment growth before pension fees."
-            error={errors.annualReturn}
-          >
-            {(id, describedBy) => (
-              <PercentageInput
-                id={id}
-                aria-describedby={describedBy}
-                value={Number.isFinite(value.annualReturn) ? value.annualReturn : ""}
-                max={20}
-                step={0.1}
-                error={Boolean(errors.annualReturn)}
-                onValueChange={(next) => updatePercentage("annualReturn", next)}
-              />
-            )}
+          <FormField id={fieldId("annualReturn")} label="Expected annual return" hint="Investment growth before pension fees." error={errors.annualReturn}>
+            {(id, describedBy) => <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.annualReturn) ? value.annualReturn : ""} max={20} step={0.1} error={Boolean(errors.annualReturn)} onValueChange={(next) => updatePercentage("annualReturn", next)} />}
           </FormField>
-          <FormField
-            id={fieldId("inflation")}
-            label="Expected inflation"
-            hint="Used to show values in today's money."
-            error={errors.inflation}
-          >
-            {(id, describedBy) => (
-              <PercentageInput
-                id={id}
-                aria-describedby={describedBy}
-                value={Number.isFinite(value.inflation) ? value.inflation : ""}
-                max={15}
-                step={0.1}
-                error={Boolean(errors.inflation)}
-                onValueChange={(next) => updatePercentage("inflation", next)}
-              />
-            )}
+          <FormField id={fieldId("inflation")} label="Expected inflation" hint="Used to show values in today's money." error={errors.inflation}>
+            {(id, describedBy) => <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.inflation) ? value.inflation : ""} max={15} step={0.1} error={Boolean(errors.inflation)} onValueChange={(next) => updatePercentage("inflation", next)} />}
           </FormField>
-          <FormField
-            id={fieldId("annualFee")}
-            label="Annual pension fee"
-            hint="Fund, platform and administration charges combined."
-            error={errors.annualFee}
-          >
-            {(id, describedBy) => (
-              <PercentageInput
-                id={id}
-                aria-describedby={describedBy}
-                value={Number.isFinite(value.annualFee) ? value.annualFee : ""}
-                max={5}
-                step={0.01}
-                decimalPlaces={4}
-                error={Boolean(errors.annualFee)}
-                onValueChange={(next) => updatePercentage("annualFee", next)}
-              />
-            )}
+          <FormField id={fieldId("annualFee")} label="Annual pension fee" hint="Fund, platform and administration charges combined." error={errors.annualFee}>
+            {(id, describedBy) => <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.annualFee) ? value.annualFee : ""} max={5} step={0.01} decimalPlaces={4} error={Boolean(errors.annualFee)} onValueChange={(next) => updatePercentage("annualFee", next)} />}
           </FormField>
         </AdvancedCard>
 
@@ -450,76 +353,30 @@ export function EssentialAdvancedPensionInputsForm({
           title="Future saving changes"
           summary={futureSavingSummary}
           icon={AppIcons.plus}
+          changed={futureSavingChanged}
           open={openAdvanced === "contributions"}
           ariaLabel="Future saving changes"
           onToggle={() => toggleAdvanced("contributions")}
         >
           <div className="advanced-settings-subheading">
             <strong>Choose the types of future change you want to model</strong>
-            <p>
-              These options do different jobs. You can use either one, both together,
-              or leave both switched off.
-            </p>
+            <p>These options do different jobs. You can use either one, both together, or leave both switched off.</p>
           </div>
 
           <section className="advanced-future-saving-option">
             <div className="advanced-settings-intro advanced-future-saving-intro">
               <div>
                 <strong>Annual contribution increase</strong>
-                <p>
-                  Gradually increases your regular monthly pension contribution every
-                  year. This is useful if you expect contributions to rise with salary
-                  or want to increase saving by a set percentage each year.
-                </p>
+                <p>Gradually increases your regular monthly pension contribution every year. This is useful if you expect contributions to rise with salary or want to increase saving by a set percentage each year.</p>
               </div>
-              <div
-                className="advanced-choice-toggle"
-                role="group"
-                aria-label="Annual contribution increase"
-              >
-                <button
-                  type="button"
-                  className={!annualIncreaseEnabled ? "is-selected" : undefined}
-                  aria-pressed={!annualIncreaseEnabled}
-                  onClick={() => setAnnualIncrease(false)}
-                >
-                  Off
-                </button>
-                <button
-                  type="button"
-                  className={annualIncreaseEnabled ? "is-selected" : undefined}
-                  aria-pressed={annualIncreaseEnabled}
-                  onClick={() => setAnnualIncrease(true)}
-                >
-                  On
-                </button>
+              <div className="advanced-choice-toggle" role="group" aria-label="Annual contribution increase">
+                <button type="button" className={!annualIncreaseEnabled ? "is-selected" : undefined} aria-pressed={!annualIncreaseEnabled} onClick={() => setAnnualIncrease(false)}>Off</button>
+                <button type="button" className={annualIncreaseEnabled ? "is-selected" : undefined} aria-pressed={annualIncreaseEnabled} onClick={() => setAnnualIncrease(true)}>On</button>
               </div>
             </div>
-
             {annualIncreaseEnabled && (
-              <FormField
-                id={fieldId("contributionIncrease")}
-                label="Increase regular contributions each year by"
-                hint="Applied to the regular monthly pension contributions each year."
-                error={errors.annualContributionIncrease}
-              >
-                {(id, describedBy) => (
-                  <PercentageInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={
-                      Number.isFinite(value.annualContributionIncrease)
-                        ? value.annualContributionIncrease
-                        : ""
-                    }
-                    max={20}
-                    step={0.1}
-                    error={Boolean(errors.annualContributionIncrease)}
-                    onValueChange={(next) =>
-                      updatePercentage("annualContributionIncrease", next)
-                    }
-                  />
-                )}
+              <FormField id={fieldId("contributionIncrease")} label="Increase regular contributions each year by" hint="Applied to the regular monthly pension contributions each year." error={errors.annualContributionIncrease}>
+                {(id, describedBy) => <PercentageInput id={id} aria-describedby={describedBy} value={Number.isFinite(value.annualContributionIncrease) ? value.annualContributionIncrease : ""} max={20} step={0.1} error={Boolean(errors.annualContributionIncrease)} onValueChange={(next) => updatePercentage("annualContributionIncrease", next)} />}
               </FormField>
             )}
           </section>
@@ -528,75 +385,20 @@ export function EssentialAdvancedPensionInputsForm({
             <div className="advanced-settings-intro advanced-future-saving-intro">
               <div>
                 <strong>Additional contribution later</strong>
-                <p>
-                  Adds a separate extra monthly pension contribution from a chosen age.
-                  This is useful when money may become available later, for example after
-                  a mortgage or another regular cost ends.
-                </p>
+                <p>Adds a separate extra monthly pension contribution from a chosen age. This is useful when money may become available later, for example after a mortgage or another regular cost ends.</p>
               </div>
-              <div
-                className="advanced-choice-toggle"
-                role="group"
-                aria-label="Additional contribution later"
-              >
-                <button
-                  type="button"
-                  className={!additionalContributionEnabled ? "is-selected" : undefined}
-                  aria-pressed={!additionalContributionEnabled}
-                  onClick={() => setAdditionalContribution(false)}
-                >
-                  Off
-                </button>
-                <button
-                  type="button"
-                  className={additionalContributionEnabled ? "is-selected" : undefined}
-                  aria-pressed={additionalContributionEnabled}
-                  onClick={() => setAdditionalContribution(true)}
-                >
-                  On
-                </button>
+              <div className="advanced-choice-toggle" role="group" aria-label="Additional contribution later">
+                <button type="button" className={!additionalContributionEnabled ? "is-selected" : undefined} aria-pressed={!additionalContributionEnabled} onClick={() => setAdditionalContribution(false)}>Off</button>
+                <button type="button" className={additionalContributionEnabled ? "is-selected" : undefined} aria-pressed={additionalContributionEnabled} onClick={() => setAdditionalContribution(true)}>On</button>
               </div>
             </div>
-
             {additionalContributionEnabled && (
               <div className="advanced-future-saving-fields">
-                <FormField
-                  id={fieldId("extraContributionAge")}
-                  label="Start extra saving at age"
-                  hint="The age when the additional monthly contribution begins."
-                  error={errors.extraContributionAge}
-                >
-                  {(id, describedBy) => (
-                    <NumberInput
-                      id={id}
-                      aria-describedby={describedBy}
-                      value={value.extraContributionAge ?? ""}
-                      min={value.currentAge}
-                      max={Math.max(value.currentAge, value.retirementAge - 1)}
-                      suffix="years"
-                      error={Boolean(errors.extraContributionAge)}
-                      onValueChange={(next) => updateOptional("extraContributionAge", next)}
-                    />
-                  )}
+                <FormField id={fieldId("extraContributionAge")} label="Start extra saving at age" hint="The age when the additional monthly contribution begins." error={errors.extraContributionAge}>
+                  {(id, describedBy) => <NumberInput id={id} aria-describedby={describedBy} value={value.extraContributionAge ?? ""} min={value.currentAge} max={Math.max(value.currentAge, value.retirementAge - 1)} suffix="years" error={Boolean(errors.extraContributionAge)} onValueChange={(next) => updateOptional("extraContributionAge", next)} />}
                 </FormField>
-                <FormField
-                  id={fieldId("extraMonthlyContribution")}
-                  label="Extra monthly contribution"
-                  hint="The additional amount paid into the pension each month from that age."
-                  error={errors.extraMonthlyContribution}
-                >
-                  {(id, describedBy) => (
-                    <CurrencyInput
-                      id={id}
-                      aria-describedby={describedBy}
-                      value={value.extraMonthlyContribution ?? ""}
-                      step={10}
-                      error={Boolean(errors.extraMonthlyContribution)}
-                      onValueChange={(next) =>
-                        updateOptional("extraMonthlyContribution", next)
-                      }
-                    />
-                  )}
+                <FormField id={fieldId("extraMonthlyContribution")} label="Extra monthly contribution" hint="The additional amount paid into the pension each month from that age." error={errors.extraMonthlyContribution}>
+                  {(id, describedBy) => <CurrencyInput id={id} aria-describedby={describedBy} value={value.extraMonthlyContribution ?? ""} step={10} error={Boolean(errors.extraMonthlyContribution)} onValueChange={(next) => updateOptional("extraMonthlyContribution", next)} />}
                 </FormField>
               </div>
             )}
@@ -605,30 +407,14 @@ export function EssentialAdvancedPensionInputsForm({
 
         <AdvancedCard
           title="Retirement strategy"
-          summary="Withdrawal approach, spending chapters, tax-free cash and State Pension details"
+          summary={retirementStrategySummary}
           icon={AppIcons.settings}
+          changed={retirementStrategyChanged}
           open={openAdvanced === "strategy"}
           ariaLabel="Retirement strategy"
           onToggle={() => toggleAdvanced("strategy")}
         >
-          <p className="advanced-plan-note">
-            These settings are optional refinements. Use them when you want more
-            control over how retirement income is modelled.
-          </p>
-          <label className="retirement-goals-checkbox">
-            <input
-              type="checkbox"
-              checked={usesMaximumTaxFreeCash}
-              onChange={(event) => setMaximumTaxFreeCash(event.target.checked)}
-            />
-            <span>Take the maximum illustrated 25% tax-free cash at retirement</span>
-          </label>
-          <p className="advanced-plan-note">
-            {usesMaximumTaxFreeCash
-              ? "The amount automatically follows the projected pension at retirement, subject to the modelled lump-sum allowance. Switch this off before entering a custom amount below."
-              : "Maximum tax-free cash is switched off. Use the Tax-free cash section below to choose no cash or a custom amount."}
-          </p>
-          <ScenarioDrawdownFields
+          <AdvancedRetirementStrategyFields
             idPrefix={fieldId("drawdown")}
             retirementAge={value.retirementAge}
             value={drawdown}
@@ -640,90 +426,29 @@ export function EssentialAdvancedPensionInputsForm({
   );
 }
 
-function EssentialCard({
-  title,
-  summary,
-  icon,
-  complete,
-  open,
-  ariaLabel,
-  onToggle,
-  children,
-}: {
-  title: string;
-  summary: string;
-  icon: (typeof AppIcons)[keyof typeof AppIcons];
-  complete: boolean;
-  open: boolean;
-  ariaLabel: string;
-  onToggle: () => void;
-  children: ReactNode;
-}) {
+function EssentialCard({ title, summary, icon, complete, open, ariaLabel, onToggle, children }: { title: string; summary: string; icon: (typeof AppIcons)[keyof typeof AppIcons]; complete: boolean; open: boolean; ariaLabel: string; onToggle: () => void; children: ReactNode }) {
   return (
     <article className={`essential-plan-card${open ? " is-open" : ""}`}>
-      <button
-        type="button"
-        className="essential-plan-card-toggle"
-        aria-label={ariaLabel}
-        aria-expanded={open}
-        onClick={onToggle}
-      >
-        <span className="essential-plan-card-icon" aria-hidden="true">
-          <FontAwesomeIcon icon={icon} />
-        </span>
-        <span className="essential-plan-card-copy">
-          <strong>{title}</strong>
-          <small>{summary}</small>
-        </span>
-        <span
-          className={`essential-plan-card-state${complete ? " is-complete" : ""}`}
-        >
-          {complete ? "Complete" : "Review"}
-        </span>
-        <span aria-hidden="true" className="essential-plan-card-chevron">
-          {open ? "−" : "+"}
-        </span>
+      <button type="button" className="essential-plan-card-toggle" aria-label={ariaLabel} aria-expanded={open} onClick={onToggle}>
+        <span className="essential-plan-card-icon" aria-hidden="true"><FontAwesomeIcon icon={icon} /></span>
+        <span className="essential-plan-card-copy"><strong>{title}</strong><small>{summary}</small></span>
+        <span className={`essential-plan-card-state${complete ? " is-complete" : ""}`}>{complete ? "Complete" : "Review"}</span>
+        <span aria-hidden="true" className="essential-plan-card-chevron">{open ? "−" : "+"}</span>
       </button>
       {open && <div className="essential-plan-card-fields">{children}</div>}
     </article>
   );
 }
 
-function AdvancedCard({
-  title,
-  summary,
-  icon,
-  open,
-  ariaLabel,
-  onToggle,
-  children,
-}: {
-  title: string;
-  summary: string;
-  icon: (typeof AppIcons)[keyof typeof AppIcons];
-  open: boolean;
-  ariaLabel: string;
-  onToggle: () => void;
-  children: ReactNode;
-}) {
+function AdvancedCard({ title, summary, icon, changed, open, ariaLabel, onToggle, children }: { title: string; summary: string; icon: (typeof AppIcons)[keyof typeof AppIcons]; changed: boolean; open: boolean; ariaLabel: string; onToggle: () => void; children: ReactNode }) {
   return (
     <article className={`advanced-plan-card${open ? " is-open" : ""}`}>
-      <button
-        type="button"
-        className="advanced-plan-card-toggle"
-        aria-label={ariaLabel}
-        aria-expanded={open}
-        onClick={onToggle}
-      >
-        <span className="essential-plan-card-icon" aria-hidden="true">
-          <FontAwesomeIcon icon={icon} />
-        </span>
-        <span className="essential-plan-card-copy">
-          <strong>{title}</strong>
-          <small>{summary}</small>
-        </span>
-        <span aria-hidden="true" className="essential-plan-card-chevron">
-          {open ? "−" : "+"}
+      <button type="button" className="advanced-plan-card-toggle" aria-label={ariaLabel} aria-expanded={open} onClick={onToggle}>
+        <span className="essential-plan-card-icon" aria-hidden="true"><FontAwesomeIcon icon={icon} /></span>
+        <span className="essential-plan-card-copy"><strong>{title}</strong><small>{summary}</small></span>
+        <span className="advanced-plan-card-meta">
+          {changed && <span className="advanced-plan-changed-badge">Changed</span>}
+          <span aria-hidden="true" className="essential-plan-card-chevron">{open ? "−" : "+"}</span>
         </span>
       </button>
       {open && <div className="essential-plan-card-fields">{children}</div>}
@@ -737,9 +462,7 @@ function createFutureSavingSummary(value: PensionInputs): string {
     summaries.push(`${formatPercentage(value.annualContributionIncrease)} annual increase`);
   }
   if (value.extraMonthlyContribution && value.extraMonthlyContribution > 0) {
-    summaries.push(
-      `${formatCurrency(value.extraMonthlyContribution)}/month extra from age ${value.extraContributionAge ?? "—"}`,
-    );
+    summaries.push(`${formatCurrency(value.extraMonthlyContribution)}/month extra from age ${value.extraContributionAge ?? "—"}`);
   }
   return summaries.length > 0 ? summaries.join(" · ") : "No future changes planned";
 }
