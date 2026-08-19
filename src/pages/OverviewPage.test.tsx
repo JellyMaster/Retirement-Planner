@@ -133,7 +133,8 @@ describe("OverviewPage", () => {
     expect(within(choices).getByText("State Pension")).toBeInTheDocument();
     expect(within(choices).getByText("Tax-free cash")).toBeInTheDocument();
     expect(within(choices).getByText("Spending plan")).toBeInTheDocument();
-    expect(within(choices).getByText("Standard")).toBeInTheDocument();
+    expect(within(choices).getByText("Maximum")).toBeInTheDocument();
+    expect(within(choices).getByText("Standard · £ target based")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Edit My Plan" })).toHaveAttribute("href", "/plan");
   });
 
@@ -188,8 +189,29 @@ describe("OverviewPage", () => {
     expect(screen.getByText("Age 100")).toBeInTheDocument();
     const choices = screen.getByLabelText("Retirement plan choices");
     expect(within(choices).getByText("Included")).toBeInTheDocument();
-    expect(within(choices).getByText("Not taken")).toBeInTheDocument();
-    expect(within(choices).getByText("Tiered")).toBeInTheDocument();
+    expect(within(choices).getByText("Not included")).toBeInTheDocument();
+    expect(within(choices).getByText("Tiered · Percentage based")).toBeInTheDocument();
+  });
+
+  it("shows a custom tax-free cash choice separately from the maximum", () => {
+    const scenario = createScenario("Custom cash plan");
+    scenario.drawdown = {
+      planningAge: 95,
+      withdrawalStrategy: "target-income",
+      withdrawalRate: 0.04,
+      desiredAnnualIncome: 30_000,
+      incomeTargetMode: "net",
+      taxFreeCash: 50_000,
+      taxFreeCashMode: "custom",
+    };
+    mockActiveScenario(scenario);
+    mockProjection(750_000);
+
+    renderPage();
+
+    const choices = screen.getByLabelText("Retirement plan choices");
+    expect(within(choices).getByText("Custom amount")).toBeInTheDocument();
+    expect(within(choices).getByText("Standard · £ target based")).toBeInTheDocument();
   });
 
   it("uses the non-baseline active scenario in the dashboard", () => {
