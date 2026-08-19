@@ -80,7 +80,7 @@ export function DrawdownPlannerPage() {
             </h2>
             <p>
               {viewMode === "simple"
-                ? "Focus on the main retirement outcomes without the calculation detail."
+                ? "See the main retirement outcomes, where your income comes from and what happens to your pension."
                 : "Inspect income, pension balance, the year-by-year timeline and calculation assumptions."}
             </p>
           </div>
@@ -131,8 +131,7 @@ export function DrawdownPlannerPage() {
 
                 <div className="drawdown-v12-secondary-grid">
                   <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
-                  <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} />
-                  <DrawdownInsights result={result} />
+                  <DrawdownInsights inputs={inputs} result={result} displayMode={displayMode} />
                 </div>
               </div>
             ) : (
