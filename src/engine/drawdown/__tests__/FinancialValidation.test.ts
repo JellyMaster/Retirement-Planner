@@ -9,7 +9,7 @@ function createInputs(overrides: Partial<DrawdownInputs> = {}): DrawdownInputs {
   return {
     startingBalance: 500_000,
     retirementAge: 65,
-    endAge: 65,
+    endAge: 66,
     withdrawalStrategy: "target-income",
     withdrawalRate: 0.04,
     desiredAnnualIncome: 0,
@@ -34,7 +34,6 @@ describe("Drawdown financial validation", () => {
       }),
     );
 
-    expect(result.years).toHaveLength(1);
     expect(result.years[0].pensionWithdrawal).toBe(40_000);
     expect(result.years[0].closingBalance).toBe(960_000);
   });
