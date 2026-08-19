@@ -20,10 +20,10 @@ const baseInputs: DrawdownInputs = {
 };
 
 describe("DrawdownEngine core calculations", () => {
-  it("calculates balances year by year", () => {
+  it("calculates balances year by year through the planning age", () => {
     const result = new DrawdownEngine().calculate(baseInputs);
 
-    expect(result.years).toHaveLength(3);
+    expect(result.years).toHaveLength(4);
     expect(result.years[0]).toMatchObject({
       year: 1,
       age: 65,
@@ -36,7 +36,8 @@ describe("DrawdownEngine core calculations", () => {
       fees: 0,
       closingBalance: 84_000,
     });
-    expect(result.finalBalance).toBe(71_085);
+    expect(result.years.at(-1)?.age).toBe(68);
+    expect(result.finalBalance).toBe(64_139.25);
   });
 
   it("starts State Pension at the configured age", () => {
@@ -46,9 +47,11 @@ describe("DrawdownEngine core calculations", () => {
       0,
       10_000,
       10_000,
+      10_000,
     ]);
     expect(result.years.map((year) => year.pensionWithdrawal)).toEqual([
       20_000,
+      10_000,
       10_000,
       10_000,
     ]);
@@ -64,15 +67,19 @@ describe("DrawdownEngine core calculations", () => {
       annualReturn: 0,
     });
 
-    expect(result.years).toHaveLength(3);
+    expect(result.years).toHaveLength(4);
     expect(result.years.map((year) => year.statePensionIncome)).toEqual([
       12_000,
       12_300,
       12_607.5,
+      12_922.69,
     ]);
-    expect(
-      result.years.map((year) => year.requiredPensionWithdrawal),
-    ).toEqual([18_000, 17_700, 17_392.5]);
+    expect(result.years.map((year) => year.requiredPensionWithdrawal)).toEqual([
+      18_000,
+      17_700,
+      17_392.5,
+      17_077.31,
+    ]);
 
     for (const year of result.years) {
       expect(year.statePensionIncome + year.pensionWithdrawal).toBeLessThanOrEqual(
