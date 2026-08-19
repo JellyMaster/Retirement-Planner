@@ -89,7 +89,14 @@ export class DrawdownEngine {
 
       const withdrawalRate = getWithdrawalRate(inputs, age);
       const percentageWithdrawal = roundMoney(openingBalance * withdrawalRate);
-      const fixedIncomeTarget = getIncomeTarget(inputs, age);
+
+      // Target-income amounts are entered in today's money. Inflate the selected
+      // target into the nominal amount required in each retirement year so that
+      // displaying the result in today's money preserves the user's spending goal.
+      const fixedIncomeTarget = roundMoney(
+        getIncomeTarget(inputs, age) * inflationMultiplier,
+      );
+
       const requiredPensionWithdrawal = inputs.withdrawalStrategy === "percentage"
         ? percentageWithdrawal
         : inputs.incomeTargetMode === "net"
