@@ -59,9 +59,11 @@ export function EssentialAdvancedPensionInputsForm({
     "retirement",
   );
   const [openAdvanced, setOpenAdvanced] = useState<AdvancedSection | null>(null);
-  const [futureSavingEnabled, setFutureSavingEnabled] = useState(
+  const [annualIncreaseEnabled, setAnnualIncreaseEnabled] = useState(
+    () => value.annualContributionIncrease > 0,
+  );
+  const [additionalContributionEnabled, setAdditionalContributionEnabled] = useState(
     () =>
-      value.annualContributionIncrease > 0 ||
       value.extraContributionAge !== undefined ||
       value.extraMonthlyContribution !== undefined,
   );
@@ -86,9 +88,7 @@ export function EssentialAdvancedPensionInputsForm({
     : drawdown.taxFreeCash > 0
       ? "Custom tax-free cash included"
       : "No tax-free cash";
-  const futureSavingSummary = futureSavingEnabled
-    ? createFutureSavingSummary(value)
-    : "No future changes planned";
+  const futureSavingSummary = createFutureSavingSummary(value);
 
   function fieldId(name: string) {
     return `${idPrefix}-${name}`;
@@ -136,16 +136,22 @@ export function EssentialAdvancedPensionInputsForm({
     });
   }
 
-  function setFutureSavingChanges(enabled: boolean) {
-    setFutureSavingEnabled(enabled);
-    if (enabled) return;
+  function setAnnualIncrease(enabled: boolean) {
+    setAnnualIncreaseEnabled(enabled);
+    if (!enabled) {
+      onChange({ ...value, annualContributionIncrease: 0 });
+    }
+  }
 
-    onChange({
-      ...value,
-      annualContributionIncrease: 0,
-      extraContributionAge: undefined,
-      extraMonthlyContribution: undefined,
-    });
+  function setAdditionalContribution(enabled: boolean) {
+    setAdditionalContributionEnabled(enabled);
+    if (!enabled) {
+      onChange({
+        ...value,
+        extraContributionAge: undefined,
+        extraMonthlyContribution: undefined,
+      });
+    }
   }
 
   return (
@@ -448,51 +454,53 @@ export function EssentialAdvancedPensionInputsForm({
           ariaLabel="Future saving changes"
           onToggle={() => toggleAdvanced("contributions")}
         >
-          <div className="advanced-settings-intro advanced-future-saving-intro">
-            <div>
-              <strong>Do you expect your pension saving to change in future?</strong>
-              <p>
-                Keep this off if you want the projection to use your current monthly
-                contributions throughout the saving period.
-              </p>
-            </div>
-            <div
-              className="advanced-choice-toggle"
-              role="group"
-              aria-label="Future saving changes"
-            >
-              <button
-                type="button"
-                className={!futureSavingEnabled ? "is-selected" : undefined}
-                aria-pressed={!futureSavingEnabled}
-                onClick={() => setFutureSavingChanges(false)}
-              >
-                No
-              </button>
-              <button
-                type="button"
-                className={futureSavingEnabled ? "is-selected" : undefined}
-                aria-pressed={futureSavingEnabled}
-                onClick={() => setFutureSavingChanges(true)}
-              >
-                Yes
-              </button>
-            </div>
+          <div className="advanced-settings-subheading">
+            <strong>Choose the types of future change you want to model</strong>
+            <p>
+              These options do different jobs. You can use either one, both together,
+              or leave both switched off.
+            </p>
           </div>
 
-          {futureSavingEnabled && (
-            <>
-              <div className="advanced-settings-subheading">
-                <strong>How might saving change?</strong>
+          <section className="advanced-future-saving-option">
+            <div className="advanced-settings-intro advanced-future-saving-intro">
+              <div>
+                <strong>Annual contribution increase</strong>
                 <p>
-                  You can model contributions rising each year, an extra monthly amount
-                  later, or both.
+                  Gradually increases your regular monthly pension contribution every
+                  year. This is useful if you expect contributions to rise with salary
+                  or want to increase saving by a set percentage each year.
                 </p>
               </div>
+              <div
+                className="advanced-choice-toggle"
+                role="group"
+                aria-label="Annual contribution increase"
+              >
+                <button
+                  type="button"
+                  className={!annualIncreaseEnabled ? "is-selected" : undefined}
+                  aria-pressed={!annualIncreaseEnabled}
+                  onClick={() => setAnnualIncrease(false)}
+                >
+                  Off
+                </button>
+                <button
+                  type="button"
+                  className={annualIncreaseEnabled ? "is-selected" : undefined}
+                  aria-pressed={annualIncreaseEnabled}
+                  onClick={() => setAnnualIncrease(true)}
+                >
+                  On
+                </button>
+              </div>
+            </div>
+
+            {annualIncreaseEnabled && (
               <FormField
                 id={fieldId("contributionIncrease")}
-                label="Annual contribution increase"
-                hint="For example, contributions rising with salary. Leave at 0% if they stay flat."
+                label="Increase regular contributions each year by"
+                hint="Applied to the regular monthly pension contributions each year."
                 error={errors.annualContributionIncrease}
               >
                 {(id, describedBy) => (
@@ -513,48 +521,86 @@ export function EssentialAdvancedPensionInputsForm({
                   />
                 )}
               </FormField>
-              <FormField
-                id={fieldId("extraContributionAge")}
-                label="Start extra saving at age"
-                hint="Only needed if you plan to add another monthly amount later."
-                error={errors.extraContributionAge}
-                optional
+            )}
+          </section>
+
+          <section className="advanced-future-saving-option">
+            <div className="advanced-settings-intro advanced-future-saving-intro">
+              <div>
+                <strong>Additional contribution later</strong>
+                <p>
+                  Adds a separate extra monthly pension contribution from a chosen age.
+                  This is useful when money may become available later, for example after
+                  a mortgage or another regular cost ends.
+                </p>
+              </div>
+              <div
+                className="advanced-choice-toggle"
+                role="group"
+                aria-label="Additional contribution later"
               >
-                {(id, describedBy) => (
-                  <NumberInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={value.extraContributionAge ?? ""}
-                    min={value.currentAge}
-                    max={Math.max(value.currentAge, value.retirementAge - 1)}
-                    suffix="years"
-                    error={Boolean(errors.extraContributionAge)}
-                    onValueChange={(next) => updateOptional("extraContributionAge", next)}
-                  />
-                )}
-              </FormField>
-              <FormField
-                id={fieldId("extraMonthlyContribution")}
-                label="Extra monthly contribution"
-                hint="The additional monthly amount from the age above."
-                error={errors.extraMonthlyContribution}
-                optional
-              >
-                {(id, describedBy) => (
-                  <CurrencyInput
-                    id={id}
-                    aria-describedby={describedBy}
-                    value={value.extraMonthlyContribution ?? ""}
-                    step={10}
-                    error={Boolean(errors.extraMonthlyContribution)}
-                    onValueChange={(next) =>
-                      updateOptional("extraMonthlyContribution", next)
-                    }
-                  />
-                )}
-              </FormField>
-            </>
-          )}
+                <button
+                  type="button"
+                  className={!additionalContributionEnabled ? "is-selected" : undefined}
+                  aria-pressed={!additionalContributionEnabled}
+                  onClick={() => setAdditionalContribution(false)}
+                >
+                  Off
+                </button>
+                <button
+                  type="button"
+                  className={additionalContributionEnabled ? "is-selected" : undefined}
+                  aria-pressed={additionalContributionEnabled}
+                  onClick={() => setAdditionalContribution(true)}
+                >
+                  On
+                </button>
+              </div>
+            </div>
+
+            {additionalContributionEnabled && (
+              <div className="advanced-future-saving-fields">
+                <FormField
+                  id={fieldId("extraContributionAge")}
+                  label="Start extra saving at age"
+                  hint="The age when the additional monthly contribution begins."
+                  error={errors.extraContributionAge}
+                >
+                  {(id, describedBy) => (
+                    <NumberInput
+                      id={id}
+                      aria-describedby={describedBy}
+                      value={value.extraContributionAge ?? ""}
+                      min={value.currentAge}
+                      max={Math.max(value.currentAge, value.retirementAge - 1)}
+                      suffix="years"
+                      error={Boolean(errors.extraContributionAge)}
+                      onValueChange={(next) => updateOptional("extraContributionAge", next)}
+                    />
+                  )}
+                </FormField>
+                <FormField
+                  id={fieldId("extraMonthlyContribution")}
+                  label="Extra monthly contribution"
+                  hint="The additional amount paid into the pension each month from that age."
+                  error={errors.extraMonthlyContribution}
+                >
+                  {(id, describedBy) => (
+                    <CurrencyInput
+                      id={id}
+                      aria-describedby={describedBy}
+                      value={value.extraMonthlyContribution ?? ""}
+                      step={10}
+                      error={Boolean(errors.extraMonthlyContribution)}
+                      onValueChange={(next) =>
+                        updateOptional("extraMonthlyContribution", next)
+                      }
+                    />
+                  )}
+                </FormField>
+              </div>
+            )}
+          </section>
         </AdvancedCard>
 
         <AdvancedCard
@@ -695,7 +741,7 @@ function createFutureSavingSummary(value: PensionInputs): string {
       `${formatCurrency(value.extraMonthlyContribution)}/month extra from age ${value.extraContributionAge ?? "—"}`,
     );
   }
-  return summaries.length > 0 ? summaries.join(" · ") : "Future changes enabled";
+  return summaries.length > 0 ? summaries.join(" · ") : "No future changes planned";
 }
 
 function safeNumber(value: number): string {
