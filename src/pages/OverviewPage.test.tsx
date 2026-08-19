@@ -19,10 +19,7 @@ vi.mock("../components/scenarios", async () => {
   const actual = await vi.importActual<typeof import("../components/scenarios")>(
     "../components/scenarios",
   );
-  return {
-    ...actual,
-    useScenarios: vi.fn(),
-  };
+  return { ...actual, useScenarios: vi.fn() };
 });
 vi.mock("../hooks/usePensionProjection");
 
@@ -114,24 +111,17 @@ describe("OverviewPage", () => {
     );
   }
 
-  it("tells the active plan story without duplicating navigation", () => {
+  it("shows the active retirement dashboard", () => {
     mockActiveScenario(createScenario());
     mockProjection(750_000);
 
     renderPage();
 
-    expect(
-      screen.getByRole("heading", { name: "Your retirement story" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your retirement" })).toBeInTheDocument();
     expect(screen.getByText("Overview · Baseline Plan")).toBeInTheDocument();
     expect(screen.getAllByText("Age 68").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("£750,000")).toBeInTheDocument();
-    expect(screen.getByText("You have already built")).toBeInTheDocument();
-    expect(screen.getByText("You are adding")).toBeInTheDocument();
-    expect(screen.getByText("Your income picture")).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "How your pension could grow" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "How your pension could grow" })).toBeInTheDocument();
     expect(
       screen.getByRole("img", {
         name: "Projected pension growth by age in today's money",
@@ -140,46 +130,28 @@ describe("OverviewPage", () => {
     expect(
       screen.getByRole("progressbar", { name: "Retirement target coverage" }),
     ).toHaveAttribute("aria-valuenow");
-    expect(
-      screen.getByRole("heading", { name: "The key moments in this plan" }),
-    ).toBeInTheDocument();
-    expect(screen.getAllByText("State Pension").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("Your next milestone")).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: /Progress towards/ })).toBeInTheDocument();
-    expect(screen.getByText("Did you know?")).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        `${defaultRetirementGoals.statePensionAnnualAmount.toLocaleString(
-          "en-GB",
-          { style: "currency", currency: "GBP", maximumFractionDigits: 0 },
-        )}/year from age ${defaultRetirementGoals.statePensionAge}`,
-      ),
-    ).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: "Open My Plan" })).toHaveLength(1);
-    expect(screen.getByRole("link", { name: "Explore a What If?" })).toHaveAttribute(
-      "href",
-      "/what-if",
-    );
+    expect(screen.getByRole("heading", { name: "The choices behind this outlook" })).toBeInTheDocument();
+    expect(screen.getByText("Current pension")).toBeInTheDocument();
+    expect(screen.getByText("Monthly saving")).toBeInTheDocument();
+    expect(screen.getByText("State Pension")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Edit My Plan" })).toHaveAttribute("href", "/plan");
   });
 
   it("shows when State Pension is not included", () => {
     localStorage.setItem(
       RETIREMENT_GOALS_STORAGE_KEY,
-      JSON.stringify({
-        ...defaultRetirementGoals,
-        includeStatePension: false,
-      }),
+      JSON.stringify({ ...defaultRetirementGoals, includeStatePension: false }),
     );
     mockActiveScenario(createScenario());
     mockProjection(750_000);
 
     renderPage();
 
-    expect(screen.getByText("Not included in this plan")).toBeInTheDocument();
-    expect(screen.queryByText("State Pension", { selector: "strong" })).not.toBeInTheDocument();
+    expect(screen.getByText("Not included")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "State Pension is not included" })).toBeInTheDocument();
   });
 
-  it("uses the non-baseline active scenario in the story", () => {
+  it("uses the non-baseline active scenario in the dashboard", () => {
     mockActiveScenario(
       createScenario(
         "Retire at 65",
@@ -199,8 +171,8 @@ describe("OverviewPage", () => {
     expect(screen.getByText("Overview · Retire at 65")).toBeInTheDocument();
     expect(screen.getAllByText("Age 65").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("£820,000")).toBeInTheDocument();
-    expect(screen.getByText(/£250,000 in the pension included/)).toBeInTheDocument();
-    expect(screen.getByText(/£1,300 each month/)).toBeInTheDocument();
+    expect(screen.getByText("£250,000")).toBeInTheDocument();
+    expect(screen.getByText("£1,300")).toBeInTheDocument();
   });
 
   it("guides the user when an incomplete plan still has a structural projection", () => {
@@ -218,32 +190,17 @@ describe("OverviewPage", () => {
 
     renderPage();
 
-    expect(
-      screen.getByRole("heading", {
-        name: "Baseline Plan needs a little more information",
-      }),
-    ).toBeInTheDocument();
-    expect(screen.getByText("No current pension balance has been added yet.")).toBeInTheDocument();
-    expect(
-      screen.getByText("No regular employee or employer contributions have been added."),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Open My Plan" })).toHaveAttribute(
-      "href",
-      "/plan",
-    );
-    expect(screen.getByRole("link", { name: "Explore a What If?" })).toHaveAttribute(
-      "href",
-      "/what-if",
-    );
+    expect(screen.getByRole("heading", { name: "Needs attention" })).toBeInTheDocument();
+    expect(screen.getByText("Not added yet")).toBeInTheDocument();
+    expect(screen.getByText("£0")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Review plan details" })).toHaveAttribute("href", "/plan");
   });
 
-  it("shows unavailable story guidance for invalid inputs", () => {
+  it("shows unavailable guidance for invalid inputs", () => {
     mockActiveScenario(createScenario());
     mockedUsePensionProjection.mockReturnValue({
       hasErrors: true,
-      errors: {
-        retirementAge: "Retirement age must be greater than current age",
-      },
+      errors: { retirementAge: "Retirement age must be greater than current age" },
       projection: {
         years: [],
         finalBalance: zeroMoney,
@@ -257,13 +214,11 @@ describe("OverviewPage", () => {
     renderPage();
 
     expect(screen.getAllByText("Unavailable")).toHaveLength(2);
+    expect(screen.getByRole("heading", { name: "Complete your plan" })).toBeInTheDocument();
     expect(
-      screen.getByText("Add valid plan inputs to see pension growth over time."),
+      screen.getByText("Add the missing plan details to restore your retirement projection."),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText("Complete the active plan to calculate an income illustration."),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Complete the active plan" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Complete My Plan" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Complete the projection" })).toBeInTheDocument();
   });
 });
