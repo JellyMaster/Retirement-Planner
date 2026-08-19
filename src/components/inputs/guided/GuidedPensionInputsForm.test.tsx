@@ -42,7 +42,9 @@ describe("GuidedPensionInputsForm", () => {
     await user.click(screen.getByRole("button", { name: "Review plan" }));
 
     expect(screen.getByText("Your plan is ready")).toBeInTheDocument();
-    expect(screen.getByText("Retirement income")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Retirement" })).toBeInTheDocument();
+    expect(screen.getByText("Target annual income")).toBeInTheDocument();
+    expect(screen.getByText("Income target")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "View projection" }));
 
