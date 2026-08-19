@@ -1,0 +1,103 @@
+.polaris-overview-story.is-success {
+  border-color: color-mix(in srgb, var(--colour-success) 38%, var(--colour-border));
+}
+
+.polaris-overview-story.is-success .polaris-overview-story-icon {
+  color: var(--colour-success-text);
+  background: var(--colour-success-background);
+}
+
+.polaris-overview-story.is-attention {
+  border-color: color-mix(in srgb, var(--colour-warning) 42%, var(--colour-border));
+}
+
+.polaris-overview-story.is-attention .polaris-overview-story-icon {
+  color: var(--colour-warning-text);
+  background: var(--colour-warning-background);
+}
+
+.polaris-overview-story.is-urgent {
+  border-color: color-mix(in srgb, var(--colour-danger) 42%, var(--colour-border));
+}
+
+.polaris-overview-story.is-urgent .polaris-overview-story-icon {
+  color: var(--colour-danger-text);
+  background: var(--colour-danger-background);
+}
+
+.polaris-overview-journey-summary {
+  align-content: start;
+}
+
+.polaris-overview-journey-intro {
+  margin: var(--ui-space-1) 0 0;
+  color: var(--colour-text-muted);
+  line-height: 1.45;
+}
+
+.polaris-overview-journey-badges {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ui-space-3);
+  margin: var(--ui-space-4) 0;
+}
+
+.polaris-overview-journey-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  min-height: 3rem;
+  padding: var(--ui-space-3) var(--ui-space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--colour-surface-secondary);
+}
+
+.polaris-overview-journey-badge small {
+  color: var(--colour-text-muted);
+  font-weight: 700;
+}
+
+.polaris-overview-journey-badge strong {
+  text-align: right;
+}
+
+.polaris-overview-journey-badge.is-enabled {
+  border-color: color-mix(in srgb, var(--colour-success) 28%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-success-background) 68%, var(--colour-surface));
+}
+
+.polaris-overview-journey-badge.is-enabled strong {
+  color: var(--colour-success-text);
+}
+
+.polaris-overview-journey-badge.is-disabled {
+  border-color: color-mix(in srgb, var(--colour-warning) 30%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-warning-background) 65%, var(--colour-surface));
+}
+
+.polaris-overview-journey-badge.is-disabled strong {
+  color: var(--colour-warning-text);
+}
+
+.polaris-overview-journey-badge.is-changed {
+  border-color: color-mix(in srgb, var(--colour-primary) 32%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+}
+
+.polaris-overview-journey-badge.is-changed strong {
+  color: var(--colour-text-strong);
+}
+
+@media (max-width: 760px) {
+  .polaris-overview-journey-badge {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--ui-space-1);
+  }
+
+  .polaris-overview-journey-badge strong {
+    text-align: left;
+  }
+}
