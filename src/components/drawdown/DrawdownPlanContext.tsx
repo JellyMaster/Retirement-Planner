@@ -1,5 +1,6 @@
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import { formatCurrency, formatPercentage } from "../../utils/formatters";
+import { ExpandCollapseIndicator } from "../ui";
 
 interface DrawdownPlanContextProps {
   activePlanName: string;
@@ -11,8 +12,8 @@ export function DrawdownPlanContext({
   value,
 }: DrawdownPlanContextProps) {
   return (
-    <details className="drawdown-plan-context drawdown-plan-context-collapsible">
-      <summary className="drawdown-plan-context-summary">
+    <details className="drawdown-plan-context drawdown-plan-context-collapsible ui-disclosure">
+      <summary className="drawdown-plan-context-summary ui-disclosure-trigger">
         <div className="drawdown-plan-context-summary-copy">
           <p className="panel-eyebrow">Active retirement plan</p>
           <h2>{activePlanName}</h2>
@@ -41,10 +42,7 @@ export function DrawdownPlanContext({
         <span className="drawdown-plan-context-toggle-label" aria-hidden="true">
           <span className="when-closed">Show details</span>
           <span className="when-open">Hide details</span>
-          <span className="drawdown-plan-context-expander">
-            <span className="when-closed">+</span>
-            <span className="when-open">−</span>
-          </span>
+          <ExpandCollapseIndicator />
         </span>
       </summary>
 
