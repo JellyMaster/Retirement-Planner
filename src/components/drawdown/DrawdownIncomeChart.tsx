@@ -26,6 +26,8 @@ interface DrawdownIncomeChartProps {
   displayMode: MoneyDisplayMode;
   spendingPhases: DrawdownSpendingPhase[] | undefined;
   statePensionAge: number | undefined;
+  selectedAge?: number;
+  onSelectAge?: (age: number) => void;
 }
 
 interface ChartDataPoint {
@@ -43,6 +45,8 @@ export function DrawdownIncomeChart({
   displayMode,
   spendingPhases,
   statePensionAge,
+  selectedAge,
+  onSelectAge,
 }: DrawdownIncomeChartProps) {
   const chartColours = useChartTheme();
 
@@ -62,16 +66,25 @@ export function DrawdownIncomeChart({
   return (
     <section className="panel drawdown-chart-panel">
       <div className="panel-heading">
-        <h2>Income through retirement</h2>
+        <h2>How your income changes over time</h2>
         <p>
-          See how income from your pension, State Pension and tax change through
-          each retirement chapter. Values are shown in {displayMode === "today" ? "today&apos;s money" : "future money"}.
+          Pension withdrawals, State Pension, tax and spendable income through retirement.
+          {onSelectAge ? " Select a point on the chart to inspect that year." : ""}
+          {` Values are shown in ${displayMode === "today" ? "today's money" : "future money"}.`}
         </p>
       </div>
 
       <div className="drawdown-chart">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={chartData} margin={{ top: 28, right: 20, bottom: 10, left: 10 }}>
+          <ComposedChart
+            data={chartData}
+            margin={{ top: 28, right: 20, bottom: 10, left: 10 }}
+            onClick={(event) => {
+              if (!onSelectAge || event?.activeLabel === undefined) return;
+              const age = Number(event.activeLabel);
+              if (Number.isFinite(age)) onSelectAge(age);
+            }}
+          >
             <CartesianGrid stroke={chartColours.grid} strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="age" tickLine={false} tick={{ fill: chartColours.text }} axisLine={false} label={{ value: "Age", position: "insideBottom", offset: -5, fill: chartColours.text }} />
             <YAxis tickLine={false} tick={{ fill: chartColours.text }} axisLine={false} width={85} tickFormatter={formatCompactCurrency} />
@@ -89,7 +102,15 @@ export function DrawdownIncomeChart({
             />
             <Legend wrapperStyle={{ color: chartColours.text }} />
 
-            {statePensionAge !== undefined && (
+            {selectedAge !== undefined && (
+              <ReferenceLine
+                x={selectedAge}
+                stroke={chartColours.primary}
+                strokeWidth={2}
+                label={{ value: `Age ${selectedAge}`, position: "insideTopLeft", fill: chartColours.text }}
+              />
+            )}
+            {statePensionAge !== undefined && statePensionAge !== selectedAge && (
               <ReferenceLine x={statePensionAge} stroke={chartColours.tertiary} strokeDasharray="4 4" label={{ value: "State Pension", position: "insideTopRight", fill: chartColours.text }} />
             )}
             {chapters.slice(1).map((phase) => (
