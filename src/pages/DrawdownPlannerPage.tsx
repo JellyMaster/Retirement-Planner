@@ -180,7 +180,7 @@ export function DrawdownPlannerPage() {
                     <SectionHeading
                       eyebrow="Income story"
                       title="Income through retirement"
-                      description="Understand how pension withdrawals, State Pension and estimated tax combine to provide your spending money each year."
+                      description="See how money from your pension, State Pension and estimated tax combine to provide the money you can spend each year."
                     />
                     <DrawdownIncomeChart
                       years={result.years}
@@ -201,7 +201,12 @@ export function DrawdownPlannerPage() {
                       spendingPhases={inputs.spendingPhases}
                     />
                     <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
-                    <DrawdownIncomeYearTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+                    <DrawdownIncomeYearTable
+                      years={result.years}
+                      inflationRate={inputs.inflationRate}
+                      displayMode={displayMode}
+                      selectedAge={selectedIncomeAge}
+                    />
                   </div>
                 )}
 
