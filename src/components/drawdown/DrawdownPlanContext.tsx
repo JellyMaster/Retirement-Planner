@@ -41,7 +41,10 @@ export function DrawdownPlanContext({
         <span className="drawdown-plan-context-toggle-label" aria-hidden="true">
           <span className="when-closed">Show details</span>
           <span className="when-open">Hide details</span>
-          <span className="drawdown-plan-context-chevron">⌄</span>
+          <span className="drawdown-plan-context-expander">
+            <span className="when-closed">+</span>
+            <span className="when-open">−</span>
+          </span>
         </span>
       </summary>
 
