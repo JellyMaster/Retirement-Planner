@@ -58,28 +58,14 @@ export function DrawdownIncomeYearTable({
     >
       <summary className="ui-disclosure-trigger drawdown-income-year-table-summary">
         <div>
-          <p className="panel-eyebrow">Detailed yearly breakdown</p>
+          <p className="panel-eyebrow">Income by year</p>
           <strong>See every year of your retirement income</strong>
-          <small>Open this section when you want to see the figures behind the income story above.</small>
+          <small>Open this section when you want to check the figures behind the income story above.</small>
         </div>
         <ExpandCollapseIndicator />
       </summary>
 
       <div className="drawdown-income-year-table-content">
-        <div className="drawdown-income-table-selected-note" aria-live="polite">
-          <span>Selected year</span>
-          <strong>Age {selectedAge}</strong>
-          {!selectedAgeIsVisible && selectedIndex >= 0 && (
-            <button
-              type="button"
-              className="ui-button ui-button-secondary ui-button-small"
-              onClick={() => setCurrentPage(selectedPage)}
-            >
-              Show selected year
-            </button>
-          )}
-        </div>
-
         <div className="drawdown-income-table-toolbar">
           <label className="drawdown-income-page-size">
             <span>Rows per page</span>
@@ -97,11 +83,23 @@ export function DrawdownIncomeYearTable({
               ))}
             </select>
           </label>
-          <span className="drawdown-income-page-range">
-            {firstVisibleAge !== undefined && lastVisibleAge !== undefined
-              ? `Ages ${firstVisibleAge}–${lastVisibleAge}`
-              : "No years to show"}
-          </span>
+
+          <div className="drawdown-income-page-status" aria-live="polite">
+            <span className="drawdown-income-page-range">
+              {firstVisibleAge !== undefined && lastVisibleAge !== undefined
+                ? `Ages ${firstVisibleAge}–${lastVisibleAge}`
+                : "No years to show"}
+            </span>
+            {!selectedAgeIsVisible && selectedIndex >= 0 && (
+              <button
+                type="button"
+                className="ui-button ui-button-secondary ui-button-small"
+                onClick={() => setCurrentPage(selectedPage)}
+              >
+                Show selected year
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="table-scroll" tabIndex={0} aria-label="Detailed retirement income by year">
