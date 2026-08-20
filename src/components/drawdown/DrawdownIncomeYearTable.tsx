@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import type { DrawdownYear } from "../../engine/drawdown/models/DrawdownYear";
 import { getDisplayYears, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
@@ -24,18 +24,6 @@ export function DrawdownIncomeYearTable({
     () => getDisplayYears(years, inflationRate, displayMode),
     [displayMode, inflationRate, years],
   );
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const frame = window.requestAnimationFrame(() => {
-      selectedRowRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "nearest",
-      });
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [isOpen, selectedAge]);
 
   return (
     <details
