@@ -80,7 +80,7 @@ export function DrawdownPlannerPage() {
             </h2>
             <p>
               {viewMode === "simple"
-                ? "See the main retirement outcomes, where your income comes from and what happens to your pension."
+                ? "Start with the overall outcome, then follow how retirement develops over time."
                 : "Inspect income, pension balance, the year-by-year timeline and calculation assumptions."}
             </p>
           </div>
@@ -117,22 +117,53 @@ export function DrawdownPlannerPage() {
         <section className="drawdown-workspace-content" aria-live="polite">
           {result ? (
             viewMode === "simple" ? (
-              <div className="drawdown-workspace-section drawdown-retirement-story drawdown-v12-dashboard" id="drawdown-simple-section">
-                <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
+              <div className="drawdown-workspace-section drawdown-retirement-story drawdown-v12-dashboard drawdown-simple-story" id="drawdown-simple-section">
+                <section className="drawdown-simple-story-section drawdown-simple-outcome" aria-labelledby="drawdown-simple-outcome-title">
+                  <SimpleStoryHeading
+                    eyebrow="Retirement outcome"
+                    title="Can your plan support your retirement?"
+                    description="Start with the headline outcome from your current plan."
+                    id="drawdown-simple-outcome-title"
+                  />
+                  <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
+                </section>
 
-                <DrawdownJourneyChart
-                  years={result.years}
-                  inflationRate={inputs.inflationRate}
-                  displayMode={displayMode}
-                  spendingPhases={inputs.spendingPhases}
-                  statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
-                  depletionAge={result.depletionAge}
-                />
+                <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-journey-title">
+                  <SimpleStoryHeading
+                    eyebrow="Your retirement journey"
+                    title="What happens over time?"
+                    description="Follow how your pension and retirement income develop through the plan."
+                    id="drawdown-simple-journey-title"
+                  />
+                  <DrawdownJourneyChart
+                    years={result.years}
+                    inflationRate={inputs.inflationRate}
+                    displayMode={displayMode}
+                    spendingPhases={inputs.spendingPhases}
+                    statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
+                    depletionAge={result.depletionAge}
+                  />
+                </section>
 
-                <div className="drawdown-v12-secondary-grid">
-                  <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
+                <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-observations-title">
+                  <SimpleStoryHeading
+                    eyebrow="At a glance"
+                    title="Anything important you should know?"
+                    description="These observations highlight the parts of the plan worth noticing."
+                    id="drawdown-simple-observations-title"
+                  />
                   <DrawdownInsights inputs={inputs} result={result} displayMode={displayMode} />
-                </div>
+                </section>
+
+                <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-income-title">
+                  <SimpleStoryHeading
+                    eyebrow="Retirement income"
+                    title="Where does your income come from?"
+                    description="See how your pension and State Pension combine to support retirement income."
+                    id="drawdown-simple-income-title"
+                  />
+                  <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
+                </section>
               </div>
             ) : (
               <div className="drawdown-detailed-view">
@@ -184,6 +215,16 @@ export function DrawdownPlannerPage() {
         </section>
       </section>
     </main>
+  );
+}
+
+function SimpleStoryHeading({ eyebrow, title, description, id }: { eyebrow: string; title: string; description: string; id: string }) {
+  return (
+    <div className="drawdown-simple-story-heading">
+      <p className="panel-eyebrow">{eyebrow}</p>
+      <h2 id={id}>{title}</h2>
+      <p>{description}</p>
+    </div>
   );
 }
 
