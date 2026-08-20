@@ -1,5 +1,4 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
 
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
@@ -101,28 +100,16 @@ export function DrawdownRetirementChapters({
               <RetirementChapterCard key={`${chapter.title}-${chapter.startAge}`} chapter={chapter} />
             ))}
           </div>
-          <Link
-            className="drawdown-chapter-action"
-            to="/what-if?experiment=spending"
-          >
-            Could you spend more during active retirement? Explore it in What If?
-          </Link>
         </div>
       ) : (
         <div className="drawdown-retirement-chapters" aria-labelledby="drawdown-single-chapter-title">
           <header>
-            <p className="panel-eyebrow">Planned spending</p>
-            <h3 id="drawdown-single-chapter-title">One income target throughout retirement</h3>
+            <p className="panel-eyebrow">Your income plan</p>
+            <h3 id="drawdown-single-chapter-title">Your planned income stays consistent</h3>
             <p>
-              Your current plan keeps the same income target from age {inputs.retirementAge} through age {inputs.endAge}.
+              Your plan keeps the same income target from age {inputs.retirementAge} through age {inputs.endAge}, so retirement is shown as one continuous stage.
             </p>
           </header>
-          <Link
-            className="drawdown-chapter-action"
-            to="/what-if?experiment=spending"
-          >
-            Want to explore changing spending later in retirement? Try it in What If?
-          </Link>
         </div>
       )}
     </section>
