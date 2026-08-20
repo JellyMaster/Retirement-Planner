@@ -48,6 +48,26 @@ describe("DrawdownEngine net-income targeting", () => {
     });
   });
 
+  it("does not create penny-level shortfalls while a funded net target is being met", () => {
+    const result = new DrawdownEngine().calculate({
+      ...netTargetInputs,
+      startingBalance: 5_000_000,
+      retirementAge: 60,
+      endAge: 95,
+      desiredAnnualIncome: 30_000,
+      annualStatePension: 12_000,
+      statePensionAge: 60,
+      inflationRate: 0.025,
+    });
+
+    result.years.forEach((year) => {
+      expect(year.netIncome).toBeGreaterThanOrEqual(year.desiredIncome);
+      expect(year.netIncomeShortfall).toBe(0);
+    });
+    expect(result.firstNetIncomeShortfallAge).toBeNull();
+    expect(result.totalNetIncomeShortfall).toBe(0);
+  });
+
   it("keeps calculation nominal while today-money display removes inflation", () => {
     const inflationRate = 0.025;
     const expectedIncome = [45_400, 46_535, 47_698.38, 48_890.84];
