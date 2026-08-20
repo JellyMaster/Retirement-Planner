@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { DrawdownYear } from "../../engine/drawdown/models/DrawdownYear";
 import { getDisplayYears, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
@@ -12,6 +12,10 @@ interface DrawdownIncomeYearTableProps {
   selectedAge: number;
 }
 
+type PageSize = 10 | 15 | 25 | 50 | "all";
+
+const PAGE_SIZE_OPTIONS: PageSize[] = [10, 15, 25, 50, "all"];
+
 export function DrawdownIncomeYearTable({
   years,
   inflationRate,
@@ -19,11 +23,32 @@ export function DrawdownIncomeYearTable({
   selectedAge,
 }: DrawdownIncomeYearTableProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const selectedRowRef = useRef<HTMLTableRowElement | null>(null);
+  const [pageSize, setPageSize] = useState<PageSize>(10);
+  const [currentPage, setCurrentPage] = useState(0);
   const displayYears = useMemo(
     () => getDisplayYears(years, inflationRate, displayMode),
     [displayMode, inflationRate, years],
   );
+
+  const effectivePageSize = pageSize === "all"
+    ? Math.max(displayYears.length, 1)
+    : pageSize;
+  const pageCount = Math.max(1, Math.ceil(displayYears.length / effectivePageSize));
+  const safeCurrentPage = Math.min(currentPage, pageCount - 1);
+  const startIndex = safeCurrentPage * effectivePageSize;
+  const visibleYears = displayYears.slice(startIndex, startIndex + effectivePageSize);
+  const selectedIndex = displayYears.findIndex((year) => year.age === selectedAge);
+  const selectedPage = selectedIndex < 0
+    ? 0
+    : Math.floor(selectedIndex / effectivePageSize);
+  const selectedAgeIsVisible = pageSize === "all" || selectedPage === safeCurrentPage;
+  const firstVisibleAge = visibleYears[0]?.age;
+  const lastVisibleAge = visibleYears.at(-1)?.age;
+
+  const handlePageSizeChange = (nextPageSize: PageSize) => {
+    setPageSize(nextPageSize);
+    setCurrentPage(0);
+  };
 
   return (
     <details
@@ -42,15 +67,41 @@ export function DrawdownIncomeYearTable({
 
       <div className="drawdown-income-year-table-content">
         <div className="drawdown-income-table-selected-note" aria-live="polite">
-          <span>Currently viewing</span>
+          <span>Selected year</span>
           <strong>Age {selectedAge}</strong>
-          <button
-            type="button"
-            className="ui-button ui-button-secondary ui-button-small"
-            onClick={() => selectedRowRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" })}
-          >
-            Jump to this year
-          </button>
+          {!selectedAgeIsVisible && selectedIndex >= 0 && (
+            <button
+              type="button"
+              className="ui-button ui-button-secondary ui-button-small"
+              onClick={() => setCurrentPage(selectedPage)}
+            >
+              Show selected year
+            </button>
+          )}
+        </div>
+
+        <div className="drawdown-income-table-toolbar">
+          <label className="drawdown-income-page-size">
+            <span>Rows per page</span>
+            <select
+              value={pageSize}
+              onChange={(event) => {
+                const value = event.target.value;
+                handlePageSizeChange(value === "all" ? "all" : Number(value) as Exclude<PageSize, "all">);
+              }}
+            >
+              {PAGE_SIZE_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option === "all" ? "All" : option}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span className="drawdown-income-page-range">
+            {firstVisibleAge !== undefined && lastVisibleAge !== undefined
+              ? `Ages ${firstVisibleAge}–${lastVisibleAge}`
+              : "No years to show"}
+          </span>
         </div>
 
         <div className="table-scroll" tabIndex={0} aria-label="Detailed retirement income by year">
@@ -68,7 +119,7 @@ export function DrawdownIncomeYearTable({
               </tr>
             </thead>
             <tbody>
-              {displayYears.map((year) => {
+              {visibleYears.map((year) => {
                 const incomeBelowTarget = year.incomeTargetMode === "net"
                   ? year.netIncomeShortfall
                   : year.incomeShortfall;
@@ -81,7 +132,6 @@ export function DrawdownIncomeYearTable({
                 return (
                   <tr
                     key={year.year}
-                    ref={isSelected ? selectedRowRef : undefined}
                     className={classes || undefined}
                     aria-current={isSelected ? "true" : undefined}
                   >
@@ -103,6 +153,31 @@ export function DrawdownIncomeYearTable({
             </tbody>
           </table>
         </div>
+
+        {pageSize !== "all" && pageCount > 1 && (
+          <nav className="drawdown-income-pagination" aria-label="Year table pages">
+            <button
+              type="button"
+              className="ui-button ui-button-secondary ui-button-small"
+              disabled={safeCurrentPage === 0}
+              onClick={() => setCurrentPage(Math.max(0, safeCurrentPage - 1))}
+            >
+              Previous
+            </button>
+            <span>
+              Page <strong>{safeCurrentPage + 1}</strong> of <strong>{pageCount}</strong>
+            </span>
+            <button
+              type="button"
+              className="ui-button ui-button-secondary ui-button-small"
+              disabled={safeCurrentPage >= pageCount - 1}
+              onClick={() => setCurrentPage(Math.min(pageCount - 1, safeCurrentPage + 1))}
+            >
+              Next
+            </button>
+          </nav>
+        )}
+
         <p className="projection-table-footnote">
           Values are shown in {displayMode === "today" ? "today’s money" : "future money"}. Highlighted warning rows show years when the plan provides less income than your target.
         </p>
