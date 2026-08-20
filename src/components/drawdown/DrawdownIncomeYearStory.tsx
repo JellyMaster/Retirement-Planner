@@ -17,11 +17,18 @@ interface DrawdownIncomeYearStoryProps {
 }
 
 type RangeMarkerTone = "positive" | "warning" | "neutral";
+type YearEventTone = "positive" | "warning" | "neutral";
 
 interface RangeMarker {
   age: number;
   title: string;
   tone: RangeMarkerTone;
+}
+
+interface YearEvent {
+  title: string;
+  description: string;
+  tone: YearEventTone;
 }
 
 export function DrawdownIncomeYearStory({
@@ -58,6 +65,7 @@ export function DrawdownIncomeYearStory({
     statePensionAge,
     spendingPhases,
   });
+  const conclusion = createYearConclusion(originalYear, events);
   const previousAge = selectedIndex > 0 ? displayYears[selectedIndex - 1]?.age : undefined;
   const nextAge =
     selectedIndex < displayYears.length - 1
@@ -179,19 +187,16 @@ export function DrawdownIncomeYearStory({
         </div>
 
         <dl className="drawdown-income-selected-year-grid">
-          <IncomeMetric label="Private pension" value={selectedYear.pensionWithdrawal} />
+          <IncomeMetric label="From your pension" value={selectedYear.pensionWithdrawal} />
           <IncomeMetric label="State Pension" value={selectedYear.statePensionIncome} />
-          <IncomeMetric label="Gross income" value={selectedYear.grossIncome} />
+          <IncomeMetric label="Total income before tax" value={selectedYear.grossIncome} />
           <IncomeMetric
             label="Estimated tax"
             value={-selectedYear.incomeTax}
             negative={selectedYear.incomeTax > 0}
           />
           <IncomeMetric label="Money available to spend" value={selectedYear.netIncome} emphasis />
-          <IncomeMetric
-            label={selectedYear.incomeTargetMode === "net" ? "Net income target" : "Gross income target"}
-            value={selectedYear.desiredIncome}
-          />
+          <IncomeMetric label="Your income target" value={selectedYear.desiredIncome} />
         </dl>
       </section>
 
@@ -214,11 +219,17 @@ export function DrawdownIncomeYearStory({
               </article>
             ))
           ) : (
-            <article className="drawdown-income-year-event is-neutral">
-              <strong>No major change this year</strong>
-              <p>Your modelled income continues on the same basis as the preceding year.</p>
+            <article className="drawdown-income-year-event is-positive">
+              <strong>Your retirement continues as planned</strong>
+              <p>Nothing significant changes this year. Your income continues on the same basis as the previous year.</p>
             </article>
           )}
+        </div>
+
+        <div className={`drawdown-income-year-conclusion is-${conclusion.tone}`}>
+          <span>What this means</span>
+          <strong>{conclusion.title}</strong>
+          <p>{conclusion.description}</p>
         </div>
       </section>
     </div>
@@ -291,7 +302,7 @@ function createRangeMarkers(
     return !previous || (!previous.isDepleted && previous.closingBalance > 0);
   });
   if (firstDepletion) {
-    addMarker({ age: firstDepletion.age, title: "Private pension is depleted", tone: "warning" });
+    addMarker({ age: firstDepletion.age, title: "Private pension fully used", tone: "warning" });
   }
 
   return [...markers.values()].sort((a, b) => a.age - b.age);
@@ -313,47 +324,43 @@ function createYearEvents({
   previousYear?: DrawdownYear;
   statePensionAge?: number;
   spendingPhases?: DrawdownSpendingPhase[];
-}) {
-  const events: Array<{
-    title: string;
-    description: string;
-    tone: "positive" | "warning" | "neutral";
-  }> = [];
+}): YearEvent[] {
+  const events: YearEvent[] = [];
 
   const statePensionStarts =
     year.statePensionIncome > 0 &&
     (!previousYear || previousYear.statePensionIncome <= 0);
   if (statePensionStarts || year.age === statePensionAge) {
     events.push({
-      title: "State Pension starts",
+      title: "Your State Pension begins this year",
       description:
-        "Part of your retirement income is now provided by State Pension, which can reduce the amount needed from your private pension.",
+        "Part of your income now comes from the State Pension, so you may need to take less from your private pension.",
       tone: "positive",
     });
   }
 
-  const shortfall = year.netIncomeShortfall > 0 || year.incomeShortfall > 0;
-  const previousShortfall = previousYear
+  const incomeBelowTarget = year.netIncomeShortfall > 0 || year.incomeShortfall > 0;
+  const previousIncomeBelowTarget = previousYear
     ? previousYear.netIncomeShortfall > 0 || previousYear.incomeShortfall > 0
     : false;
-  if (shortfall && !previousShortfall) {
+  if (incomeBelowTarget && !previousIncomeBelowTarget) {
     events.push({
-      title: "Income falls below your target",
+      title: "Your income is now below your target",
       description:
-        "From this year, the model can no longer fully provide your selected retirement income. Your pension has not necessarily run out, but the amount available is below the target.",
+        "From this year, the plan cannot provide all of the retirement income you asked for. You still receive income, but it is less than your target.",
       tone: "warning",
     });
   }
 
-  const depleted = year.isDepleted || year.closingBalance <= 0;
-  const previousDepleted = previousYear
+  const pensionFullyUsed = year.isDepleted || year.closingBalance <= 0;
+  const previousPensionFullyUsed = previousYear
     ? previousYear.isDepleted || previousYear.closingBalance <= 0
     : false;
-  if (depleted && !previousDepleted) {
+  if (pensionFullyUsed && !previousPensionFullyUsed) {
     events.push({
-      title: "Private pension is depleted",
+      title: "Your private pension has now been fully used",
       description:
-        "The private pension reaches £0 during this year, so later modelled income depends on other sources such as State Pension.",
+        "From this point, any remaining retirement income comes from other sources in your plan, such as the State Pension.",
       tone: "warning",
     });
   }
@@ -363,10 +370,66 @@ function createYearEvents({
     events.push({
       title: `${chapter.label} begins`,
       description:
-        "Your planned spending changes from this age, so the income requested from the retirement plan changes too.",
+        "Your planned spending changes from this age, so the amount of income you are asking the plan to provide changes too.",
       tone: "neutral",
     });
   }
 
   return events;
+}
+
+function createYearConclusion(year: DrawdownYear, events: YearEvent[]) {
+  const warning = events.find((event) => event.tone === "warning");
+  if (warning?.title.includes("fully used")) {
+    return {
+      tone: "warning" as const,
+      title: "Your private pension is no longer providing income.",
+      description:
+        "Future income now depends on the other income sources included in your plan, such as the State Pension.",
+    };
+  }
+
+  if (warning) {
+    return {
+      tone: "warning" as const,
+      title: "This is the first year your planned income is not fully met.",
+      description:
+        "The plan continues, but the money available is below your target. This is a useful point to review when comparing retirement choices.",
+    };
+  }
+
+  if (events.some((event) => event.title.includes("State Pension"))) {
+    return {
+      tone: "positive" as const,
+      title: "Your income now comes from more than one source.",
+      description:
+        "The State Pension helps provide part of your retirement income, which can reduce how much needs to come from your private pension.",
+    };
+  }
+
+  if (events.length > 0) {
+    return {
+      tone: "neutral" as const,
+      title: "Your planned retirement changes from this year.",
+      description:
+        "The income requested by your plan has changed, so the amount taken from your pension may change as well.",
+    };
+  }
+
+  const belowTarget = year.netIncomeShortfall > 0 || year.incomeShortfall > 0;
+  if (belowTarget) {
+    return {
+      tone: "warning" as const,
+      title: "Your income remains below your target.",
+      description:
+        "The warning began in an earlier year, so it is not repeated on the timeline. The plan is still providing less income than you asked for.",
+    };
+  }
+
+  return {
+    tone: "positive" as const,
+    title: "Your retirement continues as planned.",
+    description:
+      "There is no new issue to review this year, and the income shown continues on the same basis as the previous year.",
+  };
 }
