@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Info, PoundSterling, TrendingUp } from "lucide-react";
+import { PoundSterling, TrendingUp } from "lucide-react";
 
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
 import { DrawdownBalanceChartExplorer } from "../components/drawdown/DrawdownBalanceChartExplorer";
@@ -18,6 +18,7 @@ import {
   type DrawdownWorkspaceSection,
 } from "../components/drawdown/DrawdownWorkspaceNavigation";
 import { useScenarios } from "../components/scenarios";
+import { InfoTooltip } from "../components/ui";
 import type { ScenarioDrawdownPreferences } from "../domain/scenarios";
 import { DrawdownEngine } from "../engine/drawdown/DrawdownEngine";
 import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
@@ -245,10 +246,16 @@ function MoneyDisplayToggle({ value, onChange }: MoneyDisplayToggleProps) {
         <span>{showingToday ? "Today’s money" : "Future money"}</span>
         <span className="money-display-toggle-track" aria-hidden="true"><span className="money-display-toggle-thumb" /></span>
       </button>
-      <details className="money-display-tooltip">
-        <summary aria-label="Explain today’s money and future money"><Info size={16} aria-hidden="true" /></summary>
-        <div className="money-display-tooltip-panel"><strong>Today&apos;s money</strong><p>Removes inflation so figures are shown using today&apos;s purchasing power.</p><strong>Future money</strong><p>Shows the projected pound amount in each future year.</p><small>The projection is unchanged; only the display basis changes.</small></div>
-      </details>
+      <InfoTooltip
+        ariaLabel="Explain today’s money and future money"
+        size="medium"
+      >
+        <strong>Today&apos;s money</strong>
+        <p>Removes inflation so figures are shown using today&apos;s purchasing power.</p>
+        <strong>Future money</strong>
+        <p>Shows the projected pound amount in each future year.</p>
+        <small>The projection is unchanged; only the display basis changes.</small>
+      </InfoTooltip>
     </div>
   );
 }
