@@ -22,6 +22,10 @@ function roundMoney(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
+function roundMoneyUp(value: number): number {
+  return Math.ceil((value - Number.EPSILON) * 100) / 100;
+}
+
 function roundRate(value: number): number {
   return Math.round((value + Number.EPSILON) * 10_000) / 10_000;
 }
@@ -130,7 +134,16 @@ export class MonteCarloDrawdownEngine {
       }
     }
 
-    return roundMoney(high);
+    // Match the deterministic drawdown engine's penny-precision behaviour.
+    // Rounding the binary-search result to the nearest penny can round down and
+    // create false 1p shortfalls, so round upwards and verify the realised net
+    // income still meets the requested target.
+    let withdrawal = roundMoneyUp(high);
+    while (this.calculateTax(withdrawal, statePensionIncome).netIncome < targetNetIncome) {
+      withdrawal = roundMoney(withdrawal + 0.01);
+    }
+
+    return withdrawal;
   }
 
   public calculate(config: MonteCarloDrawdownConfig): MonteCarloDrawdownResult {
