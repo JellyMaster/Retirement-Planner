@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Info } from "lucide-react";
 
@@ -18,11 +19,7 @@ interface DrawdownInsightsProps {
 
 type InsightStatus = "positive" | "warning" | "neutral";
 
-export function DrawdownInsights({
-  inputs,
-  result,
-  displayMode,
-}: DrawdownInsightsProps) {
+export function DrawdownInsights({ inputs, result, displayMode }: DrawdownInsightsProps) {
   const display = getDisplaySummary(result, inputs.inflationRate, displayMode);
   const shortfallAge = result.incomeTargetMode === "net"
     ? result.firstNetIncomeShortfallAge
@@ -43,7 +40,7 @@ export function DrawdownInsights({
         <Insight
           status={result.depletionAge === null ? "positive" : "warning"}
           title={result.depletionAge === null ? "Pension lasts throughout the plan" : `Pension depletes at age ${result.depletionAge}`}
-          warningExplanation={result.depletionAge === null ? undefined : "Your pension is projected to reach £0 before the end of your planning period under the current assumptions. You may wish to review your retirement income target, retirement age, tax-free cash or withdrawal strategy."}
+          warningExplanation={result.depletionAge === null ? undefined : "Your pension is projected to reach zero before the end of your planning period under the current assumptions. You may wish to review your retirement income target, retirement age, tax-free cash or withdrawal strategy."}
         />
         <Insight
           status={shortfallAge === null ? "positive" : "warning"}
@@ -58,31 +55,34 @@ export function DrawdownInsights({
   );
 }
 
-function Insight({
-  title,
-  status = "neutral",
-  warningExplanation,
-}: {
+function Insight({ title, status = "neutral", warningExplanation }: {
   title: string;
   status?: InsightStatus;
   warningExplanation?: string;
 }) {
+  const tooltipId = useId();
+
   return (
-    <li className={`insight-item insight-item-${status}`}>
+    <li className={`insight-item insight-item-${status}${status === "warning" ? " insight-item-has-tooltip" : ""}`}>
       <span className="insight-icon" aria-hidden="true">
         <FontAwesomeIcon icon={status === "warning" ? AppIcons.warning : AppIcons.check} />
       </span>
-      <span>{title}</span>
+      <span className="insight-title">{title}</span>
       {status === "warning" && warningExplanation && (
-        <details className="insight-warning-tooltip">
-          <summary aria-label={`Explain why ${title.toLowerCase()} needs attention`}>
+        <span className="insight-warning-tooltip">
+          <button
+            type="button"
+            className="insight-warning-tooltip-trigger"
+            aria-label={`Explain why ${title.toLowerCase()} needs attention`}
+            aria-describedby={tooltipId}
+          >
             <Info size={15} aria-hidden="true" />
-          </summary>
-          <div className="insight-warning-tooltip-panel">
+          </button>
+          <span id={tooltipId} className="insight-warning-tooltip-panel" role="tooltip">
             <strong>Why this needs attention</strong>
-            <p>{warningExplanation}</p>
-          </div>
-        </details>
+            <span>{warningExplanation}</span>
+          </span>
+        </span>
       )}
     </li>
   );
