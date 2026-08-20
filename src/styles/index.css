@@ -26,6 +26,7 @@
 @import "./drawdown-v12-dashboard.css";
 @import "./drawdown-simple-tooltips.css";
 @import "./drawdown-simple-layout.css";
+@import "./drawdown-plan-context-expander.css";
 @import "./my-plan-income-editor.css";
 @import "./essential-advanced-plan.css";
 @import "./advanced-plan-meta.css";
