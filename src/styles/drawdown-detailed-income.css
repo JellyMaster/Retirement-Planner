@@ -309,6 +309,48 @@
   color: var(--status-warning-text, var(--colour-warning-text));
 }
 
+.drawdown-income-year-conclusion {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-income-year-conclusion > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.drawdown-income-year-conclusion > strong {
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-income-year-conclusion > p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.drawdown-income-year-conclusion.is-positive {
+  border-color: color-mix(in srgb, var(--status-good, var(--colour-success)) 35%, var(--colour-border));
+}
+
+.drawdown-income-year-conclusion.is-warning {
+  border-color: color-mix(in srgb, var(--status-warning, var(--colour-warning)) 45%, var(--colour-border));
+  background: var(--status-warning-background, var(--colour-warning-background));
+}
+
+.drawdown-income-year-conclusion.is-warning > strong,
+.drawdown-income-year-conclusion.is-warning > p {
+  color: var(--status-warning-text, var(--colour-warning-text));
+}
+
 .drawdown-income-year-table {
   overflow: hidden;
   margin: 0;
@@ -355,13 +397,56 @@
   border-top: 1px solid var(--colour-border);
 }
 
-.drawdown-income-year-table-content .table-scroll {
+.drawdown-income-table-selected-note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--colour-primary) 30%, var(--colour-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--colour-primary) 6%, var(--colour-surface));
+}
+
+.drawdown-income-table-selected-note > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+}
+
+.drawdown-income-table-selected-note > strong {
+  margin-right: auto;
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-income-year-table-content .table-scroll {
+  margin-top: 0;
 }
 
 .drawdown-income-detail-table td,
 .drawdown-income-detail-table th {
   white-space: nowrap;
+}
+
+.drawdown-income-detail-table tr.is-selected-year > th,
+.drawdown-income-detail-table tr.is-selected-year > td {
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+}
+
+.drawdown-income-detail-table tr.is-selected-year > th:first-child {
+  box-shadow: inset 3px 0 0 var(--colour-primary);
+}
+
+.drawdown-income-current-badge {
+  display: block;
+  width: fit-content;
+  margin-top: var(--space-1);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--ui-radius-pill);
+  background: color-mix(in srgb, var(--colour-primary) 12%, var(--colour-surface));
+  color: var(--colour-primary);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
 }
 
 @media (max-width: 960px) {
@@ -389,6 +474,19 @@
   .drawdown-income-year-table-content {
     padding-right: var(--space-4);
     padding-left: var(--space-4);
+  }
+
+  .drawdown-income-table-selected-note {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .drawdown-income-table-selected-note > strong {
+    margin-right: 0;
+  }
+
+  .drawdown-income-table-selected-note .ui-button {
+    width: 100%;
   }
 }
 
