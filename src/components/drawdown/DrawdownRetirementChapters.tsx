@@ -45,6 +45,7 @@ export function DrawdownRetirementChapters({
     null as (typeof displayYears)[number] | null,
   );
   const firstSpendingChange = chapters[1]?.startAge ?? null;
+  const hasMultipleChapters = chapters.length > 1;
   const supportsIncome =
     result.firstShortfallAge === null &&
     result.firstNetIncomeShortfallAge === null;
@@ -76,7 +77,7 @@ export function DrawdownRetirementChapters({
           />
           <Question
             label="When does planned spending change?"
-            value={firstSpendingChange === null ? "One target throughout" : `Age ${firstSpendingChange}`}
+            value={firstSpendingChange === null ? "Same income target throughout" : `Age ${firstSpendingChange}`}
             tone="neutral"
           />
           <Question
@@ -88,24 +89,42 @@ export function DrawdownRetirementChapters({
         </div>
       </div>
 
-      <div className="drawdown-retirement-chapters" aria-labelledby="drawdown-chapters-title">
-        <header>
-          <p className="panel-eyebrow">Retirement chapters</p>
-          <h3 id="drawdown-chapters-title">How your retirement changes over time</h3>
-          <p>Each chapter uses the income target saved in the active plan.</p>
-        </header>
-        <div className="drawdown-chapter-grid">
-          {chapters.map((chapter) => (
-            <RetirementChapterCard key={`${chapter.title}-${chapter.startAge}`} chapter={chapter} />
-          ))}
+      {hasMultipleChapters ? (
+        <div className="drawdown-retirement-chapters" aria-labelledby="drawdown-chapters-title">
+          <header>
+            <p className="panel-eyebrow">Retirement chapters</p>
+            <h3 id="drawdown-chapters-title">How your retirement changes over time</h3>
+            <p>Each chapter uses the income target saved in the active plan.</p>
+          </header>
+          <div className="drawdown-chapter-grid">
+            {chapters.map((chapter) => (
+              <RetirementChapterCard key={`${chapter.title}-${chapter.startAge}`} chapter={chapter} />
+            ))}
+          </div>
+          <Link
+            className="drawdown-chapter-action"
+            to="/what-if?experiment=spending"
+          >
+            Could you spend more during active retirement? Explore it in What If?
+          </Link>
         </div>
-        <Link
-          className="drawdown-chapter-action"
-          to="/what-if?experiment=spending"
-        >
-          Could you spend more during active retirement? Explore it in What If?
-        </Link>
-      </div>
+      ) : (
+        <div className="drawdown-retirement-chapters" aria-labelledby="drawdown-single-chapter-title">
+          <header>
+            <p className="panel-eyebrow">Planned spending</p>
+            <h3 id="drawdown-single-chapter-title">One income target throughout retirement</h3>
+            <p>
+              Your current plan keeps the same income target from age {inputs.retirementAge} through age {inputs.endAge}.
+            </p>
+          </header>
+          <Link
+            className="drawdown-chapter-action"
+            to="/what-if?experiment=spending"
+          >
+            Want to explore changing spending later in retirement? Try it in What If?
+          </Link>
+        </div>
+      )}
     </section>
   );
 }
