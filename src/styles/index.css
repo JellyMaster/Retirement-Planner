@@ -18,6 +18,7 @@
 @import "./layouts/index.css";
 @import "./scenario-decision-summary.css";
 @import "./compare-page-refined.css";
+@import "./compare-disclosures.css";
 @import "./drawdown-outcome-story.css";
 @import "./drawdown-retirement-journey.css";
 @import "./drawdown-income-balance-story.css";
