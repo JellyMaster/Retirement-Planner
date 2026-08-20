@@ -1,0 +1,57 @@
+.drawdown-simple-story {
+  gap: var(--space-6);
+}
+
+.drawdown-simple-story-section {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.drawdown-simple-story-section + .drawdown-simple-story-section {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--colour-border);
+}
+
+.drawdown-simple-story-heading {
+  display: grid;
+  gap: var(--space-1);
+  max-width: 760px;
+}
+
+.drawdown-simple-story-heading .panel-eyebrow {
+  margin: 0;
+}
+
+.drawdown-simple-story-heading h2 {
+  margin: 0;
+  color: var(--colour-text);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+}
+
+.drawdown-simple-story-heading > p:last-child {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.drawdown-simple-outcome .drawdown-summary-ribbon,
+.drawdown-simple-story-section .dashboard-insights,
+.drawdown-simple-story-section .drawdown-income-waterfall,
+.drawdown-simple-story-section .drawdown-journey-chart-panel {
+  margin: 0;
+}
+
+.drawdown-simple-story-section .dashboard-insights {
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  .drawdown-simple-story {
+    gap: var(--space-5);
+  }
+
+  .drawdown-simple-story-section + .drawdown-simple-story-section {
+    padding-top: var(--space-4);
+  }
+}
