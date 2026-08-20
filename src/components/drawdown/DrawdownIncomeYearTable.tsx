@@ -1,13 +1,11 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMemo, useState } from "react";
 
 import type { DrawdownYear } from "../../engine/drawdown/models/DrawdownYear";
+import { AppIcons } from "../../icons";
 import { getDisplayYears, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import { formatCurrency } from "../../utils/formatters";
 import { ExpandCollapseIndicator } from "../ui";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AppIcons } from "../../icons";
-
-
 
 interface DrawdownIncomeYearTableProps {
   years: DrawdownYear[];
@@ -138,19 +136,19 @@ export function DrawdownIncomeYearTable({
                     aria-current={isSelected ? "true" : undefined}
                   >
                     <th scope="row" className="projection-sticky-age">
-                      <span className="projection-age">{year.age}</span>
+                      <span className="drawdown-income-age-cell">
+                        <span className="projection-age">{year.age}</span>
+                        {isSelected && (
+                          <span
+                            className="drawdown-income-current-indicator"
+                            title="Currently selected year"
+                            aria-label="Currently selected year"
+                          >
+                            <FontAwesomeIcon icon={AppIcons.eye} fixedWidth />
+                          </span>
+                        )}
+                      </span>
                       <small>{year.year}</small>
-                      {isSelected && (  <span
-    className="drawdown-income-current-indicator"
-    title="Currently selected year"
-    aria-label="Currently selected year"
-  >
-    <FontAwesomeIcon
-      icon={AppIcons.eye}
-      fixedWidth
-    />
-  </span>
-)}
                     </th>
                     <td data-label="From your pension">{formatCurrency(year.pensionWithdrawal)}</td>
                     <td data-label="State Pension">{formatCurrency(year.statePensionIncome)}</td>
