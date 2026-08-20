@@ -68,7 +68,7 @@ export function DrawdownIncomeChart({
       <div className="panel-heading">
         <h2>How your income changes over time</h2>
         <p>
-          Pension withdrawals, State Pension, tax and spendable income through retirement.
+          See how money from your pension, State Pension, tax and the money available to spend change through retirement.
           {onSelectAge ? " Select a point on the chart to inspect that year." : ""}
           {` Values are shown in ${displayMode === "today" ? "today's money" : "future money"}.`}
         </p>
@@ -118,10 +118,10 @@ export function DrawdownIncomeChart({
             ))}
 
             <Bar dataKey="statePensionIncome" name="State Pension" stackId="gross-income" fill={chartColours.tertiary} />
-            <Bar dataKey="pensionWithdrawal" name="Income from your pension" stackId="gross-income" fill={chartColours.primary} />
-            <Line type="monotone" dataKey="netIncome" name="Net income" stroke={chartColours.secondary} strokeWidth={3} dot={false} />
-            <Line type="monotone" dataKey="incomeTax" name="Income tax" stroke={chartColours.fees} strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="desiredIncome" name={years[0]?.incomeTargetMode === "net" ? "Net target" : "Gross target"} stroke={chartColours.text} strokeDasharray="6 4" strokeWidth={2} dot={false} />
+            <Bar dataKey="pensionWithdrawal" name="From your pension" stackId="gross-income" fill={chartColours.primary} />
+            <Line type="monotone" dataKey="netIncome" name="Money to spend" stroke={chartColours.secondary} strokeWidth={3} dot={false} />
+            <Line type="monotone" dataKey="incomeTax" name="Tax" stroke={chartColours.fees} strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="desiredIncome" name="Your income target" stroke={chartColours.text} strokeDasharray="6 4" strokeWidth={2} dot={false} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
