@@ -15,6 +15,14 @@ interface DrawdownIncomeYearStoryProps {
   spendingPhases?: DrawdownSpendingPhase[];
 }
 
+type RangeMarkerTone = "positive" | "warning" | "neutral";
+
+interface RangeMarker {
+  age: number;
+  title: string;
+  tone: RangeMarkerTone;
+}
+
 export function DrawdownIncomeYearStory({
   years,
   inflationRate,
@@ -33,6 +41,10 @@ export function DrawdownIncomeYearStory({
     displayYears.findIndex((year) => year.age === selectedAge),
   );
   const selectedYear = displayYears[selectedIndex] ?? displayYears[0];
+  const rangeMarkers = useMemo(
+    () => createRangeMarkers(years, statePensionAge, spendingPhases),
+    [spendingPhases, statePensionAge, years],
+  );
 
   if (!selectedYear) return null;
 
@@ -50,6 +62,9 @@ export function DrawdownIncomeYearStory({
     selectedIndex < displayYears.length - 1
       ? displayYears[selectedIndex + 1]?.age
       : undefined;
+  const firstAge = displayYears[0]?.age ?? selectedYear.age;
+  const lastAge = displayYears.at(-1)?.age ?? selectedYear.age;
+  const maxRangeIndex = Math.max(0, displayYears.length - 1);
 
   return (
     <div className="drawdown-income-year-story">
@@ -66,19 +81,64 @@ export function DrawdownIncomeYearStory({
               {displayMode === "today" ? "Today’s money" : "Future money"}
             </p>
           </div>
-          <label>
-            <span>Inspect age</span>
-            <select
-              value={selectedYear.age}
-              onChange={(event) => onSelectAge(Number(event.target.value))}
-            >
-              {displayYears.map((year) => (
-                <option key={year.age} value={year.age}>
-                  Age {year.age}
-                </option>
-              ))}
-            </select>
-          </label>
+        </div>
+
+        <div className="drawdown-income-age-range">
+          <div className="drawdown-income-age-range-heading">
+            <div>
+              <strong>Explore retirement by age</strong>
+              <span>Warning markers show when an issue first begins.</span>
+            </div>
+            <div className="drawdown-income-age-range-legend" aria-label="Timeline marker key">
+              <span><i className="is-milestone" /> Milestone</span>
+              <span><i className="is-warning" /> Needs attention</span>
+            </div>
+          </div>
+
+          <div className="drawdown-income-age-range-track-wrap">
+            <div className="drawdown-income-age-range-markers" aria-label="Important retirement ages">
+              {rangeMarkers.map((marker) => {
+                const markerIndex = displayYears.findIndex((year) => year.age === marker.age);
+                if (markerIndex < 0) return null;
+                const left = maxRangeIndex === 0 ? 0 : (markerIndex / maxRangeIndex) * 100;
+                return (
+                  <button
+                    key={`${marker.age}-${marker.title}`}
+                    type="button"
+                    className={`drawdown-income-age-marker is-${marker.tone}`}
+                    style={{ left: `${left}%` }}
+                    aria-label={`${marker.title} at age ${marker.age}. Inspect this year.`}
+                    title={`${marker.title} · Age ${marker.age}`}
+                    onClick={() => onSelectAge(marker.age)}
+                  >
+                    <span aria-hidden="true" />
+                  </button>
+                );
+              })}
+            </div>
+
+            <input
+              className="drawdown-income-age-slider"
+              type="range"
+              min={0}
+              max={maxRangeIndex}
+              step={1}
+              value={selectedIndex}
+              aria-label={`Inspect retirement age. Currently age ${selectedYear.age}`}
+              aria-valuetext={`Age ${selectedYear.age}`}
+              onChange={(event) => {
+                const nextIndex = Number(event.target.value);
+                const nextYear = displayYears[nextIndex];
+                if (nextYear) onSelectAge(nextYear.age);
+              }}
+            />
+
+            <div className="drawdown-income-age-range-labels" aria-hidden="true">
+              <span>Age {firstAge}</span>
+              <strong>Age {selectedYear.age}</strong>
+              <span>Age {lastAge}</span>
+            </div>
+          </div>
         </div>
 
         <div className="drawdown-income-year-navigation" role="group" aria-label="Inspect nearby retirement years">
@@ -165,6 +225,65 @@ function IncomeMetric({
       <dd>{formatCurrency(value)}</dd>
     </div>
   );
+}
+
+function createRangeMarkers(
+  years: DrawdownYear[],
+  statePensionAge?: number,
+  spendingPhases?: DrawdownSpendingPhase[],
+): RangeMarker[] {
+  const markers = new Map<number, RangeMarker>();
+
+  const addMarker = (marker: RangeMarker) => {
+    const existing = markers.get(marker.age);
+    if (!existing || markerPriority(marker.tone) > markerPriority(existing.tone)) {
+      markers.set(marker.age, marker);
+    }
+  };
+
+  const statePensionStart = years.find(
+    (year, index) =>
+      year.statePensionIncome > 0 &&
+      (index === 0 || years[index - 1].statePensionIncome <= 0),
+  );
+  const stateAge = statePensionStart?.age ?? statePensionAge;
+  if (stateAge !== undefined && years.some((year) => year.age === stateAge)) {
+    addMarker({ age: stateAge, title: "State Pension starts", tone: "positive" });
+  }
+
+  spendingPhases?.forEach((phase) => {
+    if (years.some((year) => year.age === phase.startAge)) {
+      addMarker({ age: phase.startAge, title: `${phase.label} begins`, tone: "neutral" });
+    }
+  });
+
+  const firstShortfall = years.find((year, index) => {
+    const hasShortfall = year.netIncomeShortfall > 0 || year.incomeShortfall > 0;
+    if (!hasShortfall) return false;
+    const previous = index > 0 ? years[index - 1] : undefined;
+    return !previous || (previous.netIncomeShortfall <= 0 && previous.incomeShortfall <= 0);
+  });
+  if (firstShortfall) {
+    addMarker({ age: firstShortfall.age, title: "Income falls below target", tone: "warning" });
+  }
+
+  const firstDepletion = years.find((year, index) => {
+    const depleted = year.isDepleted || year.closingBalance <= 0;
+    if (!depleted) return false;
+    const previous = index > 0 ? years[index - 1] : undefined;
+    return !previous || (!previous.isDepleted && previous.closingBalance > 0);
+  });
+  if (firstDepletion) {
+    addMarker({ age: firstDepletion.age, title: "Private pension is depleted", tone: "warning" });
+  }
+
+  return [...markers.values()].sort((a, b) => a.age - b.age);
+}
+
+function markerPriority(tone: RangeMarkerTone) {
+  if (tone === "warning") return 3;
+  if (tone === "positive") return 2;
+  return 1;
 }
 
 function createYearEvents({
