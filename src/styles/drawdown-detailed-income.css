@@ -474,16 +474,31 @@
   box-shadow: inset 3px 0 0 var(--colour-primary);
 }
 
-.drawdown-income-current-badge {
-  display: block;
-  width: fit-content;
-  margin-top: var(--space-1);
-  padding: 0.15rem 0.4rem;
-  border-radius: var(--ui-radius-pill);
-  background: color-mix(in srgb, var(--colour-primary) 12%, var(--colour-surface));
+.drawdown-income-age-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  line-height: 1;
+}
+
+.drawdown-income-age-cell .projection-age {
+  display: inline;
+  line-height: 1;
+}
+
+.drawdown-income-current-indicator {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   color: var(--colour-primary);
-  font-size: var(--ui-font-size-xs);
-  font-weight: 800;
+  font-size: 0.75rem;
+  line-height: 1;
+  opacity: 0.72;
+}
+
+.drawdown-income-current-indicator:hover {
+  opacity: 1;
 }
 
 .drawdown-income-pagination {
