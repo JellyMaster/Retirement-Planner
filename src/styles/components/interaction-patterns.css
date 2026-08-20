@@ -4,6 +4,11 @@
   cursor: pointer;
 }
 
+.ui-disclosure-trigger:focus-visible {
+  outline: 2px solid var(--colour-primary);
+  outline-offset: -2px;
+}
+
 .ui-expand-collapse-indicator {
   display: grid;
   width: 2rem;
