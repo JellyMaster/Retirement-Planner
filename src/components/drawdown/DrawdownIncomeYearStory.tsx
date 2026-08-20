@@ -4,6 +4,7 @@ import type { DrawdownYear } from "../../engine/drawdown/models/DrawdownYear";
 import type { DrawdownSpendingPhase } from "../../engine/drawdown/models/DrawdownInputs";
 import { getDisplayYears, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import { formatCurrency } from "../../utils/formatters";
+import { InfoTooltip } from "../ui";
 
 interface DrawdownIncomeYearStoryProps {
   years: DrawdownYear[];
@@ -77,7 +78,7 @@ export function DrawdownIncomeYearStory({
             <p className="panel-eyebrow">Selected year</p>
             <h2 id="drawdown-income-selected-year-title">Age {selectedYear.age}</h2>
             <p aria-live="polite" aria-atomic="true">
-              Inspecting age {selectedYear.age} · {selectedYear.year} ·{" "}
+              {selectedYear.year} ·{" "}
               {displayMode === "today" ? "Today’s money" : "Future money"}
             </p>
           </div>
@@ -85,9 +86,28 @@ export function DrawdownIncomeYearStory({
 
         <div className="drawdown-income-age-range">
           <div className="drawdown-income-age-range-heading">
-            <div>
-              <strong>Explore retirement by age</strong>
-              <span>Warning markers show when an issue first begins.</span>
+            <div className="drawdown-income-age-range-title">
+              <div>
+                <strong>Explore retirement by age</strong>
+                <span>Markers highlight important changes in your retirement journey.</span>
+              </div>
+              <InfoTooltip
+                ariaLabel="Explain the retirement age timeline and warning markers"
+                size="small"
+                align="left"
+              >
+                <strong>What this timeline shows</strong>
+                <p>
+                  Use the slider to inspect each retirement year. Markers highlight important milestones and the first year a new issue begins.
+                </p>
+                <strong>Why warnings only appear once</strong>
+                <p>
+                  Repeated warning years are not marked individually. Once a warning starts, only its first year is shown so the timeline stays readable. The issue may continue in later years even when no additional warning marker is shown.
+                </p>
+                <small>
+                  For example, if income first falls below target at age 84 and remains below target afterwards, only age 84 is marked.
+                </small>
+              </InfoTooltip>
             </div>
             <div className="drawdown-income-age-range-legend" aria-label="Timeline marker key">
               <span><i className="is-milestone" /> Milestone</span>
@@ -135,7 +155,6 @@ export function DrawdownIncomeYearStory({
 
             <div className="drawdown-income-age-range-labels" aria-hidden="true">
               <span>Age {firstAge}</span>
-              <strong>Age {selectedYear.age}</strong>
               <span>Age {lastAge}</span>
             </div>
           </div>
@@ -150,7 +169,6 @@ export function DrawdownIncomeYearStory({
           >
             ← Previous year
           </button>
-          <span aria-hidden="true">Age {selectedYear.age}</span>
           <button
             type="button"
             className="ui-button ui-button-secondary ui-button-small"
