@@ -75,10 +75,9 @@ export function DrawdownIncomeYearStory({
       >
         <div className="drawdown-income-selected-year-heading">
           <div>
-            <p className="panel-eyebrow">Selected year</p>
-            <h2 id="drawdown-income-selected-year-title">Age {selectedYear.age}</h2>
+            <h2 id="drawdown-income-selected-year-title">Income breakdown</h2>
             <p aria-live="polite" aria-atomic="true">
-              {selectedYear.year} ·{" "}
+              Age {selectedYear.age} · {selectedYear.year} ·{" "}
               {displayMode === "today" ? "Today’s money" : "Future money"}
             </p>
           </div>
