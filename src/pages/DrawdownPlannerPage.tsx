@@ -6,12 +6,13 @@ import { DrawdownBalanceChartExplorer } from "../components/drawdown/DrawdownBal
 import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStory";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
+import { DrawdownIncomeYearStory } from "../components/drawdown/DrawdownIncomeYearStory";
+import { DrawdownIncomeYearTable } from "../components/drawdown/DrawdownIncomeYearTable";
 import { DrawdownInsights } from "../components/drawdown/DrawdownInsights";
 import { DrawdownJourneyChart } from "../components/drawdown/DrawdownJourneyChart";
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
 import { DrawdownRetirementChapters } from "../components/drawdown/DrawdownRetirementChapters";
-import { DrawdownSummary } from "../components/drawdown/DrawdownSummary";
 import { DrawdownSummaryRibbon } from "../components/drawdown/DrawdownSummaryRibbon";
 import {
   DrawdownWorkspaceNavigation,
@@ -44,6 +45,7 @@ export function DrawdownPlannerPage() {
   const [displayMode, setDisplayMode] = useState<MoneyDisplayMode>(getInitialMoneyDisplayMode);
   const [viewMode, setViewMode] = useState<DrawdownViewMode>("simple");
   const [activeSection, setActiveSection] = useState<DrawdownWorkspaceSection>("income");
+  const [incomeSelectedAge, setIncomeSelectedAge] = useState<number | null>(null);
   const pensionProjection = usePensionProjection(activeScenario.inputs);
   const inputs = useMemo(
     () => createDrawdownInputsFromPlan({ pensionInputs: activeScenario.inputs, projection: pensionProjection.projection, retirementGoals, drawdown: activeScenario.drawdown }),
@@ -51,6 +53,9 @@ export function DrawdownPlannerPage() {
   );
   const validation = useMemo(() => validateDrawdownInputs(inputs), [inputs]);
   const result = useMemo(() => (validation.isValid ? drawdownEngine.calculate(inputs) : null), [inputs, validation.isValid]);
+  const selectedIncomeAge = result?.years.some((year) => year.age === incomeSelectedAge)
+    ? incomeSelectedAge!
+    : result?.years[0]?.age ?? inputs.retirementAge;
 
   useEffect(() => {
     window.localStorage.setItem(MONEY_DISPLAY_STORAGE_KEY, displayMode);
@@ -171,12 +176,32 @@ export function DrawdownPlannerPage() {
                 <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
 
                 {activeSection === "income" && (
-                  <div className="drawdown-workspace-section" id="drawdown-income-section" role="tabpanel" aria-labelledby="drawdown-tab-income" tabIndex={0}>
-                    <SectionHeading eyebrow="Income and tax" title="Where does retirement income come from?" description="Review income from your pension, State Pension, tax and any modelled gaps across each retirement chapter." />
+                  <div className="drawdown-workspace-section drawdown-detailed-income" id="drawdown-income-section" role="tabpanel" aria-labelledby="drawdown-tab-income" tabIndex={0}>
+                    <SectionHeading
+                      eyebrow="Income story"
+                      title="Income through retirement"
+                      description="Understand how pension withdrawals, State Pension and estimated tax combine to provide your spending money each year."
+                    />
+                    <DrawdownIncomeChart
+                      years={result.years}
+                      inflationRate={inputs.inflationRate}
+                      displayMode={displayMode}
+                      spendingPhases={inputs.spendingPhases}
+                      statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
+                      selectedAge={selectedIncomeAge}
+                      onSelectAge={setIncomeSelectedAge}
+                    />
+                    <DrawdownIncomeYearStory
+                      years={result.years}
+                      inflationRate={inputs.inflationRate}
+                      displayMode={displayMode}
+                      selectedAge={selectedIncomeAge}
+                      onSelectAge={setIncomeSelectedAge}
+                      statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
+                      spendingPhases={inputs.spendingPhases}
+                    />
                     <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
-                    <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
-                    <section className="panel dashboard-chart-panel drawdown-workspace-chart-panel"><div className="dashboard-chart-stage"><DrawdownIncomeChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} spendingPhases={inputs.spendingPhases} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} /></div></section>
-                    <DrawdownSummary result={result} inflationRate={inputs.inflationRate} displayMode={displayMode} />
+                    <DrawdownIncomeYearTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   </div>
                 )}
 
