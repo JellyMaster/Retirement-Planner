@@ -1,0 +1,242 @@
+.drawdown-detailed-income {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.drawdown-detailed-income > .drawdown-chart-panel {
+  margin: 0;
+}
+
+.drawdown-detailed-income .drawdown-chart {
+  cursor: crosshair;
+}
+
+.drawdown-income-year-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.85fr);
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+.drawdown-income-year-story > .panel {
+  height: 100%;
+  margin: 0;
+}
+
+.drawdown-income-selected-year {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.drawdown-income-selected-year-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.drawdown-income-selected-year-heading h2,
+.drawdown-income-selected-year-heading p {
+  margin: 0;
+}
+
+.drawdown-income-selected-year-heading h2 {
+  margin-top: var(--space-1);
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+}
+
+.drawdown-income-selected-year-heading > div > p:last-child {
+  margin-top: var(--space-1);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-income-selected-year-heading label {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 9rem;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.drawdown-income-selected-year-heading select {
+  min-height: 40px;
+}
+
+.drawdown-income-selected-year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.drawdown-income-selected-year-grid > div {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-income-selected-year-grid dt {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 750;
+}
+
+.drawdown-income-selected-year-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--colour-text);
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  font-weight: 800;
+}
+
+.drawdown-income-selected-year-grid .is-emphasis {
+  border-color: color-mix(in srgb, var(--colour-primary) 45%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+}
+
+.drawdown-income-selected-year-grid .is-emphasis dd {
+  color: var(--colour-primary);
+}
+
+.drawdown-income-selected-year-grid .is-negative dd {
+  color: var(--status-warning-text, var(--colour-warning-text));
+}
+
+.drawdown-income-year-events {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+}
+
+.drawdown-income-year-events .panel-heading {
+  margin: 0;
+}
+
+.drawdown-income-year-event-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drawdown-income-year-event {
+  padding: var(--space-3);
+  border-left: 3px solid var(--colour-border-strong);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-income-year-event strong {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.drawdown-income-year-event p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.drawdown-income-year-event.is-positive {
+  border-left-color: var(--status-good, var(--colour-success));
+}
+
+.drawdown-income-year-event.is-warning {
+  border-left-color: var(--status-warning, var(--colour-warning));
+  background: var(--status-warning-background, var(--colour-warning-background));
+}
+
+.drawdown-income-year-event.is-warning p,
+.drawdown-income-year-event.is-warning strong {
+  color: var(--status-warning-text, var(--colour-warning-text));
+}
+
+.drawdown-income-year-table {
+  overflow: hidden;
+  margin: 0;
+}
+
+.drawdown-income-year-table > summary {
+  list-style: none;
+}
+
+.drawdown-income-year-table > summary::-webkit-details-marker {
+  display: none;
+}
+
+.drawdown-income-year-table-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+}
+
+.drawdown-income-year-table-summary:hover {
+  background: var(--colour-surface-hover);
+}
+
+.drawdown-income-year-table-summary > div {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.drawdown-income-year-table-summary strong {
+  font-size: 1.05rem;
+}
+
+.drawdown-income-year-table-summary small {
+  color: var(--colour-text-muted);
+}
+
+.drawdown-income-year-table-content {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0 var(--space-5) var(--space-5);
+  border-top: 1px solid var(--colour-border);
+}
+
+.drawdown-income-year-table-content .table-scroll {
+  margin-top: var(--space-4);
+}
+
+.drawdown-income-detail-table td,
+.drawdown-income-detail-table th {
+  white-space: nowrap;
+}
+
+@media (max-width: 960px) {
+  .drawdown-income-year-story {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .drawdown-income-selected-year-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .drawdown-income-selected-year-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .drawdown-income-year-table-summary,
+  .drawdown-income-year-table-content {
+    padding-right: var(--space-4);
+    padding-left: var(--space-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .drawdown-income-selected-year-grid {
+    grid-template-columns: 1fr;
+  }
+}
