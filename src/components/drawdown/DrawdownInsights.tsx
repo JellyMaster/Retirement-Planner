@@ -1,6 +1,4 @@
-import { useId } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Info } from "lucide-react";
 
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
@@ -10,6 +8,7 @@ import {
   type MoneyDisplayMode,
 } from "../../utils/drawdownDisplayValues";
 import { formatCurrency, formatPercentage } from "../../utils/formatters";
+import { InfoTooltip } from "../ui";
 
 interface DrawdownInsightsProps {
   inputs: DrawdownInputs;
@@ -78,7 +77,6 @@ function Insight({
   warningReason?: string;
   warningActions?: string[];
 }) {
-  const tooltipId = useId();
   const hasWarningTooltip = status === "warning" && warningReason;
 
   return (
@@ -88,30 +86,22 @@ function Insight({
       </span>
       <span className="insight-title">{title}</span>
       {hasWarningTooltip && (
-        <span className="insight-warning-tooltip">
-          <button
-            type="button"
-            className="insight-warning-tooltip-trigger"
-            aria-label={`Explain why ${title.toLowerCase()} needs attention`}
-            aria-describedby={tooltipId}
-          >
-            <Info size={15} aria-hidden="true" />
-          </button>
-          <span id={tooltipId} className="insight-warning-tooltip-panel" role="tooltip">
-            <strong>Why am I seeing this?</strong>
-            <span>{warningReason}</span>
-            {warningActions && warningActions.length > 0 && (
-              <span className="insight-warning-tooltip-actions">
-                <b>Things you could review</b>
-                <ul>
-                  {warningActions.map((action) => (
-                    <li key={action}>{action}</li>
-                  ))}
-                </ul>
-              </span>
-            )}
-          </span>
-        </span>
+        <InfoTooltip
+          ariaLabel={`Explain why ${title.toLowerCase()} needs attention`}
+          title="Why am I seeing this?"
+        >
+          <span>{warningReason}</span>
+          {warningActions && warningActions.length > 0 && (
+            <span className="insight-warning-tooltip-actions">
+              <b>Things you could review</b>
+              <ul>
+                {warningActions.map((action) => (
+                  <li key={action}>{action}</li>
+                ))}
+              </ul>
+            </span>
+          )}
+        </InfoTooltip>
       )}
     </li>
   );
