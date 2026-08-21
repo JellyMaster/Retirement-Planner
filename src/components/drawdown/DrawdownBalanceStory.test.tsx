@@ -54,7 +54,7 @@ const result: DrawdownResult = {
   totalFees: 0,
 };
 
-const drawdown: ScenarioDrawdownPreferences = {
+const legacyDrawdown: ScenarioDrawdownPreferences = {
   planningAge: 67,
   withdrawalStrategy: "target-income",
   withdrawalRate: 0.04,
@@ -72,7 +72,6 @@ describe("DrawdownBalanceStory", () => {
         inputs={inputs}
         result={result}
         displayMode="nominal"
-        drawdown={drawdown}
       />,
     );
 
@@ -83,13 +82,12 @@ describe("DrawdownBalanceStory", () => {
     expect(screen.queryByText(/balance chart/i)).not.toBeInTheDocument();
   });
 
-  it("explains the remaining pension and progress toward the reserve goal", () => {
+  it("explains the pension remaining at the end of the plan", () => {
     render(
       <DrawdownBalanceStory
         inputs={inputs}
         result={result}
         displayMode="nominal"
-        drawdown={drawdown}
       />,
     );
 
@@ -100,13 +98,22 @@ describe("DrawdownBalanceStory", () => {
     expect(
       screen.getByText("Reached at age 67, at the end of the plan."),
     ).toBeInTheDocument();
-    expect(screen.getByText("Target reserve")).toBeInTheDocument();
-    expect(screen.getByText("Projected reserve at age 67")).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Your plan keeps 62.5% of the reserve you asked to retain and finishes £30,000 below your target.",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.queryByText("Target reserve")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Projected reserve/i)).not.toBeInTheDocument();
+  });
+
+  it("ignores legacy ending-balance preferences on the balance screen", () => {
+    render(
+      <DrawdownBalanceStory
+        inputs={inputs}
+        result={result}
+        displayMode="nominal"
+        drawdown={legacyDrawdown}
+      />,
+    );
+
+    expect(screen.queryByText(/reserve/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/amount you chose to keep/i)).not.toBeInTheDocument();
   });
 
   it("adds educational context to the first falling year", () => {
@@ -124,6 +131,9 @@ describe("DrawdownBalanceStory", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText("A reducing pension isn't necessarily a problem."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/continue providing the income you've planned for the whole period you're planning for/i),
     ).toBeInTheDocument();
   });
 });
