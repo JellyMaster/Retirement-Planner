@@ -20,7 +20,7 @@ const sections: Array<{
 }> = [
   { id: "income", queryValue: "income", label: "Income" },
   { id: "balance", queryValue: "balance", label: "Balance" },
-  { id: "details", queryValue: "timeline", label: "Timeline" },
+  { id: "details", queryValue: "timeline", label: "Retirement journey" },
   { id: "assumptions", queryValue: "assumptions", label: "Assumptions" },
 ];
 
