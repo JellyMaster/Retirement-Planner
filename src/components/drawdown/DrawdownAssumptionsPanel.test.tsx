@@ -41,11 +41,14 @@ describe("DrawdownAssumptionsPanel", () => {
     expect(screen.getByText("Illustration, not prediction")).toBeInTheDocument();
   });
 
-  it("keeps the technical calculation order as an optional reference", () => {
+  it("keeps the detailed calculation method as an optional reference", () => {
     render(<DrawdownAssumptionsPanel inputs={inputs} displayMode="today" />);
 
-    const reference = screen.getByText("See how each retirement year is calculated").closest("details");
+    const reference = screen.getByText("How the calculations work").closest("details");
     expect(reference).not.toHaveAttribute("open");
+    expect(
+      screen.getByText(/Most people won.t need this level of detail/i),
+    ).toBeInTheDocument();
     expect(screen.getByText(/educational retirement illustration, not a guarantee or personal financial advice/i)).toBeInTheDocument();
   });
 });
