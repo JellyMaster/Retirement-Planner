@@ -10,6 +10,8 @@ interface DrawdownBalanceStoryProps {
   inputs: DrawdownInputs;
   result: DrawdownResult;
   displayMode: MoneyDisplayMode;
+  /** Legacy scenario metadata may still be supplied by existing callers, but it no longer affects this view. */
+  drawdown?: unknown;
 }
 
 export function DrawdownBalanceStory({
