@@ -1,3 +1,4 @@
+import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
 import {
@@ -10,43 +11,40 @@ interface DrawdownBalanceStoryProps {
   inputs: DrawdownInputs;
   result: DrawdownResult;
   displayMode: MoneyDisplayMode;
+  drawdown?: ScenarioDrawdownPreferences;
 }
 
 export function DrawdownBalanceStory({
   inputs,
   result,
   displayMode,
+  drawdown,
 }: DrawdownBalanceStoryProps) {
   const years = getDisplayYears(
     result.years,
     inputs.inflationRate,
     displayMode,
   );
-  const highest = years.reduce((best, year) =>
-    year.closingBalance > best.closingBalance ? year : best,
+  if (years.length === 0) return null;
+
+  const firstFallingYear = years.find(
+    (year) => year.closingBalance < year.openingBalance,
   );
   const lowest = years.reduce((best, year) =>
     year.closingBalance < best.closingBalance ? year : best,
   );
-  const firstPressureYear = years.find(
-    (year) => year.pensionWithdrawal + year.fees > year.investmentGrowth,
-  );
-  const periods = createBalancePeriods(years);
+  const finalBalance = years.at(-1)?.closingBalance ?? result.finalBalance;
+  const reserveTarget = getReserveTarget(inputs, drawdown);
+  const meetsReserveTarget = reserveTarget === null || finalBalance >= reserveTarget;
 
   return (
-    <section
-      className="drawdown-balance-story"
-      aria-labelledby="drawdown-balance-story-title"
-    >
+    <section className="drawdown-balance-story" aria-labelledby="drawdown-balance-story-title">
       <header>
         <div>
-          <p className="panel-eyebrow">Balance story</p>
-          <h3 id="drawdown-balance-story-title">
-            Why the pension rises or falls over time
-          </h3>
+          <p className="panel-eyebrow">How your pension is working</p>
+          <h3 id="drawdown-balance-story-title">The questions behind the balance chart</h3>
           <p>
-            The balance changes according to withdrawals, investment growth and
-            fees in each retirement year.
+            A pension balance does not need to rise every year to be doing its job. These answers help explain whether the projected balance is behaving in line with the plan.
           </p>
         </div>
         <span>{displayMode === "today" ? "Today’s money" : "Future money"}</span>
@@ -54,95 +52,84 @@ export function DrawdownBalanceStory({
 
       <div className="drawdown-balance-metrics">
         <Metric
-          label="Highest balance"
-          value={formatCurrency(highest.closingBalance)}
-          detail={`Age ${highest.age}`}
+          label="Does the private pension last?"
+          value={result.depletionAge === null ? `Through age ${inputs.endAge}` : `Until age ${result.depletionAge}`}
+          detail={result.depletionAge === null ? "It remains available throughout the plan." : "The private pension is fully used before the planning age."}
+          tone={result.depletionAge === null ? "positive" : "warning"}
         />
         <Metric
-          label="Lowest balance"
+          label="When does the balance first fall?"
+          value={firstFallingYear ? `Age ${firstFallingYear.age}` : "Not in this plan"}
+          detail={firstFallingYear ? "This is the first year the pension ends lower than it started." : "The illustrated balance does not finish a year lower than it started."}
+          tone="neutral"
+        />
+        <Metric
+          label="Lowest projected balance"
           value={formatCurrency(lowest.closingBalance)}
-          detail={`Age ${lowest.age}`}
+          detail={`At age ${lowest.age}.`}
+          tone={lowest.closingBalance > 0 ? "neutral" : "warning"}
         />
         <Metric
-          label="Withdrawals exceed growth"
-          value={firstPressureYear ? `Age ${firstPressureYear.age}` : "Not modelled"}
-          detail={firstPressureYear ? "Including annual fees" : "Growth covers withdrawals and fees"}
-        />
-        <Metric
-          label="Final balance"
-          value={formatCurrency(years.at(-1)?.closingBalance ?? result.finalBalance)}
-          detail={result.depletionAge === null ? `At age ${inputs.endAge}` : `Depleted at age ${result.depletionAge}`}
+          label="Balance at the end of the plan"
+          value={formatCurrency(finalBalance)}
+          detail={`At age ${inputs.endAge}.`}
+          tone={finalBalance > 0 ? "positive" : "warning"}
         />
       </div>
 
-      <div className="drawdown-balance-periods">
-        {periods.map((period) => (
-          <article key={`${period.startAge}-${period.endAge}`}>
-            <span>Age {period.startAge}–{period.endAge}</span>
-            <h4>{period.title}</h4>
-            <p>{period.description}</p>
-          </article>
-        ))}
-      </div>
+      {reserveTarget !== null && (
+        <div className={`drawdown-balance-reserve-summary ${meetsReserveTarget ? "is-positive" : "is-warning"}`}>
+          <div>
+            <span>Your ending-balance goal</span>
+            <strong>{formatCurrency(reserveTarget)}</strong>
+          </div>
+          <div>
+            <span>Projected at age {inputs.endAge}</span>
+            <strong>{formatCurrency(finalBalance)}</strong>
+          </div>
+          <p>
+            {meetsReserveTarget
+              ? "The current illustration finishes at or above the amount you asked to keep in the pension."
+              : `The current illustration finishes ${formatCurrency(reserveTarget - finalBalance)} below the amount you asked to keep.`}
+          </p>
+        </div>
+      )}
+
+      <p className="drawdown-balance-story-note">
+        A reducing balance is not automatically a warning. Your pension is there to help fund retirement; the key question is whether it can provide the planned income for long enough and still meet any amount you want to keep at the end.
+      </p>
     </section>
   );
 }
 
-function createBalancePeriods(
-  years: ReturnType<typeof getDisplayYears>,
-): Array<{
-  startAge: number;
-  endAge: number;
-  title: string;
-  description: string;
-}> {
-  if (years.length === 0) return [];
+function getReserveTarget(
+  inputs: DrawdownInputs,
+  drawdown?: ScenarioDrawdownPreferences,
+): number | null {
+  const mode = drawdown?.endingBalanceMode;
+  const retirementPot = Math.max(0, inputs.startingBalance - inputs.taxFreeCash);
 
-  const groups: Array<{ start: number; end: number; underPressure: boolean }> = [];
-  years.forEach((year, index) => {
-    const underPressure =
-      year.pensionWithdrawal + year.fees > year.investmentGrowth;
-    const current = groups.at(-1);
-    if (!current || current.underPressure !== underPressure) {
-      groups.push({ start: index, end: index, underPressure });
-    } else {
-      current.end = index;
-    }
-  });
-
-  return groups.slice(0, 4).map((group) => {
-    const first = years[group.start];
-    const last = years[group.end];
-    const falls = last.closingBalance < first.openingBalance;
-
-    return {
-      startAge: first.age,
-      endAge: last.age,
-      title: group.underPressure
-        ? falls
-          ? "Withdrawals place pressure on the balance"
-          : "Growth partly offsets retirement withdrawals"
-        : "Investment growth covers withdrawals and fees",
-      description: group.underPressure
-        ? falls
-          ? "Pension withdrawals and fees are greater than investment growth, so the illustrated balance reduces during this period."
-          : "Withdrawals exceed annual growth in some years, although the balance remains broadly stable across the period."
-        : "Investment growth is at least as high as pension withdrawals and fees, helping preserve or increase the balance.",
-    };
-  });
+  if (mode === "spend-to-zero") return 0;
+  if (mode === "preserve") return retirementPot;
+  if (mode === "percentage") {
+    return retirementPot * Math.min(1, Math.max(0, drawdown?.endingBalancePercentage ?? 0.5));
+  }
+  return null;
 }
 
 function Metric({
   label,
   value,
   detail,
+  tone,
 }: {
   label: string;
   value: string;
   detail: string;
+  tone: "positive" | "warning" | "neutral";
 }) {
   return (
-    <article>
+    <article className={`is-${tone}`}>
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{detail}</small>
