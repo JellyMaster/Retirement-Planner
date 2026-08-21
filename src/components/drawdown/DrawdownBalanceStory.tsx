@@ -50,9 +50,9 @@ export function DrawdownBalanceStory({
       <header>
         <div>
           <p className="panel-eyebrow">How your pension is working</p>
-          <h3 id="drawdown-balance-story-title">The questions behind the balance chart</h3>
+          <h3 id="drawdown-balance-story-title">Understanding your pension balance</h3>
           <p>
-            A pension balance does not need to rise every year to be doing its job. These answers help explain whether the projected balance is behaving in line with the plan.
+            These key answers summarise what the balance story means for your retirement. They help you understand whether your pension is expected to last, how it changes over time and what remains at the end of your plan.
           </p>
         </div>
         <span>{displayMode === "today" ? "Today’s money" : "Future money"}</span>
@@ -60,13 +60,14 @@ export function DrawdownBalanceStory({
 
       <div className="drawdown-balance-metrics">
         <Metric
-          label="Does the private pension last?"
+          label="Will your pension last?"
           value={result.depletionAge === null ? `Through age ${inputs.endAge}` : `Until age ${result.depletionAge}`}
-          detail={result.depletionAge === null ? "It remains available throughout the plan." : "The private pension is fully used before the planning age."}
+          detail={result.depletionAge === null ? "It remains available throughout your plan." : "The private pension is fully used before the end of your plan."}
           tone={result.depletionAge === null ? "positive" : "warning"}
+          primary
         />
         <Metric
-          label="When does the balance first fall?"
+          label="When does your pension first begin reducing?"
           value={firstFallingYear ? `Age ${firstFallingYear.age}` : "Not in this plan"}
           detail={firstFallingYear
             ? "This is the first year the pension ends lower than it started. A falling balance can be a normal part of funding retirement."
@@ -74,7 +75,7 @@ export function DrawdownBalanceStory({
           tone="neutral"
         />
         <Metric
-          label="Lowest projected balance"
+          label="Lowest projected pension balance"
           value={formatCurrency(lowest.closingBalance)}
           detail={lowestIsFinalYear
             ? `Reached at age ${lowest.age}, at the end of the plan.`
@@ -82,7 +83,7 @@ export function DrawdownBalanceStory({
           tone={lowest.closingBalance > 0 ? "neutral" : "warning"}
         />
         <Metric
-          label="Balance at the end of the plan"
+          label="Money remaining at the end of your plan"
           value={formatCurrency(finalBalance)}
           detail={retirementOpeningBalance > 0
             ? `${formatPercentage(remainingShare)} of the pension available at retirement remains at age ${inputs.endAge}.`
@@ -94,27 +95,28 @@ export function DrawdownBalanceStory({
       {reserveTarget !== null && (
         <div className={`drawdown-balance-reserve-summary ${meetsReserveTarget ? "is-positive" : "is-warning"}`}>
           <div>
-            <span>Your ending-balance goal</span>
+            <span>Target reserve</span>
             <strong>{formatCurrency(reserveTarget)}</strong>
           </div>
           <div>
-            <span>Projected at age {inputs.endAge}</span>
+            <span>Projected reserve at age {inputs.endAge}</span>
             <strong>{formatCurrency(finalBalance)}</strong>
           </div>
           <p>
             {meetsReserveTarget
               ? reserveAchievement === null
-                ? "The current illustration finishes at or above the amount you asked to keep in the pension."
-                : `The current illustration meets ${formatPercentage(reserveAchievement)} of your ending-balance goal and finishes at or above the amount you asked to keep.`
+                ? "Your projected reserve finishes at or above the amount you chose to keep."
+                : `Your projected reserve reaches ${formatPercentage(reserveAchievement)} of your target and finishes at or above the amount you chose to keep.`
               : reserveAchievement === null
-                ? `The current illustration finishes ${formatCurrency(reserveTarget - finalBalance)} below your target reserve.`
-                : `The current illustration keeps ${formatPercentage(reserveAchievement)} of your target reserve and finishes ${formatCurrency(reserveTarget - finalBalance)} below the goal.`}
+                ? `Your projected reserve finishes ${formatCurrency(reserveTarget - finalBalance)} below your target.`
+                : `Your plan keeps ${formatPercentage(reserveAchievement)} of the reserve you asked to retain and finishes ${formatCurrency(reserveTarget - finalBalance)} below your target.`}
           </p>
         </div>
       )}
 
       <p className="drawdown-balance-story-note">
-        A reducing balance is not automatically a warning. Your pension is there to help fund retirement; the key question is whether it can provide the planned income for long enough and still meet any amount you want to keep at the end.
+        <strong>A reducing pension isn&apos;t necessarily a problem.</strong>{" "}
+        Your pension is there to fund your retirement. As long as it can continue providing the income you&apos;ve planned while meeting any reserve you&apos;ve chosen to keep, a falling balance can be an expected part of a healthy retirement plan.
       </p>
     </section>
   );
@@ -140,14 +142,16 @@ function Metric({
   value,
   detail,
   tone,
+  primary = false,
 }: {
   label: string;
   value: string;
   detail: string;
   tone: "positive" | "warning" | "neutral";
+  primary?: boolean;
 }) {
   return (
-    <article className={`is-${tone}`}>
+    <article className={`is-${tone}${primary ? " is-primary" : ""}`}>
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{detail}</small>
