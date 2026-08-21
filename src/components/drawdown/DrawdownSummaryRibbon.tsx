@@ -32,16 +32,16 @@ export function DrawdownSummaryRibbon({
           {isSustainable ? <CircleCheck size={18} /> : <CircleAlert size={18} />}
         </span>
         <span>
-          <small>Plan status</small>
-          <strong>{isSustainable ? "On track" : "Review needed"}</strong>
-          <em>{result.depletionAge === null ? `Through age ${inputs.endAge}` : `Pension used by age ${result.depletionAge}`}</em>
+          <small>Your plan</small>
+          <strong>{isSustainable ? "Looks on track" : "Worth reviewing"}</strong>
+          <em>{result.depletionAge === null ? `Your pension lasts through age ${inputs.endAge}` : `Your pension may run out around age ${result.depletionAge}`}</em>
         </span>
       </article>
 
       <article className="drawdown-summary-item">
         <span className="drawdown-summary-icon" aria-hidden="true"><Coins size={18} /></span>
         <span>
-          <small>Final pension</small>
+          <small>Money left in your pension</small>
           <strong>{formatCurrency(display.finalBalance)}</strong>
           <em>At age {inputs.endAge}</em>
         </span>
@@ -50,18 +50,18 @@ export function DrawdownSummaryRibbon({
       <article className="drawdown-summary-item">
         <span className="drawdown-summary-icon" aria-hidden="true"><ReceiptText size={18} /></span>
         <span>
-          <small>Average net income</small>
-          <strong>{formatCurrency(averageAnnualNetIncome)}</strong>
-          <em>{displayMode === "today" ? "Today’s money" : "Future money"}</em>
+          <small>Average money available to spend</small>
+          <strong>{formatCurrency(averageAnnualNetIncome)}/year</strong>
+          <em>{displayMode === "today" ? "In today’s money" : "In future money"}</em>
         </span>
       </article>
 
       <article className={shortfall > 0 ? "drawdown-summary-item status-danger" : "drawdown-summary-item status-good"}>
         <span className="drawdown-summary-icon" aria-hidden="true"><Landmark size={18} /></span>
         <span>
-          <small>Lifetime shortfall</small>
+          <small>Planned income gap</small>
           <strong>{formatCurrency(shortfall)}</strong>
-          <em>{shortfall > 0 ? "Across retirement" : "No income gap"}</em>
+          <em>{shortfall > 0 ? "Across your retirement illustration" : "Your planned income is fully supported"}</em>
         </span>
       </article>
     </section>
