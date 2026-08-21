@@ -41,6 +41,41 @@
   white-space: nowrap;
 }
 
+.drawdown-income-transition {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--status-good, var(--colour-success)) 30%, var(--colour-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--status-good, var(--colour-success)) 6%, var(--colour-surface));
+}
+
+.drawdown-income-transition > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drawdown-income-transition small {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.drawdown-income-transition strong {
+  font-size: var(--ui-font-size-md);
+}
+
+.drawdown-income-transition p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
 .drawdown-waterfall-grid,
 .drawdown-balance-metrics,
 .drawdown-balance-periods {
@@ -496,6 +531,7 @@
     flex-direction: column;
   }
 
+  .drawdown-income-transition,
   .drawdown-waterfall-grid,
   .drawdown-balance-metrics,
   .drawdown-balance-periods,
