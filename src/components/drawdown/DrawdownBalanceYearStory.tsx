@@ -1,0 +1,186 @@
+import { useMemo } from "react";
+
+import type { DrawdownYear } from "../../engine/drawdown/models/DrawdownYear";
+import {
+  getDisplayYears,
+  type MoneyDisplayMode,
+} from "../../utils/drawdownDisplayValues";
+import { formatCurrency } from "../../utils/formatters";
+
+interface DrawdownBalanceYearStoryProps {
+  years: DrawdownYear[];
+  inflationRate: number;
+  displayMode: MoneyDisplayMode;
+  selectedAge: number;
+  onSelectAge: (age: number) => void;
+}
+
+export function DrawdownBalanceYearStory({
+  years,
+  inflationRate,
+  displayMode,
+  selectedAge,
+  onSelectAge,
+}: DrawdownBalanceYearStoryProps) {
+  const displayYears = useMemo(
+    () => getDisplayYears(years, inflationRate, displayMode),
+    [displayMode, inflationRate, years],
+  );
+  const selectedIndex = Math.max(
+    0,
+    displayYears.findIndex((year) => year.age === selectedAge),
+  );
+  const selected = displayYears[selectedIndex];
+  const next = displayYears[selectedIndex + 1];
+
+  if (!selected) return null;
+
+  const moneyOut = selected.pensionWithdrawal + selected.fees;
+  const balanceChange = selected.closingBalance - selected.openingBalance;
+  const growthCoversOutgoings = selected.investmentGrowth >= moneyOut;
+  const firstPressureAge = displayYears.find(
+    (year) => year.pensionWithdrawal + year.fees > year.investmentGrowth,
+  )?.age;
+  const firstDepletionAge = displayYears.find((year) => year.isDepleted)?.age;
+
+  return (
+    <section className="drawdown-balance-year-story" aria-labelledby="drawdown-balance-year-title">
+      <div className="panel drawdown-balance-year-breakdown">
+        <header className="drawdown-balance-year-heading">
+          <div>
+            <p className="panel-eyebrow">Your pension this year</p>
+            <h3 id="drawdown-balance-year-title">Balance breakdown</h3>
+            <p>
+              Age {selected.age} · {selected.year} · {displayMode === "today" ? "Today’s money" : "Future money"}
+            </p>
+          </div>
+        </header>
+
+        <div className="drawdown-balance-age-control">
+          <input
+            type="range"
+            min={0}
+            max={Math.max(displayYears.length - 1, 0)}
+            step={1}
+            value={selectedIndex}
+            aria-label="Select retirement age for pension balance breakdown"
+            onChange={(event) => {
+              const year = displayYears[Number(event.target.value)];
+              if (year) onSelectAge(year.age);
+            }}
+          />
+          <div>
+            <span>Age {displayYears[0]?.age}</span>
+            <strong>Age {selected.age}</strong>
+            <span>Age {displayYears.at(-1)?.age}</span>
+          </div>
+        </div>
+
+        <dl className="drawdown-balance-year-grid">
+          <BalanceFigure label="Started the year with" value={selected.openingBalance} />
+          <BalanceFigure label="Investment growth" value={selected.investmentGrowth} prefix="+" tone="positive" />
+          <BalanceFigure label="Taken from your pension" value={selected.pensionWithdrawal} prefix="−" />
+          <BalanceFigure label="Fees" value={selected.fees} prefix="−" />
+          <BalanceFigure label="Finished the year with" value={selected.closingBalance} emphasis />
+        </dl>
+
+        <div className={`drawdown-balance-explanation ${balanceChange < 0 ? "is-neutral" : "is-positive"}`}>
+          <strong>{balanceChange >= 0 ? "Your pension finished the year higher" : "Your pension reduced this year"}</strong>
+          <p>
+            {growthCoversOutgoings
+              ? "Investment growth was enough to cover the money taken from your pension and the fees charged this year."
+              : "You took more from the pension, including fees, than it gained from investment growth. A falling balance can be a normal part of using your pension in retirement."}
+          </p>
+          <small>
+            Overall change this year: {balanceChange >= 0 ? "+" : "−"}{formatCurrency(Math.abs(balanceChange))}
+          </small>
+        </div>
+      </div>
+
+      <aside className="panel drawdown-balance-year-context" aria-labelledby="drawdown-balance-year-context-title">
+        <div className="panel-heading">
+          <p className="panel-eyebrow">Worth knowing</p>
+          <h3 id="drawdown-balance-year-context-title">What is happening around this year?</h3>
+        </div>
+
+        <div className="drawdown-balance-context-list">
+          {selected.age === firstPressureAge && (
+            <BalanceContext
+              title="Growth no longer covers everything taken out"
+              text="This is the first year when pension withdrawals and fees are greater than investment growth. That does not automatically mean the plan is off track, but it marks the point where the balance starts doing more of the work."
+              tone="warning"
+            />
+          )}
+          {selected.age === firstDepletionAge && (
+            <BalanceContext
+              title="Your private pension is fully used"
+              text="From this point, the private pension can no longer provide further withdrawals. Any remaining retirement income comes from other sources included in the plan."
+              tone="warning"
+            />
+          )}
+          {selected.age !== firstPressureAge && selected.age !== firstDepletionAge && (
+            <BalanceContext
+              title="Your pension is following the projected path"
+              text="There is no new balance milestone in this year. The important point is whether the balance is changing at a pace that still supports the rest of the plan."
+              tone="positive"
+            />
+          )}
+        </div>
+
+        {next && (
+          <div className="drawdown-balance-next-year">
+            <span>What happens next?</span>
+            <strong>
+              {next.closingBalance > selected.closingBalance
+                ? "The projected pension balance rises next year."
+                : next.closingBalance < selected.closingBalance
+                  ? "The projected pension balance reduces again next year."
+                  : "The projected pension balance is broadly unchanged next year."}
+            </strong>
+            <p>
+              At age {next.age}, the illustrated end-of-year balance is {formatCurrency(next.closingBalance)}.
+            </p>
+          </div>
+        )}
+      </aside>
+    </section>
+  );
+}
+
+function BalanceFigure({
+  label,
+  value,
+  prefix = "",
+  tone,
+  emphasis = false,
+}: {
+  label: string;
+  value: number;
+  prefix?: string;
+  tone?: "positive";
+  emphasis?: boolean;
+}) {
+  return (
+    <div className={`${emphasis ? "is-emphasis" : ""} ${tone ? `is-${tone}` : ""}`.trim()}>
+      <dt>{label}</dt>
+      <dd>{prefix}{formatCurrency(value)}</dd>
+    </div>
+  );
+}
+
+function BalanceContext({
+  title,
+  text,
+  tone,
+}: {
+  title: string;
+  text: string;
+  tone: "positive" | "warning";
+}) {
+  return (
+    <article className={`drawdown-balance-context is-${tone}`}>
+      <strong>{title}</strong>
+      <p>{text}</p>
+    </article>
+  );
+}
