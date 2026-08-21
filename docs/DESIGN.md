@@ -1,531 +1,299 @@
 # 🎨 Polaris Retirement Planner Design System
 
-> **Version 1.0.0**
+> **Version 1.2.0**
 
 ---
 
 # Introduction
 
-The Polaris design system defines the visual and interaction principles used throughout the application.
+The Polaris design system exists to make retirement planning feel calm, understandable and approachable.
 
-It exists to ensure every page feels like part of one coherent experience rather than a collection of individual screens.
+The application should never feel like a collection of calculators. Each page should help the user understand what they are seeing, why it matters and where deeper detail is available when they want it.
 
-The design philosophy is based on one central principle:
-
-> **Financial planning should feel calm, understandable and approachable.**
-
-Retirement planning can be intimidating. Polaris aims to reduce anxiety through thoughtful design.
+> **Design software that helps people understand retirement instead of simply calculating it.**
 
 ---
 
-# Design Principles
+# Core Design Principles
 
-Every interface should support five goals.
+## 1. Plain English first
 
-## 1. Clarity
+Prefer words people naturally use in conversation.
 
-The most important information should always be immediately visible.
+Examples:
 
-Users should never wonder:
+| Prefer | Avoid when not required |
+|---|---|
+| Money from your pension | Withdrawal |
+| Money available to spend | Net income |
+| Money left in your pension | Closing balance |
+| Your planned income | Income target |
+| Your pension has been fully used | Depletion |
+| How it works | Calculation methodology |
+| Retirement journey | Timeline |
 
-- What does this number mean?
-- What should I do next?
-- Where should I click?
+Technical terms are acceptable when precision requires them, but they should be explained at first use.
 
----
+## 2. Explain before adding detail
 
-## 2. Simplicity
+Do not show a number and leave the user to interpret it.
 
-Complex calculations happen behind the scenes.
+Where useful, explain:
 
-Interfaces should expose only the information required for the current decision.
+1. What happened?
+2. Why did it happen?
+3. Is it expected?
+4. What happens next?
 
----
+## 3. Progressive disclosure
 
-## 3. Progressive Disclosure
+Keep the main experience calm. Detailed tables, calculation order and technical mechanics should remain available as optional references.
 
-Do not overwhelm users.
+The preferred pattern for a Detailed page is:
 
-Instead:
-
-```
-Overview
-
+```text
+Introduction
 ↓
-
-Understand
-
-↓
-
 Explore
-
 ↓
-
-Experiment
-
+Understand
 ↓
-
-Refine
+Key answers
+↓
+Reference
 ```
 
-Each screen reveals additional information only when it becomes useful.
+## 4. Questions over technical settings
 
----
+When possible, frame sections around the questions users ask naturally.
 
-## 4. Consistency
+Examples:
 
-Buttons should behave consistently.
+- Where is my retirement money coming from?
+- What is happening to my pension?
+- What are the important moments in my retirement?
+- How should I understand these results?
 
-Cards should look consistent.
+## 5. Educational, not advisory
 
-Spacing should be predictable.
+Polaris helps users understand possible retirement outcomes and compare choices. It does not provide regulated personal financial advice or guarantee future outcomes.
 
-Colours should carry meaning.
+Warnings should explain the issue without implying certainty or unnecessary alarm.
 
----
+## 6. Consistency
 
-## 5. Confidence
+Once an interaction pattern has been established, reuse it.
 
-The application should make users feel:
+Examples in v1.2:
 
-- informed
-- supported
-- in control
-
-rather than overwhelmed.
+- Detailed tabs share the same heading hierarchy.
+- Year-by-year tables are optional reference disclosures.
+- Selected years use a consistent eye indicator where relevant.
+- Today's Money / Future Money uses the same terminology throughout Drawdown.
 
 ---
 
 # Visual Language
 
-The Polaris interface is intentionally modern and minimal.
+Polaris uses:
 
-The design combines:
-
-- soft spacing
-- rounded corners
-- subtle elevation
-- restrained colour use
 - readable typography
+- generous but controlled spacing
+- restrained colour
+- rounded surfaces
+- subtle hierarchy
+- clear selected and warning states
 
-Rather than creating excitement, Polaris aims to create trust.
+Colour should communicate meaning, not decorate the interface.
 
----
+| Colour intent | Purpose |
+|---|---|
+| Primary | Actions and selection |
+| Positive | Reassuring outcomes |
+| Warning | Something worth reviewing |
+| Critical | Significant problem requiring attention |
+| Neutral | Supporting information |
 
-# Colour Philosophy
-
-Colour is used sparingly.
-
-Every colour communicates meaning.
-
-| Colour | Purpose |
-|----------|----------------------------|
-| Blue | Primary actions |
-| Green | Success / healthy outcomes |
-| Amber | Attention required |
-| Red | Significant risks |
-| Grey | Supporting information |
-
-Large areas of bright colour are intentionally avoided.
+Both light and dark themes are first-class experiences.
 
 ---
 
-# Light & Dark Themes
+# Detailed Drawdown Design Standard
 
-Both themes are considered first-class experiences.
+Version 1.2 establishes a consistent Detailed Drawdown workspace.
 
-Neither is treated as an afterthought.
+## Income
 
-Dark mode focuses on:
+Purpose: explain where retirement money comes from and how it changes.
 
-- reduced eye strain
-- improved contrast
-- comfortable evening use
+Use language such as:
 
----
+- Money from your pension
+- State Pension
+- Estimated tax
+- Money available to spend
+- Your planned income
 
-# Typography
+## Balance
 
-Typography should communicate hierarchy before colour.
+Purpose: explain why the pension rises or falls.
 
-Headings
+The balance waterfall should make the yearly movement understandable using:
 
-↓
+- Started with
+- Investment growth
+- Money taken out
+- Fees
+- Inflation context
+- Finished with
 
-Section headings
+Supporting context may include withdrawal rate, growth coverage and percentage movement.
 
-↓
+## Retirement Journey
 
-Body text
+Purpose: explain the important moments along the retirement plan rather than present a technical event timeline.
 
-↓
+Milestones should use personal, plain-English wording such as:
 
-Supporting text
+- Your retirement begins
+- Your State Pension starts
+- Your planned spending changes
+- Your planned income is no longer fully met
+- Your private pension has been fully used
 
-↓
+## How it works
 
-Captions
+Purpose: explain how to interpret the results and provide transparency about the model without making technical detail the default experience.
 
-Large numbers are intentionally emphasised throughout Polaris.
+The learning flow is:
 
-Financial values should stand out immediately.
-
----
-
-# Icons
-
-Version 1.0 standardises on **Font Awesome Pro**.
-
-Icons should support meaning rather than replace text.
-
-Examples
-
-✔ Retirement
-
-✔ Savings
-
-✔ Drawdown
-
-✔ Guidance
-
-✔ Education
-
-Avoid decorative icons that do not add context.
+1. Your retirement plan
+2. How to understand your results
+3. Investment estimates
+4. Tax estimates
+5. Key things to remember
+6. Optional calculation reference
 
 ---
 
-# Layout Philosophy
+# Tables and Reference Sections
 
-Every page follows the same broad structure.
+Reference tables should not dominate a page.
 
-```
-Header
+Default behaviour:
 
-↓
+- collapsed where the table is supporting information
+- clear disclosure title and helper text
+- pagination for long yearly datasets
+- sensible row-count controls
+- plain-English column labels where practical
+- technical view available only when it adds value
 
-Context
-
-↓
-
-Primary Workspace
-
-↓
-
-Supporting Information
-
-↓
-
-Actions
-```
-
-Users should immediately understand where they are.
+Disclosure headers should be fully clickable and use the shared expand/collapse indicator.
 
 ---
 
-# Cards
+# Charts and Visualisations
 
-Cards represent individual concepts.
+Charts exist to explain decisions, not decorate screens.
 
-Examples:
+Every chart should answer a useful question such as:
 
-- recommendation
-- experiment
-- projection
-- scenario
+- How does retirement income change?
+- Why is the pension balance changing?
+- When do important retirement events happen?
 
-Cards should contain one primary message.
-
-Avoid mixing multiple ideas into one card.
+If a chart no longer serves a clear question, remove it rather than retaining it for visual interest.
 
 ---
 
 # Forms
 
-Forms follow a guided approach.
+Forms should feel like a guided conversation rather than a technical configuration screen.
 
-Goals:
+Use:
 
 - short sections
-- sensible defaults
-- immediate feedback
-- minimal scrolling
+- clear labels
+- useful defaults where appropriate
+- immediate validation
+- question-led choices
+- summaries of advanced selections
 
-Users should feel they are progressing rather than completing a questionnaire.
-
----
-
-# Navigation
-
-Navigation should answer:
-
-Where am I?
-
-What can I do next?
-
-Connected journeys reduce unnecessary navigation.
-
-Users should rarely need to search for the next step.
-
----
-
-# Charts
-
-Charts exist to explain decisions.
-
-Not decorate pages.
-
-Every chart should answer at least one question.
-
-Examples:
-
-Why did the pension grow?
-
-Why did the balance fall?
-
-What caused this difference?
-
-Version 1.1 expands this significantly.
-
----
-
-# Retirement Chapters
-
-Version 1.0 introduces retirement chapters.
-
-These represent natural phases of retirement rather than fixed financial periods.
-
-```
-Active Retirement
-
-↓
-
-Settled Retirement
-
-↓
-
-Later Life
-```
-
-This approach is intended to be intuitive for users.
-
----
-
-# What If? Philosophy
-
-Experiments should feel safe.
-
-Users should understand:
-
-"This isn't changing my plan."
-
-Every experiment begins from the active scenario.
-
-Changes only become permanent if explicitly saved.
-
----
-
-# Explore
-
-Learning should be personalised.
-
-Rather than generic articles,
-
-Polaris explains concepts using the user's own retirement plan.
-
-This creates significantly greater engagement.
-
----
-
-# Guidance
-
-Guidance should never criticise.
-
-Instead:
-
-Identify
-
-↓
-
-Explain
-
-↓
-
-Recommend
-
-↓
-
-Navigate
-
-Every recommendation should include a clear next step.
+Avoid asking users to configure the same decision in multiple places. My Plan is the primary source for retirement choices; Drawdown explains their effect.
 
 ---
 
 # Accessibility
 
-Accessibility is considered part of the design.
+Accessibility is part of the design, not an add-on.
 
-Not an additional feature.
-
-Version 1.0 includes:
+Polaris should maintain:
 
 - keyboard navigation
-- accessible dialogs
-- screen reader support
-- focus management
-- reduced motion
-- high contrast themes
+- semantic controls
+- accessible dialogs and disclosures
+- visible focus states
+- screen-reader labels
+- reduced-motion support
+- sufficient contrast
 - responsive layouts
 
-Future releases will continue to improve accessibility.
+Accessible names are part of the public UI contract and should be updated in tests when product terminology changes.
 
 ---
 
 # Responsive Design
 
-The interface adapts for:
+Layouts should reorganise rather than hide important functionality.
 
-Desktop
-
-↓
-
-Laptop
-
-↓
-
-Tablet
-
-↓
-
-Mobile
-
-Rather than hiding functionality, layouts are reorganised.
+Dense desktop grids should collapse into readable single-column flows on smaller screens. Long tables should use local horizontal scrolling or mobile-specific presentation rather than cause page-level overflow.
 
 ---
 
-# Motion
+# Empty States and Errors
 
-Animations should support understanding.
+Empty states should explain why nothing is shown and what the user can do next.
 
-Avoid unnecessary movement.
+Errors should be clear, specific and actionable.
 
-Examples
+Prefer:
 
-Good
+> Retirement age must be greater than your current age.
 
-✔ opening dialogs
+instead of:
 
-✔ changing tabs
-
-✔ expanding cards
-
-Bad
-
-✘ decorative animations
-
-✘ distracting effects
-
-Version 1.0 respects reduced-motion preferences.
+> Invalid value.
 
 ---
 
-# Empty States
+# Copy Review Checklist
 
-Empty states should teach.
+Before releasing user-facing copy, ask:
 
-Rather than saying
-
-"No data"
-
-Polaris explains:
-
-Why nothing is shown.
-
-What the user can do next.
-
----
-
-# Error Messages
-
-Errors should be:
-
-Clear
-
-Specific
-
-Actionable
-
-Never blame the user.
-
-Example
-
-Instead of
-
-"Invalid value"
-
-Use
-
-"Retirement age must be greater than your current age."
-
----
-
-# Language
-
-Polaris uses plain English.
-
-Avoid financial jargon wherever possible.
-
-If technical terminology is necessary,
-
-explain it.
-
----
-
-# Future Design Direction
-
-Version 1.1
-
-Introduce richer visual storytelling.
-
-Version 1.2
-
-Professional reporting.
-
-Version 2.0
-
-Interactive retirement planning ecosystem.
+- Would someone who has never worked in pensions naturally say this?
+- Is a technical term necessary for accuracy?
+- Can the same meaning be expressed more clearly?
+- Does the wording educate rather than alarm?
+- Is terminology consistent with the rest of Polaris?
 
 ---
 
 # Design Goals
 
-Every new feature should satisfy at least one of these goals.
+Every new feature should improve at least one of these areas:
 
-✔ Reduce complexity
+- Reduce complexity
+- Improve understanding
+- Increase confidence
+- Encourage safe experimentation
+- Explain calculations
+- Improve accessibility
 
-✔ Improve understanding
-
-✔ Increase confidence
-
-✔ Encourage experimentation
-
-✔ Explain calculations
-
-If a feature does not improve one of these areas, reconsider whether it belongs in Polaris.
+If a feature does none of these, reconsider whether it belongs in Polaris.
 
 ---
 
-# Design Mission
-
-> Design software that helps people understand retirement instead of simply calculating it.
-
-Everything in Polaris should support this mission.
-
----
-
-**Polaris Retirement Planner**
-
-Design System
-
-Version **1.0.0**
+**Polaris Retirement Planner — Design System v1.2.0**
 
 August 2026

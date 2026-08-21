@@ -1,0 +1,147 @@
+.drawdown-balance-age-control {
+  gap: var(--space-3);
+}
+
+.drawdown-balance-age-control-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.drawdown-balance-age-control-heading > div:first-child {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drawdown-balance-age-control-heading strong {
+  color: var(--colour-text);
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-balance-age-control-heading span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+}
+
+.drawdown-balance-age-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.drawdown-balance-age-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+}
+
+.drawdown-balance-age-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--colour-primary);
+}
+
+.drawdown-balance-age-legend i.is-warning {
+  background: var(--status-warning, var(--colour-warning));
+}
+
+.drawdown-balance-age-track-wrap {
+  position: relative;
+  display: grid;
+  padding-top: 18px;
+}
+
+.drawdown-balance-age-track-wrap > input {
+  width: 100%;
+  min-height: 28px;
+  margin: 0;
+  accent-color: var(--colour-primary);
+  cursor: ew-resize;
+}
+
+.drawdown-balance-age-track-wrap > input:focus-visible {
+  outline: 2px solid var(--colour-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.drawdown-balance-age-markers {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 9px;
+  left: 9px;
+  height: 22px;
+  pointer-events: none;
+}
+
+.drawdown-balance-age-marker {
+  position: absolute;
+  top: 5px;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translateX(-50%);
+}
+
+.drawdown-balance-age-marker > span {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 3px;
+  border: 2px solid var(--colour-surface-secondary);
+  border-radius: 50%;
+  background: var(--colour-primary);
+  box-shadow: 0 0 0 1px var(--colour-primary);
+}
+
+.drawdown-balance-age-marker.is-warning > span {
+  width: 10px;
+  height: 10px;
+  margin: 2px;
+  background: var(--status-warning, var(--colour-warning));
+  box-shadow: 0 0 0 1px var(--status-warning, var(--colour-warning));
+}
+
+.drawdown-balance-age-marker:hover > span,
+.drawdown-balance-age-marker:focus-visible > span {
+  transform: scale(1.35);
+}
+
+.drawdown-balance-age-marker:focus-visible {
+  outline: 2px solid var(--colour-primary);
+  outline-offset: 2px;
+}
+
+.drawdown-balance-age-labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+}
+
+.drawdown-balance-age-labels strong {
+  color: var(--colour-primary);
+}
+
+@media (max-width: 700px) {
+  .drawdown-balance-age-control-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .drawdown-balance-age-legend {
+    justify-content: flex-start;
+  }
+}

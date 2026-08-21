@@ -1,0 +1,102 @@
+.drawdown-explorer-panel {
+  display: grid;
+  gap: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+.drawdown-explorer-panel-heading {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-5);
+}
+
+.drawdown-explorer-panel-heading h3,
+.drawdown-explorer-panel-heading p {
+  margin: 0;
+}
+
+.drawdown-explorer-panel-heading > p:last-child {
+  max-width: 72ch;
+  margin-top: var(--space-1);
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.drawdown-explorer-panel-content {
+  display: grid;
+}
+
+.drawdown-explorer-section {
+  min-width: 0;
+  padding: var(--space-5);
+  border-top: 1px solid var(--colour-border);
+}
+
+.drawdown-explorer-section > :first-child {
+  margin-top: 0;
+}
+
+.drawdown-explorer-section > :last-child {
+  margin-bottom: 0;
+}
+
+/* Components keep their standalone presentation elsewhere, but become part of
+   one continuous story when composed inside an Explorer. */
+.drawdown-explorer-panel .drawdown-balance-timeline-control,
+.drawdown-explorer-panel .drawdown-balance-waterfall,
+.drawdown-explorer-panel .drawdown-balance-year-breakdown,
+.drawdown-explorer-panel .drawdown-balance-year-context {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.drawdown-explorer-panel .drawdown-balance-timeline-control,
+.drawdown-explorer-panel .drawdown-balance-waterfall,
+.drawdown-explorer-panel .drawdown-balance-year-breakdown,
+.drawdown-explorer-panel .drawdown-balance-year-context {
+  padding: 0;
+}
+
+.drawdown-explorer-panel .drawdown-balance-age-control {
+  gap: var(--space-3);
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.drawdown-explorer-panel .drawdown-balance-age-control-heading {
+  display: block;
+}
+
+.drawdown-explorer-panel .drawdown-balance-age-control-heading > div:first-child {
+  max-width: 68ch;
+}
+
+.drawdown-explorer-panel .drawdown-balance-age-legend {
+  justify-content: flex-start;
+  gap: var(--space-4);
+  padding-top: var(--space-1);
+}
+
+.drawdown-explorer-panel .drawdown-balance-age-legend > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+}
+
+.drawdown-explorer-panel .drawdown-balance-chart-explorer {
+  margin: 0;
+}
+
+.drawdown-explorer-panel .drawdown-balance-year-story {
+  gap: var(--space-5);
+}
+
+@media (max-width: 700px) {
+  .drawdown-explorer-panel-heading,
+  .drawdown-explorer-section {
+    padding: var(--space-4);
+  }
+}

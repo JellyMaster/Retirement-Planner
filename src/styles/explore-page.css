@@ -198,7 +198,6 @@
   align-items: center;
   gap: var(--ui-space-3);
   padding: var(--ui-space-4);
-  cursor: pointer;
   list-style: none;
 }
 
@@ -215,23 +214,6 @@
 .explore-essential-card > p {
   color: var(--colour-text-muted);
   line-height: 1.5;
-}
-
-.explore-essential-expand {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--colour-surface-secondary);
-  color: var(--colour-primary);
-  font-size: 1.25rem;
-  font-weight: 700;
-  transition: transform var(--ui-duration-fast) var(--ui-ease-standard);
-}
-
-.explore-essential-card[open] .explore-essential-expand {
-  transform: rotate(45deg);
 }
 
 .explore-essential-card > p {
@@ -332,11 +314,5 @@
 
   .explore-essential-card > p {
     padding-left: var(--ui-space-4);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .explore-essential-expand {
-    transition: none;
   }
 }

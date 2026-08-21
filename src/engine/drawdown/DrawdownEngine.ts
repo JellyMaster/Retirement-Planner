@@ -10,6 +10,10 @@ function roundMoney(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
+function roundMoneyUp(value: number): number {
+  return Math.ceil((value - Number.EPSILON) * 100) / 100;
+}
+
 function roundRate(value: number): number {
   return Math.round((value + Number.EPSILON) * 10_000) / 10_000;
 }
@@ -64,7 +68,16 @@ export class DrawdownEngine {
       else high = midpoint;
     }
 
-    return roundMoney(high);
+    // The tax engine works to penny precision. Rounding the binary-search result
+    // to the nearest penny can occasionally round down and leave net income 1p
+    // below the target, which creates a false shortfall warning. Round upwards
+    // to the next penny and verify the realised net income still meets target.
+    let withdrawal = roundMoneyUp(high);
+    while (this.calculateTax(withdrawal, statePensionIncome).netIncome < targetNetIncome) {
+      withdrawal = roundMoney(withdrawal + 0.01);
+    }
+
+    return withdrawal;
   }
 
   calculate(inputs: DrawdownInputs): DrawdownResult {

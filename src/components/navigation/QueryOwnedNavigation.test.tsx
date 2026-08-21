@@ -52,7 +52,9 @@ describe("query-owned workspace navigation", () => {
       ),
     );
 
-    await user.click(screen.getByRole("tab", { name: "Timeline" }));
+    await user.click(
+      screen.getByRole("tab", { name: "Retirement journey" }),
+    );
     expect(screen.getByTestId("location")).toHaveTextContent(
       "/drawdown?tab=timeline",
     );

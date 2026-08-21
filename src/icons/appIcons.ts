@@ -40,6 +40,7 @@ import {
   faUmbrellaBeach,
   faUser,
   faWallet,
+  faEye
 } from "@fortawesome/pro-solid-svg-icons";
 
 /**
@@ -52,6 +53,7 @@ const iconRegistry = {
   home: faHouse,
   user: faUser,
   employment: faBriefcase,
+  eye: faEye, 
   pension: faLandmark,
   retirement: faPiggyBank,
   goals: faBullseye,

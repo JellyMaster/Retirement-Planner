@@ -1,0 +1,275 @@
+.drawdown-detailed-retirement-journey {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.drawdown-retirement-journey-summary {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+}
+
+.drawdown-retirement-journey-summary-heading h2,
+.drawdown-retirement-journey-summary-heading p {
+  margin: 0;
+}
+
+.drawdown-retirement-journey-summary-heading p:last-child {
+  max-width: 66ch;
+  margin-top: var(--space-2);
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
+.drawdown-retirement-journey-milestones {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  padding-top: var(--space-1);
+}
+
+.drawdown-retirement-journey-milestones::before {
+  position: absolute;
+  top: 1rem;
+  right: 2rem;
+  left: 2rem;
+  border-top: 2px solid var(--colour-border-strong);
+  content: "";
+}
+
+.drawdown-retirement-journey-milestone {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.drawdown-retirement-journey-marker {
+  display: flex;
+  justify-content: center;
+  width: 1.8rem;
+}
+
+.drawdown-retirement-journey-marker > span {
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-top: 0.45rem;
+  border: 2px solid var(--colour-primary);
+  border-radius: 50%;
+  background: var(--colour-surface);
+}
+
+.drawdown-retirement-journey-milestone.is-positive .drawdown-retirement-journey-marker > span {
+  border-color: var(--status-good, var(--colour-success));
+}
+
+.drawdown-retirement-journey-milestone.is-warning .drawdown-retirement-journey-marker > span {
+  border-color: var(--status-warning, var(--colour-warning));
+}
+
+.drawdown-retirement-journey-milestone > div:last-child {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drawdown-retirement-journey-milestone small {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.drawdown-retirement-journey-milestone strong {
+  line-height: 1.3;
+}
+
+.drawdown-retirement-journey-milestone p {
+  max-width: 38ch;
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.4;
+}
+
+.drawdown-retirement-journey-questions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.drawdown-retirement-journey-answer {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-retirement-journey-answer.is-positive {
+  border-color: color-mix(in srgb, var(--status-good, var(--colour-success)) 30%, var(--colour-border));
+}
+
+.drawdown-retirement-journey-answer.is-warning {
+  border-color: color-mix(in srgb, var(--status-warning, var(--colour-warning)) 38%, var(--colour-border));
+}
+
+.drawdown-retirement-journey-answer > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.drawdown-retirement-journey-answer > strong {
+  font-size: 1.05rem;
+}
+
+.drawdown-retirement-journey-note {
+  margin: 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--colour-border);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.drawdown-journey-year-table {
+  overflow: hidden;
+  margin: 0;
+}
+
+.drawdown-journey-year-table > summary {
+  list-style: none;
+}
+
+.drawdown-journey-year-table > summary::-webkit-details-marker {
+  display: none;
+}
+
+.drawdown-journey-year-table-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+}
+
+.drawdown-journey-year-table-summary > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drawdown-journey-year-table-summary small,
+.drawdown-journey-table-intro p,
+.drawdown-journey-page-status {
+  color: var(--colour-text-muted);
+}
+
+.drawdown-journey-year-table-content {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  border-top: 1px solid var(--colour-border);
+}
+
+.drawdown-journey-table-intro {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drawdown-journey-table-intro p {
+  max-width: 72ch;
+  margin: 0;
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.drawdown-journey-table-controls {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.drawdown-journey-page-status {
+  margin-left: auto;
+  padding-bottom: 0.45rem;
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-journey-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.drawdown-journey-pagination > span {
+  min-width: 7.5rem;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  text-align: center;
+}
+
+.drawdown-journey-pagination > span strong {
+  color: var(--colour-text);
+}
+
+@media (max-width: 1000px) {
+  .drawdown-retirement-journey-questions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .drawdown-journey-page-status {
+    width: 100%;
+    margin-left: 0;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .drawdown-retirement-journey-summary {
+    padding: var(--space-4);
+  }
+
+  .drawdown-retirement-journey-milestones,
+  .drawdown-retirement-journey-questions {
+    grid-template-columns: 1fr;
+  }
+
+  .drawdown-retirement-journey-milestones::before {
+    top: 1rem;
+    bottom: 1rem;
+    left: 0.9rem;
+    width: 2px;
+    border-top: 0;
+    border-left: 2px solid var(--colour-border-strong);
+  }
+
+  .drawdown-journey-year-table-summary,
+  .drawdown-journey-year-table-content {
+    padding-right: var(--space-4);
+    padding-left: var(--space-4);
+  }
+
+  .drawdown-journey-table-controls,
+  .drawdown-journey-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .drawdown-journey-pagination .ui-button {
+    width: 100%;
+  }
+
+  .drawdown-journey-pagination > span {
+    min-width: 0;
+    text-align: left;
+  }
+}

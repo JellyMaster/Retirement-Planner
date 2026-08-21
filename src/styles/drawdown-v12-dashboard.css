@@ -273,6 +273,62 @@
   white-space: nowrap;
 }
 
+.insight-warning-tooltip {
+  position: relative;
+  margin-left: auto;
+}
+
+.insight-warning-tooltip > summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--colour-border);
+  border-radius: 999px;
+  background: var(--colour-surface);
+  color: var(--colour-text-muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.insight-warning-tooltip > summary::-webkit-details-marker {
+  display: none;
+}
+
+.insight-warning-tooltip > summary:hover,
+.insight-warning-tooltip > summary:focus-visible {
+  border-color: var(--colour-primary);
+  color: var(--colour-primary);
+}
+
+.insight-warning-tooltip-panel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(320px, 80vw);
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-md);
+  color: var(--colour-text);
+}
+
+.insight-warning-tooltip-panel strong {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.insight-warning-tooltip-panel p {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
 .drawdown-v12-dashboard .panel-heading h2 {
   font-size: 1.05rem;
 }

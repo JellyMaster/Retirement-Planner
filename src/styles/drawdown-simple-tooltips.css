@@ -1,0 +1,43 @@
+.insight-item-has-tooltip {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+}
+
+.insight-item-has-tooltip .insight-title {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.insight-item-has-tooltip .ui-info-tooltip {
+  margin-left: -2px;
+}
+
+.insight-warning-tooltip-actions {
+  display: block;
+  margin-top: var(--space-2);
+}
+
+.insight-warning-tooltip-actions b {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--colour-text);
+  font-size: var(--ui-font-size-sm);
+}
+
+.insight-warning-tooltip-actions ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.insight-warning-tooltip-actions li + li {
+  margin-top: 2px;
+}
+
+@media (max-width: 520px) {
+  .insight-item-has-tooltip .insight-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

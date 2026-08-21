@@ -1,5 +1,4 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
 
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
@@ -9,7 +8,7 @@ import {
   getDisplayYears,
   type MoneyDisplayMode,
 } from "../../utils/drawdownDisplayValues";
-import { formatCurrency } from "../../utils/formatters";
+import { formatCurrency, formatPercentage } from "../../utils/formatters";
 
 interface DrawdownRetirementChaptersProps {
   inputs: DrawdownInputs;
@@ -45,67 +44,114 @@ export function DrawdownRetirementChapters({
     null as (typeof displayYears)[number] | null,
   );
   const firstSpendingChange = chapters[1]?.startAge ?? null;
+  const hasMultipleChapters = chapters.length > 1;
   const supportsIncome =
     result.firstShortfallAge === null &&
     result.firstNetIncomeShortfallAge === null;
   const lastsToHorizon = result.depletionAge === null;
+  const statePensionStart = displayYears.find((year) => year.statePensionIncome > 0);
+  const highestTaxYear = displayYears.reduce(
+    (highest, year) =>
+      highest === null || year.incomeTax > highest.incomeTax ? year : highest,
+    null as (typeof displayYears)[number] | null,
+  );
+  const averageSpendableIncome = displayYears.length > 0
+    ? displayYears.reduce((total, year) => total + year.netIncome, 0) / displayYears.length
+    : 0;
+  const averageTaxRate = result.averageEffectiveTaxRate;
 
   return (
     <section className="drawdown-chapters-and-questions">
       <div className="drawdown-key-questions" aria-labelledby="drawdown-key-questions-title">
         <header>
-          <p className="panel-eyebrow">Key questions</p>
-          <h3 id="drawdown-key-questions-title">Your retirement at a glance</h3>
-          <p>Clear answers to the questions most likely to shape the plan.</p>
+          <p className="panel-eyebrow">Understanding your income</p>
+          <h3 id="drawdown-key-questions-title">The key answers behind your retirement income</h3>
+          <p>
+            These answers summarise whether your planned income is supported, when other income sources begin helping and how tax affects the money available to spend.
+          </p>
         </header>
         <div className="drawdown-question-grid">
           <Question
-            label="Can the plan support the target income?"
-            value={supportsIncome ? "Yes" : "Not throughout"}
+            label="Will your planned income be available throughout retirement?"
+            value={supportsIncome ? "Yes, throughout the plan" : "Not throughout the plan"}
+            detail={supportsIncome
+              ? "The illustration provides the income you planned for every year shown."
+              : "At least one year provides less than the income you planned for."}
             tone={supportsIncome ? "positive" : "warning"}
           />
           <Question
-            label="Does the private pension last?"
+            label="When does State Pension begin helping?"
+            value={statePensionStart ? `Age ${statePensionStart.age}` : "Not included"}
+            detail={statePensionStart
+              ? "From this age, less of your retirement income may need to come from your private pension."
+              : "No State Pension income is included in this illustration."}
+            tone="neutral"
+          />
+          <Question
+            label="When is estimated tax highest?"
+            value={highestTaxYear ? formatCurrency(highestTaxYear.incomeTax) : formatCurrency(0)}
+            detail={highestTaxYear
+              ? `At age ${highestTaxYear.age}. Average tax across the plan is ${formatPercentage(averageTaxRate)} of gross retirement income.`
+              : undefined}
+            tone="neutral"
+          />
+          <Question
+            label="How much money is available to spend on average?"
+            value={`${formatCurrency(averageSpendableIncome)}/year`}
+            detail={displayMode === "today" ? "Shown in today’s money." : "Shown in future money."}
+            tone="positive"
+          />
+          <Question
+            label="Does your private pension remain available?"
             value={lastsToHorizon ? `Through age ${inputs.endAge}` : `Until age ${result.depletionAge}`}
+            detail={lastsToHorizon
+              ? "It remains available throughout the period you are planning for."
+              : "It is fully used before the end of the planning period."}
             tone={lastsToHorizon ? "positive" : "warning"}
           />
           <Question
-            label="When does State Pension begin?"
-            value={inputs.annualStatePension > 0 ? `Age ${inputs.statePensionAge}` : "Not included"}
+            label="When does your planned spending change?"
+            value={firstSpendingChange === null ? "It stays the same" : `Age ${firstSpendingChange}`}
+            detail={firstSpendingChange === null
+              ? "Your income target is unchanged throughout the plan."
+              : "A new spending phase begins from this age."}
             tone="neutral"
           />
           <Question
-            label="When does planned spending change?"
-            value={firstSpendingChange === null ? "One target throughout" : `Age ${firstSpendingChange}`}
-            tone="neutral"
-          />
-          <Question
-            label="Lowest illustrated pension balance"
+            label="What is the lowest projected pension balance?"
             value={lowestBalanceYear ? formatCurrency(lowestBalanceYear.closingBalance) : formatCurrency(0)}
-            detail={lowestBalanceYear ? `At age ${lowestBalanceYear.age}` : undefined}
+            detail={lowestBalanceYear ? `At age ${lowestBalanceYear.age}.` : undefined}
             tone={lowestBalanceYear && lowestBalanceYear.closingBalance > 0 ? "positive" : "warning"}
           />
         </div>
       </div>
 
-      <div className="drawdown-retirement-chapters" aria-labelledby="drawdown-chapters-title">
-        <header>
-          <p className="panel-eyebrow">Retirement chapters</p>
-          <h3 id="drawdown-chapters-title">How your retirement changes over time</h3>
-          <p>Each chapter uses the income target saved in the active plan.</p>
-        </header>
-        <div className="drawdown-chapter-grid">
-          {chapters.map((chapter) => (
-            <RetirementChapterCard key={`${chapter.title}-${chapter.startAge}`} chapter={chapter} />
-          ))}
+      {hasMultipleChapters ? (
+        <div className="drawdown-retirement-chapters" aria-labelledby="drawdown-chapters-title">
+          <header>
+            <p className="panel-eyebrow">Retirement chapters</p>
+            <h3 id="drawdown-chapters-title">How your planned spending changes over time</h3>
+            <p>
+              Each chapter shows the income you have planned for that stage of retirement and helps explain why the amount needed from your pension may change.
+            </p>
+          </header>
+          <div className="drawdown-chapter-grid">
+            {chapters.map((chapter) => (
+              <RetirementChapterCard key={`${chapter.title}-${chapter.startAge}`} chapter={chapter} />
+            ))}
+          </div>
         </div>
-        <Link
-          className="drawdown-chapter-action"
-          to="/what-if?experiment=spending"
-        >
-          Could you spend more during active retirement? Explore it in What If?
-        </Link>
-      </div>
+      ) : (
+        <div className="drawdown-retirement-chapters" aria-labelledby="drawdown-single-chapter-title">
+          <header>
+            <p className="panel-eyebrow">Your income plan</p>
+            <h3 id="drawdown-single-chapter-title">Your planned income stays consistent</h3>
+            <p>
+              Your plan keeps the same income target from age {inputs.retirementAge} through age {inputs.endAge}, so retirement is shown as one continuous stage.
+            </p>
+          </header>
+        </div>
+      )}
     </section>
   );
 }

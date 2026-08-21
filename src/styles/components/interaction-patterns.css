@@ -1,0 +1,126 @@
+/* Shared interaction patterns used across planner features. */
+
+.ui-disclosure-trigger {
+  cursor: pointer;
+}
+
+.ui-disclosure-trigger:focus-visible {
+  outline: 2px solid var(--colour-primary);
+  outline-offset: -2px;
+}
+
+.ui-expand-collapse-indicator {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text-muted);
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ui-disclosure-trigger:hover .ui-expand-collapse-indicator,
+.ui-disclosure-trigger:focus-visible .ui-expand-collapse-indicator {
+  background: var(--colour-surface-hover);
+  color: var(--colour-primary);
+}
+
+.ui-disclosure-when-open {
+  display: none;
+}
+
+.ui-disclosure[open] .ui-disclosure-when-closed {
+  display: none;
+}
+
+.ui-disclosure[open] .ui-disclosure-when-open {
+  display: inline;
+}
+
+.ui-info-tooltip {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.ui-info-tooltip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--colour-border);
+  border-radius: 999px;
+  background: var(--colour-surface);
+  color: var(--colour-text-muted);
+  cursor: help;
+}
+
+.ui-info-tooltip-trigger-small {
+  width: 22px;
+  height: 22px;
+}
+
+.ui-info-tooltip-trigger-medium {
+  width: 28px;
+  height: 28px;
+}
+
+.ui-info-tooltip-trigger:hover,
+.ui-info-tooltip-trigger:focus-visible {
+  border-color: var(--colour-primary);
+  color: var(--colour-primary);
+  outline: 0;
+}
+
+.ui-info-tooltip-panel {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  display: none;
+  width: min(340px, 82vw);
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+  box-shadow: var(--shadow-md);
+  color: var(--colour-text);
+  white-space: normal;
+}
+
+.ui-info-tooltip-right .ui-info-tooltip-panel {
+  right: 0;
+}
+
+.ui-info-tooltip-left .ui-info-tooltip-panel {
+  left: 0;
+}
+
+.ui-info-tooltip:hover .ui-info-tooltip-panel,
+.ui-info-tooltip:focus-within .ui-info-tooltip-panel {
+  display: block;
+}
+
+.ui-info-tooltip-title {
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.ui-info-tooltip-content {
+  display: block;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.ui-info-tooltip-content > :first-child {
+  margin-top: 0;
+}
+
+.ui-info-tooltip-content > :last-child {
+  margin-bottom: 0;
+}

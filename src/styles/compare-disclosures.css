@@ -1,0 +1,21 @@
+.compare-disclosure-meta,
+.compare-card-more-actions > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.compare-disclosure-meta {
+  flex: 0 0 auto;
+}
+
+.compare-create-disclosure .ui-expand-collapse-indicator,
+.compare-card-more-actions .ui-expand-collapse-indicator {
+  width: 1.65rem;
+  height: 1.65rem;
+  font-size: 1rem;
+}
+
+.compare-card-more-actions > summary {
+  min-height: 2rem;
+}

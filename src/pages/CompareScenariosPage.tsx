@@ -7,6 +7,7 @@ import {
   ScenarioIntelligencePanel,
   useScenarios,
 } from "../components/scenarios";
+import { ExpandCollapseIndicator } from "../components/ui";
 import { calculateScenarioSummary } from "../domain/scenarios/calculateScenarioSummary";
 import type { ScenarioDrawdownPreferences } from "../domain/scenarios";
 import type { PensionInputs } from "../engine/models/PensionInputs";
@@ -212,9 +213,9 @@ export function CompareScenariosPage() {
           </strong>
         </div>
 
-        <details className="compare-create-disclosure">
-          <summary>
-            <FontAwesomeIcon icon={AppIcons.plus} aria-hidden="true" />
+        <details className="compare-create-disclosure ui-disclosure">
+          <summary className="ui-disclosure-trigger">
+            <ExpandCollapseIndicator />
             Create another scenario
           </summary>
           <div className="compare-create-panel">
@@ -245,13 +246,16 @@ export function CompareScenariosPage() {
         scenarios={selectedScenarios}
       />
 
-      <details className="scenario-library" open={scenarios.length <= 1}>
-        <summary>
+      <details className="scenario-library ui-disclosure" open={scenarios.length <= 1}>
+        <summary className="ui-disclosure-trigger">
           <span>
             <FontAwesomeIcon icon={AppIcons.comparison} aria-hidden="true" />
             Manage scenarios
           </span>
-          <small>{scenarios.length} available</small>
+          <span className="compare-disclosure-meta">
+            <small>{scenarios.length} available</small>
+            <ExpandCollapseIndicator />
+          </span>
         </summary>
 
         <section aria-labelledby="scenario-list-title">
@@ -396,8 +400,11 @@ export function CompareScenariosPage() {
                     )}
                   </div>
 
-                  <details className="compare-card-more-actions">
-                    <summary>More actions</summary>
+                  <details className="compare-card-more-actions ui-disclosure">
+                    <summary className="ui-disclosure-trigger">
+                      <span>More actions</span>
+                      <ExpandCollapseIndicator />
+                    </summary>
                     <div>
                       <button
                         type="button"

@@ -1,465 +1,267 @@
 # 📖 Polaris Retirement Planner User Guide
 
-> **Version 1.0.0**
+> **Version 1.2.0**
 
 ---
 
 # Welcome to Polaris
 
-Welcome to **Polaris Retirement Planner**.
+Polaris is an educational retirement planning application designed to help you understand how today's choices may affect your retirement.
 
-Polaris is designed to help you understand how today's financial decisions affect tomorrow's retirement.
+It can help you build a plan, explore alternatives, compare scenarios and understand how retirement income and pension savings may change over time.
 
-Unlike traditional pension calculators, Polaris allows you to build, compare and improve retirement plans through guided planning, experimentation and personalised recommendations.
-
-Whether you're planning decades ahead or preparing to retire soon, Polaris helps you make informed decisions with confidence.
+Polaris does **not** provide personal financial advice and its projections are not guarantees of future outcomes.
 
 ---
 
-# Getting Started
+# A Simple Way to Use Polaris
 
-Your journey through Polaris follows a simple process.
-
-```
-Create Plan
-
+```text
+Create or review My Plan
 ↓
-
-Review Results
-
+Check Overview
 ↓
-
-Experiment
-
+Explore alternatives in What If? or Compare
 ↓
-
-Compare
-
+Understand retirement income in Drawdown
 ↓
-
-Plan Retirement Income
-
+Use Explore and Guidance to learn more
 ↓
-
-Learn
-
-↓
-
-Improve Your Plan
+Return to My Plan when you want to change the plan
 ```
 
-Every page builds on the active retirement plan.
+Every analysis page uses the currently active retirement plan.
 
 ---
 
-# Navigation
+# Overview
 
-The main navigation includes:
+Overview is the quickest place to understand the active plan.
 
-## 🏠 Overview
+It summarises information such as:
 
-A summary of your retirement plan.
-
-Use this page to quickly understand:
-
-- Retirement age
-- Projected pension
-- Retirement income
-- Active scenario
-- Plan health
-- Recommended next steps
+- retirement age
+- projected pension
+- retirement income
+- funding status
+- State Pension choice
+- tax-free cash choice
+- retirement journey and important events
 
 ---
 
-## 📝 My Plan
+# My Plan
 
-This is where you build your retirement plan.
+My Plan is where you make changes to the retirement plan.
 
-The guided planner walks through each step.
+## Essential planning
 
-### Step 1
+Use the guided journey to set:
 
-About You
+- personal details
+- pension savings and contributions
+- retirement age
+- planning age
+- retirement-income goal
+- State Pension
+- tax-free cash
 
-- Current age
-- Retirement age
-- Planning age
+## Advanced planning
 
----
+Advanced options cover:
 
-### Step 2
+- how retirement spending changes over time
+- retirement-income strategy
+- investment return
+- inflation
+- pension fees
+- future contribution changes
 
-Your Pension
-
-- Current pension value
-- Monthly contributions
-- Employer contributions
-
----
-
-### Step 3
-
-Investment Assumptions
-
-- Growth rate
-- Inflation
-- Fees
+Polaris may offer Retirement Living Standards as a way to choose a lifestyle-based income goal.
 
 ---
 
-### Step 4
+# Scenarios and Compare
 
-Retirement Income
+Scenarios let you explore more than one retirement plan.
 
-Plan how much income you would like during retirement.
+You can:
 
-Version 1.0 introduces three retirement chapters.
+- create a new scenario
+- duplicate a plan
+- edit a scenario
+- switch the active plan
+- select plans for comparison
 
----
-
-# Retirement Chapters
-
-Retirement spending usually changes over time.
-
-Polaris models this using three phases.
-
----
-
-## Active Retirement
-
-Usually the first years after retirement.
-
-Examples include:
-
-- Travel
-- Holidays
-- New hobbies
-- Home improvements
-
-Many people spend more during this period.
-
----
-
-## Settled Retirement
-
-A more stable period.
-
-Typical spending includes:
-
-- Household costs
-- Leisure
-- General living expenses
-
----
-
-## Later Life
-
-Planning for later retirement.
-
-Examples include:
-
-- Healthcare
-- Additional support
-- Care costs
-
-Planning for this stage helps improve long-term confidence.
-
----
-
-# State Pension
-
-The State Pension section allows you to:
-
-- Include or exclude it from projections
-- Change the illustrated annual amount
-- Adjust the expected starting age
-
-This affects retirement income projections but does not change the private pension itself.
-
----
-
-# Tax-Free Cash
-
-Use this section to explore:
-
-- Taking a lump sum
-- Leaving money invested
-- How withdrawals affect retirement income
-
----
-
-# Saving Your Plan
-
-Every change made in **My Plan** updates the active retirement plan immediately.
-
-To explore alternatives without changing your main plan, use **What If?**
+The active plan is the plan used by Overview, Drawdown, Explore and Guidance.
 
 ---
 
 # What If? Decision Lab
 
-The Decision Lab allows you to safely explore different decisions.
+What If? lets you safely test a change without immediately altering the active plan.
 
-Nothing is permanently changed until you choose to save a scenario.
+Experiments may include:
 
----
+- retiring earlier or later
+- saving more
+- spending more
+- changing pension fees
+- changing inflation
+- changing State Pension assumptions
+- testing a market downturn
 
-## Available Experiments
-
-### Retirement Age
-
-Explore retiring earlier or later.
-
----
-
-### Save More
-
-Increase pension contributions.
-
----
-
-### Spend More
-
-Increase retirement income targets.
-
----
-
-### Lower Fees
-
-See how pension charges affect long-term growth.
-
----
-
-### Inflation
-
-Understand the impact of rising prices.
-
----
-
-### State Pension
-
-Experiment with different State Pension assumptions.
-
----
-
-### Market Downturn
-
-Explore how market falls may affect retirement outcomes.
-
----
-
-# Saving Scenarios
-
-When an experiment is complete:
-
-Select
-
-**Save as Scenario**
-
-The experiment becomes a new retirement plan while preserving your original plan.
-
----
-
-# Compare
-
-The Compare page allows multiple retirement plans to be viewed together.
-
-Compare:
-
-- Pension value
-- Contributions
-- Growth
-- Fees
-- Retirement income
-- Sustainability
-
-The active scenario is always highlighted.
+You can save a useful experiment as a new scenario.
 
 ---
 
 # Drawdown
 
-The Drawdown planner shows how your retirement income may change throughout retirement.
+Drawdown explains what the active retirement plan may look like after retirement.
 
-You can review:
+It has two levels of detail.
 
-- Pension balance
-- Withdrawals
-- Spending phases
+## Simple
+
+Start here if you want the retirement story in plain English.
+
+Simple Drawdown explains:
+
+- what happens over time
+- important things worth reviewing
+- how your private pension and State Pension may work together
+- how to interpret the retirement illustration
+
+## Detailed
+
+Detailed Drawdown is for users who want to understand the mechanics behind the plan.
+
+### Income
+
+Use Income to answer:
+
+> **Where is my retirement money coming from?**
+
+You can explore:
+
+- money from your private pension
 - State Pension
-- Retirement timeline
+- estimated tax
+- money available to spend
+- your planned income
+- what changes in a selected year
 
-The aim is to understand whether your retirement income remains sustainable.
+Open **Income by year** when you want the underlying yearly figures.
+
+### Balance
+
+Use Balance to answer:
+
+> **What is happening to my pension?**
+
+The yearly balance story explains:
+
+- what the pension started the year with
+- investment growth
+- money taken out
+- fees
+- inflation context
+- money left in the pension
+
+Additional context can include withdrawal rate, how much investment growth offset the money leaving the pension and the percentage movement over the year.
+
+Open **Balance by year** when you want the yearly figures.
+
+### Retirement Journey
+
+Use Retirement Journey to answer:
+
+> **What are the important moments in my retirement?**
+
+Depending on the plan, the journey may highlight:
+
+- retirement begins
+- State Pension starts
+- planned spending changes
+- planned income is no longer fully met
+- private pension is fully used
+- planning period ends
+
+Open **Retirement by year** for the complete yearly reference.
+
+### How it works
+
+Use How it works to answer:
+
+> **How should I understand these results?**
+
+This page explains:
+
+- the choices taken from My Plan
+- Today's Money and Future Money
+- investment estimates
+- inflation
+- pension fees
+- tax estimates
+- why the results are an illustration rather than a prediction
+
+A collapsed **Calculation reference** is available if you want to see the order used to calculate each retirement year.
+
+---
+
+# Today's Money and Future Money
+
+## Today's Money
+
+Today's Money expresses future amounts using today's buying power. This can make it easier to compare values many years apart.
+
+## Future Money
+
+Future Money shows the projected pound amount in each future year, including the effect of inflation.
+
+Changing this switch changes how the figures are displayed; it does not change the retirement plan itself.
 
 ---
 
 # Explore
 
-Explore explains retirement concepts using your own plan.
+Explore provides personalised educational content using the active retirement plan.
 
-Topics include:
+Topics may include:
 
-- Investment growth
-- Inflation
-- Pension fees
-- Market downturns
-- Sequence of Returns Risk
-
-This makes learning directly relevant to your circumstances.
+- investment growth
+- inflation
+- fees
+- retirement timing
+- market falls
+- sequence-of-returns risk
 
 ---
 
 # Guidance
 
-Guidance reviews your retirement plan and highlights opportunities to improve it.
+Guidance highlights areas worth reviewing and helps you understand possible next steps.
 
-Recommendations include:
-
-- Suggested next actions
-- Areas needing attention
-- Educational opportunities
-- Links directly into the relevant planning page
+Guidance is educational rather than personal financial advice.
 
 ---
 
-# Themes
+# Reading Warnings
 
-Polaris supports:
+An amber or warning message does not always mean the retirement plan has failed.
 
-- Light Mode
-- Dark Mode
-
-Theme selection is remembered automatically.
+For example, a pension balance may fall because the pension is doing its job of funding retirement. Polaris aims to explain why a warning appears and what it means in context.
 
 ---
 
-# Mobile Support
+# Important Reminder
 
-Polaris works on:
+Retirement projections depend on assumptions about investment returns, inflation, tax and your own choices. These can all change.
 
-- Desktop
-- Laptop
-- Tablet
-- Mobile
+Use Polaris to understand and compare plans, and review your retirement choices regularly.
 
-Layouts automatically adapt to the available screen size.
+If you need personal financial advice, consider speaking with an appropriately qualified financial adviser.
 
 ---
 
-# Frequently Asked Questions
-
-## Does changing a What If? experiment affect my main plan?
-
-No.
-
-Experiments remain temporary until saved as a scenario.
-
----
-
-## Can I compare retirement plans?
-
-Yes.
-
-Use the Compare page to review multiple scenarios side by side.
-
----
-
-## Can I edit a saved scenario?
-
-Yes.
-
-Switch to the scenario and open **My Plan**.
-
----
-
-## What happens if I change my retirement age?
-
-All projections update automatically using the new assumption.
-
----
-
-## Why does retirement income change during retirement?
-
-Many people spend differently throughout retirement.
-
-Polaris models:
-
-- Active Retirement
-- Settled Retirement
-- Later Life
-
-to create more realistic planning.
-
----
-
-## Is the State Pension included?
-
-Only if enabled within your retirement plan.
-
----
-
-## Can I return to my original plan?
-
-Yes.
-
-Your baseline plan always remains available.
-
----
-
-# Best Practices
-
-For the most useful results:
-
-✔ Keep pension values up to date
-
-✔ Review your plan regularly
-
-✔ Explore multiple scenarios
-
-✔ Read the Explore lessons
-
-✔ Review Guidance recommendations
-
-✔ Compare important decisions before making changes
-
----
-
-# Need Help?
-
-Refer to:
-
-- README.md
-- FEATURES.md
-- ROADMAP.md
-
-or future online documentation.
-
----
-
-# Version History
-
-This guide applies to:
-
-**Polaris Retirement Planner Version 1.0.0**
-
-Released
-
-**2 August 2026**
-
----
-
-# Final Thoughts
-
-Retirement planning is not about predicting the future perfectly.
-
-It is about understanding how today's decisions influence tomorrow's opportunities.
-
-Polaris is designed to help you build that understanding one decision at a time.
-
----
-
-**Polaris Retirement Planner**
-
-**User Guide**
-
-**Version 1.0.0**
+**Polaris Retirement Planner — User Guide v1.2.0**

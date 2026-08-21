@@ -26,42 +26,42 @@ export function DrawdownSummaryRibbon({
     : 0;
 
   return (
-    <section className="drawdown-summary-ribbon" aria-label="Drawdown summary">
+    <section className="drawdown-summary-ribbon" aria-label="Retirement plan summary">
       <article className={isSustainable ? "drawdown-summary-item status-good" : "drawdown-summary-item status-warning"}>
         <span className="drawdown-summary-icon" aria-hidden="true">
-          {isSustainable ? <CircleCheck size={19} /> : <CircleAlert size={19} />}
+          {isSustainable ? <CircleCheck size={18} /> : <CircleAlert size={18} />}
         </span>
         <span>
-          <small>Plan status</small>
-          <strong>{isSustainable ? "Income target funded" : "Review required"}</strong>
-          <em>{result.depletionAge === null ? `Modelled through age ${inputs.endAge}` : `Pension depletes at age ${result.depletionAge}`}</em>
+          <small>Your plan</small>
+          <strong>{isSustainable ? "Looks on track" : "Worth reviewing"}</strong>
+          <em>{result.depletionAge === null ? `Your pension lasts through age ${inputs.endAge}` : `Your pension may run out around age ${result.depletionAge}`}</em>
         </span>
       </article>
 
       <article className="drawdown-summary-item">
-        <span className="drawdown-summary-icon" aria-hidden="true"><Coins size={19} /></span>
+        <span className="drawdown-summary-icon" aria-hidden="true"><Coins size={18} /></span>
         <span>
-          <small>Final pension balance</small>
+          <small>Money left in your pension</small>
           <strong>{formatCurrency(display.finalBalance)}</strong>
           <em>At age {inputs.endAge}</em>
         </span>
       </article>
 
       <article className="drawdown-summary-item">
-        <span className="drawdown-summary-icon" aria-hidden="true"><ReceiptText size={19} /></span>
+        <span className="drawdown-summary-icon" aria-hidden="true"><ReceiptText size={18} /></span>
         <span>
-          <small>Average annual net income</small>
-          <strong>{formatCurrency(averageAnnualNetIncome)}</strong>
-          <em>{displayMode === "today" ? "In today’s money" : "Across future money values"}</em>
+          <small>Average money available to spend</small>
+          <strong>{formatCurrency(averageAnnualNetIncome)}/year</strong>
+          <em>{displayMode === "today" ? "In today’s money" : "In future money"}</em>
         </span>
       </article>
 
       <article className={shortfall > 0 ? "drawdown-summary-item status-danger" : "drawdown-summary-item status-good"}>
-        <span className="drawdown-summary-icon" aria-hidden="true"><Landmark size={19} /></span>
+        <span className="drawdown-summary-icon" aria-hidden="true"><Landmark size={18} /></span>
         <span>
-          <small>Lifetime shortfall</small>
+          <small>Planned income gap</small>
           <strong>{formatCurrency(shortfall)}</strong>
-          <em>{shortfall > 0 ? "Across the planning period" : "No modelled income gap"}</em>
+          <em>{shortfall > 0 ? "Across your retirement illustration" : "Your planned income is fully supported"}</em>
         </span>
       </article>
     </section>

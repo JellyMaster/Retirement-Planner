@@ -39,6 +39,8 @@ export function convertDrawdownYearForDisplay(
 
   const convert = (value: number) =>
     toDisplayValue(value, yearIndex, inflationRate, displayMode);
+  const convertEndOfYearBalance = (value: number) =>
+    toDisplayValue(value, yearIndex + 1, inflationRate, displayMode);
 
   return {
     ...year,
@@ -55,7 +57,7 @@ export function convertDrawdownYearForDisplay(
     investmentGrowth: convert(year.investmentGrowth),
     fees: convert(year.fees),
     incomeShortfall: convert(year.incomeShortfall),
-    closingBalance: convert(year.closingBalance),
+    closingBalance: convertEndOfYearBalance(year.closingBalance),
   };
 }
 

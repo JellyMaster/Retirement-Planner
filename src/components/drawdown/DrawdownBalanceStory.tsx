@@ -4,12 +4,14 @@ import {
   getDisplayYears,
   type MoneyDisplayMode,
 } from "../../utils/drawdownDisplayValues";
-import { formatCurrency } from "../../utils/formatters";
+import { formatCurrency, formatPercentage } from "../../utils/formatters";
 
 interface DrawdownBalanceStoryProps {
   inputs: DrawdownInputs;
   result: DrawdownResult;
   displayMode: MoneyDisplayMode;
+  /** Legacy scenario metadata may still be supplied by existing callers, but it no longer affects this view. */
+  drawdown?: unknown;
 }
 
 export function DrawdownBalanceStory({
@@ -22,31 +24,29 @@ export function DrawdownBalanceStory({
     inputs.inflationRate,
     displayMode,
   );
-  const highest = years.reduce((best, year) =>
-    year.closingBalance > best.closingBalance ? year : best,
+  if (years.length === 0) return null;
+
+  const firstFallingYear = years.find(
+    (year) => year.closingBalance < year.openingBalance,
   );
   const lowest = years.reduce((best, year) =>
     year.closingBalance < best.closingBalance ? year : best,
   );
-  const firstPressureYear = years.find(
-    (year) => year.pensionWithdrawal + year.fees > year.investmentGrowth,
-  );
-  const periods = createBalancePeriods(years);
+  const finalBalance = years.at(-1)?.closingBalance ?? result.finalBalance;
+  const retirementOpeningBalance = years[0]?.openingBalance ?? 0;
+  const remainingShare = retirementOpeningBalance > 0
+    ? finalBalance / retirementOpeningBalance
+    : 0;
+  const lowestIsFinalYear = lowest.age === years.at(-1)?.age;
 
   return (
-    <section
-      className="drawdown-balance-story"
-      aria-labelledby="drawdown-balance-story-title"
-    >
+    <section className="drawdown-balance-story" aria-labelledby="drawdown-balance-story-title">
       <header>
         <div>
-          <p className="panel-eyebrow">Balance story</p>
-          <h3 id="drawdown-balance-story-title">
-            Why the pension rises or falls over time
-          </h3>
+          <p className="panel-eyebrow">How your pension is working</p>
+          <h3 id="drawdown-balance-story-title">Understanding your pension balance</h3>
           <p>
-            The balance changes according to withdrawals, investment growth and
-            fees in each retirement year.
+            These key answers summarise what the balance story means for your retirement. They help you understand whether your pension is expected to last, how it changes over time and what remains at the end of your plan.
           </p>
         </div>
         <span>{displayMode === "today" ? "Today’s money" : "Future money"}</span>
@@ -54,95 +54,61 @@ export function DrawdownBalanceStory({
 
       <div className="drawdown-balance-metrics">
         <Metric
-          label="Highest balance"
-          value={formatCurrency(highest.closingBalance)}
-          detail={`Age ${highest.age}`}
+          label="Will your pension last?"
+          value={result.depletionAge === null ? `Through age ${inputs.endAge}` : `Until age ${result.depletionAge}`}
+          detail={result.depletionAge === null ? "It remains available throughout your plan." : "The private pension is fully used before the end of your plan."}
+          tone={result.depletionAge === null ? "positive" : "warning"}
+          primary
         />
         <Metric
-          label="Lowest balance"
+          label="When does your pension first begin reducing?"
+          value={firstFallingYear ? `Age ${firstFallingYear.age}` : "Not in this plan"}
+          detail={firstFallingYear
+            ? "This is the first year the pension ends lower than it started. A falling balance can be a normal part of funding retirement."
+            : "The illustrated balance does not finish a year lower than it started."}
+          tone="neutral"
+        />
+        <Metric
+          label="Lowest projected pension balance"
           value={formatCurrency(lowest.closingBalance)}
-          detail={`Age ${lowest.age}`}
+          detail={lowestIsFinalYear
+            ? `Reached at age ${lowest.age}, at the end of the plan.`
+            : `Reached at age ${lowest.age}; the projected balance is higher again later in the plan.`}
+          tone={lowest.closingBalance > 0 ? "neutral" : "warning"}
         />
         <Metric
-          label="Withdrawals exceed growth"
-          value={firstPressureYear ? `Age ${firstPressureYear.age}` : "Not modelled"}
-          detail={firstPressureYear ? "Including annual fees" : "Growth covers withdrawals and fees"}
-        />
-        <Metric
-          label="Final balance"
-          value={formatCurrency(years.at(-1)?.closingBalance ?? result.finalBalance)}
-          detail={result.depletionAge === null ? `At age ${inputs.endAge}` : `Depleted at age ${result.depletionAge}`}
+          label="Money remaining at the end of your plan"
+          value={formatCurrency(finalBalance)}
+          detail={retirementOpeningBalance > 0
+            ? `${formatPercentage(remainingShare)} of the pension available at retirement remains at age ${inputs.endAge}.`
+            : `At age ${inputs.endAge}.`}
+          tone={finalBalance > 0 ? "positive" : "warning"}
         />
       </div>
 
-      <div className="drawdown-balance-periods">
-        {periods.map((period) => (
-          <article key={`${period.startAge}-${period.endAge}`}>
-            <span>Age {period.startAge}–{period.endAge}</span>
-            <h4>{period.title}</h4>
-            <p>{period.description}</p>
-          </article>
-        ))}
-      </div>
+      <p className="drawdown-balance-story-note">
+        <strong>A reducing pension isn&apos;t necessarily a problem.</strong>{" "}
+        Your pension is there to help fund your retirement. The key question is whether it can continue providing the income you&apos;ve planned for the whole period you&apos;re planning for. A falling balance can therefore be an expected part of using your pension in retirement.
+      </p>
     </section>
   );
-}
-
-function createBalancePeriods(
-  years: ReturnType<typeof getDisplayYears>,
-): Array<{
-  startAge: number;
-  endAge: number;
-  title: string;
-  description: string;
-}> {
-  if (years.length === 0) return [];
-
-  const groups: Array<{ start: number; end: number; underPressure: boolean }> = [];
-  years.forEach((year, index) => {
-    const underPressure =
-      year.pensionWithdrawal + year.fees > year.investmentGrowth;
-    const current = groups.at(-1);
-    if (!current || current.underPressure !== underPressure) {
-      groups.push({ start: index, end: index, underPressure });
-    } else {
-      current.end = index;
-    }
-  });
-
-  return groups.slice(0, 4).map((group) => {
-    const first = years[group.start];
-    const last = years[group.end];
-    const falls = last.closingBalance < first.openingBalance;
-
-    return {
-      startAge: first.age,
-      endAge: last.age,
-      title: group.underPressure
-        ? falls
-          ? "Withdrawals place pressure on the balance"
-          : "Growth partly offsets retirement withdrawals"
-        : "Investment growth covers withdrawals and fees",
-      description: group.underPressure
-        ? falls
-          ? "Pension withdrawals and fees are greater than investment growth, so the illustrated balance reduces during this period."
-          : "Withdrawals exceed annual growth in some years, although the balance remains broadly stable across the period."
-        : "Investment growth is at least as high as pension withdrawals and fees, helping preserve or increase the balance.",
-    };
-  });
 }
 
 function Metric({
   label,
   value,
   detail,
+  tone,
+  primary = false,
 }: {
   label: string;
   value: string;
   detail: string;
+  tone: "positive" | "warning" | "neutral";
+  primary?: boolean;
 }) {
   return (
-    <article>
+    <article className={`is-${tone}${primary ? " is-primary" : ""}`}>
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{detail}</small>

@@ -1,6 +1,7 @@
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import { formatCurrency } from "../../utils/formatters";
+import { ExpandCollapseIndicator } from "../ui";
 
 interface DrawdownAssumptionsPanelProps {
   inputs: DrawdownInputs;
@@ -20,100 +21,206 @@ export function DrawdownAssumptionsPanel({
   displayMode,
 }: DrawdownAssumptionsPanelProps) {
   const projectionYears = Math.max(0, inputs.endAge - inputs.retirementAge);
-
-  const assumptions = [
-    {
-      label: "Starting pension",
-      value: formatCurrency(inputs.startingBalance),
-    },
-    {
-      label: "Retirement period",
-      value: `${inputs.retirementAge} to ${inputs.endAge} (${projectionYears} years)`,
-    },
-    {
-      label: "Withdrawal strategy",
-      value: inputs.withdrawalStrategy === "percentage" ? "Percentage of pension" : "Target annual income",
-    },
-    {
-      label: inputs.withdrawalStrategy === "percentage"
-        ? "Annual withdrawal rate"
-        : inputs.incomeTargetMode === "net" ? "Net income target" : "Gross income target",
-      value: inputs.withdrawalStrategy === "percentage"
-        ? formatPercentage(inputs.withdrawalRate)
-        : formatCurrency(inputs.desiredAnnualIncome),
-    },
-    {
-      label: "State Pension",
-      value: `${formatCurrency(inputs.annualStatePension)} from age ${inputs.statePensionAge}`,
-    },
-    {
-      label: "Investment return",
-      value: formatPercentage(inputs.annualReturn),
-    },
-    {
-      label: "State Pension increase",
-      value: formatPercentage(inputs.inflationRate),
-    },
-    {
-      label: "Annual pension fee",
-      value: formatPercentage(inputs.annualFee),
-    },
-    {
-      label: "Tax-free cash",
-      value: formatCurrency(inputs.taxFreeCash),
-    },
-  ];
+  const targetLabel = inputs.withdrawalStrategy === "percentage"
+    ? "Annual pension withdrawal"
+    : "Your planned income";
+  const targetValue = inputs.withdrawalStrategy === "percentage"
+    ? formatPercentage(inputs.withdrawalRate)
+    : formatCurrency(inputs.desiredAnnualIncome);
 
   return (
-    <section className="panel drawdown-assumptions-panel">
-      <div className="panel-heading">
-        <p className="panel-eyebrow">Calculation basis</p>
-        <h2>How this projection is calculated</h2>
-        <p>
-          A transparent summary of the assumptions and yearly calculation order
-          currently used by the drawdown engine.
-        </p>
+    <section className="drawdown-assumptions-panel">
+      <div className="drawdown-assumptions-groups">
+        <AssumptionGroup
+          eyebrow="Your retirement plan"
+          title="The choices your illustration starts with"
+          description="These are the ages, income choices and pension values taken from your active plan."
+          items={[
+            {
+              label: "Pension at retirement",
+              value: formatCurrency(inputs.startingBalance),
+              explanation: "This is the pension available when the drawdown illustration begins.",
+            },
+            {
+              label: "Retirement period",
+              value: `Age ${inputs.retirementAge} to ${inputs.endAge}`,
+              explanation: `The illustration follows ${projectionYears} years of retirement after the starting age.`,
+            },
+            {
+              label: targetLabel,
+              value: targetValue,
+              explanation: inputs.withdrawalStrategy === "percentage"
+                ? "This percentage is recalculated from the opening pension balance each year."
+                : `This is treated as ${inputs.incomeTargetMode === "net" ? "money available to spend after estimated tax" : "income before estimated tax"}.`,
+            },
+            {
+              label: "State Pension",
+              value: inputs.annualStatePension > 0
+                ? `${formatCurrency(inputs.annualStatePension)} from age ${inputs.statePensionAge}`
+                : "Not included",
+              explanation: "When included, State Pension contributes to retirement income and can reduce how much needs to come from your private pension.",
+            },
+          ]}
+        />
+
+        <section className="drawdown-assumption-education" aria-labelledby="drawdown-assumption-education-title">
+          <div>
+            <p className="panel-eyebrow">Understanding the illustration</p>
+            <h2 id="drawdown-assumption-education-title">How to understand your results</h2>
+            <p>These concepts help explain why the figures can look different depending on the view you choose and why real retirement outcomes will not follow a perfectly smooth path.</p>
+          </div>
+          <div className="drawdown-assumption-concepts">
+            <Concept
+              title="Today’s money"
+              text="Shows future values using today’s buying power, which makes different retirement years easier to compare."
+            />
+            <Concept
+              title="Future money"
+              text="Shows the projected pound amount in each future year, including the effect of inflation."
+            />
+            <Concept
+              title="Illustration, not prediction"
+              text="The model applies the same assumptions consistently. Real investment returns, inflation, tax rules and personal circumstances will change over time."
+            />
+            <Concept
+              title="Why pension balances can fall"
+              text="A pension is there to fund retirement. A falling balance can be expected when withdrawals and charges are greater than investment growth."
+            />
+          </div>
+        </section>
+
+        <AssumptionGroup
+          eyebrow="Investment assumptions"
+          title="How your pension is expected to change"
+          description="These assumptions estimate growth, rising prices and the charges taken from your pension."
+          items={[
+            {
+              label: "Expected investment return",
+              value: formatPercentage(inputs.annualReturn),
+              explanation: "Used to estimate how the invested pension could grow. Actual investment returns will vary from year to year.",
+            },
+            {
+              label: "Inflation",
+              value: formatPercentage(inputs.inflationRate),
+              explanation: "Used to estimate how buying power changes over time and to increase the State Pension in the illustration.",
+            },
+            {
+              label: "Annual pension charges",
+              value: formatPercentage(inputs.annualFee),
+              explanation: "Charges are deducted from the pension each year after investment growth is applied.",
+            },
+          ]}
+        />
+
+        <AssumptionGroup
+          eyebrow="Tax assumptions"
+          title="How tax is estimated"
+          description="Tax is illustrated using a consistent set of current rules so different retirement plans can be compared on the same basis."
+          items={[
+            {
+              label: "Income tax rules",
+              value: "2026/27 England, Wales and Northern Ireland",
+              explanation: "Future tax rates, bands and allowances may change, so actual retirement tax may be different.",
+            },
+            {
+              label: "Tax-free cash",
+              value: formatCurrency(inputs.taxFreeCash),
+              explanation: "Any initial tax-free cash is taken before annual retirement income is calculated and is not treated as taxable annual income.",
+            },
+            {
+              label: "Taxable retirement income",
+              value: "State Pension + private pension income",
+              explanation: "The illustration estimates tax on these income sources using the modelled tax rules and allowances.",
+            },
+          ]}
+        />
       </div>
 
-      <div className="drawdown-assumptions-layout">
-        <dl className="drawdown-assumptions-list">
-          {assumptions.map((assumption) => (
-            <div className="drawdown-assumption-row" key={assumption.label}>
-              <dt>{assumption.label}</dt>
-              <dd>{assumption.value}</dd>
-            </div>
-          ))}
-        </dl>
+      <aside className="drawdown-assumption-remember" role="note">
+        <p className="panel-eyebrow">Key things to remember</p>
+        <strong>This is an educational retirement illustration, not a guarantee or personal financial advice.</strong>
+        <p>
+          Use it to understand and compare retirement choices. Review your plan regularly because investment returns, inflation, tax rules and your circumstances can all change.
+        </p>
+      </aside>
 
-        <div className="drawdown-method-card">
-          <h3>Yearly calculation order</h3>
+      <details className="panel ui-disclosure drawdown-assumption-reference">
+        <summary className="ui-disclosure-trigger drawdown-assumption-reference-summary">
+          <div className="drawdown-assumption-reference-heading">
+            <p className="panel-eyebrow">Calculation reference</p>
+            <strong>How the calculations work</strong>
+            <small>
+              Open this section if you&apos;d like to understand how the planner calculates each year of your retirement illustration. Most people won&apos;t need this level of detail, but it&apos;s available for complete transparency.
+            </small>
+          </div>
+          <ExpandCollapseIndicator />
+        </summary>
+        <div className="drawdown-assumption-reference-content">
           <ol className="drawdown-method-list">
-            <li>Apply any tax-free cash before the first projection year.</li>
+            <li>Apply any tax-free cash before the first retirement year.</li>
             <li>Calculate the State Pension available at that age.</li>
             <li>
               {inputs.withdrawalStrategy === "percentage"
-                ? `Withdraw ${formatPercentage(inputs.withdrawalRate)} of that year's opening pension balance.`
+                ? `Take ${formatPercentage(inputs.withdrawalRate)} of that year's opening pension balance.`
                 : inputs.incomeTargetMode === "net"
-                  ? "Solve for the gross pension withdrawal needed to reach the net spendable-income target after tax."
-                  : "Withdraw only the amount needed to reach the gross annual income target."}
+                  ? "Calculate the pension income needed to provide the planned amount after estimated tax."
+                  : "Take only the pension income needed to reach the planned income before tax."}
             </li>
-            <li>
-              Calculate income tax using the 2026/27 England, Wales and Northern Ireland rules.
-            </li>
-            <li>Apply investment growth to the remaining pension balance.</li>
-            <li>Deduct the annual pension fee after growth.</li>
+            <li>Estimate income tax using the modelled tax rules.</li>
+            <li>Apply investment growth to the remaining pension.</li>
+            <li>Deduct annual pension charges after growth.</li>
           </ol>
+          <p>
+            Calculations are performed in future pounds. The current display is {displayMode === "today" ? "then converted to today’s money using the inflation assumption" : "shown in projected future pounds"}.
+          </p>
         </div>
-      </div>
-
-      <div className="drawdown-basis-note" role="note">
-        <strong>Money basis:</strong> calculations remain in nominal pounds. Results are currently displayed in {displayMode === "today" ? "today&apos;s money using the first modelled drawdown year as the base and the inflation assumption" : "projected future pounds"}.
-        {inputs.withdrawalStrategy === "percentage"
-          ? `The pension withdrawal is recalculated each year as ${formatPercentage(inputs.withdrawalRate)} of the opening pension balance, so private-pension income can rise or fall. State Pension is added separately.`
-          : `The desired-income target is treated as ${inputs.incomeTargetMode === "net" ? "net spendable income" : "gross income"}. State Pension increases using the inflation assumption and therefore reduces the private-pension withdrawal required over time.`} State Pension and private-pension withdrawals
-        are treated as taxable income; the initial tax-free cash amount is excluded
-        from annual income.
-      </div>
+      </details>
     </section>
+  );
+}
+
+interface AssumptionItem {
+  label: string;
+  value: string;
+  explanation: string;
+}
+
+function AssumptionGroup({
+  eyebrow,
+  title,
+  description,
+  items,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  items: AssumptionItem[];
+}) {
+  return (
+    <section className="panel drawdown-assumption-group">
+      <header>
+        <p className="panel-eyebrow">{eyebrow}</p>
+        <h2>{title}</h2>
+        <p>{description}</p>
+      </header>
+      <dl>
+        {items.map((item) => (
+          <div key={item.label} className="drawdown-assumption-card">
+            <dt>{item.label}</dt>
+            <dd>{item.value}</dd>
+            <p>{item.explanation}</p>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function Concept({ title, text }: { title: string; text: string }) {
+  return (
+    <article>
+      <strong>{title}</strong>
+      <p>{text}</p>
+    </article>
   );
 }

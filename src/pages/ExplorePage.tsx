@@ -4,6 +4,7 @@ import { Link, useSearchParams } from "react-router-dom";
 
 import { SequenceReturnsLesson } from "../components/explore/SequenceReturnsLesson";
 import { useScenarios } from "../components/scenarios";
+import { ExpandCollapseIndicator } from "../components/ui";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import { AppIcons, type AppIcon } from "../icons";
@@ -234,8 +235,8 @@ export function ExplorePage() {
           </p>
         </div>
         <div>
-          <Link className="primary-button" to="/what-if?experiment=retirement-age">Open What If?</Link>
-          <Link className="secondary-button" to="/drawdown?tab=overview">Review Drawdown</Link>
+          <Link className="ui-button ui-button-primary ui-button-medium" to="/what-if?experiment=retirement-age">Open What If?</Link>
+          <Link className="ui-button ui-button-secondary ui-button-medium" to="/drawdown?tab=overview">Review Drawdown</Link>
         </div>
       </section>
     </main>
@@ -298,8 +299,8 @@ function Essential({
   children: string;
 }) {
   return (
-    <details className="explore-essential-card">
-      <summary>
+    <details className="explore-essential-card ui-disclosure">
+      <summary className="ui-disclosure-trigger">
         <span className="explore-essential-icon" aria-hidden="true">
           <FontAwesomeIcon icon={icon} fixedWidth />
         </span>
@@ -307,7 +308,7 @@ function Essential({
           <strong>{title}</strong>
           <small>{summary}</small>
         </span>
-        <span className="explore-essential-expand" aria-hidden="true">+</span>
+        <ExpandCollapseIndicator />
       </summary>
       <p>{children}</p>
     </details>
