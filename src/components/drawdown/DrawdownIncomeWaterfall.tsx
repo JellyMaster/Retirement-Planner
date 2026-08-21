@@ -47,11 +47,10 @@ export function DrawdownIncomeWaterfall({
         <div>
           <p className="panel-eyebrow">Income at key ages</p>
           <h3 id="drawdown-income-waterfall-title">
-            Where your retirement income comes from
+            How your retirement is funded
           </h3>
           <p>
-            Key points show how private-pension withdrawals and State Pension combine,
-            with tax deducted to reach the income available to spend.
+            At different points in retirement, your income may come from different places. These examples show how much comes from your private pension, how much comes from State Pension and how much is paid in tax.
           </p>
         </div>
         <span>{displayMode === "today" ? "Today’s money" : "Future money"}</span>
@@ -66,13 +65,13 @@ export function DrawdownIncomeWaterfall({
             <small>State Pension milestone</small>
             <strong>
               {statePensionStartYear.age <= inputs.retirementAge
-                ? "State Pension supports your income from retirement"
-                : `State Pension starts at age ${statePensionStartYear.age}`}
+                ? "Your State Pension supports your income from retirement"
+                : `Your State Pension starts at age ${statePensionStartYear.age}`}
             </strong>
           </div>
           <p>
             {preStatePensionYear
-              ? `It adds ${formatCurrency(statePensionStartYear.statePensionIncome)}/year and changes the amount needed from your private pension from ${formatCurrency(preStatePensionYear.pensionWithdrawal)} to ${formatCurrency(statePensionStartYear.pensionWithdrawal)}/year.`
+              ? `Once your State Pension begins, ${formatCurrency(statePensionStartYear.statePensionIncome)}/year comes from the Government. In this illustration, the amount needed from your private pension changes from ${formatCurrency(preStatePensionYear.pensionWithdrawal)} to ${formatCurrency(statePensionStartYear.pensionWithdrawal)}/year.`
               : `It provides ${formatCurrency(statePensionStartYear.statePensionIncome)}/year alongside ${formatCurrency(statePensionStartYear.pensionWithdrawal)}/year from your private pension.`}
           </p>
         </aside>
@@ -96,9 +95,9 @@ export function DrawdownIncomeWaterfall({
               <div className="drawdown-waterfall-card-heading">
                 <div>
                   <span>Age {year.age}</span>
-                  <strong>{formatCurrency(year.netIncome)}/year available</strong>
+                  <strong>{formatCurrency(year.netIncome)}/year available to spend</strong>
                 </div>
-                {shortfall > 0 && <small>Shortfall {formatCurrency(shortfall)}</small>}
+                {shortfall > 0 && <small>Below your plan by {formatCurrency(shortfall)}</small>}
               </div>
 
               <div
@@ -123,19 +122,19 @@ export function DrawdownIncomeWaterfall({
 
               <dl>
                 <div>
-                  <dt>Private pension</dt>
+                  <dt>From your pension</dt>
                   <dd>{formatCurrency(year.pensionWithdrawal)}</dd>
                 </div>
                 <div>
-                  <dt>State Pension</dt>
+                  <dt>From State Pension</dt>
                   <dd>{formatCurrency(year.statePensionIncome)}</dd>
                 </div>
                 <div>
-                  <dt>Income tax</dt>
+                  <dt>Estimated tax</dt>
                   <dd>−{formatCurrency(year.incomeTax)}</dd>
                 </div>
                 <div>
-                  <dt>Net income</dt>
+                  <dt>Available to spend</dt>
                   <dd>{formatCurrency(year.netIncome)}</dd>
                 </div>
               </dl>
