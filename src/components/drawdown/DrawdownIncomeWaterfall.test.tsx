@@ -69,6 +69,47 @@ describe("DrawdownIncomeWaterfall", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Shortfall £500")).toBeInTheDocument();
   });
+
+  it("explains how State Pension changes the private-pension withdrawal", () => {
+    render(
+      <DrawdownIncomeWaterfall
+        inputs={inputs}
+        result={result}
+        displayMode="nominal"
+      />,
+    );
+
+    const milestone = screen.getByLabelText(
+      "How State Pension changes your retirement income mix",
+    );
+
+    expect(milestone).toHaveTextContent("State Pension starts at age 67");
+    expect(milestone).toHaveTextContent("£11,500/year");
+    expect(milestone).toHaveTextContent("£40,000");
+    expect(milestone).toHaveTextContent("£28,500/year");
+  });
+
+  it("does not show a State Pension milestone when the plan has no State Pension", () => {
+    const noStatePensionResult: DrawdownResult = {
+      ...result,
+      years: result.years.map((year) => ({
+        ...year,
+        statePensionIncome: 0,
+      })),
+    };
+
+    render(
+      <DrawdownIncomeWaterfall
+        inputs={{ ...inputs, annualStatePension: 0 }}
+        result={noStatePensionResult}
+        displayMode="nominal"
+      />,
+    );
+
+    expect(
+      screen.queryByLabelText("How State Pension changes your retirement income mix"),
+    ).not.toBeInTheDocument();
+  });
 });
 
 function createYear(
