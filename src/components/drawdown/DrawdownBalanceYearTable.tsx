@@ -1,11 +1,13 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMemo, useState } from "react";
 
 import type { DrawdownYear } from "../../engine/drawdown/models/DrawdownYear";
+import { AppIcons } from "../../icons";
 import {
   getDisplayYears,
   type MoneyDisplayMode,
 } from "../../utils/drawdownDisplayValues";
-import { formatCurrency } from "../../utils/formatters";
+import { formatCurrency, formatPercentage } from "../../utils/formatters";
 import { ExpandCollapseIndicator } from "../ui";
 
 type PageSize = 10 | 15 | 25 | 50 | "all";
@@ -109,10 +111,25 @@ export function DrawdownBalanceYearTable({
               {visibleYears.map((year) => {
                 const isSelected = year.age === selectedAge;
                 const change = year.closingBalance - year.openingBalance;
+                const changeRate = year.openingBalance > 0
+                  ? Math.abs(change) / year.openingBalance
+                  : 0;
+
                 return (
                   <tr key={year.year} className={isSelected ? "is-selected-year" : undefined} aria-current={isSelected ? "true" : undefined}>
                     <th scope="row" className="projection-sticky-age">
-                      <span className="projection-age">{year.age}</span>
+                      <span className="drawdown-balance-age-cell">
+                        <span className="projection-age">{year.age}</span>
+                        {isSelected && (
+                          <span
+                            className="drawdown-balance-current-indicator"
+                            title="Currently selected year"
+                            aria-label="Currently selected year"
+                          >
+                            <FontAwesomeIcon icon={AppIcons.eye} fixedWidth />
+                          </span>
+                        )}
+                      </span>
                       <small>{year.year}</small>
                     </th>
                     <td data-label="Started with">{formatCurrency(year.openingBalance)}</td>
@@ -120,7 +137,12 @@ export function DrawdownBalanceYearTable({
                     <td data-label="Taken from pension">{formatCurrency(year.pensionWithdrawal)}</td>
                     <td data-label="Fees">{formatCurrency(year.fees)}</td>
                     <td data-label="Finished with"><strong>{formatCurrency(year.closingBalance)}</strong></td>
-                    <td data-label="Change">{change >= 0 ? "+" : "−"}{formatCurrency(Math.abs(change))}</td>
+                    <td data-label="Change">
+                      <span className={`drawdown-balance-change ${change >= 0 ? "is-positive" : "is-reducing"}`}>
+                        <strong>{change >= 0 ? "+" : "−"}{formatCurrency(Math.abs(change))}</strong>
+                        <small>{change >= 0 ? "↑" : "↓"} {formatPercentage(changeRate)}</small>
+                      </span>
+                    </td>
                   </tr>
                 );
               })}
@@ -137,7 +159,7 @@ export function DrawdownBalanceYearTable({
         )}
 
         <p className="projection-table-footnote">
-          Values are shown in {displayMode === "today" ? "today’s money" : "future money"}. A lower ending balance is not automatically a warning; it can be part of using the pension as planned.
+          Values are shown in {displayMode === "today" ? "today’s money" : "future money"}. The eye marks the year currently selected in the balance explorer above. A lower ending balance is not automatically a warning; it can be part of using the pension as planned.
         </p>
       </div>
     </details>
