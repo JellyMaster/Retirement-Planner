@@ -83,11 +83,11 @@ export function DrawdownPlannerPage() {
         </div>
       </header>
 
-      <DrawdownPlanContext activePlanName={activeScenario.name} value={inputs} />
-
       {result && (
         <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
       )}
+
+      <DrawdownPlanContext activePlanName={activeScenario.name} value={inputs} />
 
       <section className="drawdown-results-workspace" aria-labelledby="drawdown-results-title">
         <div className="drawdown-view-controls">
