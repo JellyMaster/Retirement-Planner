@@ -51,9 +51,11 @@ export function DrawdownBalanceYearStory({
   )?.age;
   const firstDepletionAge = displayYears.find((year) => year.isDepleted)?.age;
   const firstSustainedDeclineAge = findFirstSustainedDeclineAge(displayYears);
+  const effectiveStatePensionAge = statePensionAge
+    ?? displayYears.find((year) => year.statePensionIncome > 0)?.age;
   const milestones = createBalanceMilestones({
     displayYears,
-    statePensionAge,
+    statePensionAge: effectiveStatePensionAge,
     firstPressureAge,
     firstSustainedDeclineAge,
     firstDepletionAge,
