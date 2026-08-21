@@ -1,0 +1,19 @@
+.drawdown-balance-metrics > article.is-primary {
+  border-color: color-mix(in srgb, var(--status-good, var(--colour-success)) 46%, var(--colour-border));
+  background: color-mix(in srgb, var(--status-good, var(--colour-success)) 7%, var(--colour-surface));
+  box-shadow: inset 0 3px 0 color-mix(in srgb, var(--status-good, var(--colour-success)) 72%, transparent);
+}
+
+.drawdown-balance-metrics > article.is-primary > span {
+  color: var(--colour-text);
+  font-weight: 800;
+}
+
+.drawdown-balance-metrics > article.is-primary > strong {
+  color: var(--status-good, var(--colour-success));
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+}
+
+.drawdown-balance-story-note > strong {
+  color: var(--colour-text);
+}
