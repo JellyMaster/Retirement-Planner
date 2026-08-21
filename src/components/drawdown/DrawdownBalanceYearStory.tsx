@@ -7,7 +7,7 @@ import {
 } from "../../utils/drawdownDisplayValues";
 import { formatCurrency } from "../../utils/formatters";
 
-interface DrawdownBalanceYearStoryProps {
+interface BalanceTimelineProps {
   years: DrawdownYear[];
   inflationRate: number;
   displayMode: MoneyDisplayMode;
@@ -16,10 +16,127 @@ interface DrawdownBalanceYearStoryProps {
   statePensionAge?: number;
 }
 
+interface DrawdownBalanceYearStoryProps {
+  years: DrawdownYear[];
+  inflationRate: number;
+  displayMode: MoneyDisplayMode;
+  selectedAge: number;
+}
+
 interface BalanceMilestone {
   age: number;
   label: string;
   tone: "neutral" | "warning";
+}
+
+export function DrawdownBalanceAgeControl({
+  years,
+  inflationRate,
+  displayMode,
+  selectedAge,
+  onSelectAge,
+  statePensionAge,
+}: BalanceTimelineProps) {
+  const displayYears = useMemo(
+    () => getDisplayYears(years, inflationRate, displayMode),
+    [displayMode, inflationRate, years],
+  );
+  const selectedIndex = Math.max(
+    0,
+    displayYears.findIndex((year) => year.age === selectedAge),
+  );
+  const selected = displayYears[selectedIndex];
+
+  if (!selected) return null;
+
+  const firstPressureAge = displayYears.find(
+    (year) => year.pensionWithdrawal + year.fees > year.investmentGrowth,
+  )?.age;
+  const firstDepletionAge = displayYears.find((year) => year.isDepleted)?.age;
+  const firstSustainedDeclineAge = findFirstSustainedDeclineAge(displayYears);
+  const effectiveStatePensionAge =
+    statePensionAge ?? displayYears.find((year) => year.statePensionIncome > 0)?.age;
+  const milestones = createBalanceMilestones({
+    displayYears,
+    statePensionAge: effectiveStatePensionAge,
+    firstPressureAge,
+    firstSustainedDeclineAge,
+    firstDepletionAge,
+  });
+
+  return (
+    <section className="panel drawdown-balance-year-breakdown drawdown-balance-timeline-control" aria-labelledby="drawdown-balance-timeline-title">
+      <header className="drawdown-balance-year-heading">
+        <div>
+          <p className="panel-eyebrow">Explore the timeline</p>
+          <h3 id="drawdown-balance-timeline-title">Choose a year to understand</h3>
+          <p>
+            Move through retirement to update the waterfall below. Milestones show the
+            first year something important changes.
+          </p>
+        </div>
+      </header>
+
+      <div className="drawdown-balance-age-control">
+        <div className="drawdown-balance-age-control-heading">
+          <div>
+            <strong>Explore your pension through retirement</strong>
+            <span>Markers highlight the first year something important changes.</span>
+          </div>
+          {milestones.length > 0 && (
+            <div className="drawdown-balance-age-legend" aria-hidden="true">
+              <span><i /> Milestone</span>
+              <span><i className="is-warning" /> Needs attention</span>
+            </div>
+          )}
+        </div>
+
+        <div className="drawdown-balance-age-track-wrap">
+          <div className="drawdown-balance-age-markers" aria-label="Pension balance milestones">
+            {milestones.map((milestone) => {
+              const index = displayYears.findIndex((year) => year.age === milestone.age);
+              const position = displayYears.length <= 1
+                ? 0
+                : (index / (displayYears.length - 1)) * 100;
+
+              return (
+                <button
+                  key={`${milestone.age}-${milestone.label}`}
+                  type="button"
+                  className={`drawdown-balance-age-marker is-${milestone.tone}`}
+                  style={{ left: `${position}%` }}
+                  title={`Age ${milestone.age}: ${milestone.label}`}
+                  aria-label={`Age ${milestone.age}: ${milestone.label}`}
+                  onClick={() => onSelectAge(milestone.age)}
+                >
+                  <span />
+                </button>
+              );
+            })}
+          </div>
+
+          <input
+            type="range"
+            min={0}
+            max={Math.max(displayYears.length - 1, 0)}
+            step={1}
+            value={selectedIndex}
+            aria-label="Select retirement age for pension balance breakdown"
+            onChange={(event) => {
+              const year = displayYears[Number(event.target.value)];
+              if (year) onSelectAge(year.age);
+            }}
+          />
+        </div>
+
+        <div className="drawdown-balance-age-labels">
+          <span>Age {displayYears[0]?.age}</span>
+          <strong>Age {selected.age}</strong>
+          <span>Age {displayYears.at(-1)?.age}</span>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export function DrawdownBalanceYearStory({
@@ -27,8 +144,6 @@ export function DrawdownBalanceYearStory({
   inflationRate,
   displayMode,
   selectedAge,
-  onSelectAge,
-  statePensionAge,
 }: DrawdownBalanceYearStoryProps) {
   const displayYears = useMemo(
     () => getDisplayYears(years, inflationRate, displayMode),
@@ -50,89 +165,17 @@ export function DrawdownBalanceYearStory({
     (year) => year.pensionWithdrawal + year.fees > year.investmentGrowth,
   )?.age;
   const firstDepletionAge = displayYears.find((year) => year.isDepleted)?.age;
-  const firstSustainedDeclineAge = findFirstSustainedDeclineAge(displayYears);
-  const effectiveStatePensionAge =
-    statePensionAge ?? displayYears.find((year) => year.statePensionIncome > 0)?.age;
-  const milestones = createBalanceMilestones({
-    displayYears,
-    statePensionAge: effectiveStatePensionAge,
-    firstPressureAge,
-    firstSustainedDeclineAge,
-    firstDepletionAge,
-  });
 
   return (
     <section className="drawdown-balance-year-story" aria-labelledby="drawdown-balance-year-title">
       <div className="panel drawdown-balance-year-breakdown">
         <header className="drawdown-balance-year-heading">
           <div>
-            <p className="panel-eyebrow">Explore the timeline</p>
-            <h3 id="drawdown-balance-year-title">Choose a year to understand</h3>
-            <p>
-              Move through retirement to update the waterfall and explanation above.
-              Milestones show the first year something important changes.
-            </p>
+            <p className="panel-eyebrow">Why it changed</p>
+            <h3 id="drawdown-balance-year-title">What does this year mean?</h3>
+            <p>Age {selected.age} · {selected.year} · {displayMode === "today" ? "Today’s money" : "Future money"}</p>
           </div>
         </header>
-
-        <div className="drawdown-balance-age-control">
-          <div className="drawdown-balance-age-control-heading">
-            <div>
-              <strong>Explore your pension through retirement</strong>
-              <span>Markers highlight the first year something important changes.</span>
-            </div>
-            {milestones.length > 0 && (
-              <div className="drawdown-balance-age-legend" aria-hidden="true">
-                <span><i /> Milestone</span>
-                <span><i className="is-warning" /> Needs attention</span>
-              </div>
-            )}
-          </div>
-
-          <div className="drawdown-balance-age-track-wrap">
-            <div className="drawdown-balance-age-markers" aria-label="Pension balance milestones">
-              {milestones.map((milestone) => {
-                const index = displayYears.findIndex((year) => year.age === milestone.age);
-                const position = displayYears.length <= 1
-                  ? 0
-                  : (index / (displayYears.length - 1)) * 100;
-
-                return (
-                  <button
-                    key={`${milestone.age}-${milestone.label}`}
-                    type="button"
-                    className={`drawdown-balance-age-marker is-${milestone.tone}`}
-                    style={{ left: `${position}%` }}
-                    title={`Age ${milestone.age}: ${milestone.label}`}
-                    aria-label={`Age ${milestone.age}: ${milestone.label}`}
-                    onClick={() => onSelectAge(milestone.age)}
-                  >
-                    <span />
-                  </button>
-                );
-              })}
-            </div>
-
-            <input
-              type="range"
-              min={0}
-              max={Math.max(displayYears.length - 1, 0)}
-              step={1}
-              value={selectedIndex}
-              aria-label="Select retirement age for pension balance breakdown"
-              onChange={(event) => {
-                const year = displayYears[Number(event.target.value)];
-                if (year) onSelectAge(year.age);
-              }}
-            />
-          </div>
-
-          <div className="drawdown-balance-age-labels">
-            <span>Age {displayYears[0]?.age}</span>
-            <strong>Age {selected.age}</strong>
-            <span>Age {displayYears.at(-1)?.age}</span>
-          </div>
-        </div>
 
         <div className={`drawdown-balance-explanation ${balanceChange < 0 ? "is-neutral" : "is-positive"}`}>
           <strong>{balanceChange >= 0 ? "Your pension finished the year higher" : "Your pension reduced this year"}</strong>
