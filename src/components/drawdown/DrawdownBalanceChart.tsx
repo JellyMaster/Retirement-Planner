@@ -120,6 +120,7 @@ export function DrawdownBalanceChart({
           tone="opening"
           tooltipTitle="Starting pension balance"
           tooltipText="The pension balance available at the start of this retirement year, before this year’s investment growth, withdrawals and fees are applied."
+          tooltipAlign="left"
         />
 
         {movements.map((movement) => (
@@ -144,6 +145,7 @@ export function DrawdownBalanceChart({
               ? "The pension balance remaining at the end of this year, shown in today’s purchasing power. This becomes the starting balance for the next retirement year."
               : "The pension balance remaining at the end of this year. This becomes the starting balance for the next retirement year."
           }
+          tooltipAlign="right"
         />
       </div>
 
@@ -178,12 +180,14 @@ function WaterfallAnchor({
   tone,
   tooltipTitle,
   tooltipText,
+  tooltipAlign,
 }: {
   label: string;
   value: number;
   tone: "opening" | "closing";
   tooltipTitle: string;
   tooltipText: string;
+  tooltipAlign: "left" | "right";
 }) {
   return (
     <article className={`drawdown-balance-waterfall-step is-${tone}`}>
@@ -191,6 +195,7 @@ function WaterfallAnchor({
         label={label}
         tooltipTitle={tooltipTitle}
         tooltipText={tooltipText}
+        tooltipAlign={tooltipAlign}
       />
       <strong>{formatCurrency(value)}</strong>
       <div className="drawdown-balance-waterfall-anchor-bar" aria-hidden="true" />
@@ -238,15 +243,21 @@ function WaterfallStepLabel({
   label,
   tooltipTitle,
   tooltipText,
+  tooltipAlign = "right",
 }: {
   label: string;
   tooltipTitle: string;
   tooltipText: string;
+  tooltipAlign?: "left" | "right";
 }) {
   return (
     <div className="drawdown-balance-waterfall-step-label">
       <span>{label}</span>
-      <InfoTooltip ariaLabel={`Explain ${tooltipTitle.toLowerCase()}`} size="small">
+      <InfoTooltip
+        ariaLabel={`Explain ${tooltipTitle.toLowerCase()}`}
+        size="small"
+        align={tooltipAlign}
+      >
         <strong>{tooltipTitle}</strong>
         <p>{tooltipText}</p>
       </InfoTooltip>
