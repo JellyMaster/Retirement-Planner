@@ -100,6 +100,53 @@
   margin-top: var(--space-1);
 }
 
+.drawdown-assumption-reference-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  list-style: none;
+  cursor: pointer;
+}
+
+.drawdown-assumption-reference-summary::-webkit-details-marker {
+  display: none;
+}
+
+.drawdown-assumption-reference-summary::marker {
+  content: "";
+}
+
+.drawdown-assumption-reference-heading {
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.drawdown-assumption-reference-heading .panel-eyebrow,
+.drawdown-assumption-reference-heading strong,
+.drawdown-assumption-reference-heading small {
+  margin: 0;
+}
+
+.drawdown-assumption-reference-heading strong {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.drawdown-assumption-reference-heading small {
+  max-width: 72ch;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.drawdown-assumption-reference-summary .ui-expand-collapse-indicator {
+  flex: 0 0 auto;
+}
+
 .drawdown-assumption-reference-content {
   display: grid;
   gap: var(--space-4);
@@ -123,5 +170,14 @@
   .drawdown-assumption-group,
   .drawdown-assumption-education {
     padding: var(--space-4);
+  }
+
+  .drawdown-assumption-reference-summary {
+    align-items: flex-start;
+    padding: var(--space-4);
+  }
+
+  .drawdown-assumption-reference-content {
+    padding: 0 var(--space-4) var(--space-4);
   }
 }
