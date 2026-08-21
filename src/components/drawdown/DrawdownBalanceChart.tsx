@@ -28,6 +28,15 @@ export function DrawdownBalanceChart({
 
   if (!selected) return null;
 
+  const inflationEffect =
+    displayMode === "today"
+      ? selected.openingBalance
+        + selected.investmentGrowth
+        - selected.pensionWithdrawal
+        - selected.fees
+        - selected.closingBalance
+      : 0;
+
   const movements = [
     {
       key: "growth",
@@ -47,6 +56,16 @@ export function DrawdownBalanceChart({
       value: selected.fees,
       direction: "negative" as const,
     },
+    ...(displayMode === "today"
+      ? [
+          {
+            key: "inflation",
+            label: "Effect of inflation",
+            value: Math.abs(inflationEffect),
+            direction: inflationEffect >= 0 ? ("negative" as const) : ("positive" as const),
+          },
+        ]
+      : []),
   ];
   const largestMovement = Math.max(
     1,
@@ -75,7 +94,13 @@ export function DrawdownBalanceChart({
         </div>
       </div>
 
-      <div className="drawdown-balance-waterfall-flow">
+      <div
+        className={
+          displayMode === "today"
+            ? "drawdown-balance-waterfall-flow has-inflation-step"
+            : "drawdown-balance-waterfall-flow"
+        }
+      >
         <WaterfallAnchor
           label="Started the year with"
           value={selected.openingBalance}
@@ -99,6 +124,13 @@ export function DrawdownBalanceChart({
         />
       </div>
 
+      {displayMode === "today" && (
+        <p className="drawdown-balance-waterfall-inflation-note">
+          Today&apos;s money removes the effect of inflation. The inflation step bridges the
+          year&apos;s cash movements to the end-of-year balance in today&apos;s purchasing power.
+        </p>
+      )}
+
       <div
         className={`drawdown-balance-waterfall-result ${balanceChange >= 0 ? "is-positive" : "is-reducing"}`}
       >
@@ -109,7 +141,7 @@ export function DrawdownBalanceChart({
         </strong>
         <p>
           {balanceChange >= 0
-            ? "Your pension finished the year with more money than it started with."
+            ? "Your pension finished the year with more purchasing power than it started with."
             : "Your pension finished the year lower than it started. In retirement, that can be a normal part of using the money you have built up."}
         </p>
       </div>
