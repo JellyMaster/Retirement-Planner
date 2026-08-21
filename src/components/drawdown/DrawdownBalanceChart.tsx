@@ -4,6 +4,7 @@ import {
   type MoneyDisplayMode,
 } from "../../utils/drawdownDisplayValues";
 import { formatCurrency } from "../../utils/formatters";
+import { InfoTooltip } from "../ui";
 
 interface DrawdownBalanceChartProps {
   years: DrawdownYear[];
@@ -43,18 +44,27 @@ export function DrawdownBalanceChart({
       label: "Investment growth",
       value: selected.investmentGrowth,
       direction: "positive" as const,
+      tooltipTitle: "Investment growth",
+      tooltipText:
+        "The amount your pension is projected to gain from investment returns during this year. It increases the pension balance.",
     },
     {
       key: "withdrawal",
       label: "Money taken out",
       value: selected.pensionWithdrawal,
       direction: "negative" as const,
+      tooltipTitle: "Money taken out",
+      tooltipText:
+        "The amount withdrawn from your private pension to support your retirement income during this year. It reduces the pension balance.",
     },
     {
       key: "fees",
       label: "Fees",
       value: selected.fees,
       direction: "negative" as const,
+      tooltipTitle: "Fees",
+      tooltipText:
+        "The estimated pension and investment charges applied during this year. Fees are paid from the pension and reduce the balance.",
     },
     ...(displayMode === "today"
       ? [
@@ -63,6 +73,9 @@ export function DrawdownBalanceChart({
             label: "Effect of inflation",
             value: Math.abs(inflationEffect),
             direction: inflationEffect >= 0 ? ("negative" as const) : ("positive" as const),
+            tooltipTitle: "Effect of inflation",
+            tooltipText:
+              "Today’s money adjusts the end-of-year balance for the loss of purchasing power caused by inflation. This does not represent money leaving your pension; it shows what the future balance is worth in today’s terms.",
           },
         ]
       : []),
@@ -105,6 +118,8 @@ export function DrawdownBalanceChart({
           label="Started the year with"
           value={selected.openingBalance}
           tone="opening"
+          tooltipTitle="Starting pension balance"
+          tooltipText="The pension balance available at the start of this retirement year, before this year’s investment growth, withdrawals and fees are applied."
         />
 
         {movements.map((movement) => (
@@ -114,6 +129,8 @@ export function DrawdownBalanceChart({
             value={movement.value}
             direction={movement.direction}
             width={(Math.abs(movement.value) / largestMovement) * 100}
+            tooltipTitle={movement.tooltipTitle}
+            tooltipText={movement.tooltipText}
           />
         ))}
 
@@ -121,6 +138,12 @@ export function DrawdownBalanceChart({
           label="Finished the year with"
           value={selected.closingBalance}
           tone="closing"
+          tooltipTitle="Ending pension balance"
+          tooltipText={
+            displayMode === "today"
+              ? "The pension balance remaining at the end of this year, shown in today’s purchasing power. This becomes the starting balance for the next retirement year."
+              : "The pension balance remaining at the end of this year. This becomes the starting balance for the next retirement year."
+          }
         />
       </div>
 
@@ -153,14 +176,22 @@ function WaterfallAnchor({
   label,
   value,
   tone,
+  tooltipTitle,
+  tooltipText,
 }: {
   label: string;
   value: number;
   tone: "opening" | "closing";
+  tooltipTitle: string;
+  tooltipText: string;
 }) {
   return (
     <article className={`drawdown-balance-waterfall-step is-${tone}`}>
-      <span>{label}</span>
+      <WaterfallStepLabel
+        label={label}
+        tooltipTitle={tooltipTitle}
+        tooltipText={tooltipText}
+      />
       <strong>{formatCurrency(value)}</strong>
       <div className="drawdown-balance-waterfall-anchor-bar" aria-hidden="true" />
     </article>
@@ -172,17 +203,26 @@ function WaterfallMovement({
   value,
   direction,
   width,
+  tooltipTitle,
+  tooltipText,
 }: {
   label: string;
   value: number;
   direction: "positive" | "negative";
   width: number;
+  tooltipTitle: string;
+  tooltipText: string;
 }) {
   const safeWidth = Math.max(8, Math.min(100, width));
+  const signedLabel = `${direction === "positive" ? "+" : "−"} ${label}`;
 
   return (
     <article className={`drawdown-balance-waterfall-step is-${direction}`}>
-      <span>{direction === "positive" ? "+" : "−"} {label}</span>
+      <WaterfallStepLabel
+        label={signedLabel}
+        tooltipTitle={tooltipTitle}
+        tooltipText={tooltipText}
+      />
       <strong>
         {direction === "positive" ? "+" : "−"}
         {formatCurrency(Math.abs(value))}
@@ -191,5 +231,25 @@ function WaterfallMovement({
         <div style={{ width: `${safeWidth}%` }} />
       </div>
     </article>
+  );
+}
+
+function WaterfallStepLabel({
+  label,
+  tooltipTitle,
+  tooltipText,
+}: {
+  label: string;
+  tooltipTitle: string;
+  tooltipText: string;
+}) {
+  return (
+    <div className="drawdown-balance-waterfall-step-label">
+      <span>{label}</span>
+      <InfoTooltip ariaLabel={`Explain ${tooltipTitle.toLowerCase()}`} size="small">
+        <strong>{tooltipTitle}</strong>
+        <p>{tooltipText}</p>
+      </InfoTooltip>
+    </div>
   );
 }
