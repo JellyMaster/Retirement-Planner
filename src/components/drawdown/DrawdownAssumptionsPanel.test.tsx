@@ -25,10 +25,10 @@ describe("DrawdownAssumptionsPanel", () => {
     render(<DrawdownAssumptionsPanel inputs={inputs} displayMode="today" />);
 
     expect(screen.getByText("Your retirement plan")).toBeInTheDocument();
+    expect(screen.getByText("Understanding the illustration")).toBeInTheDocument();
+    expect(screen.getByText("How to understand your results")).toBeInTheDocument();
     expect(screen.getByText("Investment assumptions")).toBeInTheDocument();
     expect(screen.getByText("Tax assumptions")).toBeInTheDocument();
-    expect(screen.getByText("Understanding the illustration")).toBeInTheDocument();
-    expect(screen.getByText("How to read the results")).toBeInTheDocument();
   });
 
   it("explains the assumptions in plain English", () => {
