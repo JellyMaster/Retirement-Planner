@@ -29,7 +29,7 @@ export function DrawdownInsights({ inputs, result, displayMode }: DrawdownInsigh
       <div className="panel-heading dashboard-panel-heading">
         <div>
           <p className="panel-eyebrow">At a glance</p>
-          <h2 id="drawdown-insights-heading">Key observations</h2>
+          <h2 id="drawdown-insights-heading">What your plan is telling you</h2>
         </div>
         <span className="drawdown-insights-money-basis">
           {displayMode === "today" ? "Today’s money" : "Future money"}
@@ -38,29 +38,29 @@ export function DrawdownInsights({ inputs, result, displayMode }: DrawdownInsigh
       <ul className="insights-list">
         <Insight
           status={result.depletionAge === null ? "positive" : "warning"}
-          title={result.depletionAge === null ? "Pension lasts throughout the plan" : `Pension depletes at age ${result.depletionAge}`}
-          warningReason={result.depletionAge === null ? undefined : `Based on your current assumptions, your pension is projected to run out at age ${result.depletionAge}, before the end of your planning period.`}
+          title={result.depletionAge === null ? `Your pension is expected to last through age ${inputs.endAge}` : `Your pension is expected to run out around age ${result.depletionAge}`}
+          warningReason={result.depletionAge === null ? undefined : `Based on your current assumptions, your pension is expected to be exhausted around age ${result.depletionAge}. If this happened, you would need another source of income to continue meeting your planned spending.`}
           warningActions={result.depletionAge === null ? undefined : [
-            "Retirement income target",
-            "Retirement age",
-            "Tax-free cash amount",
-            "Withdrawal strategy",
+            "Your planned retirement income",
+            "When you retire",
+            "How much tax-free cash you take",
+            "How you take money from your pension",
           ]}
         />
         <Insight
           status={shortfallAge === null ? "positive" : "warning"}
-          title={shortfallAge === null ? "Income target is fully funded" : `First income shortfall at age ${shortfallAge}`}
-          warningReason={shortfallAge === null ? undefined : `Based on your current assumptions, your pension can no longer fully provide your chosen retirement income from age ${shortfallAge}. This does not mean your pension has run out — it means the amount available to spend would fall below your target unless something changes.`}
+          title={shortfallAge === null ? "Your planned income is fully supported" : `Your planned income may no longer be fully achievable from age ${shortfallAge}`}
+          warningReason={shortfallAge === null ? undefined : `Your pension is still expected to have money remaining, but it may not be able to provide the level of income you've chosen from age ${shortfallAge}. This is different from your pension running out completely.`}
           warningActions={shortfallAge === null ? undefined : [
-            "Retirement income target",
-            "Retirement age",
-            "Tax-free cash amount",
-            "Withdrawal strategy",
+            "Your planned retirement income",
+            "When you retire",
+            "How much tax-free cash you take",
+            "How you take money from your pension",
           ]}
         />
-        <Insight title={`${formatPercentage(result.averageEffectiveTaxRate)} average effective tax rate`} />
-        <Insight title={`${formatCurrency(display.totalIncomeTax)} projected lifetime income tax`} />
-        <Insight title={`${formatCurrency(display.finalBalance)} remaining at planning age`} />
+        <Insight title={`${formatPercentage(result.averageEffectiveTaxRate)} of your gross retirement income is paid in tax on average`} />
+        <Insight title={`${formatCurrency(display.totalIncomeTax)} estimated tax across the illustration`} />
+        <Insight title={`${formatCurrency(display.finalBalance)} could be left in your pension at age ${inputs.endAge}`} />
       </ul>
     </section>
   );
