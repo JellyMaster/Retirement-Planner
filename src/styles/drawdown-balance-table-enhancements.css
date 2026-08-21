@@ -1,0 +1,52 @@
+.drawdown-balance-age-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  line-height: 1;
+}
+
+.drawdown-balance-age-cell .projection-age {
+  display: inline;
+  line-height: 1;
+}
+
+.drawdown-balance-current-indicator {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  color: var(--colour-primary);
+  font-size: 0.75rem;
+  line-height: 1;
+  opacity: 0.72;
+}
+
+.drawdown-balance-current-indicator:hover {
+  opacity: 1;
+}
+
+.drawdown-balance-change {
+  display: inline-grid;
+  gap: 0.1rem;
+  justify-items: end;
+  line-height: 1.15;
+}
+
+.drawdown-balance-change > strong {
+  font: inherit;
+  font-weight: 700;
+}
+
+.drawdown-balance-change > small {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+}
+
+.drawdown-balance-change.is-positive > small {
+  color: var(--status-good, var(--colour-success));
+}
+
+.drawdown-balance-change.is-reducing > small {
+  color: var(--status-warning-text, var(--colour-warning-text));
+}
