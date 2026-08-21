@@ -6,11 +6,7 @@
 
 # Release Philosophy
 
-Polaris follows **Semantic Versioning (SemVer)**.
-
-```text
-MAJOR.MINOR.PATCH
-```
+Polaris follows **Semantic Versioning (SemVer)** using `MAJOR.MINOR.PATCH`.
 
 Patch releases contain bug fixes, minor releases add compatible features, and major releases are reserved for larger behavioural or architectural changes.
 
@@ -18,126 +14,117 @@ Patch releases contain bug fixes, minor releases add compatible features, and ma
 
 # Current Stable Release
 
-# Version 1.1.0
+# Version 1.2.0
 
-**Release Date**
-
-19 August 2026
-
-**Status**
-
-✅ Stable
+**Release Date:** 21 August 2026  
+**Status:** ✅ Stable candidate / ready for release verification
 
 ## Theme
 
-**Retirement Journey and Income Strategy**
+**Educational Drawdown Workspace**
 
-Version 1.1.0 makes the planning journey easier to understand and improves how retirement-income choices are carried through the Overview and drawdown experience.
+Version 1.2.0 completes a major redesign of Drawdown so users can understand where retirement money comes from, why the pension changes, which moments matter and how the underlying calculations should be interpreted.
 
 ## Highlights
 
-### Simpler plan creation
+### Simple Drawdown
 
-- Essential and Advanced plan sections
-- Retirement-income goal set by a custom amount or Retirement Living Standards
-- Minimum, Moderate and Comfortable lifestyle choices
-- Plan-name editing in My Plan
-- Clearer future-saving controls and advanced-change summaries
+- Plain-English retirement story
+- Important observations worth reviewing
+- Clear explanation of private pension and State Pension income
+- Today's Money / Future Money display choices
+- Educational illustration guidance and persistent disclaimer
 
-### Question-led retirement strategy
+### Detailed Income
 
-- Stable income or Flexible income
-- Consistent spending or different retirement stages
-- Clear State Pension and tax-free cash choices
-- Support for target-income, percentage-withdrawal and tiered spending strategies
+- Income-through-retirement explorer
+- Selected-year explanation and retirement milestones
+- Plain-English income labels
+- Expandable income-by-year reference
 
-### Retirement journey visualisation
+### Detailed Balance
 
-- Pension journey from the current age through the full planning age
-- £100k, £250k, £500k, £1m and larger reached milestones
-- Retirement, tax-free cash, State Pension, spending-change and plan-age events
-- Interactive event explanations using the active plan
-- Consistent today's-money treatment before and after retirement
+- Balance waterfall showing growth, money taken out, fees and inflation context
+- Withdrawal-rate and growth-coverage explanations
+- Year movement and next-year context
+- Pension longevity summary
+- Expandable balance-by-year reference
 
-### Overview improvements
+### Retirement Journey
 
-- Successfully Funded, Needs Attention, Needs Urgent Attention and incomplete-plan states
-- Cleaner retirement facts and income summaries
-- Strategy-aware plan-choice badges
-- Retirement Living Standards displayed as Lifestyle · Minimum / Moderate / Comfortable
-- Improved handling of zero and incomplete projections
+- Replaces the old technical Timeline presentation
+- Important retirement moments shown as a journey
+- Compact journey summary
+- Optional retirement-by-year reference with filtering and pagination
+
+### How it works
+
+- Replaces the user-facing Assumptions label while preserving the existing route
+- Explains the choices taken from My Plan
+- Explains Today's Money, Future Money and illustration-versus-prediction concepts
+- Separates investment estimates and tax estimates
+- Keeps the detailed yearly calculation method available as an optional reference
+
+### Language and design
+
+- Consistent plain-English terminology across Detailed Drawdown
+- Progressive disclosure keeps technical information available without overwhelming the main experience
+- Improved responsive layout, disclosure styling and accessibility
+- Removed obsolete reserve-goal output from Balance
 
 ### Engineering and quality
 
-- Safer scenario-storage normalisation and legacy-plan handling
-- React state-flow and TypeScript fixes from the release-hardening pass
-- Updated accessible chart/event tests and retirement-strategy deep links
-- Full release verification completed with lint, type checking, automated tests and production build
+- Expanded component and financial-validation tests
+- Backward-compatible query navigation after tab renames
+- Strict TypeScript hardening for balance movement data
+- Full local release gate remains `npm run verify`
 
 ---
 
-# Previous Stable Release
+# Previous Stable Releases
+
+## Version 1.1.0
+
+**Release Date:** 19 August 2026  
+**Status:** Superseded by 1.2.0
+
+### Theme
+
+**Retirement Journey and Income Strategy**
+
+Version 1.1.0 introduced Essential and Advanced planning, Retirement Living Standards, question-led retirement strategy, improved Overview funding states and the full pension journey chart.
+
+---
 
 ## Version 1.0.0
 
 **Release Date:** 2 August 2026  
-**Status:** Superseded by 1.1.0
+**Status:** Superseded
 
 ### Theme
 
 **Complete Retirement Planning**
 
-Version 1.0.0 was the first stable public release and established the core Polaris platform.
-
-Its major capabilities included:
-
-- Guided retirement planning
-- Pension projections and contribution modelling
-- Retirement income and spending phases
-- Tax-free cash and State Pension modelling
-- What If? experiments
-- Multiple scenarios and comparison
-- Drawdown planning and sustainability analysis
-- Explore learning content
-- Personalised Guidance
-- Responsive layouts and Dark Mode
-- Shared scenario architecture and comprehensive automated testing
+Version 1.0.0 established the core Polaris platform: guided planning, projections, State Pension, tax-free cash, scenario management, comparison, Drawdown, Decision Lab, Explore, Guidance, responsive design and Dark Mode.
 
 ---
 
 # Planned Releases
 
-## Version 1.2
-
-### Theme
-
-**Strategy-aware decision support**
-
-Focus areas:
-
-- Compare retirement outcomes, not only accumulation outcomes
-- Expand What If? with retirement-strategy and ending-pot experiments
-- Make Drawdown more explanatory and reduce configuration duplication
-- Make Explore fully aware of Stable, Flexible and lifestyle-based strategies
-- Continue Guidance wording and decision-support improvements
-- PDF retirement reports and richer printable summaries
-
-**Status:** Planned
-
----
-
 ## Version 1.3
 
 ### Theme
 
-**Connected Data**
+**Connected Data and Reporting**
 
-Focus areas:
+Potential focus areas:
 
 - Local database support
-- Import / Export
+- Import / export
 - Version history
 - Autosave and offline persistence
+- Printable retirement summaries
+- PDF retirement reports
 
 **Status:** Planned
 
@@ -163,13 +150,12 @@ Future vision:
 
 # Version Support
 
-Only the latest stable version is actively developed.
-
 | Version | Status |
 |---|---|
-| 1.1.0 | ✅ Current |
+| 1.2.0 | ✅ Current |
+| 1.1.0 | Previous stable release |
 | 1.0.0 | Previous stable release |
-| 1.2+ | 🚧 Planned |
+| 1.3+ | 🚧 Planned |
 
 ---
 
@@ -178,10 +164,8 @@ Only the latest stable version is actively developed.
 Every Polaris release should include:
 
 - Updated version metadata
-- Updated changelog and release history
-- Successful lint and type checking
-- Successful automated tests
-- Successful production build
+- Updated README, changelog, roadmap and release history
+- Successful `npm run verify`
 - Deployment smoke test
 - Version tag
 - GitHub Release
@@ -189,5 +173,5 @@ Every Polaris release should include:
 ---
 
 **Polaris Retirement Planner**  
-Current stable release: **Version 1.1.0**  
-Released **19 August 2026**
+Current release: **Version 1.2.0**  
+Release date: **21 August 2026**
