@@ -72,11 +72,8 @@ export function DrawdownBalanceAgeControl({
       <div className="drawdown-balance-age-control">
         <div className="drawdown-balance-age-control-heading">
           <div>
-            <strong id="drawdown-balance-timeline-title">Choose a year to understand</strong>
-            <span>
-              Move through retirement to update the waterfall. Markers highlight the first
-              year something important changes.
-            </span>
+            <strong id="drawdown-balance-timeline-title">Choose an age</strong>
+            <span>Move through retirement or select a milestone to see what changed.</span>
           </div>
         </div>
 
