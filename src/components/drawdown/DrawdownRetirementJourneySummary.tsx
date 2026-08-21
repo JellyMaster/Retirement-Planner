@@ -1,6 +1,5 @@
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
-import { formatCurrency } from "../../utils/formatters";
 
 interface DrawdownRetirementJourneySummaryProps {
   inputs: DrawdownInputs;
@@ -19,12 +18,8 @@ export function DrawdownRetirementJourneySummary({
   result,
 }: DrawdownRetirementJourneySummaryProps) {
   const milestones = createJourneyMilestones(inputs, result);
-  const firstSpendingChange = inputs.spendingPhases?.find(
-    (phase) => phase.startAge > inputs.retirementAge,
-  );
   const firstIncomeConcernAge =
     result.firstNetIncomeShortfallAge ?? result.firstShortfallAge;
-  const finalBalance = result.years.at(-1)?.closingBalance ?? result.finalBalance;
 
   return (
     <section
@@ -38,8 +33,8 @@ export function DrawdownRetirementJourneySummary({
             The important moments in your retirement
           </h2>
           <p>
-            Retirement is rarely one identical year after another. These milestones show
-            when the way your plan works changes and why those points are worth noticing.
+            See the points where your retirement plan changes, from your first year of
+            retirement through to the end of the period you are planning for.
           </p>
         </div>
       </header>
@@ -63,67 +58,46 @@ export function DrawdownRetirementJourneySummary({
         ))}
       </div>
 
-      <div className="drawdown-retirement-journey-questions">
+      <div className="drawdown-retirement-journey-questions" aria-label="Key retirement journey answers">
         <JourneyAnswer
-          label="When does retirement begin?"
+          label="Retirement starts"
           value={`Age ${inputs.retirementAge}`}
-          detail="This is the first year shown in your retirement plan."
           tone="neutral"
         />
         <JourneyAnswer
-          label="When does State Pension begin helping?"
+          label="State Pension starts"
           value={
             inputs.annualStatePension > 0
               ? `Age ${inputs.statePensionAge}`
               : "Not included"
           }
-          detail={
-            inputs.annualStatePension > 0
-              ? "From this point, less of your income may need to come from your private pension."
-              : "Your illustration currently relies on the other income sources in your plan."
-          }
           tone="neutral"
         />
         <JourneyAnswer
-          label="When does planned spending first change?"
-          value={firstSpendingChange ? `Age ${firstSpendingChange.startAge}` : "No change planned"}
-          detail={
-            firstSpendingChange
-              ? `${firstSpendingChange.label} begins here.`
-              : "The same planned income is used throughout retirement."
-          }
-          tone="neutral"
-        />
-        <JourneyAnswer
-          label="Is your planned income fully met?"
-          value={firstIncomeConcernAge === null ? "Throughout the plan" : `Until age ${firstIncomeConcernAge}`}
-          detail={
-            firstIncomeConcernAge === null
-              ? "The illustration provides the planned income throughout the period shown."
-              : "From this age, the amount available is below the income in your plan."
-          }
-          tone={firstIncomeConcernAge === null ? "positive" : "warning"}
-        />
-        <JourneyAnswer
-          label="Does your private pension last?"
-          value={result.depletionAge === null ? `Through age ${inputs.endAge}` : `Until age ${result.depletionAge}`}
-          detail={
+          label="Private pension lasts"
+          value={
             result.depletionAge === null
-              ? `${formatCurrency(finalBalance)} remains at the end of the plan.`
-              : "The private pension is fully used before the end of the planning period."
+              ? `Through age ${inputs.endAge}`
+              : `Until age ${result.depletionAge}`
           }
           tone={result.depletionAge === null ? "positive" : "warning"}
         />
+        <JourneyAnswer
+          label="Planned income"
+          value={
+            firstIncomeConcernAge === null
+              ? "Met throughout"
+              : `Below plan from age ${firstIncomeConcernAge}`
+          }
+          tone={firstIncomeConcernAge === null ? "positive" : "warning"}
+        />
       </div>
 
-      <aside className="drawdown-retirement-journey-note">
-        <strong>What does this journey tell you?</strong>
-        <p>
-          The important part is not that every year looks the same. It is understanding
-          when your income sources, spending needs or pension position change, and whether
-          the plan continues to support the retirement you have described.
-        </p>
-      </aside>
+      <p className="drawdown-retirement-journey-note">
+        Retirement does not usually change in exactly the same way every year. This journey
+        highlights the key moments where your income or pension changes so you can see how
+        your plan evolves over time.
+      </p>
     </section>
   );
 }
@@ -144,7 +118,7 @@ function createJourneyMilestones(
   add({
     age: inputs.retirementAge,
     title: "Your retirement begins",
-    description: "Your private pension starts supporting the retirement income in this plan.",
+    description: "Your private pension starts providing your planned retirement income.",
     tone: "neutral",
   });
 
@@ -152,7 +126,7 @@ function createJourneyMilestones(
     add({
       age: inputs.statePensionAge,
       title: "Your State Pension begins",
-      description: "Part of your retirement income now comes from the State Pension, which can reduce how much needs to come from your private pension.",
+      description: "Your State Pension starts, reducing how much may need to come from your private pension.",
       tone: "positive",
     });
   }
@@ -163,7 +137,7 @@ function createJourneyMilestones(
       add({
         age: phase.startAge,
         title: "Your planned spending changes",
-        description: `${phase.label} begins, so the amount of income your plan is trying to provide changes from this point.`,
+        description: `${phase.label} begins and the income your plan aims to provide changes.`,
         tone: "neutral",
       });
     });
@@ -174,7 +148,7 @@ function createJourneyMilestones(
     add({
       age: firstIncomeConcernAge,
       title: "Your planned income is no longer fully met",
-      description: "The plan continues to provide income, but the amount available from this point is below the level you planned for.",
+      description: "The amount available from this point is below the income you planned for.",
       tone: "warning",
     });
   }
@@ -183,7 +157,7 @@ function createJourneyMilestones(
     add({
       age: result.depletionAge,
       title: "Your private pension has been fully used",
-      description: "After this point, retirement income depends on the other income sources included in your plan.",
+      description: "Income after this point depends on the other sources included in your plan.",
       tone: "warning",
     });
   }
@@ -191,7 +165,7 @@ function createJourneyMilestones(
   add({
     age: inputs.endAge,
     title: "Your planning period ends",
-    description: "This is the final age included in the retirement illustration.",
+    description: "Your illustrated retirement journey finishes here.",
     tone: "neutral",
   });
 
@@ -207,19 +181,16 @@ function tonePriority(tone: JourneyMilestone["tone"]) {
 function JourneyAnswer({
   label,
   value,
-  detail,
   tone,
 }: {
   label: string;
   value: string;
-  detail: string;
   tone: "neutral" | "positive" | "warning";
 }) {
   return (
     <article className={`drawdown-retirement-journey-answer is-${tone}`}>
       <span>{label}</span>
       <strong>{value}</strong>
-      <small>{detail}</small>
     </article>
   );
 }
