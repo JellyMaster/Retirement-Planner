@@ -5,7 +5,7 @@ import {
   getDisplayYears,
   type MoneyDisplayMode,
 } from "../../utils/drawdownDisplayValues";
-import { formatCurrency } from "../../utils/formatters";
+import { formatCurrency, formatPercentage } from "../../utils/formatters";
 
 interface DrawdownBalanceStoryProps {
   inputs: DrawdownInputs;
@@ -34,8 +34,16 @@ export function DrawdownBalanceStory({
     year.closingBalance < best.closingBalance ? year : best,
   );
   const finalBalance = years.at(-1)?.closingBalance ?? result.finalBalance;
+  const retirementOpeningBalance = years[0]?.openingBalance ?? 0;
+  const remainingShare = retirementOpeningBalance > 0
+    ? finalBalance / retirementOpeningBalance
+    : 0;
   const reserveTarget = getReserveTarget(inputs, drawdown);
   const meetsReserveTarget = reserveTarget === null || finalBalance >= reserveTarget;
+  const reserveAchievement = reserveTarget !== null && reserveTarget > 0
+    ? finalBalance / reserveTarget
+    : null;
+  const lowestIsFinalYear = lowest.age === years.at(-1)?.age;
 
   return (
     <section className="drawdown-balance-story" aria-labelledby="drawdown-balance-story-title">
@@ -60,19 +68,25 @@ export function DrawdownBalanceStory({
         <Metric
           label="When does the balance first fall?"
           value={firstFallingYear ? `Age ${firstFallingYear.age}` : "Not in this plan"}
-          detail={firstFallingYear ? "This is the first year the pension ends lower than it started." : "The illustrated balance does not finish a year lower than it started."}
+          detail={firstFallingYear
+            ? "This is the first year the pension ends lower than it started. A falling balance can be a normal part of funding retirement."
+            : "The illustrated balance does not finish a year lower than it started."}
           tone="neutral"
         />
         <Metric
           label="Lowest projected balance"
           value={formatCurrency(lowest.closingBalance)}
-          detail={`At age ${lowest.age}.`}
+          detail={lowestIsFinalYear
+            ? `Reached at age ${lowest.age}, at the end of the plan.`
+            : `Reached at age ${lowest.age}; the projected balance is higher again later in the plan.`}
           tone={lowest.closingBalance > 0 ? "neutral" : "warning"}
         />
         <Metric
           label="Balance at the end of the plan"
           value={formatCurrency(finalBalance)}
-          detail={`At age ${inputs.endAge}.`}
+          detail={retirementOpeningBalance > 0
+            ? `${formatPercentage(remainingShare)} of the pension available at retirement remains at age ${inputs.endAge}.`
+            : `At age ${inputs.endAge}.`}
           tone={finalBalance > 0 ? "positive" : "warning"}
         />
       </div>
@@ -89,8 +103,12 @@ export function DrawdownBalanceStory({
           </div>
           <p>
             {meetsReserveTarget
-              ? "The current illustration finishes at or above the amount you asked to keep in the pension."
-              : `The current illustration finishes ${formatCurrency(reserveTarget - finalBalance)} below the amount you asked to keep.`}
+              ? reserveAchievement === null
+                ? "The current illustration finishes at or above the amount you asked to keep in the pension."
+                : `The current illustration meets ${formatPercentage(reserveAchievement)} of your ending-balance goal and finishes at or above the amount you asked to keep.`
+              : reserveAchievement === null
+                ? `The current illustration finishes ${formatCurrency(reserveTarget - finalBalance)} below your target reserve.`
+                : `The current illustration keeps ${formatPercentage(reserveAchievement)} of your target reserve and finishes ${formatCurrency(reserveTarget - finalBalance)} below the goal.`}
           </p>
         </div>
       )}
