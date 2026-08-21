@@ -1,118 +1,163 @@
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-
 import type { DrawdownYear } from "../../engine/drawdown";
-import type { DrawdownSpendingPhase } from "../../engine/drawdown/models/DrawdownInputs";
-import { useChartTheme } from "../../theme/useChartTheme";
-import { getDisplayYears, type MoneyDisplayMode } from "../../utils/drawdownDisplayValues";
 import {
-  formatCompactCurrency,
-  formatCurrency,
-} from "../../utils/formatters";
+  getDisplayYears,
+  type MoneyDisplayMode,
+} from "../../utils/drawdownDisplayValues";
+import { formatCurrency } from "../../utils/formatters";
 
 interface DrawdownBalanceChartProps {
   years: DrawdownYear[];
   depletionAge: number | null;
   inflationRate: number;
   displayMode: MoneyDisplayMode;
-  spendingPhases: DrawdownSpendingPhase[] | undefined;
-  statePensionAge: number | undefined;
   selectedAge?: number;
   onSelectAge?: (age: number) => void;
 }
 
-interface ChartDataPoint {
-  age: number;
-  openingBalance: number;
-  closingBalance: number;
-}
-
 export function DrawdownBalanceChart({
   years,
-  depletionAge,
   inflationRate,
   displayMode,
-  spendingPhases,
-  statePensionAge,
   selectedAge,
-  onSelectAge,
 }: DrawdownBalanceChartProps) {
-  const chartColours = useChartTheme();
-
   if (years.length === 0) return null;
 
-  const chapters = spendingPhases ?? [];
   const displayYears = getDisplayYears(years, inflationRate, displayMode);
-  const chartData: ChartDataPoint[] = displayYears.map((year) => ({
-    age: year.age,
-    openingBalance: year.openingBalance,
-    closingBalance: year.closingBalance,
-  }));
+  const selected =
+    displayYears.find((year) => year.age === selectedAge) ?? displayYears[0];
+
+  if (!selected) return null;
+
+  const movements = [
+    {
+      key: "growth",
+      label: "Investment growth",
+      value: selected.investmentGrowth,
+      direction: "positive" as const,
+    },
+    {
+      key: "withdrawal",
+      label: "Money taken out",
+      value: selected.pensionWithdrawal,
+      direction: "negative" as const,
+    },
+    {
+      key: "fees",
+      label: "Fees",
+      value: selected.fees,
+      direction: "negative" as const,
+    },
+  ];
+  const largestMovement = Math.max(
+    1,
+    ...movements.map((movement) => Math.abs(movement.value)),
+  );
+  const balanceChange = selected.closingBalance - selected.openingBalance;
 
   return (
-    <section className="panel drawdown-chart-panel">
-      <div className="panel-heading">
-        <h2>Your pension through retirement</h2>
+    <section className="panel drawdown-balance-waterfall" aria-labelledby="drawdown-balance-waterfall-title">
+      <div className="panel-heading drawdown-balance-waterfall-heading">
+        <div>
+          <p className="panel-eyebrow">Balance movement</p>
+          <h2 id="drawdown-balance-waterfall-title">
+            What changed your pension this year?
+          </h2>
+          <p>
+            Follow the money from the start of age {selected.age} to the end of the year.
+            The middle bars are scaled against each other so you can quickly compare what
+            moved the balance.
+          </p>
+        </div>
+        <div className="drawdown-balance-waterfall-age" aria-label={`Selected age ${selected.age}`}>
+          <span>Selected age</span>
+          <strong>{selected.age}</strong>
+          <small>{selected.year}</small>
+        </div>
+      </div>
+
+      <div className="drawdown-balance-waterfall-flow">
+        <WaterfallAnchor
+          label="Started the year with"
+          value={selected.openingBalance}
+          tone="opening"
+        />
+
+        {movements.map((movement) => (
+          <WaterfallMovement
+            key={movement.key}
+            label={movement.label}
+            value={movement.value}
+            direction={movement.direction}
+            width={(Math.abs(movement.value) / largestMovement) * 100}
+          />
+        ))}
+
+        <WaterfallAnchor
+          label="Finished the year with"
+          value={selected.closingBalance}
+          tone="closing"
+        />
+      </div>
+
+      <div
+        className={`drawdown-balance-waterfall-result ${balanceChange >= 0 ? "is-positive" : "is-reducing"}`}
+      >
+        <span>Overall change</span>
+        <strong>
+          {balanceChange >= 0 ? "+" : "−"}
+          {formatCurrency(Math.abs(balanceChange))}
+        </strong>
         <p>
-          Track the pension left at the start and end of each year. Select a point on the chart to inspect what changed in that retirement year. Values are shown in {displayMode === "today" ? "today&apos;s money" : "future money"}.
+          {balanceChange >= 0
+            ? "Your pension finished the year with more money than it started with."
+            : "Your pension finished the year lower than it started. In retirement, that can be a normal part of using the money you have built up."}
         </p>
       </div>
-
-      <div className="drawdown-chart">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={chartData}
-            margin={{ top: 28, right: 20, bottom: 10, left: 10 }}
-            onClick={(state) => {
-              if (!onSelectAge || state?.activeLabel === undefined || state?.activeLabel === null) return;
-              const age = Number(state.activeLabel);
-              if (Number.isFinite(age)) onSelectAge(age);
-            }}
-          >
-            <CartesianGrid stroke={chartColours.grid} strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="age" tickLine={false} tick={{ fill: chartColours.text }} axisLine={false} label={{ value: "Age", position: "insideBottom", offset: -5, fill: chartColours.text }} />
-            <YAxis tickLine={false} tick={{ fill: chartColours.text }} axisLine={false} width={85} tickFormatter={formatCompactCurrency} />
-            <Tooltip
-              cursor={{ stroke: chartColours.cursor }}
-              contentStyle={{ backgroundColor: chartColours.tooltipBackground, border: `1px solid ${chartColours.tooltipBorder}`, borderRadius: "0.5rem", color: chartColours.tooltipText }}
-              labelStyle={{ color: chartColours.tooltipText }}
-              itemStyle={{ color: chartColours.tooltipText }}
-              formatter={(value, name) => {
-                const rawValue = Array.isArray(value) ? value[0] : value;
-                const numericValue = Number(rawValue ?? 0);
-                return [formatCurrency(Number.isFinite(numericValue) ? numericValue : 0), name];
-              }}
-              labelFormatter={(age) => `Age ${String(age)}`}
-            />
-            <Legend wrapperStyle={{ color: chartColours.text }} />
-
-            {selectedAge !== undefined && (
-              <ReferenceLine x={selectedAge} stroke={chartColours.primary} strokeWidth={2} strokeDasharray="2 3" label={{ value: `Age ${selectedAge}`, position: "insideTopLeft", fill: chartColours.text }} />
-            )}
-            {statePensionAge !== undefined && (
-              <ReferenceLine x={statePensionAge} stroke={chartColours.tertiary} strokeDasharray="4 4" label={{ value: "State Pension", position: "insideTopRight", fill: chartColours.text }} />
-            )}
-            {chapters.slice(1).map((phase) => (
-              <ReferenceLine key={`${phase.label}-${phase.startAge}`} x={phase.startAge} stroke={chartColours.secondary} strokeDasharray="3 5" label={{ value: phase.label, position: "insideTopLeft", fill: chartColours.text }} />
-            ))}
-            {depletionAge !== null && (
-              <ReferenceLine x={depletionAge} stroke={chartColours.fees} strokeDasharray="5 5" label={{ value: "Private pension runs out", position: "insideTopRight", fill: chartColours.text }} />
-            )}
-
-            <Line type="monotone" dataKey="openingBalance" name="Pension at start of year" stroke={chartColours.secondary} strokeWidth={3} strokeDasharray="6 5" dot={false} activeDot={{ r: 5 }} />
-            <Line type="monotone" dataKey="closingBalance" name="Pension at end of year" stroke={chartColours.primary} strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
     </section>
+  );
+}
+
+function WaterfallAnchor({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "opening" | "closing";
+}) {
+  return (
+    <article className={`drawdown-balance-waterfall-step is-${tone}`}>
+      <span>{label}</span>
+      <strong>{formatCurrency(value)}</strong>
+      <div className="drawdown-balance-waterfall-anchor-bar" aria-hidden="true" />
+    </article>
+  );
+}
+
+function WaterfallMovement({
+  label,
+  value,
+  direction,
+  width,
+}: {
+  label: string;
+  value: number;
+  direction: "positive" | "negative";
+  width: number;
+}) {
+  const safeWidth = Math.max(8, Math.min(100, width));
+
+  return (
+    <article className={`drawdown-balance-waterfall-step is-${direction}`}>
+      <span>{direction === "positive" ? "+" : "−"} {label}</span>
+      <strong>
+        {direction === "positive" ? "+" : "−"}
+        {formatCurrency(Math.abs(value))}
+      </strong>
+      <div className="drawdown-balance-waterfall-movement-track" aria-hidden="true">
+        <div style={{ width: `${safeWidth}%` }} />
+      </div>
+    </article>
   );
 }
