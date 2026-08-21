@@ -18,7 +18,7 @@
 }
 
 .drawdown-retirement-journey-summary-heading p:last-child {
-  max-width: 72ch;
+  max-width: 66ch;
   margin-top: var(--space-2);
   color: var(--colour-text-muted);
   line-height: 1.5;
@@ -27,16 +27,17 @@
 .drawdown-retirement-journey-milestones {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  padding-top: var(--space-1);
 }
 
 .drawdown-retirement-journey-milestones::before {
   position: absolute;
-  top: 0.9rem;
+  top: 1rem;
   right: 2rem;
   left: 2rem;
-  border-top: 1px solid var(--colour-border-strong);
+  border-top: 2px solid var(--colour-border-strong);
   content: "";
 }
 
@@ -56,8 +57,8 @@
 }
 
 .drawdown-retirement-journey-marker > span {
-  width: 0.85rem;
-  height: 0.85rem;
+  width: 0.9rem;
+  height: 0.9rem;
   margin-top: 0.45rem;
   border: 2px solid var(--colour-primary);
   border-radius: 50%;
@@ -88,23 +89,24 @@
 }
 
 .drawdown-retirement-journey-milestone p {
+  max-width: 38ch;
   margin: 0;
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 .drawdown-retirement-journey-questions {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-3);
 }
 
 .drawdown-retirement-journey-answer {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-1);
   min-width: 0;
-  padding: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--colour-border);
   border-radius: var(--radius-md);
   background: var(--colour-surface-secondary);
@@ -118,12 +120,8 @@
   border-color: color-mix(in srgb, var(--status-warning, var(--colour-warning)) 38%, var(--colour-border));
 }
 
-.drawdown-retirement-journey-answer > span,
-.drawdown-retirement-journey-answer > small {
-  color: var(--colour-text-muted);
-}
-
 .drawdown-retirement-journey-answer > span {
+  color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
   font-weight: 800;
 }
@@ -132,27 +130,18 @@
   font-size: 1.05rem;
 }
 
-.drawdown-retirement-journey-answer > small {
-  line-height: 1.45;
-}
-
 .drawdown-retirement-journey-note {
-  padding: var(--space-3) var(--space-4);
-  border-left: 3px solid var(--colour-primary);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  background: color-mix(in srgb, var(--colour-primary) 5%, var(--colour-surface-secondary));
-}
-
-.drawdown-retirement-journey-note p {
-  margin: var(--space-1) 0 0;
+  margin: 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--colour-border);
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-sm);
   line-height: 1.5;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1000px) {
   .drawdown-retirement-journey-questions {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -170,8 +159,8 @@
     top: 1rem;
     bottom: 1rem;
     left: 0.9rem;
-    width: 1px;
+    width: 2px;
     border-top: 0;
-    border-left: 1px solid var(--colour-border-strong);
+    border-left: 2px solid var(--colour-border-strong);
   }
 }
