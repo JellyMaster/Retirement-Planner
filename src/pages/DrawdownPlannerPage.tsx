@@ -92,14 +92,12 @@ export function DrawdownPlannerPage() {
       <section className="drawdown-results-workspace" aria-labelledby="drawdown-results-title">
         <div className="drawdown-view-controls">
           <div>
-            <p className="panel-eyebrow">Drawdown view</p>
-            <h2 id="drawdown-results-title">
-              {viewMode === "simple" ? "Your retirement at a glance" : "Detailed drawdown analysis"}
-            </h2>
+            <p className="panel-eyebrow">Explore your retirement</p>
+            <h2 id="drawdown-results-title">Choose how much detail you want to see</h2>
             <p>
               {viewMode === "simple"
-                ? "Start with the overall outcome, then follow how retirement develops over time."
-                : "Inspect income, pension balance, the year-by-year timeline and calculation assumptions."}
+                ? "See the headline retirement story and the key points worth noticing."
+                : "Explore income, pension balance, the full timeline and calculation assumptions."}
             </p>
           </div>
 
