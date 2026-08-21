@@ -1,4 +1,3 @@
-import type { ScenarioDrawdownPreferences } from "../../domain/scenarios";
 import type { DrawdownInputs } from "../../engine/drawdown/models/DrawdownInputs";
 import type { DrawdownResult } from "../../engine/drawdown/models/DrawdownResult";
 import {
@@ -11,14 +10,12 @@ interface DrawdownBalanceStoryProps {
   inputs: DrawdownInputs;
   result: DrawdownResult;
   displayMode: MoneyDisplayMode;
-  drawdown?: ScenarioDrawdownPreferences;
 }
 
 export function DrawdownBalanceStory({
   inputs,
   result,
   displayMode,
-  drawdown,
 }: DrawdownBalanceStoryProps) {
   const years = getDisplayYears(
     result.years,
@@ -38,11 +35,6 @@ export function DrawdownBalanceStory({
   const remainingShare = retirementOpeningBalance > 0
     ? finalBalance / retirementOpeningBalance
     : 0;
-  const reserveTarget = getReserveTarget(inputs, drawdown);
-  const meetsReserveTarget = reserveTarget === null || finalBalance >= reserveTarget;
-  const reserveAchievement = reserveTarget !== null && reserveTarget > 0
-    ? finalBalance / reserveTarget
-    : null;
   const lowestIsFinalYear = lowest.age === years.at(-1)?.age;
 
   return (
@@ -92,49 +84,12 @@ export function DrawdownBalanceStory({
         />
       </div>
 
-      {reserveTarget !== null && (
-        <div className={`drawdown-balance-reserve-summary ${meetsReserveTarget ? "is-positive" : "is-warning"}`}>
-          <div>
-            <span>Target reserve</span>
-            <strong>{formatCurrency(reserveTarget)}</strong>
-          </div>
-          <div>
-            <span>Projected reserve at age {inputs.endAge}</span>
-            <strong>{formatCurrency(finalBalance)}</strong>
-          </div>
-          <p>
-            {meetsReserveTarget
-              ? reserveAchievement === null
-                ? "Your projected reserve finishes at or above the amount you chose to keep."
-                : `Your projected reserve reaches ${formatPercentage(reserveAchievement)} of your target and finishes at or above the amount you chose to keep.`
-              : reserveAchievement === null
-                ? `Your projected reserve finishes ${formatCurrency(reserveTarget - finalBalance)} below your target.`
-                : `Your plan keeps ${formatPercentage(reserveAchievement)} of the reserve you asked to retain and finishes ${formatCurrency(reserveTarget - finalBalance)} below your target.`}
-          </p>
-        </div>
-      )}
-
       <p className="drawdown-balance-story-note">
         <strong>A reducing pension isn&apos;t necessarily a problem.</strong>{" "}
-        Your pension is there to fund your retirement. As long as it can continue providing the income you&apos;ve planned while meeting any reserve you&apos;ve chosen to keep, a falling balance can be an expected part of a healthy retirement plan.
+        Your pension is there to help fund your retirement. The key question is whether it can continue providing the income you&apos;ve planned for the whole period you&apos;re planning for. A falling balance can therefore be an expected part of using your pension in retirement.
       </p>
     </section>
   );
-}
-
-function getReserveTarget(
-  inputs: DrawdownInputs,
-  drawdown?: ScenarioDrawdownPreferences,
-): number | null {
-  const mode = drawdown?.endingBalanceMode;
-  const retirementPot = Math.max(0, inputs.startingBalance - inputs.taxFreeCash);
-
-  if (mode === "spend-to-zero") return 0;
-  if (mode === "preserve") return retirementPot;
-  if (mode === "percentage") {
-    return retirementPot * Math.min(1, Math.max(0, drawdown?.endingBalancePercentage ?? 0.5));
-  }
-  return null;
 }
 
 function Metric({
