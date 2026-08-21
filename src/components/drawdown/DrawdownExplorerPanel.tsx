@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
 interface DrawdownExplorerPanelProps {
-  eyebrow: string;
-  title: string;
-  description: string;
+  eyebrow?: string;
+  title?: string;
+  description?: string;
   children: ReactNode;
 }
 
@@ -18,13 +18,17 @@ export function DrawdownExplorerPanel({
   description,
   children,
 }: DrawdownExplorerPanelProps) {
+  const hasHeading = eyebrow || title || description;
+
   return (
     <section className="panel drawdown-explorer-panel">
-      <header className="drawdown-explorer-panel-heading">
-        <p className="panel-eyebrow">{eyebrow}</p>
-        <h3>{title}</h3>
-        <p>{description}</p>
-      </header>
+      {hasHeading && (
+        <header className="drawdown-explorer-panel-heading">
+          {eyebrow && <p className="panel-eyebrow">{eyebrow}</p>}
+          {title && <h3>{title}</h3>}
+          {description && <p>{description}</p>}
+        </header>
+      )}
       <div className="drawdown-explorer-panel-content">{children}</div>
     </section>
   );
