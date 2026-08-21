@@ -61,4 +61,29 @@ describe("DrawdownBalanceChart", () => {
     expect(screen.queryByText(/Effect of inflation/i)).not.toBeInTheDocument();
     expect(screen.getByText("£104,000")).toBeInTheDocument();
   });
+
+  it("adds withdrawal-rate, growth-coverage and balance-trend context", () => {
+    render(
+      <DrawdownBalanceChart
+        years={[year]}
+        depletionAge={null}
+        inflationRate={0.04}
+        displayMode="nominal"
+        selectedAge={60}
+      />,
+    );
+
+    expect(screen.getByText("5.0% of opening pension")).toBeInTheDocument();
+    expect(
+      screen.getByText("166.67% of withdrawals and fees replaced"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Your pension finished the year 4.0% higher than it started."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Investment growth replaced 166.67% of the money taken out and fees this year.",
+      ),
+    ).toBeInTheDocument();
+  });
 });
