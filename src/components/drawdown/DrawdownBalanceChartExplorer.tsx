@@ -8,6 +8,7 @@ interface DrawdownBalanceChartExplorerProps {
   result: DrawdownResult;
   displayMode: MoneyDisplayMode;
   selectedAge?: number;
+  onSelectAge?: (age: number) => void;
 }
 
 export function DrawdownBalanceChartExplorer({
