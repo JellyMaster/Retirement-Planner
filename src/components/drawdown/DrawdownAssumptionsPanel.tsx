@@ -145,11 +145,13 @@ export function DrawdownAssumptionsPanel({
       </aside>
 
       <details className="panel ui-disclosure drawdown-assumption-reference">
-        <summary className="ui-disclosure-trigger">
-          <div>
+        <summary className="ui-disclosure-trigger drawdown-assumption-reference-summary">
+          <div className="drawdown-assumption-reference-heading">
             <p className="panel-eyebrow">Calculation reference</p>
-            <strong>See how each retirement year is calculated</strong>
-            <small>Open this section when you want the technical calculation order behind the illustration.</small>
+            <strong>How the calculations work</strong>
+            <small>
+              Open this section if you&apos;d like to understand how the planner calculates each year of your retirement illustration. Most people won&apos;t need this level of detail, but it&apos;s available for complete transparency.
+            </small>
           </div>
           <ExpandCollapseIndicator />
         </summary>
