@@ -59,6 +59,33 @@
   padding: 0;
 }
 
+.drawdown-explorer-panel .drawdown-balance-age-control {
+  gap: var(--space-3);
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.drawdown-explorer-panel .drawdown-balance-age-control-heading {
+  display: block;
+}
+
+.drawdown-explorer-panel .drawdown-balance-age-control-heading > div:first-child {
+  max-width: 68ch;
+}
+
+.drawdown-explorer-panel .drawdown-balance-age-legend {
+  justify-content: flex-start;
+  gap: var(--space-4);
+  padding-top: var(--space-1);
+}
+
+.drawdown-explorer-panel .drawdown-balance-age-legend > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+}
+
 .drawdown-explorer-panel .drawdown-balance-chart-explorer {
   margin: 0;
 }
