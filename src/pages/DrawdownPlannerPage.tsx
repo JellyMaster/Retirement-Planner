@@ -22,7 +22,6 @@ import {
 } from "../components/drawdown/DrawdownWorkspaceNavigation";
 import { useScenarios } from "../components/scenarios";
 import { InfoTooltip } from "../components/ui";
-import type { ScenarioDrawdownPreferences } from "../domain/scenarios";
 import { DrawdownEngine } from "../engine/drawdown/DrawdownEngine";
 import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
 import { validateDrawdownInputs } from "../engine/drawdown/validators/DrawdownInputsValidator";
@@ -42,7 +41,7 @@ function getInitialMoneyDisplayMode(): MoneyDisplayMode {
 }
 
 export function DrawdownPlannerPage() {
-  const { activeScenario, updateScenarioPlan } = useScenarios();
+  const { activeScenario } = useScenarios();
   const [retirementGoals] = useStoredRetirementGoals();
   const [displayMode, setDisplayMode] = useState<MoneyDisplayMode>(getInitialMoneyDisplayMode);
   const [viewMode, setViewMode] = useState<DrawdownViewMode>("simple");
@@ -66,10 +65,6 @@ export function DrawdownPlannerPage() {
   useEffect(() => {
     window.localStorage.setItem(MONEY_DISPLAY_STORAGE_KEY, displayMode);
   }, [displayMode]);
-
-  function updateDrawdownPreferences(drawdown: ScenarioDrawdownPreferences) {
-    updateScenarioPlan(activeScenario.id, activeScenario.inputs, drawdown);
-  }
 
   return (
     <main className="planner-page drawdown-dashboard-page drawdown-workspace-page drawdown-guided-page">
@@ -150,8 +145,8 @@ export function DrawdownPlannerPage() {
                 {activeSection === "balance" && (
                   <div className="drawdown-workspace-section drawdown-detailed-balance" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
                     <SectionHeading eyebrow="Pension balance" title="What is happening to your pension?" description="Follow how investment growth, pension withdrawals and fees change the money left in your pension through retirement." />
-                    <DrawdownBalanceChartExplorer inputs={inputs} result={result} displayMode={displayMode} drawdown={activeScenario.drawdown} onChange={updateDrawdownPreferences} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} />
-                    <DrawdownBalanceYearStory years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} />
+                    <DrawdownBalanceChartExplorer inputs={inputs} result={result} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} />
+                    <DrawdownBalanceYearStory years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} />
                     <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} drawdown={activeScenario.drawdown} />
                     <DrawdownBalanceYearTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} />
                   </div>
