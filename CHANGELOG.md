@@ -6,6 +6,74 @@ The format is based on **Keep a Changelog** and follows **Semantic Versioning (S
 
 ---
 
+# [1.2.0] - 2026-08-21
+
+## Educational Drawdown Workspace
+
+Version **1.2.0** completes a major redesign of Drawdown around plain-English education, progressive disclosure and a consistent Detailed workspace.
+
+## Added
+
+### Detailed Income
+
+- Added an educational income explorer showing money from the private pension, State Pension, estimated tax, planned income and money available to spend.
+- Added selected-year explanations covering what changed and what it means for the plan.
+- Added retirement-income summary questions and a consistent expandable year-by-year reference table.
+- Added selected-year indicators and clearer plain-English yearly table labels.
+
+### Detailed Balance
+
+- Added a balance waterfall showing opening pension, investment growth, money taken out, fees, inflation context and closing pension.
+- Added withdrawal-rate, investment-growth coverage and annual percentage-movement context.
+- Added selected-year explanations, next-year context and pension longevity summaries.
+- Added a consistent expandable balance-by-year reference table with selected-year indication.
+
+### Retirement Journey
+
+- Replaced the technical Timeline experience with a Retirement Journey focused on the important moments in the plan.
+- Added retirement, State Pension, spending-change, income-concern, pension-exhaustion and planning-end milestones where relevant.
+- Added a compact journey summary and a collapsed retirement-by-year reference table with filtering and pagination.
+
+### How it works
+
+- Reframed the Assumptions tab as **How it works** while preserving the existing `?tab=assumptions` route for compatibility.
+- Grouped information into retirement-plan choices, result interpretation, investment estimates and tax estimates.
+- Added explanations for Today's Money, Future Money, inflation, investment growth and why pension balances can fall.
+- Added an optional calculation reference for users who want the detailed yearly calculation order.
+
+### Education and clarity
+
+- Added a persistent educational / financial-advice disclaimer.
+- Added clearer State Pension milestone explanations.
+- Added consistent Simple versus Detailed language: Simple focuses on guidance; Detailed exposes the mechanics without unnecessary jargon.
+- Expanded educational tooltips and explanatory copy throughout Drawdown.
+
+## Changed
+
+- Reworked Drawdown so the saved plan is the source of truth rather than asking users to configure the same retirement choices again.
+- Simplified the Simple Drawdown experience around retirement journey, important observations and income sources.
+- Standardised plain-English terminology including **money from your pension**, **money available to spend**, **money left in your pension** and **planned income**.
+- Removed obsolete ending-reserve goal output from Detailed Balance because the current My Plan journey no longer asks users to configure it.
+- Reduced dense technical content by moving yearly data and calculation mechanics into optional reference disclosures.
+- Improved responsive spacing, disclosure layouts and visual hierarchy across Detailed Drawdown.
+
+## Fixed
+
+- Corrected financial-validation expectations for real balances when nominal return equals inflation.
+- Corrected waterfall alignment when explanatory context is present on only some movement items.
+- Kept navigation deep links backward compatible after renaming Timeline to Retirement journey and Assumptions to How it works.
+- Updated query-owned navigation and component tests for the new accessible labels.
+- Hardened balance movement typing under strict TypeScript settings.
+
+## Quality
+
+- Expanded component tests for Income, Balance, Retirement Journey and How it works.
+- Added regression coverage for educational wording and removal of stale reserve-goal output.
+- Added financial-validation coverage for real and nominal drawdown values.
+- Release candidate is intended to pass the full `npm run verify` gate before merge.
+
+---
+
 # [1.1.0] - 2026-08-19
 
 ## Retirement Journey and Income Strategy
@@ -86,89 +154,19 @@ Version **1.1.0** focuses on making retirement planning easier to understand and
 
 # [1.0.0] - 2026-08-02
 
-## 🎉 Initial Stable Release
+## Initial Stable Release
 
-Version **1.0.0** marks the first stable public release of Polaris Retirement Planner.
-
-Polaris evolved from a simple pension projection tool into a complete retirement planning platform capable of helping users understand, model and improve every stage of retirement planning.
-
-## Added
-
-### 🏠 Overview Dashboard
-
-Introduced a personalised dashboard providing:
-
-- Retirement readiness summary
-- Projected pension value
-- Retirement income overview
-- Active scenario summary
-- Plan health indicators
-- Quick navigation
-- Recommended next actions
-
-### 📝 My Plan
-
-Introduced a complete guided planning experience with personal details, pension details, contribution planning, investment assumptions, retirement goals, State Pension planning and tax-free cash planning.
-
-### Retirement Income Planning
-
-Introduced flexible retirement income planning with Active Retirement, Settled Retirement and Later Life spending phases.
-
-### 🧪 What If? Decision Lab
-
-Introduced experiments for Retirement Age, Save More, Spend More, Lower Fees, Inflation, State Pension and Market Downturn, with the ability to save experiments as scenarios.
-
-### ⚖ Scenario Comparison
-
-Added multiple retirement plans, active scenario switching, side-by-side comparisons, comparison charts and comparison tables.
-
-### 💷 Drawdown Planner
-
-Added lifetime balance projection, withdrawal planning, spending phases, retirement timeline, State Pension integration and sustainability analysis.
-
-### 🎓 Explore
-
-Introduced personalised retirement education covering investment growth, retirement timing, inflation, pension fees, sequence-of-returns risk and market downturns.
-
-### 🧭 Guidance
-
-Added personalised planning recommendations, areas requiring attention, suggested next actions and direct navigation into relevant planning sections.
-
-## User Experience
-
-Added responsive layouts, Dark Mode, connected page journeys, guided editing, accessible navigation, keyboard navigation improvements and improved mobile support.
-
-## Scenario System
-
-Added multiple scenarios, active plan management, scenario editing, duplication, comparison and baseline-plan preservation.
-
-## Technical
-
-Application rebuilt using React 19, TypeScript and Vite with shared planning models, shared scenario architecture, context providers, improved routing, a shared design system, theme support and extensive automated testing.
-
-## Accessibility
-
-Improved keyboard navigation, tab navigation, focus management, modal accessibility, screen-reader compatibility and responsive layouts.
-
-## Known Limitations
-
-Version 1.0.0 intentionally focused on single-user retirement planning. Cloud accounts, database persistence, multi-device synchronisation, PDF retirement reports and advanced investment analytics remain future work.
+Version **1.0.0** established the Polaris retirement planning platform with the Overview dashboard, My Plan, retirement income planning, scenario management and comparison, Drawdown, Decision Lab, Explore, Guidance, responsive design, dark mode and automated testing.
 
 ---
 
 # Future Releases
 
-## Version 1.2
-
-### Professional Planning
-
-Planned areas include richer retirement-outcome comparisons, strategy-aware What If? experiments, further Drawdown UX refinement, PDF retirement reports and enhanced guidance.
-
 ## Version 1.3
 
-### Connected Data
+### Connected Data and Reporting
 
-Planned areas include local database support, import/export, version history and offline persistence.
+Potential areas include local database support, import/export, version history, stronger persistence and printable/PDF retirement reporting.
 
 ## Version 2.0
 
@@ -180,6 +178,6 @@ Future vision includes user accounts, cloud synchronisation, adviser mode, share
 
 **Polaris Retirement Planner**
 
-Current release: **Version 1.1.0**
+Current release: **Version 1.2.0**
 
-Released **19 August 2026**
+Released **21 August 2026**
