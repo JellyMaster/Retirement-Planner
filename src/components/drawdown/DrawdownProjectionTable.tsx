@@ -64,8 +64,8 @@ export function DrawdownProjectionTable({ years, inflationRate, displayMode }: D
     return (
       <section className="panel projection-table-panel">
         <div className="panel-heading">
-          <h2>Year-by-year drawdown</h2>
-          <p>No drawdown years are available for the current ages.</p>
+          <h2>Your retirement journey</h2>
+          <p>There are no retirement years to show for the current plan.</p>
         </div>
       </section>
     );
@@ -75,14 +75,14 @@ export function DrawdownProjectionTable({ years, inflationRate, displayMode }: D
     <section className="panel projection-table-panel drawdown-projection-table-panel">
       <div className="projection-table-header">
         <div className="panel-heading projection-table-heading">
-          <span className="projection-table-eyebrow">Retirement timeline</span>
-          <h2>Year-by-year drawdown</h2>
+          <span className="projection-table-eyebrow">Complete journey</span>
+          <h2>Explore every year of retirement</h2>
           <p>
-            Review the essential figures or switch to the full calculation breakdown. Values are shown in {displayMode === "today" ? "today's money" : "future money"}.
+            Follow the figures behind your retirement journey. Start with the plain-English view, or switch to Detailed when you want to inspect the full calculation. Values are shown in {displayMode === "today" ? "today's money" : "future money"}.
           </p>
         </div>
 
-        <div className="projection-table-controls" aria-label="Projection table options">
+        <div className="projection-table-controls" aria-label="Retirement journey table options">
           <div className="projection-control-group">
             <span className="projection-control-label">Table detail</span>
             <div className="projection-segmented-control" role="group" aria-label="Table detail">
@@ -92,7 +92,7 @@ export function DrawdownProjectionTable({ years, inflationRate, displayMode }: D
           </div>
 
           <label className="projection-control-group projection-row-filter">
-            <span className="projection-control-label">Rows shown</span>
+            <span className="projection-control-label">Years shown</span>
             <select value={rowFrequency} onChange={(event) => setRowFrequency(event.target.value as RowFrequency)}>
               <option value="annual">Every year</option>
               <option value="five-year">Every 5 years</option>
@@ -102,36 +102,36 @@ export function DrawdownProjectionTable({ years, inflationRate, displayMode }: D
         </div>
       </div>
 
-      <div className="projection-table-legend" aria-label="Highlighted rows">
-        <span><i className="legend-dot legend-dot-state" /> State Pension starts</span>
-        <span><i className="legend-dot legend-dot-warning" /> Income shortfall</span>
-        <span><i className="legend-dot legend-dot-depleted" /> Pension depleted</span>
+      <div className="projection-table-legend" aria-label="Important retirement journey years">
+        <span><i className="legend-dot legend-dot-state" /> State Pension begins</span>
+        <span><i className="legend-dot legend-dot-warning" /> Planned income no longer fully met</span>
+        <span><i className="legend-dot legend-dot-depleted" /> Private pension fully used</span>
       </div>
 
-      <div className="table-scroll drawdown-table-scroll" tabIndex={0} aria-label={`${tableView} drawdown projection table`}>
+      <div className="table-scroll drawdown-table-scroll" tabIndex={0} aria-label={`${tableView} retirement journey table`}>
         {tableView === "simplified" ? (
           <table className="projection-table drawdown-projection-table projection-table-simplified">
             <thead>
               <tr>
                 <th scope="col">Age</th>
-                <th scope="col">Opening balance</th>
-                <th scope="col">Pension withdrawal</th>
+                <th scope="col">Started with</th>
+                <th scope="col">Money from your pension</th>
                 <th scope="col">State Pension</th>
-                <th scope="col">Income tax</th>
-                <th scope="col">Net income</th>
-                <th scope="col">Closing balance</th>
+                <th scope="col">Estimated tax</th>
+                <th scope="col">Money available to spend</th>
+                <th scope="col">Money left in your pension</th>
               </tr>
             </thead>
             <tbody>
               {visibleYears.map((year) => (
                 <tr key={year.year} className={getRowClass(year, displayYears)}>
                   <th scope="row" className="projection-sticky-age"><span className="projection-age">{year.age}</span><small>{year.year}</small></th>
-                  <td data-label="Opening balance">{formatCurrency(year.openingBalance)}</td>
-                  <td data-label="Pension withdrawal">{formatCurrency(year.pensionWithdrawal)}</td>
+                  <td data-label="Started with">{formatCurrency(year.openingBalance)}</td>
+                  <td data-label="Money from your pension">{formatCurrency(year.pensionWithdrawal)}</td>
                   <td data-label="State Pension">{formatCurrency(year.statePensionIncome)}</td>
-                  <td data-label="Income tax">{formatCurrency(year.incomeTax)}</td>
-                  <td data-label="Net income"><strong>{formatCurrency(year.netIncome)}</strong></td>
-                  <td data-label="Closing balance"><strong>{formatCurrency(year.closingBalance)}</strong></td>
+                  <td data-label="Estimated tax">{formatCurrency(year.incomeTax)}</td>
+                  <td data-label="Money available to spend"><strong>{formatCurrency(year.netIncome)}</strong></td>
+                  <td data-label="Money left in your pension"><strong>{formatCurrency(year.closingBalance)}</strong></td>
                 </tr>
               ))}
             </tbody>
@@ -141,7 +141,7 @@ export function DrawdownProjectionTable({ years, inflationRate, displayMode }: D
             <thead>
               <tr className="projection-column-groups">
                 <th scope="colgroup" colSpan={2}>Period</th>
-                <th scope="colgroup" colSpan={4}>Portfolio</th>
+                <th scope="colgroup" colSpan={4}>Pension</th>
                 <th scope="colgroup" colSpan={7}>Income &amp; tax</th>
                 <th scope="colgroup" colSpan={2}>Outcome</th>
               </tr>
@@ -152,15 +152,15 @@ export function DrawdownProjectionTable({ years, inflationRate, displayMode }: D
                 <th scope="col">Growth</th>
                 <th scope="col">Fees</th>
                 <th scope="col">Closing</th>
-                <th scope="col">Target</th>
+                <th scope="col">Planned income</th>
                 <th scope="col">State Pension</th>
-                <th scope="col">Withdrawal</th>
-                <th scope="col">Gross income</th>
+                <th scope="col">Money from pension</th>
+                <th scope="col">Income before tax</th>
                 <th scope="col">Taxable income</th>
-                <th scope="col">Tax</th>
-                <th scope="col">Net income</th>
-                <th scope="col">Effective tax</th>
-                <th scope="col">Shortfall</th>
+                <th scope="col">Estimated tax</th>
+                <th scope="col">Money available to spend</th>
+                <th scope="col">Average tax rate</th>
+                <th scope="col">Below plan by</th>
               </tr>
             </thead>
             <tbody>
@@ -172,15 +172,15 @@ export function DrawdownProjectionTable({ years, inflationRate, displayMode }: D
                   <td data-label="Growth">{formatCurrency(year.investmentGrowth)}</td>
                   <td data-label="Fees">{formatCurrency(year.fees)}</td>
                   <td data-label="Closing balance"><strong>{formatCurrency(year.closingBalance)}</strong></td>
-                  <td data-label="Income target">{formatCurrency(year.desiredIncome)} <span className="table-target-basis">{year.incomeTargetMode}</span></td>
+                  <td data-label="Planned income">{formatCurrency(year.desiredIncome)} <span className="table-target-basis">{year.incomeTargetMode}</span></td>
                   <td data-label="State Pension">{formatCurrency(year.statePensionIncome)}</td>
-                  <td data-label="Pension withdrawal">{formatCurrency(year.pensionWithdrawal)}</td>
-                  <td data-label="Gross income">{formatCurrency(year.grossIncome)}</td>
+                  <td data-label="Money from pension">{formatCurrency(year.pensionWithdrawal)}</td>
+                  <td data-label="Income before tax">{formatCurrency(year.grossIncome)}</td>
                   <td data-label="Taxable income">{formatCurrency(year.taxableIncome)}</td>
-                  <td data-label="Income tax">{formatCurrency(year.incomeTax)}</td>
-                  <td data-label="Net income"><strong>{formatCurrency(year.netIncome)}</strong></td>
-                  <td data-label="Effective tax">{formatPercentage(year.effectiveTaxRate)}</td>
-                  <td data-label="Net shortfall">{formatCurrency(year.netIncomeShortfall)}</td>
+                  <td data-label="Estimated tax">{formatCurrency(year.incomeTax)}</td>
+                  <td data-label="Money available to spend"><strong>{formatCurrency(year.netIncome)}</strong></td>
+                  <td data-label="Average tax rate">{formatPercentage(year.effectiveTaxRate)}</td>
+                  <td data-label="Below plan by">{formatCurrency(year.netIncomeShortfall)}</td>
                 </tr>
               ))}
             </tbody>
@@ -188,26 +188,26 @@ export function DrawdownProjectionTable({ years, inflationRate, displayMode }: D
         )}
       </div>
 
-      <div className="projection-mobile-list" aria-label={`${tableView} drawdown projection cards`}>
+      <div className="projection-mobile-list" aria-label={`${tableView} retirement journey cards`}>
         {visibleYears.map((year) => (
           <details key={year.year} className={`projection-mobile-year ${getRowClass(year, displayYears) ?? ""}`}>
             <summary>
               <span><strong>Age {year.age}</strong><small>{year.year}</small></span>
-              <span><small>Closing balance</small><strong>{formatCurrency(year.closingBalance)}</strong></span>
+              <span><small>Money left in your pension</small><strong>{formatCurrency(year.closingBalance)}</strong></span>
             </summary>
             <div className="projection-mobile-metrics">
-              <div><span>Opening balance</span><strong>{formatCurrency(year.openingBalance)}</strong></div>
-              <div><span>Pension withdrawal</span><strong>{formatCurrency(year.pensionWithdrawal)}</strong></div>
+              <div><span>Started with</span><strong>{formatCurrency(year.openingBalance)}</strong></div>
+              <div><span>Money from your pension</span><strong>{formatCurrency(year.pensionWithdrawal)}</strong></div>
               <div><span>State Pension</span><strong>{formatCurrency(year.statePensionIncome)}</strong></div>
-              <div><span>Income tax</span><strong>{formatCurrency(year.incomeTax)}</strong></div>
-              <div><span>Net income</span><strong>{formatCurrency(year.netIncome)}</strong></div>
+              <div><span>Estimated tax</span><strong>{formatCurrency(year.incomeTax)}</strong></div>
+              <div><span>Money available to spend</span><strong>{formatCurrency(year.netIncome)}</strong></div>
               {tableView === "detailed" && (
                 <>
-                  <div><span>Growth</span><strong>{formatCurrency(year.investmentGrowth)}</strong></div>
+                  <div><span>Investment growth</span><strong>{formatCurrency(year.investmentGrowth)}</strong></div>
                   <div><span>Fees</span><strong>{formatCurrency(year.fees)}</strong></div>
                   <div><span>Taxable income</span><strong>{formatCurrency(year.taxableIncome)}</strong></div>
-                  <div><span>Effective tax</span><strong>{formatPercentage(year.effectiveTaxRate)}</strong></div>
-                  <div><span>Shortfall</span><strong>{formatCurrency(year.netIncomeShortfall)}</strong></div>
+                  <div><span>Average tax rate</span><strong>{formatPercentage(year.effectiveTaxRate)}</strong></div>
+                  <div><span>Below plan by</span><strong>{formatCurrency(year.netIncomeShortfall)}</strong></div>
                 </>
               )}
             </div>
@@ -216,7 +216,7 @@ export function DrawdownProjectionTable({ years, inflationRate, displayMode }: D
       </div>
 
       <p className="projection-table-footnote">
-        Showing {visibleYears.length} of {displayYears.length} retirement years. Highlighting identifies important changes in the projection.
+        Showing {visibleYears.length} of {displayYears.length} retirement years. Highlighted rows mark the first year an important change begins, so you can see where the retirement story shifts rather than treating every year as identical.
       </p>
     </section>
   );
