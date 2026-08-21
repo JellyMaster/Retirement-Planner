@@ -1,29 +1,31 @@
 # 🚀 Polaris Retirement Planner Features
 
-> **Version 1.0.0**
+> **Version 1.2.0**
 
 ---
 
 # Introduction
 
-Polaris Retirement Planner is designed to help users understand every stage of retirement planning.
+Polaris Retirement Planner combines retirement modelling, education, scenario analysis and guided decision support in one application.
 
-Rather than focusing on a single pension projection, Polaris provides an integrated planning experience combining financial modelling, education, experimentation and personalised guidance.
-
-Version **1.0.0** establishes the foundation of the platform.
+Version 1.2 strengthens the educational Drawdown experience and establishes a consistent plain-English standard for detailed retirement analysis.
 
 ---
 
 # Feature Overview
 
 | Area | Status |
-|-------|--------|
+|---|---|
 | Overview Dashboard | ✅ |
 | My Plan | ✅ |
 | Scenario Management | ✅ |
-| What If? Decision Lab | ✅ |
 | Compare Plans | ✅ |
-| Drawdown Planning | ✅ |
+| What If? Decision Lab | ✅ |
+| Drawdown — Simple | ✅ |
+| Drawdown — Detailed Income | ✅ |
+| Drawdown — Detailed Balance | ✅ |
+| Drawdown — Retirement Journey | ✅ |
+| Drawdown — How it works | ✅ |
 | Explore Learning Centre | ✅ |
 | Guidance Centre | ✅ |
 | Responsive Design | ✅ |
@@ -34,436 +36,224 @@ Version **1.0.0** establishes the foundation of the platform.
 
 # Overview Dashboard
 
-The Overview page provides a snapshot of the active retirement plan.
-
-## Displays
-
-- Retirement age
-- Current pension value
-- Projected pension
-- Estimated retirement income
-- Active scenario
-- Retirement readiness
-- Planning highlights
-
-## Purpose
-
-Allow users to understand their retirement position within seconds.
+The Overview gives a quick summary of the active retirement plan, including retirement age, pension value, retirement income, funding status, State Pension choices, tax-free cash choices and key retirement events.
 
 ---
 
 # My Plan
 
-The planning workspace is the primary location for editing retirement assumptions.
+My Plan is the primary place for editing retirement choices.
 
-## Guided Planning
+It includes:
 
-Users complete planning through a structured journey.
+- personal information
+- pension savings and contributions
+- retirement age and planning horizon
+- retirement-income goals
+- Retirement Living Standards
+- State Pension
+- tax-free cash
+- investment return, inflation and fee estimates
+- future saving changes
+- advanced retirement-income strategy and spending changes
 
-Sections include:
-
-- Personal Information
-- Pension Details
-- Contributions
-- Investment Returns
-- Retirement Goals
-- Retirement Income
-- Review
-
----
-
-## Retirement Income Planning
-
-Version 1.0 introduces flexible retirement income planning.
-
-Income may be modelled separately for:
-
-### Active Retirement
-
-Typically higher spending immediately after retirement.
-
-Examples:
-
-- Travel
-- Holidays
-- Home improvements
+Analysis pages should explain the effect of these saved choices rather than duplicate them as configuration controls.
 
 ---
 
-### Settled Retirement
-
-More stable spending.
-
-Examples:
-
-- Household costs
-- Leisure
-- Day-to-day living
-
----
-
-### Later Life
-
-Planning for increased healthcare and support costs.
-
----
-
-# State Pension
-
-Users may configure:
-
-- Include / Exclude
-- Annual amount
-- Starting age
-
-The planner incorporates this into retirement income projections.
-
----
-
-# Tax-Free Cash
-
-Supports planning for:
-
-- Lump sum
-- Remaining invested pension
-- Retirement income implications
-
----
-
-# Scenario Management
-
-One of Polaris' core capabilities.
+# Scenario Management and Compare
 
 Users can:
 
-- Create scenarios
-- Edit scenarios
-- Duplicate scenarios
-- Compare scenarios
-- Switch active scenario
-
-The baseline retirement plan always remains available.
+- create, edit and duplicate plans
+- switch the active plan
+- select multiple plans for comparison
+- compare outcomes in charts and tables
+- keep the active plan visually prominent
 
 ---
 
 # What If? Decision Lab
 
-The Decision Lab allows experimentation without changing the saved plan.
+Decision Lab allows safe experiments without changing the active plan.
 
----
+Current experiment areas include:
 
-## Retirement Age
-
-Explore retiring earlier or later.
-
-Shows impact on:
-
-- Pension value
-- Retirement income
-- Sustainability
-
----
-
-## Save More
-
-Model:
-
-- Employee contributions
-- Employer contributions
-- Additional contributions
-- Contribution start age
-
----
-
-## Spend More
-
-Model retirement income requirements.
-
-Shows sustainability implications.
-
----
-
-## Lower Fees
-
-Understand how pension fees compound over time.
-
-Displays:
-
-- Fee savings
-- Pension growth
-- Lifetime effect
-
----
-
-## Inflation
-
-Explore inflation assumptions.
-
-Understand purchasing power.
-
----
-
-## State Pension
-
-Experiment with:
-
-- Annual amount
-- Start age
-- Inclusion
-
----
-
-## Market Downturn
-
-Illustrates sequence of returns risk.
-
-Users can model:
-
-- Mild downturn
-- Moderate downturn
-- Severe downturn
-
----
-
-# Compare
-
-Compare multiple retirement plans.
-
-Comparison includes:
-
-- Pension value
-- Contributions
-- Investment growth
-- Fees
-- Retirement income
-- Drawdown
-- Sustainability
-
-Charts and tables update automatically.
-
----
-
-# Drawdown Planner
-
-Model retirement income after retirement.
-
-Supports:
-
-- Lifetime balance
-- Annual withdrawals
-- Spending phases
+- retirement age
+- saving more
+- spending more
+- lower fees
+- inflation
 - State Pension
-- Retirement chapters
+- market downturns
+
+Experiments can be saved as new scenarios.
 
 ---
 
-# Retirement Timeline
+# Drawdown
 
-The drawdown planner visualises key retirement milestones.
+Drawdown explains how the active plan may work after retirement.
 
-Including:
+## Simple view
 
-- Retirement
+The Simple view focuses on guidance and understanding:
+
+- what happens over time
+- important observations worth reviewing
+- how private pension and State Pension work together
+- educational explanation of the illustration
+
+## Detailed — Income
+
+Purpose: explain where retirement money comes from and how it changes.
+
+Includes:
+
+- money from the private pension
 - State Pension
-- Spending changes
-- Planning horizon
+- estimated tax
+- money available to spend
+- planned income
+- selected-year explanations
+- important retirement-income changes
+- expandable income-by-year reference
+
+## Detailed — Balance
+
+Purpose: explain why the pension rises or falls.
+
+Includes:
+
+- opening pension
+- investment growth
+- money taken out
+- fees
+- inflation context
+- closing pension
+- withdrawal rate
+- growth coverage
+- yearly percentage movement
+- next-year context
+- pension longevity summary
+- expandable balance-by-year reference
+
+## Detailed — Retirement Journey
+
+Purpose: explain the important moments along the retirement plan.
+
+Possible journey points include:
+
+- retirement begins
+- State Pension starts
+- planned spending changes
+- planned income is no longer fully met
+- private pension is fully used
+- planning period ends
+
+A collapsed retirement-by-year reference provides the underlying figures when needed.
+
+## Detailed — How it works
+
+Purpose: explain how to interpret the results and make the calculation basis transparent.
+
+The page covers:
+
+- choices taken from the active plan
+- how to understand Today's Money and Future Money
+- investment estimates
+- inflation
+- pension fees
+- tax estimates
+- illustration-versus-prediction guidance
+- optional detailed yearly calculation method
+
+---
+
+# State Pension
+
+State Pension can be included or excluded in My Plan, with an annual amount and starting age. Drawdown explains when it starts and how it can reduce the amount needed from the private pension.
+
+---
+
+# Tax-Free Cash
+
+Polaris supports tax-free cash planning and reflects its effect on the pension available for retirement income.
 
 ---
 
 # Explore Learning Centre
 
-Interactive learning built around the user's own retirement plan.
+Interactive learning uses the active retirement plan to explain topics including:
 
-Topics include:
-
-## Investment Growth
-
-Understand compound growth.
-
----
-
-## Inflation
-
-Understand long-term purchasing power.
-
----
-
-## Fees
-
-See the effect of pension charges.
-
----
-
-## Sequence of Returns
-
-Interactive lesson demonstrating why investment timing matters.
-
----
-
-## Market Falls
-
-Shows how downturns affect retirement outcomes.
+- investment growth
+- inflation
+- pension fees
+- sequence-of-returns risk
+- market downturns
+- retirement timing
 
 ---
 
 # Guidance Centre
 
-Provides personalised recommendations.
+Guidance identifies areas worth reviewing and links users back into the relevant planning workflow.
 
-Categories include:
-
-- Planning opportunities
-- Potential risks
-- Suggested improvements
-- Educational recommendations
-
-Each recommendation links directly into the relevant planning workflow.
+Guidance should remain educational and should not be presented as regulated personal financial advice.
 
 ---
 
-# Navigation
+# Money Display
 
-Version 1.0 introduces connected journeys.
+Drawdown supports two consistent views:
 
-Users can move directly between related pages while preserving context.
+- **Today's Money** — future values expressed using today's buying power
+- **Future Money** — projected pound amounts in each future year, including inflation
 
-Examples:
-
-Overview → My Plan
-
-Guidance → What If?
-
-Explore → Drawdown
+Changing the display mode does not change the underlying retirement plan.
 
 ---
 
-# Accessibility
+# Accessibility and Responsive Design
 
-Version 1.0 includes:
+Polaris supports:
 
-- Keyboard navigation
-- Accessible tabs
-- Accessible dialogs
-- Focus management
-- Reduced motion
-- Responsive layouts
-- Screen reader support
-
----
-
-# Responsive Design
-
-Supports:
-
-- Desktop
-- Laptop
-- Tablet
-- Mobile
-
-Layouts adapt automatically.
-
----
-
-# Theme Support
-
-Built-in:
-
-- Light Theme
-- Dark Theme
-
-Theme preference is remembered.
+- keyboard navigation
+- accessible tabs, dialogs and disclosures
+- visible focus states
+- screen-reader labels
+- reduced-motion preferences
+- responsive desktop, tablet and mobile layouts
+- light and dark themes
 
 ---
 
 # Automated Testing
 
-Version 1.0 includes extensive automated testing covering:
+The test suite covers components, navigation, scenarios, projections, Drawdown, educational wording and financial validation.
 
-- Components
-- Pages
-- Navigation
-- Contexts
-- Drawdown
-- What If?
-- Guidance
-- Explore
-- Scenarios
+The local release gate is:
 
----
-
-# Design Goals
-
-Every feature aims to:
-
-✔ Reduce complexity
-
-✔ Increase confidence
-
-✔ Encourage experimentation
-
-✔ Explain calculations
-
-✔ Help users make informed decisions
+```bash
+npm run verify
+```
 
 ---
 
 # Current Scope
 
-Version 1.0 focuses on:
-
-- Individual retirement planning
-- Pension modelling
-- Scenario analysis
-- Retirement education
-
-It is intentionally designed as a single-user planning platform.
+Version 1.2 remains a single-user planning application. Cloud accounts, multi-device synchronisation, adviser collaboration and persistent online storage are future work.
 
 ---
 
-# Planned Enhancements
+# Design Standard
 
-Version 1.1
+Version 1.2 establishes the following product rule:
 
-- Rich visual analytics
-- Interactive charts
-- Retirement timeline engine
+> **Use plain English by default. Keep technical detail available as a reference rather than making it the main experience.**
 
-Version 1.2
-
-- PDF retirement reports
-- Professional planning summaries
-
-Version 1.3
-
-- Local persistence
-- Import / Export
-- Version history
-
-Version 2.0
-
-- User accounts
-- Cloud synchronisation
-- Adviser mode
-- Shared retirement plans
+See `docs/DESIGN.md` for the maintained design language.
 
 ---
 
-# Summary
-
-Version **1.0.0** establishes Polaris as a complete retirement planning platform rather than a simple pension calculator.
-
-The platform combines financial modelling, retirement education, scenario analysis and personalised guidance into a single integrated planning experience.
-
-Future versions will continue to enhance visualisation, planning intelligence and cloud capabilities while maintaining the core philosophy:
-
-> **Help people understand their retirement, not simply calculate it.**
-
----
-
-**Polaris Retirement Planner**
-
-Feature Guide
-
-Version **1.0.0**
-
-August 2026
+**Polaris Retirement Planner — Feature Guide v1.2.0**
