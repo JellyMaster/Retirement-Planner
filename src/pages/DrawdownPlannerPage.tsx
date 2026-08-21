@@ -85,6 +85,10 @@ export function DrawdownPlannerPage() {
 
       <DrawdownPlanContext activePlanName={activeScenario.name} value={inputs} />
 
+      {result && (
+        <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
+      )}
+
       <section className="drawdown-results-workspace" aria-labelledby="drawdown-results-title">
         <div className="drawdown-view-controls">
           <div>
@@ -118,10 +122,6 @@ export function DrawdownPlannerPage() {
           {result ? (
             viewMode === "simple" ? (
               <div className="drawdown-workspace-section drawdown-retirement-story drawdown-v12-dashboard drawdown-simple-story" id="drawdown-simple-section">
-                <section className="drawdown-simple-story-section drawdown-simple-outcome" aria-labelledby="drawdown-simple-outcome-title">
-                  <SimpleStoryHeading eyebrow="Retirement outcome" title="Can your plan support your retirement?" description="Start with the headline outcome from your current plan." id="drawdown-simple-outcome-title" />
-                  <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
-                </section>
                 <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-journey-title">
                   <SimpleStoryHeading eyebrow="Your retirement journey" title="What happens over time?" description="Follow how your pension and retirement income develop through the plan." id="drawdown-simple-journey-title" />
                   <DrawdownJourneyChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} spendingPhases={inputs.spendingPhases} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} depletionAge={result.depletionAge} />
@@ -137,8 +137,6 @@ export function DrawdownPlannerPage() {
               </div>
             ) : (
               <div className="drawdown-detailed-view">
-                <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
-
                 {activeSection === "income" && (
                   <div className="drawdown-workspace-section drawdown-detailed-income" id="drawdown-income-section" role="tabpanel" aria-labelledby="drawdown-tab-income" tabIndex={0}>
                     <SectionHeading eyebrow="Income story" title="Income through retirement" description="See how money from your pension, State Pension and estimated tax combine to provide the money you can spend each year." />
