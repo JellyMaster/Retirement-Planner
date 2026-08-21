@@ -63,6 +63,32 @@ export function DrawdownAssumptionsPanel({
           ]}
         />
 
+        <section className="drawdown-assumption-education" aria-labelledby="drawdown-assumption-education-title">
+          <div>
+            <p className="panel-eyebrow">Understanding the illustration</p>
+            <h2 id="drawdown-assumption-education-title">How to understand your results</h2>
+            <p>These concepts help explain why the figures can look different depending on the view you choose and why real retirement outcomes will not follow a perfectly smooth path.</p>
+          </div>
+          <div className="drawdown-assumption-concepts">
+            <Concept
+              title="Today’s money"
+              text="Shows future values using today’s buying power, which makes different retirement years easier to compare."
+            />
+            <Concept
+              title="Future money"
+              text="Shows the projected pound amount in each future year, including the effect of inflation."
+            />
+            <Concept
+              title="Illustration, not prediction"
+              text="The model applies the same assumptions consistently. Real investment returns, inflation, tax rules and personal circumstances will change over time."
+            />
+            <Concept
+              title="Why pension balances can fall"
+              text="A pension is there to fund retirement. A falling balance can be expected when withdrawals and charges are greater than investment growth."
+            />
+          </div>
+        </section>
+
         <AssumptionGroup
           eyebrow="Investment assumptions"
           title="How your pension is expected to change"
@@ -108,32 +134,6 @@ export function DrawdownAssumptionsPanel({
             },
           ]}
         />
-
-        <section className="drawdown-assumption-education" aria-labelledby="drawdown-assumption-education-title">
-          <div>
-            <p className="panel-eyebrow">Understanding the illustration</p>
-            <h2 id="drawdown-assumption-education-title">How to read the results</h2>
-            <p>These concepts help explain why the figures can look different depending on the view you choose and why real retirement outcomes will not follow a perfectly smooth path.</p>
-          </div>
-          <div className="drawdown-assumption-concepts">
-            <Concept
-              title="Today’s money"
-              text="Shows future values using today’s buying power, which makes different retirement years easier to compare."
-            />
-            <Concept
-              title="Future money"
-              text="Shows the projected pound amount in each future year, including the effect of inflation."
-            />
-            <Concept
-              title="Illustration, not prediction"
-              text="The model applies the same assumptions consistently. Real investment returns, inflation, tax rules and personal circumstances will change over time."
-            />
-            <Concept
-              title="Why pension balances can fall"
-              text="A pension is there to fund retirement. A falling balance can be expected when withdrawals and charges are greater than investment growth."
-            />
-          </div>
-        </section>
       </div>
 
       <aside className="drawdown-assumption-remember" role="note">
