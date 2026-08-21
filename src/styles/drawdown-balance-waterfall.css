@@ -29,26 +29,7 @@
 }
 
 .drawdown-balance-waterfall-age {
-  display: grid;
-  min-width: 6rem;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius-md);
-  background: var(--colour-surface-secondary);
-  text-align: right;
-}
-
-.drawdown-balance-waterfall-age span,
-.drawdown-balance-waterfall-age small {
-  color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-xs);
-  font-weight: 700;
-}
-
-.drawdown-balance-waterfall-age strong {
-  color: var(--colour-primary);
-  font-size: 1.4rem;
-  line-height: 1.1;
+  display: none;
 }
 
 .drawdown-balance-waterfall-flow {
@@ -244,11 +225,6 @@
 
   .drawdown-balance-waterfall-heading {
     flex-direction: column;
-  }
-
-  .drawdown-balance-waterfall-age {
-    width: 100%;
-    text-align: left;
   }
 
   .drawdown-balance-waterfall-flow,
