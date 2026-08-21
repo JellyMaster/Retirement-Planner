@@ -51,7 +51,7 @@ const result: DrawdownResult = {
 };
 
 describe("DrawdownIncomeWaterfall", () => {
-  it("shows the transition from private pension to State Pension", () => {
+  it("shows the transition from private pension to State Pension in plain language", () => {
     render(
       <DrawdownIncomeWaterfall
         inputs={inputs}
@@ -60,6 +60,7 @@ describe("DrawdownIncomeWaterfall", () => {
       />,
     );
 
+    expect(screen.getByText("How your retirement is funded")).toBeInTheDocument();
     expect(screen.getByText("Age 65")).toBeInTheDocument();
     expect(screen.getByText("Age 67")).toBeInTheDocument();
     expect(
@@ -67,7 +68,8 @@ describe("DrawdownIncomeWaterfall", () => {
         "At age 67, £28,500 comes from the private pension and £11,500 from State Pension.",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("Shortfall £500")).toBeInTheDocument();
+    expect(screen.getByText("Below your plan by £500")).toBeInTheDocument();
+    expect(screen.getAllByText("Available to spend").length).toBeGreaterThan(0);
   });
 
   it("explains how State Pension changes the private-pension withdrawal", () => {
@@ -83,10 +85,11 @@ describe("DrawdownIncomeWaterfall", () => {
       "How State Pension changes your retirement income mix",
     );
 
-    expect(milestone).toHaveTextContent("State Pension starts at age 67");
+    expect(milestone).toHaveTextContent("Your State Pension starts at age 67");
     expect(milestone).toHaveTextContent("£11,500/year");
     expect(milestone).toHaveTextContent("£40,000");
     expect(milestone).toHaveTextContent("£28,500/year");
+    expect(milestone).toHaveTextContent("comes from the Government");
   });
 
   it("does not show a State Pension milestone when the plan has no State Pension", () => {
