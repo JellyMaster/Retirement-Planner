@@ -60,6 +60,10 @@
   padding: var(--space-3) 0;
 }
 
+.drawdown-balance-waterfall-flow.has-inflation-step {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
 .drawdown-balance-waterfall-flow::before {
   position: absolute;
   z-index: 0;
@@ -144,6 +148,13 @@
   background: var(--colour-negative, var(--colour-danger));
 }
 
+.drawdown-balance-waterfall-inflation-note {
+  margin: calc(var(--space-2) * -1) 0 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.45;
+}
+
 .drawdown-balance-waterfall-result {
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr);
@@ -195,6 +206,12 @@
   }
 }
 
+@media (max-width: 1200px) {
+  .drawdown-balance-waterfall-flow.has-inflation-step {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1000px) {
   .drawdown-balance-waterfall-flow {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -221,7 +238,8 @@
     text-align: left;
   }
 
-  .drawdown-balance-waterfall-flow {
+  .drawdown-balance-waterfall-flow,
+  .drawdown-balance-waterfall-flow.has-inflation-step {
     grid-template-columns: 1fr;
   }
 }
