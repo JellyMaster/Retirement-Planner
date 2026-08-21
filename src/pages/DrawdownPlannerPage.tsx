@@ -4,7 +4,10 @@ import { PoundSterling, TrendingUp } from "lucide-react";
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
 import { DrawdownBalanceChartExplorer } from "../components/drawdown/DrawdownBalanceChartExplorer";
 import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStory";
-import { DrawdownBalanceYearStory } from "../components/drawdown/DrawdownBalanceYearStory";
+import {
+  DrawdownBalanceAgeControl,
+  DrawdownBalanceYearStory,
+} from "../components/drawdown/DrawdownBalanceYearStory";
 import { DrawdownBalanceYearTable } from "../components/drawdown/DrawdownBalanceYearTable";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
@@ -145,8 +148,9 @@ export function DrawdownPlannerPage() {
                 {activeSection === "balance" && (
                   <div className="drawdown-workspace-section drawdown-detailed-balance" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
                     <SectionHeading eyebrow="Pension balance" title="What is happening to your pension?" description="Follow how investment growth, pension withdrawals and fees change the money left in your pension through retirement." />
+                    <DrawdownBalanceAgeControl years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} />
                     <DrawdownBalanceChartExplorer inputs={inputs} result={result} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} />
-                    <DrawdownBalanceYearStory years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} />
+                    <DrawdownBalanceYearStory years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} />
                     <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} drawdown={activeScenario.drawdown} />
                     <DrawdownBalanceYearTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} />
                   </div>
