@@ -53,7 +53,7 @@ export function DrawdownBalanceChart({
       direction: "positive" as const,
       detail: growthCoverage === null
         ? undefined
-        : `${formatPercentage(growthCoverage)} of withdrawals and fees replaced`,
+        : `${formatPercentage(growthCoverage)} of withdrawals and fees covered`,
       tooltipTitle: "Investment growth",
       tooltipText:
         "The amount your pension is projected to gain from investment returns during this year. It increases the pension balance.",
@@ -180,14 +180,21 @@ export function DrawdownBalanceChart({
           {formatCurrency(Math.abs(balanceChange))}
         </strong>
         <div className="drawdown-balance-waterfall-result-copy">
+          <span
+            className="drawdown-balance-trend"
+            aria-label={`Balance trend: ${balanceChange >= 0 ? "up" : "down"} ${formatPercentage(balanceChangeRate)}`}
+          >
+            <b aria-hidden="true">{balanceChange >= 0 ? "↑" : "↓"}</b>
+            {formatPercentage(balanceChangeRate)} {balanceChange >= 0 ? "higher" : "lower"}
+          </span>
           <p>
             {balanceChange >= 0
-              ? `Your pension finished the year ${formatPercentage(balanceChangeRate)} higher than it started.`
-              : `Your pension finished the year ${formatPercentage(balanceChangeRate)} lower than it started. In retirement, that can be a normal part of using the money you have built up.`}
+              ? "Your pension finished the year higher than it started."
+              : "Your pension finished the year lower than it started. In retirement, that can be a normal part of using the money you have built up."}
           </p>
           {growthCoverage !== null && (
             <small>
-              Investment growth replaced {formatPercentage(growthCoverage)} of the money taken out and fees this year.
+              Investment growth covered {formatPercentage(growthCoverage)} of the money taken out and fees this year.
             </small>
           )}
         </div>
