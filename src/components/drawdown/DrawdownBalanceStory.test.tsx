@@ -66,6 +66,23 @@ const drawdown: ScenarioDrawdownPreferences = {
 };
 
 describe("DrawdownBalanceStory", () => {
+  it("summarises the balance story without referring to a chart", () => {
+    render(
+      <DrawdownBalanceStory
+        inputs={inputs}
+        result={result}
+        displayMode="nominal"
+        drawdown={drawdown}
+      />,
+    );
+
+    expect(screen.getByText("Understanding your pension balance")).toBeInTheDocument();
+    expect(
+      screen.getByText(/These key answers summarise what the balance story means for your retirement/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/balance chart/i)).not.toBeInTheDocument();
+  });
+
   it("explains the remaining pension and progress toward the reserve goal", () => {
     render(
       <DrawdownBalanceStory
@@ -76,15 +93,18 @@ describe("DrawdownBalanceStory", () => {
       />,
     );
 
+    expect(screen.getByText("Will your pension last?")).toBeInTheDocument();
     expect(
       screen.getByText("50.0% of the pension available at retirement remains at age 67."),
     ).toBeInTheDocument();
     expect(
       screen.getByText("Reached at age 67, at the end of the plan."),
     ).toBeInTheDocument();
+    expect(screen.getByText("Target reserve")).toBeInTheDocument();
+    expect(screen.getByText("Projected reserve at age 67")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "The current illustration keeps 62.5% of your target reserve and finishes £30,000 below the goal.",
+        "Your plan keeps 62.5% of the reserve you asked to retain and finishes £30,000 below your target.",
       ),
     ).toBeInTheDocument();
   });
@@ -101,6 +121,9 @@ describe("DrawdownBalanceStory", () => {
     expect(screen.getByText("Age 65")).toBeInTheDocument();
     expect(
       screen.getByText(/A falling balance can be a normal part of funding retirement/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("A reducing pension isn't necessarily a problem."),
     ).toBeInTheDocument();
   });
 });
