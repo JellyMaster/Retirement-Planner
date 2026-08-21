@@ -51,8 +51,8 @@ export function DrawdownBalanceYearStory({
   )?.age;
   const firstDepletionAge = displayYears.find((year) => year.isDepleted)?.age;
   const firstSustainedDeclineAge = findFirstSustainedDeclineAge(displayYears);
-  const effectiveStatePensionAge = statePensionAge
-    ?? displayYears.find((year) => year.statePensionIncome > 0)?.age;
+  const effectiveStatePensionAge =
+    statePensionAge ?? displayYears.find((year) => year.statePensionIncome > 0)?.age;
   const milestones = createBalanceMilestones({
     displayYears,
     statePensionAge: effectiveStatePensionAge,
@@ -66,10 +66,11 @@ export function DrawdownBalanceYearStory({
       <div className="panel drawdown-balance-year-breakdown">
         <header className="drawdown-balance-year-heading">
           <div>
-            <p className="panel-eyebrow">Your pension this year</p>
-            <h3 id="drawdown-balance-year-title">Balance breakdown</h3>
+            <p className="panel-eyebrow">Explore the timeline</p>
+            <h3 id="drawdown-balance-year-title">Choose a year to understand</h3>
             <p>
-              Age {selected.age} · {selected.year} · {displayMode === "today" ? "Today’s money" : "Future money"}
+              Move through retirement to update the waterfall and explanation above.
+              Milestones show the first year something important changes.
             </p>
           </div>
         </header>
@@ -133,23 +134,15 @@ export function DrawdownBalanceYearStory({
           </div>
         </div>
 
-        <dl className="drawdown-balance-year-grid">
-          <BalanceFigure label="Started the year with" value={selected.openingBalance} />
-          <BalanceFigure label="Investment growth" value={selected.investmentGrowth} prefix="+" tone="positive" />
-          <BalanceFigure label="Taken from your pension" value={selected.pensionWithdrawal} prefix="−" />
-          <BalanceFigure label="Fees" value={selected.fees} prefix="−" />
-          <BalanceFigure label="Finished the year with" value={selected.closingBalance} emphasis />
-        </dl>
-
         <div className={`drawdown-balance-explanation ${balanceChange < 0 ? "is-neutral" : "is-positive"}`}>
           <strong>{balanceChange >= 0 ? "Your pension finished the year higher" : "Your pension reduced this year"}</strong>
           <p>
             {growthCoversOutgoings
-              ? "Investment growth was enough to cover the money taken from your pension and the fees charged this year."
-              : "You took more from the pension, including fees, than it gained from investment growth. A falling balance can be a normal part of using your pension in retirement."}
+              ? `Investment growth of ${formatCurrency(selected.investmentGrowth)} was enough to cover ${formatCurrency(selected.pensionWithdrawal)} taken from the pension and ${formatCurrency(selected.fees)} in fees.`
+              : `The ${formatCurrency(selected.pensionWithdrawal)} taken from your pension plus ${formatCurrency(selected.fees)} in fees was greater than the ${formatCurrency(selected.investmentGrowth)} gained through investment growth. A falling balance can be a normal part of using your pension in retirement.`}
           </p>
           <small>
-            Overall change this year: {balanceChange >= 0 ? "+" : "−"}{formatCurrency(Math.abs(balanceChange))}
+            Overall change at age {selected.age}: {balanceChange >= 0 ? "+" : "−"}{formatCurrency(Math.abs(balanceChange))}
           </small>
         </div>
       </div>
@@ -252,27 +245,6 @@ function createBalanceMilestones({
   add(firstDepletionAge, "The private pension is fully used", "warning");
 
   return [...byAge.values()].sort((a, b) => a.age - b.age);
-}
-
-function BalanceFigure({
-  label,
-  value,
-  prefix = "",
-  tone,
-  emphasis = false,
-}: {
-  label: string;
-  value: number;
-  prefix?: string;
-  tone?: "positive";
-  emphasis?: boolean;
-}) {
-  return (
-    <div className={`${emphasis ? "is-emphasis" : ""} ${tone ? `is-${tone}` : ""}`.trim()}>
-      <dt>{label}</dt>
-      <dd>{prefix}{formatCurrency(value)}</dd>
-    </div>
-  );
 }
 
 function BalanceContext({
