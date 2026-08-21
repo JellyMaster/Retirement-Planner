@@ -136,6 +136,14 @@
   padding: var(--space-4);
 }
 
+.drawdown-balance-metrics > article.is-positive {
+  border-color: color-mix(in srgb, var(--status-good, var(--colour-success)) 28%, var(--colour-border));
+}
+
+.drawdown-balance-metrics > article.is-warning {
+  border-color: color-mix(in srgb, var(--status-warning, var(--colour-warning)) 40%, var(--colour-border));
+}
+
 .drawdown-balance-metrics strong {
   font-size: 1.15rem;
 }
@@ -158,25 +166,351 @@
   line-height: 1.5;
 }
 
+.drawdown-detailed-balance {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.drawdown-balance-year-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.85fr);
+  gap: var(--space-4);
+}
+
+.drawdown-balance-year-breakdown,
+.drawdown-balance-year-context {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.drawdown-balance-year-heading h3,
+.drawdown-balance-year-heading p,
+.drawdown-balance-year-context h3 {
+  margin: 0;
+}
+
+.drawdown-balance-year-heading p:last-child {
+  margin-top: var(--space-1);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-balance-age-control {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-balance-age-control input {
+  width: 100%;
+  accent-color: var(--colour-primary);
+}
+
+.drawdown-balance-age-control > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+}
+
+.drawdown-balance-age-control strong {
+  color: var(--colour-primary);
+}
+
+.drawdown-balance-year-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.drawdown-balance-year-grid > div {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-balance-year-grid dt {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 750;
+}
+
+.drawdown-balance-year-grid dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.drawdown-balance-year-grid .is-positive dd {
+  color: var(--status-good, var(--colour-success));
+}
+
+.drawdown-balance-year-grid .is-emphasis {
+  border-color: color-mix(in srgb, var(--colour-primary) 42%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 7%, var(--colour-surface));
+}
+
+.drawdown-balance-year-grid .is-emphasis dd {
+  color: var(--colour-primary);
+}
+
+.drawdown-balance-explanation,
+.drawdown-balance-next-year,
+.drawdown-balance-reserve-summary,
+.drawdown-balance-story-note {
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-balance-explanation strong,
+.drawdown-balance-next-year strong {
+  display: block;
+}
+
+.drawdown-balance-explanation p,
+.drawdown-balance-next-year p,
+.drawdown-balance-story-note {
+  margin: var(--space-1) 0 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.drawdown-balance-explanation small,
+.drawdown-balance-next-year > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 750;
+}
+
+.drawdown-balance-explanation.is-positive {
+  border-color: color-mix(in srgb, var(--status-good, var(--colour-success)) 32%, var(--colour-border));
+}
+
+.drawdown-balance-context-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drawdown-balance-context {
+  padding: var(--space-3);
+  border-left: 3px solid var(--colour-border-strong);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--colour-surface-secondary);
+}
+
+.drawdown-balance-context.is-positive {
+  border-left-color: var(--status-good, var(--colour-success));
+}
+
+.drawdown-balance-context.is-warning {
+  border-left-color: var(--status-warning, var(--colour-warning));
+  background: var(--status-warning-background, var(--colour-warning-background));
+}
+
+.drawdown-balance-context p {
+  margin: var(--space-1) 0 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.5;
+}
+
+.drawdown-balance-reserve-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.drawdown-balance-reserve-summary > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drawdown-balance-reserve-summary span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 750;
+}
+
+.drawdown-balance-reserve-summary strong {
+  font-size: 1.15rem;
+}
+
+.drawdown-balance-reserve-summary p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-balance-reserve-summary.is-positive {
+  border-color: color-mix(in srgb, var(--status-good, var(--colour-success)) 32%, var(--colour-border));
+}
+
+.drawdown-balance-reserve-summary.is-warning {
+  border-color: color-mix(in srgb, var(--status-warning, var(--colour-warning)) 40%, var(--colour-border));
+}
+
+.drawdown-balance-story-note {
+  margin: 0;
+}
+
+.drawdown-balance-year-table {
+  overflow: hidden;
+  margin: 0;
+}
+
+.drawdown-balance-year-table > summary {
+  list-style: none;
+}
+
+.drawdown-balance-year-table > summary::-webkit-details-marker {
+  display: none;
+}
+
+.drawdown-balance-year-table-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+}
+
+.drawdown-balance-year-table-summary > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drawdown-balance-year-table-summary small {
+  color: var(--colour-text-muted);
+}
+
+.drawdown-balance-year-table-content {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  border-top: 1px solid var(--colour-border);
+}
+
+.drawdown-balance-table-toolbar,
+.drawdown-balance-page-status,
+.drawdown-balance-pagination,
+.drawdown-balance-page-size {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.drawdown-balance-table-toolbar {
+  justify-content: space-between;
+}
+
+.drawdown-balance-page-status {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+}
+
+.drawdown-balance-page-size {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  font-weight: 700;
+}
+
+.drawdown-balance-page-size select {
+  padding: 0.4rem 1.75rem 0.4rem 0.6rem;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface);
+  color: var(--colour-text);
+}
+
+.drawdown-balance-detail-table td,
+.drawdown-balance-detail-table th {
+  white-space: nowrap;
+}
+
+.drawdown-balance-detail-table tbody td,
+.drawdown-balance-detail-table tbody th {
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
+}
+
+.drawdown-balance-detail-table tr.is-selected-year > th,
+.drawdown-balance-detail-table tr.is-selected-year > td {
+  background: color-mix(in srgb, var(--colour-primary) 8%, var(--colour-surface));
+}
+
+.drawdown-balance-detail-table tr.is-selected-year > th:first-child {
+  box-shadow: inset 3px 0 0 var(--colour-primary);
+}
+
+.drawdown-balance-pagination {
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.drawdown-balance-pagination > span {
+  min-width: 7.5rem;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .drawdown-balance-year-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1000px) {
   .drawdown-balance-metrics,
   .drawdown-balance-periods {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .drawdown-balance-year-story {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 700px) {
   .drawdown-income-waterfall > header,
   .drawdown-balance-story > header,
-  .drawdown-waterfall-card-heading {
-    align-items: flex-start;
+  .drawdown-waterfall-card-heading,
+  .drawdown-balance-table-toolbar,
+  .drawdown-balance-page-status,
+  .drawdown-balance-pagination {
+    align-items: stretch;
     flex-direction: column;
   }
 
   .drawdown-waterfall-grid,
   .drawdown-balance-metrics,
   .drawdown-balance-periods,
-  .drawdown-waterfall-grid dl {
+  .drawdown-waterfall-grid dl,
+  .drawdown-balance-year-grid,
+  .drawdown-balance-reserve-summary {
     grid-template-columns: 1fr;
+  }
+
+  .drawdown-balance-reserve-summary p {
+    grid-column: auto;
+  }
+
+  .drawdown-balance-pagination .ui-button,
+  .drawdown-balance-page-status .ui-button {
+    width: 100%;
   }
 }
