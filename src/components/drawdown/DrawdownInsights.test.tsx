@@ -47,7 +47,7 @@ const fundedResult: DrawdownResult = {
 };
 
 describe("DrawdownInsights", () => {
-  it("keeps fully funded and neutral observations free of attention tooltips", () => {
+  it("keeps reassuring and neutral observations free of attention tooltips", () => {
     render(
       <DrawdownInsights
         inputs={inputs}
@@ -56,8 +56,8 @@ describe("DrawdownInsights", () => {
       />,
     );
 
-    expect(screen.getByText("Pension lasts throughout the plan")).toBeInTheDocument();
-    expect(screen.getByText("Income target is fully funded")).toBeInTheDocument();
+    expect(screen.getByText("Your pension is expected to last through age 90")).toBeInTheDocument();
+    expect(screen.getByText("Your planned income is fully supported")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /needs attention/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
@@ -72,7 +72,7 @@ describe("DrawdownInsights", () => {
     );
 
     const trigger = screen.getByRole("button", {
-      name: "Explain why pension depletes at age 82 needs attention",
+      name: "Explain why your pension is expected to run out around age 82 needs attention",
     });
     const tooltipId = trigger.getAttribute("aria-describedby");
 
@@ -80,13 +80,16 @@ describe("DrawdownInsights", () => {
     expect(document.getElementById(tooltipId!)).toHaveAttribute("role", "tooltip");
     expect(screen.getByText("Why am I seeing this?")).toBeInTheDocument();
     expect(
-      screen.getByText(/projected to run out at age 82, before the end of your planning period/i),
+      screen.getByText(/expected to be exhausted around age 82/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/would need another source of income to continue meeting your planned spending/i),
     ).toBeInTheDocument();
     expect(screen.getByText("Things you could review")).toBeInTheDocument();
-    expect(screen.getByText("Retirement income target")).toBeInTheDocument();
-    expect(screen.getByText("Retirement age")).toBeInTheDocument();
-    expect(screen.getByText("Tax-free cash amount")).toBeInTheDocument();
-    expect(screen.getByText("Withdrawal strategy")).toBeInTheDocument();
+    expect(screen.getByText("Your planned retirement income")).toBeInTheDocument();
+    expect(screen.getByText("When you retire")).toBeInTheDocument();
+    expect(screen.getByText("How much tax-free cash you take")).toBeInTheDocument();
+    expect(screen.getByText("How you take money from your pension")).toBeInTheDocument();
   });
 
   it("explains an income shortfall warning without implying the pension has depleted", () => {
@@ -99,15 +102,15 @@ describe("DrawdownInsights", () => {
     );
 
     const trigger = screen.getByRole("button", {
-      name: "Explain why first income shortfall at age 78 needs attention",
+      name: "Explain why your planned income may no longer be fully achievable from age 78 needs attention",
     });
 
     expect(trigger).toHaveAttribute("aria-describedby");
     expect(
-      screen.getByText(/can no longer fully provide your chosen retirement income from age 78/i),
+      screen.getByText(/may not be able to provide the level of income you've chosen from age 78/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/does not mean your pension has run out/i),
+      screen.getByText(/different from your pension running out completely/i),
     ).toBeInTheDocument();
     expect(screen.getAllByRole("tooltip")).toHaveLength(1);
   });
