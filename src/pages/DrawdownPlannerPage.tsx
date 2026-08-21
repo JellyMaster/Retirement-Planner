@@ -4,6 +4,8 @@ import { PoundSterling, TrendingUp } from "lucide-react";
 import { DrawdownAssumptionsPanel } from "../components/drawdown/DrawdownAssumptionsPanel";
 import { DrawdownBalanceChartExplorer } from "../components/drawdown/DrawdownBalanceChartExplorer";
 import { DrawdownBalanceStory } from "../components/drawdown/DrawdownBalanceStory";
+import { DrawdownBalanceYearStory } from "../components/drawdown/DrawdownBalanceYearStory";
+import { DrawdownBalanceYearTable } from "../components/drawdown/DrawdownBalanceYearTable";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
 import { DrawdownIncomeYearStory } from "../components/drawdown/DrawdownIncomeYearStory";
@@ -46,6 +48,7 @@ export function DrawdownPlannerPage() {
   const [viewMode, setViewMode] = useState<DrawdownViewMode>("simple");
   const [activeSection, setActiveSection] = useState<DrawdownWorkspaceSection>("income");
   const [incomeSelectedAge, setIncomeSelectedAge] = useState<number | null>(null);
+  const [balanceSelectedAge, setBalanceSelectedAge] = useState<number | null>(null);
   const pensionProjection = usePensionProjection(activeScenario.inputs);
   const inputs = useMemo(
     () => createDrawdownInputsFromPlan({ pensionInputs: activeScenario.inputs, projection: pensionProjection.projection, retirementGoals, drawdown: activeScenario.drawdown }),
@@ -55,6 +58,9 @@ export function DrawdownPlannerPage() {
   const result = useMemo(() => (validation.isValid ? drawdownEngine.calculate(inputs) : null), [inputs, validation.isValid]);
   const selectedIncomeAge = result?.years.some((year) => year.age === incomeSelectedAge)
     ? incomeSelectedAge!
+    : result?.years[0]?.age ?? inputs.retirementAge;
+  const selectedBalanceAge = result?.years.some((year) => year.age === balanceSelectedAge)
+    ? balanceSelectedAge!
     : result?.years[0]?.age ?? inputs.retirementAge;
 
   useEffect(() => {
@@ -93,22 +99,8 @@ export function DrawdownPlannerPage() {
 
           <div className="drawdown-view-actions">
             <div className="drawdown-view-mode-toggle" role="group" aria-label="Drawdown view">
-              <button
-                type="button"
-                className={viewMode === "simple" ? "is-active" : undefined}
-                aria-pressed={viewMode === "simple"}
-                onClick={() => setViewMode("simple")}
-              >
-                Simple
-              </button>
-              <button
-                type="button"
-                className={viewMode === "detailed" ? "is-active" : undefined}
-                aria-pressed={viewMode === "detailed"}
-                onClick={() => setViewMode("detailed")}
-              >
-                Detailed
-              </button>
+              <button type="button" className={viewMode === "simple" ? "is-active" : undefined} aria-pressed={viewMode === "simple"} onClick={() => setViewMode("simple")}>Simple</button>
+              <button type="button" className={viewMode === "detailed" ? "is-active" : undefined} aria-pressed={viewMode === "detailed"} onClick={() => setViewMode("detailed")}>Detailed</button>
             </div>
             <MoneyDisplayToggle value={displayMode} onChange={setDisplayMode} />
           </div>
@@ -125,49 +117,19 @@ export function DrawdownPlannerPage() {
             viewMode === "simple" ? (
               <div className="drawdown-workspace-section drawdown-retirement-story drawdown-v12-dashboard drawdown-simple-story" id="drawdown-simple-section">
                 <section className="drawdown-simple-story-section drawdown-simple-outcome" aria-labelledby="drawdown-simple-outcome-title">
-                  <SimpleStoryHeading
-                    eyebrow="Retirement outcome"
-                    title="Can your plan support your retirement?"
-                    description="Start with the headline outcome from your current plan."
-                    id="drawdown-simple-outcome-title"
-                  />
+                  <SimpleStoryHeading eyebrow="Retirement outcome" title="Can your plan support your retirement?" description="Start with the headline outcome from your current plan." id="drawdown-simple-outcome-title" />
                   <DrawdownSummaryRibbon inputs={inputs} result={result} displayMode={displayMode} />
                 </section>
-
                 <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-journey-title">
-                  <SimpleStoryHeading
-                    eyebrow="Your retirement journey"
-                    title="What happens over time?"
-                    description="Follow how your pension and retirement income develop through the plan."
-                    id="drawdown-simple-journey-title"
-                  />
-                  <DrawdownJourneyChart
-                    years={result.years}
-                    inflationRate={inputs.inflationRate}
-                    displayMode={displayMode}
-                    spendingPhases={inputs.spendingPhases}
-                    statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
-                    depletionAge={result.depletionAge}
-                  />
+                  <SimpleStoryHeading eyebrow="Your retirement journey" title="What happens over time?" description="Follow how your pension and retirement income develop through the plan." id="drawdown-simple-journey-title" />
+                  <DrawdownJourneyChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} spendingPhases={inputs.spendingPhases} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} depletionAge={result.depletionAge} />
                 </section>
-
                 <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-observations-title">
-                  <SimpleStoryHeading
-                    eyebrow="At a glance"
-                    title="Anything important you should know?"
-                    description="These observations highlight the parts of the plan worth noticing."
-                    id="drawdown-simple-observations-title"
-                  />
+                  <SimpleStoryHeading eyebrow="At a glance" title="Anything important you should know?" description="These observations highlight the parts of the plan worth noticing." id="drawdown-simple-observations-title" />
                   <DrawdownInsights inputs={inputs} result={result} displayMode={displayMode} />
                 </section>
-
                 <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-income-title">
-                  <SimpleStoryHeading
-                    eyebrow="Retirement income"
-                    title="Where does your income come from?"
-                    description="See how your pension and State Pension combine to support retirement income."
-                    id="drawdown-simple-income-title"
-                  />
+                  <SimpleStoryHeading eyebrow="Retirement income" title="Where does your income come from?" description="See how your pension and State Pension combine to support retirement income." id="drawdown-simple-income-title" />
                   <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
                 </section>
               </div>
@@ -177,51 +139,21 @@ export function DrawdownPlannerPage() {
 
                 {activeSection === "income" && (
                   <div className="drawdown-workspace-section drawdown-detailed-income" id="drawdown-income-section" role="tabpanel" aria-labelledby="drawdown-tab-income" tabIndex={0}>
-                    <SectionHeading
-                      eyebrow="Income story"
-                      title="Income through retirement"
-                      description="See how money from your pension, State Pension and estimated tax combine to provide the money you can spend each year."
-                    />
-                    <DrawdownIncomeChart
-                      years={result.years}
-                      inflationRate={inputs.inflationRate}
-                      displayMode={displayMode}
-                      spendingPhases={inputs.spendingPhases}
-                      statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
-                      selectedAge={selectedIncomeAge}
-                      onSelectAge={setIncomeSelectedAge}
-                    />
-                    <DrawdownIncomeYearStory
-                      years={result.years}
-                      inflationRate={inputs.inflationRate}
-                      displayMode={displayMode}
-                      selectedAge={selectedIncomeAge}
-                      onSelectAge={setIncomeSelectedAge}
-                      statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined}
-                      spendingPhases={inputs.spendingPhases}
-                    />
+                    <SectionHeading eyebrow="Income story" title="Income through retirement" description="See how money from your pension, State Pension and estimated tax combine to provide the money you can spend each year." />
+                    <DrawdownIncomeChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} spendingPhases={inputs.spendingPhases} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} selectedAge={selectedIncomeAge} onSelectAge={setIncomeSelectedAge} />
+                    <DrawdownIncomeYearStory years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedIncomeAge} onSelectAge={setIncomeSelectedAge} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} spendingPhases={inputs.spendingPhases} />
                     <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
-                    <DrawdownIncomeYearTable
-                      years={result.years}
-                      inflationRate={inputs.inflationRate}
-                      displayMode={displayMode}
-                      selectedAge={selectedIncomeAge}
-                    />
+                    <DrawdownIncomeYearTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedIncomeAge} />
                   </div>
                 )}
 
                 {activeSection === "balance" && (
-                  <div className="drawdown-workspace-section" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
-                    <SectionHeading eyebrow="Pension balance" title="How does your pension change through retirement?" description="See the current plan in detail and inspect alternative ending-balance illustrations." />
-                    <DrawdownRetirementChapters inputs={inputs} result={result} displayMode={displayMode} />
-                    <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} />
-                    <DrawdownBalanceChartExplorer
-                      inputs={inputs}
-                      result={result}
-                      displayMode={displayMode}
-                      drawdown={activeScenario.drawdown}
-                      onChange={updateDrawdownPreferences}
-                    />
+                  <div className="drawdown-workspace-section drawdown-detailed-balance" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
+                    <SectionHeading eyebrow="Pension balance" title="What is happening to your pension?" description="Follow how investment growth, pension withdrawals and fees change the money left in your pension through retirement." />
+                    <DrawdownBalanceChartExplorer inputs={inputs} result={result} displayMode={displayMode} drawdown={activeScenario.drawdown} onChange={updateDrawdownPreferences} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} />
+                    <DrawdownBalanceYearStory years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} />
+                    <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} drawdown={activeScenario.drawdown} />
+                    <DrawdownBalanceYearTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} />
                   </div>
                 )}
 
@@ -250,13 +182,7 @@ export function DrawdownPlannerPage() {
 }
 
 function SimpleStoryHeading({ eyebrow, title, description, id }: { eyebrow: string; title: string; description: string; id: string }) {
-  return (
-    <div className="drawdown-simple-story-heading">
-      <p className="panel-eyebrow">{eyebrow}</p>
-      <h2 id={id}>{title}</h2>
-      <p>{description}</p>
-    </div>
-  );
+  return <div className="drawdown-simple-story-heading"><p className="panel-eyebrow">{eyebrow}</p><h2 id={id}>{title}</h2><p>{description}</p></div>;
 }
 
 function SectionHeading({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
@@ -276,10 +202,7 @@ function MoneyDisplayToggle({ value, onChange }: MoneyDisplayToggleProps) {
         <span>{showingToday ? "Today’s money" : "Future money"}</span>
         <span className="money-display-toggle-track" aria-hidden="true"><span className="money-display-toggle-thumb" /></span>
       </button>
-      <InfoTooltip
-        ariaLabel="Explain today’s money and future money"
-        size="medium"
-      >
+      <InfoTooltip ariaLabel="Explain today’s money and future money" size="medium">
         <strong>Today&apos;s money</strong>
         <p>Removes inflation so figures are shown using today&apos;s purchasing power.</p>
         <strong>Future money</strong>
