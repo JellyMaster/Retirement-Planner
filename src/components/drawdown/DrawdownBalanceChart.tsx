@@ -26,6 +26,8 @@ interface DrawdownBalanceChartProps {
   displayMode: MoneyDisplayMode;
   spendingPhases: DrawdownSpendingPhase[] | undefined;
   statePensionAge: number | undefined;
+  selectedAge?: number;
+  onSelectAge?: (age: number) => void;
 }
 
 interface ChartDataPoint {
@@ -41,6 +43,8 @@ export function DrawdownBalanceChart({
   displayMode,
   spendingPhases,
   statePensionAge,
+  selectedAge,
+  onSelectAge,
 }: DrawdownBalanceChartProps) {
   const chartColours = useChartTheme();
 
@@ -59,14 +63,21 @@ export function DrawdownBalanceChart({
       <div className="panel-heading">
         <h2>Your pension through retirement</h2>
         <p>
-          Track the pension left at the start and end of each year, with key
-          retirement chapter changes marked on the chart. Values are shown in {displayMode === "today" ? "today&apos;s money" : "future money"}.
+          Track the pension left at the start and end of each year. Select a point on the chart to inspect what changed in that retirement year. Values are shown in {displayMode === "today" ? "today&apos;s money" : "future money"}.
         </p>
       </div>
 
       <div className="drawdown-chart">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 28, right: 20, bottom: 10, left: 10 }}>
+          <LineChart
+            data={chartData}
+            margin={{ top: 28, right: 20, bottom: 10, left: 10 }}
+            onClick={(state) => {
+              if (!onSelectAge || state?.activeLabel === undefined || state?.activeLabel === null) return;
+              const age = Number(state.activeLabel);
+              if (Number.isFinite(age)) onSelectAge(age);
+            }}
+          >
             <CartesianGrid stroke={chartColours.grid} strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="age" tickLine={false} tick={{ fill: chartColours.text }} axisLine={false} label={{ value: "Age", position: "insideBottom", offset: -5, fill: chartColours.text }} />
             <YAxis tickLine={false} tick={{ fill: chartColours.text }} axisLine={false} width={85} tickFormatter={formatCompactCurrency} />
@@ -84,6 +95,9 @@ export function DrawdownBalanceChart({
             />
             <Legend wrapperStyle={{ color: chartColours.text }} />
 
+            {selectedAge !== undefined && (
+              <ReferenceLine x={selectedAge} stroke={chartColours.primary} strokeWidth={2} strokeDasharray="2 3" label={{ value: `Age ${selectedAge}`, position: "insideTopLeft", fill: chartColours.text }} />
+            )}
             {statePensionAge !== undefined && (
               <ReferenceLine x={statePensionAge} stroke={chartColours.tertiary} strokeDasharray="4 4" label={{ value: "State Pension", position: "insideTopRight", fill: chartColours.text }} />
             )}
