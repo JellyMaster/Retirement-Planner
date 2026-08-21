@@ -75,14 +75,17 @@ describe("DrawdownBalanceChart", () => {
 
     expect(screen.getByText("5.0% of opening pension")).toBeInTheDocument();
     expect(
-      screen.getByText("166.67% of withdrawals and fees replaced"),
+      screen.getByText("166.67% of withdrawals and fees covered"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Your pension finished the year 4.0% higher than it started."),
+      screen.getByLabelText("Balance trend: up 4.0%"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Your pension finished the year higher than it started."),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Investment growth replaced 166.67% of the money taken out and fees this year.",
+        "Investment growth covered 166.67% of the money taken out and fees this year.",
       ),
     ).toBeInTheDocument();
   });
