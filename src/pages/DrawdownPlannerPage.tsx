@@ -79,7 +79,9 @@ export function DrawdownPlannerPage() {
         <div>
           <p className="planner-eyebrow">Your retirement</p>
           <h1>Drawdown</h1>
-          <p>See how your retirement income and pension could evolve over time.</p>
+          <p>
+            Understand how your retirement income may change throughout retirement. We&apos;ll explain where your money comes from, highlight anything worth reviewing, and show how your pension supports your lifestyle over time.
+          </p>
         </div>
       </header>
 
@@ -96,7 +98,7 @@ export function DrawdownPlannerPage() {
             <h2 id="drawdown-results-title">Choose how much detail you want to see</h2>
             <p>
               {viewMode === "simple"
-                ? "See the headline retirement story and the key points worth noticing."
+                ? "Start with the retirement story in plain English, with the key things worth noticing explained along the way."
                 : "Explore income, pension balance, the full timeline and calculation assumptions."}
             </p>
           </div>
@@ -121,17 +123,27 @@ export function DrawdownPlannerPage() {
             viewMode === "simple" ? (
               <div className="drawdown-workspace-section drawdown-retirement-story drawdown-v12-dashboard drawdown-simple-story" id="drawdown-simple-section">
                 <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-journey-title">
-                  <SimpleStoryHeading eyebrow="Your retirement journey" title="What happens over time?" description="Follow how your pension and retirement income develop through the plan." id="drawdown-simple-journey-title" />
+                  <SimpleStoryHeading eyebrow="Your retirement journey" title="What happens over time?" description="This timeline tells the story of your retirement. It shows when important events happen, such as retiring, receiving your State Pension and any changes to your spending." id="drawdown-simple-journey-title" />
                   <DrawdownJourneyChart years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} spendingPhases={inputs.spendingPhases} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} depletionAge={result.depletionAge} />
                 </section>
                 <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-observations-title">
-                  <SimpleStoryHeading eyebrow="At a glance" title="Anything important you should know?" description="These observations highlight the parts of the plan worth noticing." id="drawdown-simple-observations-title" />
+                  <SimpleStoryHeading eyebrow="At a glance" title="Anything important you should know?" description="We’ve reviewed your plan and picked out the things most likely to affect your retirement. Green items are reassuring. Amber items deserve a closer look." id="drawdown-simple-observations-title" />
                   <DrawdownInsights inputs={inputs} result={result} displayMode={displayMode} />
                 </section>
                 <section className="drawdown-simple-story-section" aria-labelledby="drawdown-simple-income-title">
-                  <SimpleStoryHeading eyebrow="Retirement income" title="Where does your income come from?" description="See how your pension and State Pension combine to support retirement income." id="drawdown-simple-income-title" />
+                  <SimpleStoryHeading eyebrow="Retirement income" title="How is your retirement funded?" description="At different points in retirement, your income may come from different places. See how your private pension and State Pension work together to provide money you can spend." id="drawdown-simple-income-title" />
                   <DrawdownIncomeWaterfall inputs={inputs} result={result} displayMode={displayMode} />
                 </section>
+                <aside className="drawdown-education-note" aria-labelledby="drawdown-education-note-title">
+                  <p className="panel-eyebrow">Good to know</p>
+                  <h2 id="drawdown-education-note-title">Understanding your retirement illustration</h2>
+                  <p>
+                    This planner uses the assumptions you&apos;ve entered together with projected investment growth, inflation and tax rules to illustrate one possible outcome. It is designed to help you understand how different choices may affect your retirement, rather than predict exactly what will happen.
+                  </p>
+                  <p>
+                    Investment returns, inflation, tax rules and your personal circumstances can all change over time.
+                  </p>
+                </aside>
               </div>
             ) : (
               <div className="drawdown-detailed-view">
@@ -203,7 +215,7 @@ function MoneyDisplayToggle({ value, onChange }: MoneyDisplayToggleProps) {
   const nextValue: MoneyDisplayMode = showingToday ? "nominal" : "today";
   return (
     <div className="money-display-toggle-group">
-      <span className="money-display-toggle-label">Display values</span>
+      <span className="money-display-toggle-label">How would you like to view the figures?</span>
       <button type="button" role="switch" aria-checked={!showingToday} aria-label={`Display values as ${showingToday ? "today's money" : "future money"}. Switch to ${showingToday ? "future money" : "today's money"}.`} className="money-display-toggle" onClick={() => onChange(nextValue)}>
         <span className="money-display-toggle-icon" aria-hidden="true">{showingToday ? <PoundSterling size={16} /> : <TrendingUp size={16} />}</span>
         <span>{showingToday ? "Today’s money" : "Future money"}</span>
@@ -211,10 +223,10 @@ function MoneyDisplayToggle({ value, onChange }: MoneyDisplayToggleProps) {
       </button>
       <InfoTooltip ariaLabel="Explain today’s money and future money" size="medium">
         <strong>Today&apos;s money</strong>
-        <p>Removes inflation so figures are shown using today&apos;s purchasing power.</p>
+        <p>Shows everything using today&apos;s buying power, making it easier to compare different years.</p>
         <strong>Future money</strong>
-        <p>Shows the projected pound amount in each future year.</p>
-        <small>The projection is unchanged; only the display basis changes.</small>
+        <p>Shows the projected pound amounts in each future year, including the effect of inflation.</p>
+        <small>Both views use the same retirement plan. Only the way the numbers are displayed changes.</small>
       </InfoTooltip>
     </div>
   );
