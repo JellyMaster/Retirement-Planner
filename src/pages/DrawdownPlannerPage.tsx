@@ -9,6 +9,10 @@ import {
   DrawdownBalanceYearStory,
 } from "../components/drawdown/DrawdownBalanceYearStory";
 import { DrawdownBalanceYearTable } from "../components/drawdown/DrawdownBalanceYearTable";
+import {
+  DrawdownExplorerPanel,
+  DrawdownExplorerSection,
+} from "../components/drawdown/DrawdownExplorerPanel";
 import { DrawdownIncomeChart } from "../components/drawdown/DrawdownIncomeChart";
 import { DrawdownIncomeWaterfall } from "../components/drawdown/DrawdownIncomeWaterfall";
 import { DrawdownIncomeYearStory } from "../components/drawdown/DrawdownIncomeYearStory";
@@ -148,9 +152,21 @@ export function DrawdownPlannerPage() {
                 {activeSection === "balance" && (
                   <div className="drawdown-workspace-section drawdown-detailed-balance" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
                     <SectionHeading eyebrow="Pension balance" title="What is happening to your pension?" description="Follow how investment growth, pension withdrawals and fees change the money left in your pension through retirement." />
-                    <DrawdownBalanceAgeControl years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} />
-                    <DrawdownBalanceChartExplorer inputs={inputs} result={result} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} />
-                    <DrawdownBalanceYearStory years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} />
+                    <DrawdownExplorerPanel
+                      eyebrow="Balance explorer"
+                      title="Explore your pension"
+                      description="Choose a year, see what changed your pension balance, then understand what that movement means for the rest of your retirement."
+                    >
+                      <DrawdownExplorerSection className="drawdown-explorer-section-timeline">
+                        <DrawdownBalanceAgeControl years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} />
+                      </DrawdownExplorerSection>
+                      <DrawdownExplorerSection className="drawdown-explorer-section-visual">
+                        <DrawdownBalanceChartExplorer inputs={inputs} result={result} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} />
+                      </DrawdownExplorerSection>
+                      <DrawdownExplorerSection className="drawdown-explorer-section-explanation">
+                        <DrawdownBalanceYearStory years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} />
+                      </DrawdownExplorerSection>
+                    </DrawdownExplorerPanel>
                     <DrawdownBalanceStory inputs={inputs} result={result} displayMode={displayMode} drawdown={activeScenario.drawdown} />
                     <DrawdownBalanceYearTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} />
                   </div>
