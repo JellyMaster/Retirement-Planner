@@ -61,7 +61,7 @@ export function DrawdownIncomeYearTable({
       <summary className="ui-disclosure-trigger drawdown-income-year-table-summary">
         <div>
           <p className="panel-eyebrow">Income by year</p>
-          <strong>See every year of your retirement income</strong>
+          <strong>See how your retirement income changes each year</strong>
           <small>Open this section when you want to check the figures behind the income story above.</small>
         </div>
         <ExpandCollapseIndicator />
@@ -104,18 +104,18 @@ export function DrawdownIncomeYearTable({
           </div>
         </div>
 
-        <div className="table-scroll" tabIndex={0} aria-label="Detailed retirement income by year">
+        <div className="table-scroll" tabIndex={0} aria-label="Retirement income by year">
           <table className="projection-table drawdown-income-detail-table">
             <thead>
               <tr>
                 <th scope="col">Age</th>
-                <th scope="col">From your pension</th>
+                <th scope="col">Money from your pension</th>
                 <th scope="col">State Pension</th>
-                <th scope="col">Total income before tax</th>
-                <th scope="col">Tax</th>
-                <th scope="col">Money to spend</th>
-                <th scope="col">Your target</th>
-                <th scope="col">Income below target</th>
+                <th scope="col">Income before tax</th>
+                <th scope="col">Estimated tax</th>
+                <th scope="col">Money available to spend</th>
+                <th scope="col">Your planned income</th>
+                <th scope="col">Below your plan by</th>
               </tr>
             </thead>
             <tbody>
@@ -150,13 +150,13 @@ export function DrawdownIncomeYearTable({
                       </span>
                       <small>{year.year}</small>
                     </th>
-                    <td data-label="From your pension">{formatCurrency(year.pensionWithdrawal)}</td>
+                    <td data-label="Money from your pension">{formatCurrency(year.pensionWithdrawal)}</td>
                     <td data-label="State Pension">{formatCurrency(year.statePensionIncome)}</td>
-                    <td data-label="Total income before tax">{formatCurrency(year.grossIncome)}</td>
-                    <td data-label="Tax">{formatCurrency(year.incomeTax)}</td>
-                    <td data-label="Money to spend"><strong>{formatCurrency(year.netIncome)}</strong></td>
-                    <td data-label="Your target">{formatCurrency(year.desiredIncome)}</td>
-                    <td data-label="Income below target">{formatCurrency(incomeBelowTarget)}</td>
+                    <td data-label="Income before tax">{formatCurrency(year.grossIncome)}</td>
+                    <td data-label="Estimated tax">{formatCurrency(year.incomeTax)}</td>
+                    <td data-label="Money available to spend"><strong>{formatCurrency(year.netIncome)}</strong></td>
+                    <td data-label="Your planned income">{formatCurrency(year.desiredIncome)}</td>
+                    <td data-label="Below your plan by">{formatCurrency(incomeBelowTarget)}</td>
                   </tr>
                 );
               })}
@@ -165,7 +165,7 @@ export function DrawdownIncomeYearTable({
         </div>
 
         {pageSize !== "all" && pageCount > 1 && (
-          <nav className="drawdown-income-pagination" aria-label="Year table pages">
+          <nav className="drawdown-income-pagination" aria-label="Income table pages">
             <button
               type="button"
               className="ui-button ui-button-secondary ui-button-small"
@@ -189,7 +189,7 @@ export function DrawdownIncomeYearTable({
         )}
 
         <p className="projection-table-footnote">
-          Values are shown in {displayMode === "today" ? "today’s money" : "future money"}. Highlighted warning rows show years when the plan provides less income than your target.
+          Values are shown in {displayMode === "today" ? "today’s money" : "future money"}. The eye marks the year selected in the income explorer above. Highlighted rows show years when the illustration provides less than your planned income.
         </p>
       </div>
     </details>
