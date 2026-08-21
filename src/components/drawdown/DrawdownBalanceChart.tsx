@@ -73,6 +73,7 @@ export function DrawdownBalanceChart({
       label: "Fees",
       value: selected.fees,
       direction: "negative" as const,
+      detail: undefined,
       tooltipTitle: "Fees",
       tooltipText:
         "The estimated pension and investment charges applied during this year. Fees are paid from the pension and reduce the balance.",
@@ -84,6 +85,7 @@ export function DrawdownBalanceChart({
             label: "Effect of inflation",
             value: Math.abs(inflationEffect),
             direction: inflationEffect >= 0 ? ("negative" as const) : ("positive" as const),
+            detail: undefined,
             tooltipTitle: "Effect of inflation",
             tooltipText:
               "Today’s money adjusts the end-of-year balance for the loss of purchasing power caused by inflation. This does not represent money leaving your pension; it shows what the future balance is worth in today’s terms.",
