@@ -29,6 +29,14 @@ export function DrawdownIncomeWaterfall({
     ...(inputs.spendingPhases?.slice(1).map((phase) => phase.startAge) ?? []),
   ]);
   const snapshots = years.filter((year) => selectedAges.has(year.age));
+  const statePensionStartYear = inputs.annualStatePension > 0
+    ? years.find(
+        (year) => year.age >= inputs.statePensionAge && year.statePensionIncome > 0,
+      )
+    : undefined;
+  const preStatePensionYear = statePensionStartYear
+    ? years.filter((year) => year.age < statePensionStartYear.age).at(-1)
+    : undefined;
 
   return (
     <section
@@ -48,6 +56,27 @@ export function DrawdownIncomeWaterfall({
         </div>
         <span>{displayMode === "today" ? "Today’s money" : "Future money"}</span>
       </header>
+
+      {statePensionStartYear && (
+        <aside
+          className="drawdown-income-transition"
+          aria-label="How State Pension changes your retirement income mix"
+        >
+          <div>
+            <small>State Pension milestone</small>
+            <strong>
+              {statePensionStartYear.age <= inputs.retirementAge
+                ? "State Pension supports your income from retirement"
+                : `State Pension starts at age ${statePensionStartYear.age}`}
+            </strong>
+          </div>
+          <p>
+            {preStatePensionYear
+              ? `It adds ${formatCurrency(statePensionStartYear.statePensionIncome)}/year and changes the amount needed from your private pension from ${formatCurrency(preStatePensionYear.pensionWithdrawal)} to ${formatCurrency(statePensionStartYear.pensionWithdrawal)}/year.`
+              : `It provides ${formatCurrency(statePensionStartYear.statePensionIncome)}/year alongside ${formatCurrency(statePensionStartYear.pensionWithdrawal)}/year from your private pension.`}
+          </p>
+        </aside>
+      )}
 
       <div className="drawdown-waterfall-grid">
         {snapshots.map((year) => {
