@@ -148,11 +148,7 @@ export function DrawdownPlannerPage() {
                 {activeSection === "balance" && (
                   <div className="drawdown-workspace-section drawdown-detailed-balance" id="drawdown-balance-section" role="tabpanel" aria-labelledby="drawdown-tab-balance" tabIndex={0}>
                     <SectionHeading eyebrow="Pension balance" title="What is happening to your pension?" description="Follow how investment growth, pension withdrawals and fees change the money left in your pension through retirement." />
-                    <DrawdownExplorerPanel
-                      eyebrow="Balance explorer"
-                      title="Explore your pension"
-                      description="Choose a year, see what changed your pension balance, then understand what that movement means for the rest of your retirement."
-                    >
+                    <DrawdownExplorerPanel>
                       <DrawdownExplorerSection className="drawdown-explorer-section-timeline">
                         <DrawdownBalanceAgeControl years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} selectedAge={selectedBalanceAge} onSelectAge={setBalanceSelectedAge} statePensionAge={inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined} />
                       </DrawdownExplorerSection>
