@@ -8,7 +8,6 @@ interface DrawdownBalanceChartExplorerProps {
   result: DrawdownResult;
   displayMode: MoneyDisplayMode;
   selectedAge?: number;
-  onSelectAge?: (age: number) => void;
 }
 
 export function DrawdownBalanceChartExplorer({
@@ -16,7 +15,6 @@ export function DrawdownBalanceChartExplorer({
   result,
   displayMode,
   selectedAge,
-  onSelectAge,
 }: DrawdownBalanceChartExplorerProps) {
   return (
     <section className="drawdown-balance-chart-explorer">
@@ -25,12 +23,7 @@ export function DrawdownBalanceChartExplorer({
         depletionAge={result.depletionAge}
         inflationRate={inputs.inflationRate}
         displayMode={displayMode}
-        spendingPhases={inputs.spendingPhases}
-        statePensionAge={
-          inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined
-        }
         selectedAge={selectedAge}
-        onSelectAge={onSelectAge}
       />
     </section>
   );
