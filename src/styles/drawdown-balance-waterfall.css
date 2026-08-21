@@ -87,6 +87,11 @@
   background: var(--colour-surface);
 }
 
+.drawdown-balance-waterfall-step:hover,
+.drawdown-balance-waterfall-step:focus-within {
+  z-index: 60;
+}
+
 .drawdown-balance-waterfall-step-label {
   display: inline-flex;
   align-items: center;
