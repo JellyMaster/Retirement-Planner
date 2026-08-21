@@ -59,7 +59,7 @@ const result: DrawdownResult = {
 };
 
 describe("DrawdownRetirementJourneySummary", () => {
-  it("explains the important retirement milestones in plain English", () => {
+  it("keeps the milestone path as the main retirement story", () => {
     render(<DrawdownRetirementJourneySummary inputs={inputs} result={result} />);
 
     expect(screen.getByText("The important moments in your retirement")).toBeInTheDocument();
@@ -69,14 +69,24 @@ describe("DrawdownRetirementJourneySummary", () => {
     expect(screen.getByText("Your planning period ends")).toBeInTheDocument();
   });
 
-  it("answers the key journey questions without technical depletion language", () => {
+  it("uses four compact key answers without duplicating the spending milestone", () => {
     render(<DrawdownRetirementJourneySummary inputs={inputs} result={result} />);
 
-    expect(screen.getByText("When does retirement begin?")).toBeInTheDocument();
-    expect(screen.getByText("When does State Pension begin helping?")).toBeInTheDocument();
-    expect(screen.getByText("Is your planned income fully met?")).toBeInTheDocument();
-    expect(screen.getByText("Does your private pension last?")).toBeInTheDocument();
+    expect(screen.getByText("Retirement starts")).toBeInTheDocument();
+    expect(screen.getByText("State Pension starts")).toBeInTheDocument();
+    expect(screen.getByText("Private pension lasts")).toBeInTheDocument();
+    expect(screen.getByText("Planned income")).toBeInTheDocument();
+    expect(screen.queryByText("When does planned spending first change?")).not.toBeInTheDocument();
     expect(screen.queryByText(/depletion/i)).not.toBeInTheDocument();
+  });
+
+  it("finishes with a quiet educational explanation of the journey", () => {
+    render(<DrawdownRetirementJourneySummary inputs={inputs} result={result} />);
+
+    expect(
+      screen.getByText(/This journey highlights the key moments where your income or pension changes/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("What does this journey tell you?")).not.toBeInTheDocument();
   });
 });
 
