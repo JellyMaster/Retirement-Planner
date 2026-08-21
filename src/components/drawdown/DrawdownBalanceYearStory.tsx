@@ -65,30 +65,19 @@ export function DrawdownBalanceAgeControl({
   });
 
   return (
-    <section className="panel drawdown-balance-year-breakdown drawdown-balance-timeline-control" aria-labelledby="drawdown-balance-timeline-title">
-      <header className="drawdown-balance-year-heading">
-        <div>
-          <p className="panel-eyebrow">Explore the timeline</p>
-          <h3 id="drawdown-balance-timeline-title">Choose a year to understand</h3>
-          <p>
-            Move through retirement to update the waterfall below. Milestones show the
-            first year something important changes.
-          </p>
-        </div>
-      </header>
-
+    <section
+      className="drawdown-balance-timeline-control"
+      aria-labelledby="drawdown-balance-timeline-title"
+    >
       <div className="drawdown-balance-age-control">
         <div className="drawdown-balance-age-control-heading">
           <div>
-            <strong>Explore your pension through retirement</strong>
-            <span>Markers highlight the first year something important changes.</span>
+            <strong id="drawdown-balance-timeline-title">Choose a year to understand</strong>
+            <span>
+              Move through retirement to update the waterfall. Markers highlight the first
+              year something important changes.
+            </span>
           </div>
-          {milestones.length > 0 && (
-            <div className="drawdown-balance-age-legend" aria-hidden="true">
-              <span><i /> Milestone</span>
-              <span><i className="is-warning" /> Needs attention</span>
-            </div>
-          )}
         </div>
 
         <div className="drawdown-balance-age-track-wrap">
@@ -134,6 +123,13 @@ export function DrawdownBalanceAgeControl({
           <strong>Age {selected.age}</strong>
           <span>Age {displayYears.at(-1)?.age}</span>
         </div>
+
+        {milestones.length > 0 && (
+          <div className="drawdown-balance-age-legend" aria-hidden="true">
+            <span><i /> Milestone</span>
+            <span><i className="is-warning" /> Needs attention</span>
+          </div>
+        )}
       </div>
     </section>
   );
