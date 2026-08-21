@@ -22,6 +22,7 @@ import { DrawdownJourneyChart } from "../components/drawdown/DrawdownJourneyChar
 import { DrawdownPlanContext } from "../components/drawdown/DrawdownPlanContext";
 import { DrawdownProjectionTable } from "../components/drawdown/DrawdownProjectionTable";
 import { DrawdownRetirementChapters } from "../components/drawdown/DrawdownRetirementChapters";
+import { DrawdownRetirementJourneySummary } from "../components/drawdown/DrawdownRetirementJourneySummary";
 import { DrawdownSummaryRibbon } from "../components/drawdown/DrawdownSummaryRibbon";
 import {
   DrawdownWorkspaceNavigation,
@@ -99,7 +100,7 @@ export function DrawdownPlannerPage() {
             <p>
               {viewMode === "simple"
                 ? "Start with the retirement story in plain English, with the key things worth noticing explained along the way."
-                : "Explore income, pension balance, the full timeline and calculation assumptions."}
+                : "Explore income, pension balance, your retirement journey and calculation assumptions."}
             </p>
           </div>
 
@@ -177,8 +178,9 @@ export function DrawdownPlannerPage() {
                 )}
 
                 {activeSection === "details" && (
-                  <div className="drawdown-workspace-section" id="drawdown-details-section" role="tabpanel" aria-labelledby="drawdown-tab-details" tabIndex={0}>
-                    <SectionHeading eyebrow="Retirement timeline" title="Inspect every year of retirement" description="Trace pension withdrawals, State Pension, tax, growth, fees and the pension left at the end of each year." />
+                  <div className="drawdown-workspace-section drawdown-detailed-retirement-journey" id="drawdown-details-section" role="tabpanel" aria-labelledby="drawdown-tab-details" tabIndex={0}>
+                    <SectionHeading eyebrow="Retirement journey" title="Your retirement journey" description="Follow the important milestones throughout retirement. See when your income sources change, when planned spending changes and the moments that shape how your pension supports you over time." />
+                    <DrawdownRetirementJourneySummary inputs={inputs} result={result} />
                     <DrawdownProjectionTable years={result.years} inflationRate={inputs.inflationRate} displayMode={displayMode} />
                   </div>
                 )}
