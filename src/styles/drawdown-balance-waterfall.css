@@ -87,10 +87,18 @@
   background: var(--colour-surface);
 }
 
-.drawdown-balance-waterfall-step > span {
+.drawdown-balance-waterfall-step-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
   font-weight: 750;
+}
+
+.drawdown-balance-waterfall-step-label > span {
+  min-width: 0;
 }
 
 .drawdown-balance-waterfall-step > strong {
