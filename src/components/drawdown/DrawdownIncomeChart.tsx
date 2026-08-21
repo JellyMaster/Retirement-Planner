@@ -66,10 +66,10 @@ export function DrawdownIncomeChart({
   return (
     <section className="panel drawdown-chart-panel">
       <div className="panel-heading">
-        <h2>How your income changes over time</h2>
+        <h2>How your retirement income changes</h2>
         <p>
-          See how money from your pension, State Pension, tax and the money available to spend change through retirement.
-          {onSelectAge ? " Select a point on the chart to inspect that year." : ""}
+          Follow where your income comes from, how much tax is estimated and how much money is available to spend through retirement.
+          {onSelectAge ? " Select any age on the chart to understand that year in more detail." : ""}
           {` Values are shown in ${displayMode === "today" ? "today's money" : "future money"}.`}
         </p>
       </div>
@@ -111,17 +111,17 @@ export function DrawdownIncomeChart({
               />
             )}
             {statePensionAge !== undefined && statePensionAge !== selectedAge && (
-              <ReferenceLine x={statePensionAge} stroke={chartColours.tertiary} strokeDasharray="4 4" label={{ value: "State Pension", position: "insideTopRight", fill: chartColours.text }} />
+              <ReferenceLine x={statePensionAge} stroke={chartColours.tertiary} strokeDasharray="4 4" label={{ value: "State Pension starts", position: "insideTopRight", fill: chartColours.text }} />
             )}
             {chapters.slice(1).map((phase) => (
               <ReferenceLine key={`${phase.label}-${phase.startAge}`} x={phase.startAge} stroke={chartColours.secondary} strokeDasharray="3 5" label={{ value: phase.label, position: "insideTopLeft", fill: chartColours.text }} />
             ))}
 
             <Bar dataKey="statePensionIncome" name="State Pension" stackId="gross-income" fill={chartColours.tertiary} />
-            <Bar dataKey="pensionWithdrawal" name="From your pension" stackId="gross-income" fill={chartColours.primary} />
-            <Line type="monotone" dataKey="netIncome" name="Money to spend" stroke={chartColours.secondary} strokeWidth={3} dot={false} />
-            <Line type="monotone" dataKey="incomeTax" name="Tax" stroke={chartColours.fees} strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="desiredIncome" name="Your income target" stroke={chartColours.text} strokeDasharray="6 4" strokeWidth={2} dot={false} />
+            <Bar dataKey="pensionWithdrawal" name="Money from your pension" stackId="gross-income" fill={chartColours.primary} />
+            <Line type="monotone" dataKey="netIncome" name="Money available to spend" stroke={chartColours.secondary} strokeWidth={3} dot={false} />
+            <Line type="monotone" dataKey="incomeTax" name="Estimated tax" stroke={chartColours.fees} strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="desiredIncome" name="Your planned income" stroke={chartColours.text} strokeDasharray="6 4" strokeWidth={2} dot={false} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
