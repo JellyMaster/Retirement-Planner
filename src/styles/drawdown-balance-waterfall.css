@@ -183,6 +183,29 @@
   gap: var(--space-1);
 }
 
+.drawdown-balance-trend {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  width: fit-content;
+  color: var(--colour-text);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.drawdown-balance-trend b {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.drawdown-balance-waterfall-result.is-positive .drawdown-balance-trend b {
+  color: var(--status-good, var(--colour-success));
+}
+
+.drawdown-balance-waterfall-result.is-reducing .drawdown-balance-trend b {
+  color: var(--status-warning-text, var(--colour-warning-text));
+}
+
 .drawdown-balance-waterfall-result-copy > p,
 .drawdown-balance-waterfall-result-copy > small {
   margin: 0;
