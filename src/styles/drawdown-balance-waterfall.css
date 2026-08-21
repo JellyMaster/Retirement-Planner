@@ -93,6 +93,7 @@
 }
 
 .drawdown-balance-waterfall-step-detail {
+  grid-row: 3;
   min-height: 2.6em;
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
@@ -119,6 +120,7 @@
 
 .drawdown-balance-waterfall-anchor-bar,
 .drawdown-balance-waterfall-movement-track {
+  grid-row: 4;
   align-self: end;
   height: 2.4rem;
   overflow: hidden;
