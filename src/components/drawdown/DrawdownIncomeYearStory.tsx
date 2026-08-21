@@ -83,7 +83,8 @@ export function DrawdownIncomeYearStory({
       >
         <div className="drawdown-income-selected-year-heading">
           <div>
-            <h2 id="drawdown-income-selected-year-title">Income breakdown</h2>
+            <p className="panel-eyebrow">Income at this age</p>
+            <h2 id="drawdown-income-selected-year-title">Where your money comes from</h2>
             <p aria-live="polite" aria-atomic="true">
               Age {selectedYear.age} · {selectedYear.year} ·{" "}
               {displayMode === "today" ? "Today’s money" : "Future money"}
@@ -96,7 +97,7 @@ export function DrawdownIncomeYearStory({
             <div className="drawdown-income-age-range-title">
               <div>
                 <strong>Explore retirement by age</strong>
-                <span>Markers highlight important changes in your retirement journey.</span>
+                <span>Move through the plan to see when your income sources or planned spending change.</span>
               </div>
               <InfoTooltip
                 ariaLabel="Explain the retirement age timeline and warning markers"
@@ -105,14 +106,14 @@ export function DrawdownIncomeYearStory({
               >
                 <strong>What this timeline shows</strong>
                 <p>
-                  Use the slider to inspect each retirement year. Markers highlight important milestones and the first year a new issue begins.
+                  Use the slider to inspect each retirement year. Markers highlight important milestones and the first year something needs attention.
                 </p>
                 <strong>Why warnings only appear once</strong>
                 <p>
-                  Repeated warning years are not marked individually. Once a warning starts, only its first year is shown so the timeline stays readable. The issue may continue in later years even when no additional warning marker is shown.
+                  Repeated warning years are not marked individually. Once a warning begins, only its first year is shown so the timeline stays readable. The issue may continue in later years even when no additional marker is shown.
                 </p>
                 <small>
-                  For example, if income first falls below target at age 84 and remains below target afterwards, only age 84 is marked.
+                  For example, if your planned income first falls short at age 84 and remains below plan afterwards, only age 84 is marked.
                 </small>
               </InfoTooltip>
             </div>
@@ -187,16 +188,16 @@ export function DrawdownIncomeYearStory({
         </div>
 
         <dl className="drawdown-income-selected-year-grid">
-          <IncomeMetric label="From your pension" value={selectedYear.pensionWithdrawal} />
+          <IncomeMetric label="Money from your pension" value={selectedYear.pensionWithdrawal} />
           <IncomeMetric label="State Pension" value={selectedYear.statePensionIncome} />
-          <IncomeMetric label="Total income before tax" value={selectedYear.grossIncome} />
+          <IncomeMetric label="Income before tax" value={selectedYear.grossIncome} />
           <IncomeMetric
             label="Estimated tax"
             value={-selectedYear.incomeTax}
             negative={selectedYear.incomeTax > 0}
           />
           <IncomeMetric label="Money available to spend" value={selectedYear.netIncome} emphasis />
-          <IncomeMetric label="Your income target" value={selectedYear.desiredIncome} />
+          <IncomeMetric label="Your planned income" value={selectedYear.desiredIncome} />
         </dl>
       </section>
 
@@ -207,8 +208,9 @@ export function DrawdownIncomeYearStory({
         aria-labelledby="drawdown-income-year-events-title"
       >
         <div className="panel-heading">
-          <p className="panel-eyebrow">Important this year</p>
-          <h2 id="drawdown-income-year-events-title">What changes at age {selectedYear.age}?</h2>
+          <p className="panel-eyebrow">What this year means</p>
+          <h2 id="drawdown-income-year-events-title">What is happening at age {selectedYear.age}?</h2>
+          <p>We highlight changes that affect where your income comes from or whether your planned income is still being met.</p>
         </div>
         <div className="drawdown-income-year-event-list">
           {events.length > 0 ? (
@@ -220,14 +222,14 @@ export function DrawdownIncomeYearStory({
             ))
           ) : (
             <article className="drawdown-income-year-event is-positive">
-              <strong>Your retirement continues as planned</strong>
-              <p>Nothing significant changes this year. Your income continues on the same basis as the previous year.</p>
+              <strong>Your retirement income continues as planned</strong>
+              <p>Nothing significant changes this year. The same income sources continue to support the money available to spend.</p>
             </article>
           )}
         </div>
 
         <div className={`drawdown-income-year-conclusion is-${conclusion.tone}`}>
-          <span>What this means</span>
+          <span>What this means for your plan</span>
           <strong>{conclusion.title}</strong>
           <p>{conclusion.description}</p>
         </div>
@@ -292,7 +294,7 @@ function createRangeMarkers(
     return !previous || (previous.netIncomeShortfall <= 0 && previous.incomeShortfall <= 0);
   });
   if (firstShortfall) {
-    addMarker({ age: firstShortfall.age, title: "Income falls below target", tone: "warning" });
+    addMarker({ age: firstShortfall.age, title: "Planned income is no longer fully met", tone: "warning" });
   }
 
   const firstDepletion = years.find((year, index) => {
@@ -334,7 +336,7 @@ function createYearEvents({
     events.push({
       title: "Your State Pension begins this year",
       description:
-        "Part of your income now comes from the State Pension, so you may need to take less from your private pension.",
+        "Part of your retirement income now comes from the State Pension. This usually reduces how much needs to come from your private pension.",
       tone: "positive",
     });
   }
@@ -345,9 +347,9 @@ function createYearEvents({
     : false;
   if (incomeBelowTarget && !previousIncomeBelowTarget) {
     events.push({
-      title: "Your income is now below your target",
+      title: "Your planned income is no longer fully met",
       description:
-        "From this year, the plan cannot provide all of the retirement income you asked for. You still receive income, but it is less than your target.",
+        "From this year, the illustration provides less money than you planned to spend. Income continues, but it is below your chosen amount.",
       tone: "warning",
     });
   }
@@ -360,7 +362,7 @@ function createYearEvents({
     events.push({
       title: "Your private pension has now been fully used",
       description:
-        "From this point, any remaining retirement income comes from other sources in your plan, such as the State Pension.",
+        "From this point, any remaining retirement income comes from other sources included in your plan, such as the State Pension.",
       tone: "warning",
     });
   }
@@ -370,7 +372,7 @@ function createYearEvents({
     events.push({
       title: `${chapter.label} begins`,
       description:
-        "Your planned spending changes from this age, so the amount of income you are asking the plan to provide changes too.",
+        "Your planned spending changes from this age, so the amount of income your retirement plan needs to provide changes too.",
       tone: "neutral",
     });
   }
@@ -394,7 +396,7 @@ function createYearConclusion(year: DrawdownYear, events: YearEvent[]) {
       tone: "warning" as const,
       title: "This is the first year your planned income is not fully met.",
       description:
-        "The plan continues, but the money available is below your target. This is a useful point to review when comparing retirement choices.",
+        "The plan continues, but the money available to spend is below your planned amount. This is a useful point to review when comparing retirement choices.",
     };
   }
 
@@ -403,7 +405,7 @@ function createYearConclusion(year: DrawdownYear, events: YearEvent[]) {
       tone: "positive" as const,
       title: "Your income now comes from more than one source.",
       description:
-        "The State Pension helps provide part of your retirement income, which can reduce how much needs to come from your private pension.",
+        "The State Pension provides part of the money you can spend, which can reduce how much needs to come from your private pension.",
     };
   }
 
@@ -412,7 +414,7 @@ function createYearConclusion(year: DrawdownYear, events: YearEvent[]) {
       tone: "neutral" as const,
       title: "Your planned retirement changes from this year.",
       description:
-        "The income requested by your plan has changed, so the amount taken from your pension may change as well.",
+        "The amount you plan to spend has changed, so the amount needed from your pension may change as well.",
     };
   }
 
@@ -420,16 +422,16 @@ function createYearConclusion(year: DrawdownYear, events: YearEvent[]) {
   if (belowTarget) {
     return {
       tone: "warning" as const,
-      title: "Your income remains below your target.",
+      title: "Your income remains below your planned amount.",
       description:
-        "The warning began in an earlier year, so it is not repeated on the timeline. The plan is still providing less income than you asked for.",
+        "The warning began in an earlier year, so it is not repeated on the timeline. The illustration is still providing less income than you planned for.",
     };
   }
 
   return {
     tone: "positive" as const,
-    title: "Your retirement continues as planned.",
+    title: "Your retirement income continues as planned.",
     description:
-      "There is no new issue to review this year, and the income shown continues on the same basis as the previous year.",
+      "There is no new issue to review this year, and your income continues on the same basis as the previous year.",
   };
 }
