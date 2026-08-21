@@ -100,7 +100,7 @@ export function DrawdownPlannerPage() {
             <p>
               {viewMode === "simple"
                 ? "Start with the retirement story in plain English, with the key things worth noticing explained along the way."
-                : "Explore income, pension balance, your retirement journey and calculation assumptions."}
+                : "Explore income, pension balance, your retirement journey and how the illustration works."}
             </p>
           </div>
 
@@ -187,7 +187,7 @@ export function DrawdownPlannerPage() {
 
                 {activeSection === "assumptions" && (
                   <div className="drawdown-workspace-section" id="drawdown-assumptions-section" role="tabpanel" aria-labelledby="drawdown-tab-assumptions" tabIndex={0}>
-                    <SectionHeading eyebrow="Calculation basis" title="What rules drive the illustration?" description="Understand the methodology, money basis and plan values used by the deterministic model." />
+                    <SectionHeading eyebrow="How this illustration works" title="How your retirement illustration is calculated" description="See the plan choices, investment assumptions and tax rules behind the figures, and understand how to interpret the results without treating them as a prediction." />
                     <DrawdownAssumptionsPanel inputs={inputs} displayMode={displayMode} />
                   </div>
                 )}
