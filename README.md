@@ -49,7 +49,7 @@ Version **1.2** completes a major redesign of the Drawdown experience around pla
 - ✅ Expanded financial-validation and component test coverage
 - ✅ Persistent educational / financial-advice disclaimer
 
-See [CHANGELOG.md](CHANGELOG.md) and [docs/RELEASES.md](docs/RELEASES.md) for the full release details.
+See [CHANGELOG.md](CHANGELOG.md) and [docs/RELEASE_NOTES_1.2.md](docs/RELEASE_NOTES_1.2.md) for the full release details.
 
 ---
 
@@ -290,6 +290,8 @@ npm run build
 # 📚 Documentation
 
 - [CHANGELOG.md](CHANGELOG.md) — release history
+- [docs/RELEASE_NOTES_1.2.md](docs/RELEASE_NOTES_1.2.md) — Version 1.2 release notes
+- [docs/RELEASE_CHECKLIST_1.2.md](docs/RELEASE_CHECKLIST_1.2.md) — final merge/tag/deploy checklist
 - [docs/RELEASES.md](docs/RELEASES.md) — release summaries
 - [docs/ROADMAP.md](docs/ROADMAP.md) — future direction
 - [docs/FEATURES.md](docs/FEATURES.md) — current capabilities
