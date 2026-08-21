@@ -3,7 +3,7 @@ import {
   getDisplayYears,
   type MoneyDisplayMode,
 } from "../../utils/drawdownDisplayValues";
-import { formatCurrency } from "../../utils/formatters";
+import { formatCurrency, formatPercentage } from "../../utils/formatters";
 import { InfoTooltip } from "../ui";
 
 interface DrawdownBalanceChartProps {
@@ -37,6 +37,13 @@ export function DrawdownBalanceChart({
         - selected.fees
         - selected.closingBalance
       : 0;
+  const moneyOut = selected.pensionWithdrawal + selected.fees;
+  const withdrawalRate = selected.openingBalance > 0
+    ? selected.pensionWithdrawal / selected.openingBalance
+    : 0;
+  const growthCoverage = moneyOut > 0
+    ? selected.investmentGrowth / moneyOut
+    : null;
 
   const movements = [
     {
@@ -44,6 +51,9 @@ export function DrawdownBalanceChart({
       label: "Investment growth",
       value: selected.investmentGrowth,
       direction: "positive" as const,
+      detail: growthCoverage === null
+        ? undefined
+        : `${formatPercentage(growthCoverage)} of withdrawals and fees replaced`,
       tooltipTitle: "Investment growth",
       tooltipText:
         "The amount your pension is projected to gain from investment returns during this year. It increases the pension balance.",
@@ -53,6 +63,7 @@ export function DrawdownBalanceChart({
       label: "Money taken out",
       value: selected.pensionWithdrawal,
       direction: "negative" as const,
+      detail: `${formatPercentage(withdrawalRate)} of opening pension`,
       tooltipTitle: "Money taken out",
       tooltipText:
         "The amount withdrawn from your private pension to support your retirement income during this year. It reduces the pension balance.",
@@ -85,6 +96,9 @@ export function DrawdownBalanceChart({
     ...movements.map((movement) => Math.abs(movement.value)),
   );
   const balanceChange = selected.closingBalance - selected.openingBalance;
+  const balanceChangeRate = selected.openingBalance > 0
+    ? Math.abs(balanceChange) / selected.openingBalance
+    : 0;
 
   return (
     <section className="panel drawdown-balance-waterfall" aria-labelledby="drawdown-balance-waterfall-title">
@@ -130,6 +144,7 @@ export function DrawdownBalanceChart({
             value={movement.value}
             direction={movement.direction}
             width={(Math.abs(movement.value) / largestMovement) * 100}
+            detail={movement.detail}
             tooltipTitle={movement.tooltipTitle}
             tooltipText={movement.tooltipText}
           />
@@ -164,11 +179,18 @@ export function DrawdownBalanceChart({
           {balanceChange >= 0 ? "+" : "−"}
           {formatCurrency(Math.abs(balanceChange))}
         </strong>
-        <p>
-          {balanceChange >= 0
-            ? "Your pension finished the year with more purchasing power than it started with."
-            : "Your pension finished the year lower than it started. In retirement, that can be a normal part of using the money you have built up."}
-        </p>
+        <div className="drawdown-balance-waterfall-result-copy">
+          <p>
+            {balanceChange >= 0
+              ? `Your pension finished the year ${formatPercentage(balanceChangeRate)} higher than it started.`
+              : `Your pension finished the year ${formatPercentage(balanceChangeRate)} lower than it started. In retirement, that can be a normal part of using the money you have built up.`}
+          </p>
+          {growthCoverage !== null && (
+            <small>
+              Investment growth replaced {formatPercentage(growthCoverage)} of the money taken out and fees this year.
+            </small>
+          )}
+        </div>
       </div>
     </section>
   );
@@ -208,6 +230,7 @@ function WaterfallMovement({
   value,
   direction,
   width,
+  detail,
   tooltipTitle,
   tooltipText,
 }: {
@@ -215,6 +238,7 @@ function WaterfallMovement({
   value: number;
   direction: "positive" | "negative";
   width: number;
+  detail?: string;
   tooltipTitle: string;
   tooltipText: string;
 }) {
@@ -232,6 +256,7 @@ function WaterfallMovement({
         {direction === "positive" ? "+" : "−"}
         {formatCurrency(Math.abs(value))}
       </strong>
+      {detail && <small className="drawdown-balance-waterfall-step-detail">{detail}</small>}
       <div className="drawdown-balance-waterfall-movement-track" aria-hidden="true">
         <div style={{ width: `${safeWidth}%` }} />
       </div>
