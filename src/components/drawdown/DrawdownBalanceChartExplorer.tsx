@@ -35,6 +35,8 @@ interface DrawdownBalanceChartExplorerProps {
   displayMode: MoneyDisplayMode;
   drawdown?: ScenarioDrawdownPreferences;
   onChange: (drawdown: ScenarioDrawdownPreferences) => void;
+  selectedAge?: number;
+  onSelectAge?: (age: number) => void;
 }
 
 export function DrawdownBalanceChartExplorer({
@@ -43,6 +45,8 @@ export function DrawdownBalanceChartExplorer({
   displayMode,
   drawdown,
   onChange,
+  selectedAge,
+  onSelectAge,
 }: DrawdownBalanceChartExplorerProps) {
   const [view, setView] = useState<ChartView>("plan");
 
@@ -52,7 +56,7 @@ export function DrawdownBalanceChartExplorer({
         <div>
           <span>Balance chart view</span>
           <small>
-            Switch between your saved plan and ending-balance spending paths.
+            Start with your saved plan. Ending-balance options are available when you want to compare different amounts left in the pension.
           </small>
         </div>
         <div
@@ -89,6 +93,8 @@ export function DrawdownBalanceChartExplorer({
           statePensionAge={
             inputs.annualStatePension > 0 ? inputs.statePensionAge : undefined
           }
+          selectedAge={selectedAge}
+          onSelectAge={onSelectAge}
         />
       ) : (
         <EndingBalanceComparisonChart
@@ -105,7 +111,7 @@ function EndingBalanceComparisonChart({
   inputs,
   drawdown,
   onChange,
-}: Omit<DrawdownBalanceChartExplorerProps, "result" | "displayMode">) {
+}: Omit<DrawdownBalanceChartExplorerProps, "result" | "displayMode" | "selectedAge" | "onSelectAge">) {
   const chartColours = useChartTheme();
   const preferences = drawdown ?? createFallbackPreferences(inputs);
   const selectedMode = preferences.endingBalanceMode ?? "preserve";
