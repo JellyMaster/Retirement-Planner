@@ -111,6 +111,10 @@ export function DrawdownJourneyChart({
             and State Pension combine to provide retirement income. Values are shown
             in {displayMode === "today" ? "today’s money" : "future money"}.
           </p>
+          <p className="drawdown-journey-balance-note">
+            Pension balance shows the amount remaining at the end of each age shown,
+            after that year’s withdrawals, investment growth and fees.
+          </p>
         </div>
         <div className="drawdown-chart-zoom" role="group" aria-label="Retirement journey chart zoom">
           <button type="button" onClick={zoomIn} disabled={visibleCount <= 6}>Zoom in</button>
