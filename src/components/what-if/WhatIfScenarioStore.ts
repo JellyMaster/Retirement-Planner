@@ -17,6 +17,8 @@ export interface SaveWhatIfScenarioInput {
 }
 
 export interface WhatIfScenarioContextValue extends WhatIfScenarioState {
+  hasUnsavedExperiment: boolean;
+  setHasUnsavedExperiment: (hasUnsavedExperiment: boolean) => void;
   saveScenario: (input: SaveWhatIfScenarioInput) => WhatIfScenario;
   deleteScenario: (id: string) => void;
 }
