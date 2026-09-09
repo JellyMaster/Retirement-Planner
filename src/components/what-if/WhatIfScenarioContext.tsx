@@ -104,3 +104,8 @@ export function WhatIfScenarioProvider({ children }: PropsWithChildren) {
     </WhatIfScenarioContext.Provider>
   );
 }
+
+// Temporary compatibility export for existing imports. The hook itself lives in
+// a non-component module so the provider remains compatible with Fast Refresh.
+// eslint-disable-next-line react-refresh/only-export-components
+export { useWhatIfScenarios } from "./useWhatIfScenarios";
