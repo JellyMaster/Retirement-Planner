@@ -4,6 +4,10 @@
    Keep the primary page title and subtitle consistent across the
    application. Page-specific header classes may still control their
    secondary actions, summaries and decorative marks.
+
+   Desktop headers deliberately give titles more horizontal room than
+   body copy. This avoids headline wrapping feeling cramped on wide
+   screens while keeping subtitles at a comfortable reading measure.
    ========================================================= */
 
 .polaris-overview-header,
@@ -24,7 +28,9 @@
 .scenario-manager-header > div:first-child,
 .explore-header > div:first-child,
 .guidance-header > div:first-child {
-  max-width: 68ch;
+  flex: 1 1 56rem;
+  min-width: 0;
+  max-width: 64rem;
 }
 
 .polaris-overview-header h1,
@@ -34,6 +40,7 @@
 .scenario-manager-header h1,
 .explore-header h1,
 .guidance-header h1 {
+  max-width: 30ch;
   margin: 0;
   font-size: var(--ui-font-size-2xl, clamp(1.6rem, 3vw, 2.25rem));
   line-height: 1.2;
@@ -47,11 +54,44 @@
 .scenario-manager-header > div:first-child > p:not(.planner-eyebrow),
 .explore-header > div:first-child > p:not(.planner-eyebrow),
 .guidance-header > div:first-child > p:not(.planner-eyebrow) {
-  max-width: 68ch;
+  max-width: 80ch;
   margin: var(--ui-space-2, var(--space-2)) 0 0;
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-md, 1rem);
   line-height: 1.55;
+}
+
+.polaris-overview-header > :not(:first-child),
+.my-plan-header > :not(:first-child),
+.drawdown-workspace-header > :not(:first-child),
+.what-if-header > :not(:first-child),
+.scenario-manager-header > :not(:first-child),
+.explore-header > :not(:first-child),
+.guidance-header > :not(:first-child) {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1100px) {
+  .polaris-overview-header > div:first-child,
+  .my-plan-header > div:first-child,
+  .drawdown-workspace-header > div:first-child,
+  .what-if-header > div:first-child,
+  .scenario-manager-header > div:first-child,
+  .explore-header > div:first-child,
+  .guidance-header > div:first-child {
+    flex-basis: 42rem;
+    max-width: 52rem;
+  }
+
+  .polaris-overview-header h1,
+  .my-plan-header h1,
+  .drawdown-workspace-header h1,
+  .what-if-header h1,
+  .scenario-manager-header h1,
+  .explore-header h1,
+  .guidance-header h1 {
+    max-width: 26ch;
+  }
 }
 
 @media (max-width: 800px) {
@@ -65,6 +105,17 @@
     align-items: stretch;
   }
 
+  .polaris-overview-header > div:first-child,
+  .my-plan-header > div:first-child,
+  .drawdown-workspace-header > div:first-child,
+  .what-if-header > div:first-child,
+  .scenario-manager-header > div:first-child,
+  .explore-header > div:first-child,
+  .guidance-header > div:first-child {
+    flex-basis: auto;
+    max-width: none;
+  }
+
   .polaris-overview-header h1,
   .my-plan-header h1,
   .drawdown-workspace-header h1,
@@ -72,6 +123,17 @@
   .scenario-manager-header h1,
   .explore-header h1,
   .guidance-header h1 {
+    max-width: none;
     font-size: clamp(1.75rem, 7vw, 2.1rem);
+  }
+
+  .polaris-overview-header > div:first-child > p:not(.planner-eyebrow),
+  .my-plan-header > div:first-child > p:not(.planner-eyebrow),
+  .drawdown-workspace-header > div:first-child > p:not(.planner-eyebrow),
+  .what-if-header > div:first-child > p:not(.planner-eyebrow),
+  .scenario-manager-header > div:first-child > p:not(.planner-eyebrow),
+  .explore-header > div:first-child > p:not(.planner-eyebrow),
+  .guidance-header > div:first-child > p:not(.planner-eyebrow) {
+    max-width: none;
   }
 }
