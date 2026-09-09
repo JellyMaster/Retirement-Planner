@@ -41,6 +41,7 @@ function loadState(): WhatIfScenarioState {
 
 export function WhatIfScenarioProvider({ children }: PropsWithChildren) {
   const [state, setState] = useState<WhatIfScenarioState>(loadState);
+  const [hasUnsavedExperiment, setHasUnsavedExperiment] = useState(false);
 
   const persist = useCallback((nextState: WhatIfScenarioState) => {
     setState(nextState);
@@ -79,6 +80,7 @@ export function WhatIfScenarioProvider({ children }: PropsWithChildren) {
         return nextState;
       });
 
+      setHasUnsavedExperiment(false);
       return scenario;
     },
     [],
@@ -94,8 +96,14 @@ export function WhatIfScenarioProvider({ children }: PropsWithChildren) {
   );
 
   const value = useMemo<WhatIfScenarioContextValue>(
-    () => ({ ...state, saveScenario, deleteScenario }),
-    [deleteScenario, saveScenario, state],
+    () => ({
+      ...state,
+      hasUnsavedExperiment,
+      setHasUnsavedExperiment,
+      saveScenario,
+      deleteScenario,
+    }),
+    [deleteScenario, hasUnsavedExperiment, saveScenario, state],
   );
 
   return (
