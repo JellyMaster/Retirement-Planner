@@ -38,7 +38,7 @@ function createScenario(
   };
 }
 
-function mockScenarioContext(setActiveScenario: ReturnType<typeof vi.fn>) {
+function mockScenarioContext(setActiveScenario: (id: string) => void) {
   const baseline = createScenario("baseline", "Baseline Plan", true);
   const alternative = createScenario("alternative", "Retire at 65");
 
