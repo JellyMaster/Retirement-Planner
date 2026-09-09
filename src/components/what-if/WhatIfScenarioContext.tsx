@@ -1,36 +1,21 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useMemo,
   useState,
   type PropsWithChildren,
 } from "react";
 
 import type {
-  WhatIfExperimentId,
   WhatIfScenario,
   WhatIfScenarioState,
 } from "../../domain/what-if/WhatIfScenario";
-import type { ScenarioDrawdownPreferences, ScenarioId } from "../../domain/scenarios";
-import type { PensionInputs } from "../../engine/models/PensionInputs";
+import {
+  WhatIfScenarioContext,
+  type SaveWhatIfScenarioInput,
+  type WhatIfScenarioContextValue,
+} from "./WhatIfScenarioStore";
 
 const WHAT_IF_SCENARIO_STORAGE_KEY = "retirement-planner-what-if-scenarios-v1";
-
-interface SaveWhatIfScenarioInput {
-  name: string;
-  baseScenarioId: ScenarioId;
-  experimentType: WhatIfExperimentId;
-  inputs: PensionInputs;
-  drawdown: ScenarioDrawdownPreferences;
-}
-
-interface WhatIfScenarioContextValue extends WhatIfScenarioState {
-  saveScenario: (input: SaveWhatIfScenarioInput) => WhatIfScenario;
-  deleteScenario: (id: string) => void;
-}
-
-const WhatIfScenarioContext = createContext<WhatIfScenarioContextValue | null>(null);
 
 function createId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -118,12 +103,4 @@ export function WhatIfScenarioProvider({ children }: PropsWithChildren) {
       {children}
     </WhatIfScenarioContext.Provider>
   );
-}
-
-export function useWhatIfScenarios(): WhatIfScenarioContextValue {
-  const context = useContext(WhatIfScenarioContext);
-  if (!context) {
-    throw new Error("useWhatIfScenarios must be used inside WhatIfScenarioProvider.");
-  }
-  return context;
 }
