@@ -257,10 +257,13 @@
 .what-if-detail-disclosures {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: var(--space-3);
 }
 
 .what-if-detail-card {
+  align-self: start;
+  width: 100%;
   border: 1px solid var(--colour-border);
   border-radius: var(--radius-md);
   background: var(--colour-surface-secondary);
