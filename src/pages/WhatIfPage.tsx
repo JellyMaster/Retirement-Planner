@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
@@ -19,7 +19,6 @@ import { useWhatIfScenarios } from "../components/what-if/WhatIfScenarioContext"
 import { ExperimentInsights } from "../components/what-if/shared/ExperimentInsights";
 import {
   createDefaultScenarioDrawdownPreferences,
-  type Scenario,
   type ScenarioDrawdownPreferences,
 } from "../domain/scenarios";
 import type { WhatIfScenario } from "../domain/what-if/WhatIfScenario";
@@ -37,57 +36,39 @@ import "../styles/what-if-scenarios.css";
 export function WhatIfPage() {
   const scenarios = useScenarios();
   const whatIfScenarios = useWhatIfScenarios();
-  const [baseScenarioId, setBaseScenarioId] = useState(scenarios.activeScenario.id);
-
-  const allScenarios = useMemo(() => {
-    const scenariosById = new Map<string, Scenario>();
-    scenarios.scenarios.forEach((scenario) => scenariosById.set(scenario.id, scenario));
-    scenariosById.set(scenarios.activeScenario.id, scenarios.activeScenario);
-    return [...scenariosById.values()];
-  }, [scenarios.activeScenario, scenarios.scenarios]);
-
-  const baseScenario =
-    allScenarios.find((scenario) => scenario.id === baseScenarioId) ??
-    scenarios.activeScenario;
 
   return (
     <WhatIfWorkspace
-      key={baseScenario.id}
-      activeScenario={baseScenario}
-      appActiveScenarioName={scenarios.activeScenario.name}
-      allScenarios={allScenarios}
-      onBaseScenarioChange={setBaseScenarioId}
+      key={scenarios.activeScenario.id}
+      activeScenario={scenarios.activeScenario}
       createScenario={scenarios.createScenario}
       updateScenarioPlan={scenarios.updateScenarioPlan}
       savedWhatIfScenarios={whatIfScenarios.scenarios}
       saveWhatIfScenario={whatIfScenarios.saveScenario}
       deleteWhatIfScenario={whatIfScenarios.deleteScenario}
+      setHasUnsavedExperiment={whatIfScenarios.setHasUnsavedExperiment}
     />
   );
 }
 
 interface WhatIfWorkspaceProps {
-  activeScenario: Scenario;
-  appActiveScenarioName: string;
-  allScenarios: Scenario[];
-  onBaseScenarioChange: (id: string) => void;
+  activeScenario: ReturnType<typeof useScenarios>["activeScenario"];
   createScenario: ReturnType<typeof useScenarios>["createScenario"];
   updateScenarioPlan: ReturnType<typeof useScenarios>["updateScenarioPlan"];
   savedWhatIfScenarios: WhatIfScenario[];
   saveWhatIfScenario: ReturnType<typeof useWhatIfScenarios>["saveScenario"];
   deleteWhatIfScenario: ReturnType<typeof useWhatIfScenarios>["deleteScenario"];
+  setHasUnsavedExperiment: ReturnType<typeof useWhatIfScenarios>["setHasUnsavedExperiment"];
 }
 
 function WhatIfWorkspace({
   activeScenario,
-  appActiveScenarioName,
-  allScenarios,
-  onBaseScenarioChange,
   createScenario,
   updateScenarioPlan,
   savedWhatIfScenarios,
   saveWhatIfScenario,
   deleteWhatIfScenario,
+  setHasUnsavedExperiment,
 }: WhatIfWorkspaceProps) {
   const [retirementGoals] = useStoredRetirementGoals();
   const baselineDrawdown =
@@ -231,6 +212,11 @@ function WhatIfWorkspace({
     baselineStateAge,
     alternativeStateAge,
   );
+
+  useEffect(() => {
+    setHasUnsavedExperiment(experimentHasChanged && loadedWhatIfScenarioId === null);
+    return () => setHasUnsavedExperiment(false);
+  }, [experimentHasChanged, loadedWhatIfScenarioId, setHasUnsavedExperiment]);
 
   function selectExperiment(experiment: ExperimentId) {
     setActiveExperiment(experiment);
@@ -472,36 +458,15 @@ function WhatIfWorkspace({
       </header>
 
       <section className="what-if-scenario-bar" aria-labelledby="what-if-base-plan-title">
-        <div className="what-if-base-plan-control">
+        <div className="what-if-active-plan-context">
           <div>
-            <p className="planner-eyebrow">Experiment base</p>
-            <h2 id="what-if-base-plan-title">Choose the plan to explore</h2>
+            <p className="planner-eyebrow">Experimenting with</p>
+            <h2 id="what-if-base-plan-title">{activeScenario.name}</h2>
             <p>
-              Switch the starting plan for this workspace without changing the active plan
-              used elsewhere in Polaris.
+              What If always uses the active plan selected in the top navigation.
             </p>
           </div>
-          <label>
-            <span>Base plan for this experiment</span>
-            <select
-              value={activeScenario.id}
-              onChange={(event) => onBaseScenarioChange(event.target.value)}
-            >
-              {allScenarios.map((scenario) => {
-                const savedCount = savedWhatIfScenarios.filter(
-                  (saved) => saved.baseScenarioId === scenario.id,
-                ).length;
-                return (
-                  <option key={scenario.id} value={scenario.id}>
-                    {scenario.name}{savedCount > 0 ? ` · ${savedCount} saved` : ""}
-                  </option>
-                );
-              })}
-            </select>
-            <small className="what-if-base-plan-note">
-              Active plan elsewhere: <strong>{appActiveScenarioName}</strong>
-            </small>
-          </label>
+          <span className="what-if-active-plan-badge">Active plan</span>
         </div>
 
         <div
