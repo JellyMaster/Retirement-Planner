@@ -1,17 +1,25 @@
 import { useScenarios } from "./ScenarioContext";
 
-export function ActiveScenarioSwitcher() {
+interface ActiveScenarioSwitcherProps {
+  onBeforeChange?: (nextScenarioId: string) => boolean;
+}
+
+export function ActiveScenarioSwitcher({ onBeforeChange }: ActiveScenarioSwitcherProps) {
   const { scenarios, activeScenarioId, setActiveScenario } = useScenarios();
+
+  function handleChange(nextScenarioId: string) {
+    if (nextScenarioId === activeScenarioId) return;
+    if (onBeforeChange && !onBeforeChange(nextScenarioId)) return;
+    setActiveScenario(nextScenarioId);
+  }
 
   return (
     <div className="active-scenario-switcher">
-       <span className="active-scenario-switcher-label">
-    Active Plan
-  </span>
+      <span className="active-scenario-switcher-label">Active Plan</span>
       <select
         id="active-scenario-select"
         value={activeScenarioId}
-        onChange={(event) => setActiveScenario(event.target.value)}
+        onChange={(event) => handleChange(event.target.value)}
         aria-label="Active plan"
         title="Change active plan"
       >
