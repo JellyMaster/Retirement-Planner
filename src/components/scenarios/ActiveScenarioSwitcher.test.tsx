@@ -38,25 +38,29 @@ function createScenario(
   };
 }
 
+function mockScenarioContext(setActiveScenario: ReturnType<typeof vi.fn>) {
+  const baseline = createScenario("baseline", "Baseline Plan", true);
+  const alternative = createScenario("alternative", "Retire at 65");
+
+  mockedUseScenarios.mockReturnValue({
+    scenarios: [baseline, alternative],
+    activeScenarioId: baseline.id,
+    activeScenario: baseline,
+    createScenario: vi.fn(),
+    duplicateScenario: vi.fn(),
+    renameScenario: vi.fn(),
+    updateScenarioInputs: vi.fn(),
+    updateScenarioPlan: vi.fn(),
+    setActiveScenario,
+    deleteScenario: vi.fn(),
+  });
+}
+
 describe("ActiveScenarioSwitcher", () => {
   it("shows all scenarios and changes the active plan", async () => {
     const user = userEvent.setup();
     const setActiveScenario = vi.fn();
-    const baseline = createScenario("baseline", "Baseline Plan", true);
-    const alternative = createScenario("alternative", "Retire at 65");
-
-    mockedUseScenarios.mockReturnValue({
-      scenarios: [baseline, alternative],
-      activeScenarioId: baseline.id,
-      activeScenario: baseline,
-      createScenario: vi.fn(),
-      duplicateScenario: vi.fn(),
-      renameScenario: vi.fn(),
-      updateScenarioInputs: vi.fn(),
-      updateScenarioPlan: vi.fn(),
-      setActiveScenario,
-      deleteScenario: vi.fn(),
-    });
+    mockScenarioContext(setActiveScenario);
 
     render(<ActiveScenarioSwitcher />);
 
@@ -72,5 +76,22 @@ describe("ActiveScenarioSwitcher", () => {
     await user.selectOptions(select, "alternative");
 
     expect(setActiveScenario).toHaveBeenCalledWith("alternative");
+  });
+
+  it("keeps the active plan when a guarded change is cancelled", async () => {
+    const user = userEvent.setup();
+    const setActiveScenario = vi.fn();
+    const onBeforeChange = vi.fn(() => false);
+    mockScenarioContext(setActiveScenario);
+
+    render(<ActiveScenarioSwitcher onBeforeChange={onBeforeChange} />);
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Active plan" }),
+      "alternative",
+    );
+
+    expect(onBeforeChange).toHaveBeenCalledWith("alternative");
+    expect(setActiveScenario).not.toHaveBeenCalled();
   });
 });
