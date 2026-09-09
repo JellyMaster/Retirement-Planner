@@ -4,6 +4,13 @@ import { useInRouterContext, useSearchParams } from "react-router-dom";
 
 import { AppIcons } from "../../icons";
 import "../../styles/what-if-v1-3.css";
+import { InfoTooltip } from "../ui";
+import {
+  setWhatIfMoneyDisplayMode,
+  setWhatIfViewMode,
+  useWhatIfDisplaySettings,
+  type WhatIfMoneyDisplayMode,
+} from "./whatIfDisplaySettings";
 
 export type ExperimentId =
   | "retirement-age"
@@ -122,6 +129,8 @@ function ExperimentLauncherContent({
   activeExperiment,
   onSelect,
 }: ExperimentLauncherProps) {
+  const { viewMode, displayMode } = useWhatIfDisplaySettings();
+
   return (
     <section className="what-if-launcher" aria-labelledby="what-if-launcher-title">
       <div className="what-if-launcher-heading">
@@ -153,7 +162,77 @@ function ExperimentLauncherContent({
           );
         })}
       </div>
+
+      {activeExperiment === "retirement-age" && (
+        <div className="drawdown-view-controls what-if-view-controls">
+          <div>
+            <p className="panel-eyebrow">Explore this change</p>
+            <h2>Choose how much detail you want to see</h2>
+            <p>
+              {viewMode === "simple"
+                ? "Start with the impact in plain English and the few numbers that matter most."
+                : "See the financial figures behind the change and compare them with your saved plan."}
+            </p>
+          </div>
+
+          <div className="drawdown-view-actions">
+            <div className="drawdown-view-mode-toggle" role="group" aria-label="What If view">
+              <button
+                type="button"
+                className={viewMode === "simple" ? "is-active" : undefined}
+                aria-pressed={viewMode === "simple"}
+                onClick={() => setWhatIfViewMode("simple")}
+              >
+                Simple
+              </button>
+              <button
+                type="button"
+                className={viewMode === "detailed" ? "is-active" : undefined}
+                aria-pressed={viewMode === "detailed"}
+                onClick={() => setWhatIfViewMode("detailed")}
+              >
+                Detailed
+              </button>
+            </div>
+            <MoneyDisplayToggle value={displayMode} />
+          </div>
+        </div>
+      )}
     </section>
+  );
+}
+
+function MoneyDisplayToggle({ value }: { value: WhatIfMoneyDisplayMode }) {
+  const showingToday = value === "today";
+  const nextValue: WhatIfMoneyDisplayMode = showingToday ? "nominal" : "today";
+
+  return (
+    <div className="money-display-toggle-group">
+      <span className="money-display-toggle-label">How would you like to view the figures?</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={!showingToday}
+        aria-label={`Display values as ${showingToday ? "today's money" : "future money"}. Switch to ${showingToday ? "future money" : "today's money"}.`}
+        className="money-display-toggle"
+        onClick={() => setWhatIfMoneyDisplayMode(nextValue)}
+      >
+        <span className="money-display-toggle-icon" aria-hidden="true">
+          <FontAwesomeIcon icon={showingToday ? AppIcons.money : AppIcons.growth} fixedWidth />
+        </span>
+        <span>{showingToday ? "Today’s money" : "Future money"}</span>
+        <span className="money-display-toggle-track" aria-hidden="true">
+          <span className="money-display-toggle-thumb" />
+        </span>
+      </button>
+      <InfoTooltip ariaLabel="Explain today’s money and future money" size="medium">
+        <strong>Today&apos;s money</strong>
+        <p>Shows the figures using today&apos;s buying power, making the impact easier to compare with what money is worth now.</p>
+        <strong>Future money</strong>
+        <p>Shows the projected pound amounts at retirement, including the effect of inflation before you reach that age.</p>
+        <small>Both views use the same experiment. Only the way the money values are displayed changes.</small>
+      </InfoTooltip>
+    </div>
   );
 }
 
