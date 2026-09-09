@@ -7,59 +7,35 @@
   background: var(--colour-surface);
 }
 
-.what-if-base-plan-control {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
-  align-items: end;
-  gap: var(--space-5);
+.what-if-active-plan-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
 }
 
-.what-if-base-plan-control h2 {
+.what-if-active-plan-context > div {
+  min-width: 0;
+}
+
+.what-if-active-plan-context h2 {
   margin: 0;
 }
 
-.what-if-base-plan-control p:last-child {
+.what-if-active-plan-context p:last-child {
   margin-bottom: 0;
   max-width: 62ch;
   color: var(--colour-text-muted);
 }
 
-.what-if-base-plan-control label {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.what-if-base-plan-control label > span {
-  color: var(--colour-text-muted);
+.what-if-active-plan-badge {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--colour-primary) 12%, transparent);
+  color: var(--colour-primary);
   font-size: var(--ui-font-size-xs);
   font-weight: 800;
-}
-
-.what-if-base-plan-control select {
-  min-height: 2.9rem;
-  width: 100%;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius-md);
-  background: var(--colour-surface-elevated, var(--colour-surface));
-  color: var(--colour-text);
-  font: inherit;
-  font-weight: 750;
-}
-
-.what-if-base-plan-control select:focus-visible {
-  outline: 2px solid var(--colour-primary);
-  outline-offset: 2px;
-}
-
-.what-if-base-plan-note {
-  color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-xs);
-  line-height: 1.4;
-}
-
-.what-if-base-plan-note strong {
-  color: var(--colour-text);
 }
 
 .what-if-saved-scenarios {
@@ -215,10 +191,8 @@
 }
 
 @media (max-width: 800px) {
-  .what-if-base-plan-control {
-    grid-template-columns: 1fr;
-    align-items: stretch;
-    gap: var(--space-3);
+  .what-if-active-plan-context {
+    align-items: flex-start;
   }
 
   .what-if-saved-scenarios-heading {
@@ -234,6 +208,14 @@
 @media (max-width: 560px) {
   .what-if-scenario-bar {
     padding: var(--space-3);
+  }
+
+  .what-if-active-plan-context {
+    display: grid;
+  }
+
+  .what-if-active-plan-badge {
+    width: fit-content;
   }
 
   .what-if-saved-scenario {
