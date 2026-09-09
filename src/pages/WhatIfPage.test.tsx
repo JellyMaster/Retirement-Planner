@@ -177,7 +177,7 @@ describe("WhatIfPage", () => {
       { target: { value: "47" } },
     );
 
-    expect(screen.getByText("Age 47")).toBeInTheDocument();
+    expect(screen.getByText("Age 47", { selector: "strong" })).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Retire at 47" }),
     ).toBeInTheDocument();
