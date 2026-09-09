@@ -1,0 +1,150 @@
+.what-if-scenario-bar {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+}
+
+.what-if-base-plan-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+  align-items: end;
+  gap: var(--space-4);
+}
+
+.what-if-base-plan-control h2 {
+  margin: 0;
+}
+
+.what-if-base-plan-control p:last-child {
+  margin-bottom: 0;
+  color: var(--colour-text-muted);
+}
+
+.what-if-base-plan-control label {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.what-if-base-plan-control label > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.what-if-base-plan-control select {
+  min-height: 2.75rem;
+  width: 100%;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-elevated, var(--colour-surface));
+  color: var(--colour-text);
+  font: inherit;
+  font-weight: 750;
+}
+
+.what-if-saved-scenarios {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--colour-border);
+}
+
+.what-if-saved-scenarios-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.what-if-saved-scenarios-heading > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+}
+
+.what-if-saved-scenario-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--space-2);
+}
+
+.what-if-saved-scenario {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  min-width: 0;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-background, var(--colour-surface));
+  overflow: hidden;
+}
+
+.what-if-saved-scenario.is-active {
+  border-color: var(--colour-primary);
+  box-shadow: 0 0 0 1px var(--colour-primary);
+}
+
+.what-if-saved-scenario-main {
+  display: grid;
+  flex: 1;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.what-if-saved-scenario-main strong,
+.what-if-saved-scenario-main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.what-if-saved-scenario-main span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+}
+
+.what-if-saved-scenario-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-1) var(--space-1) 0;
+}
+
+.what-if-saved-scenario-delete {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--colour-text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.what-if-saved-scenario-delete:hover,
+.what-if-saved-scenario-delete:focus-visible {
+  background: var(--colour-surface);
+  color: var(--colour-negative, #c2414b);
+}
+
+@media (max-width: 800px) {
+  .what-if-base-plan-control {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .what-if-saved-scenario-list {
+    grid-template-columns: 1fr;
+  }
+}
