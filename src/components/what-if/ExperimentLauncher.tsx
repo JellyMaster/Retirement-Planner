@@ -132,46 +132,16 @@ function ExperimentLauncherContent({
   const { viewMode, displayMode } = useWhatIfDisplaySettings();
 
   return (
-    <section className="what-if-launcher" aria-labelledby="what-if-launcher-title">
-      <div className="what-if-launcher-heading">
-        <div>
-          <p className="planner-eyebrow">Explore one change</p>
-          <h2 id="what-if-launcher-title">Choose a decision</h2>
-        </div>
-        <p>Change one lever at a time. Your saved plan stays untouched.</p>
-      </div>
-
-      <div className="what-if-experiment-nav" role="tablist" aria-label="What If experiments">
-        {experiments.map((experiment) => {
-          const isActive = activeExperiment === experiment.id;
-
-          return (
-            <button
-              key={experiment.id}
-              type="button"
-              role="tab"
-              className={`what-if-experiment-tab${isActive ? " is-active" : ""}`}
-              aria-selected={isActive}
-              title={experiment.description}
-              disabled={!experiment.available}
-              onClick={() => onSelect(experiment.id)}
-            >
-              <FontAwesomeIcon icon={experiment.icon} fixedWidth aria-hidden="true" />
-              <span>{experiment.title}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {activeExperiment === "retirement-age" && (
+    <>
+      <section className="what-if-main-display-controls" aria-labelledby="what-if-display-title">
         <div className="drawdown-view-controls what-if-view-controls">
           <div>
-            <p className="panel-eyebrow">Explore this change</p>
-            <h2>Choose how much detail you want to see</h2>
+            <p className="panel-eyebrow">Explore your options</p>
+            <h2 id="what-if-display-title">Choose how much detail you want to see</h2>
             <p>
               {viewMode === "simple"
                 ? "Start with the impact in plain English and the few numbers that matter most."
-                : "See the financial figures behind the change and compare them with your saved plan."}
+                : "See the financial figures behind each change and compare them with your saved plan."}
             </p>
           </div>
 
@@ -197,8 +167,40 @@ function ExperimentLauncherContent({
             <MoneyDisplayToggle value={displayMode} />
           </div>
         </div>
-      )}
-    </section>
+      </section>
+
+      <section className="what-if-launcher" aria-labelledby="what-if-launcher-title">
+        <div className="what-if-launcher-heading">
+          <div>
+            <p className="planner-eyebrow">Explore one change</p>
+            <h2 id="what-if-launcher-title">Choose a decision</h2>
+          </div>
+          <p>Change one lever at a time. Your saved plan stays untouched.</p>
+        </div>
+
+        <div className="what-if-experiment-nav" role="tablist" aria-label="What If experiments">
+          {experiments.map((experiment) => {
+            const isActive = activeExperiment === experiment.id;
+
+            return (
+              <button
+                key={experiment.id}
+                type="button"
+                role="tab"
+                className={`what-if-experiment-tab${isActive ? " is-active" : ""}`}
+                aria-selected={isActive}
+                title={experiment.description}
+                disabled={!experiment.available}
+                onClick={() => onSelect(experiment.id)}
+              >
+                <FontAwesomeIcon icon={experiment.icon} fixedWidth aria-hidden="true" />
+                <span>{experiment.title}</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    </>
   );
 }
 
