@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import { useScenarios } from "../scenarios";
+import { InfoTooltip } from "../ui";
 import { AppIcons } from "../../icons";
 import "../../styles/what-if-view-modes.css";
 import { formatCurrency } from "../../utils/formatters";
 
 type WhatIfViewMode = "simple" | "detailed";
+type MoneyDisplayMode = "today" | "nominal";
 
 interface RetirementAgeExperimentProps {
   activePlanName: string;
@@ -46,11 +49,10 @@ export function RetirementAgeExperiment({
   onReset,
   onSave,
 }: RetirementAgeExperimentProps) {
+  const { activeScenario } = useScenarios();
   const [viewMode, setViewMode] = useState<WhatIfViewMode>("simple");
+  const [displayMode, setDisplayMode] = useState<MoneyDisplayMode>("today");
   const ageDifference = retirementAge - baselineRetirementAge;
-  const pensionDifference = projectedPension - baselineProjectedPension;
-  const incomeDifference = annualIncome - baselineAnnualIncome;
-  const preparednessDifference = preparedness - baselinePreparedness;
   const retirementYearsDifference = baselineRetirementAge - retirementAge;
   const hasChanged = ageDifference !== 0;
   const minAge = currentAge;
@@ -61,12 +63,37 @@ export function RetirementAgeExperiment({
     Math.min(100, ((baselineRetirementAge - minAge) / ageRange) * 100),
   );
   const immediateRetirement = retirementAge === currentAge;
+  const inflation = activeScenario.inputs.inflation;
+  const baselineInflationFactor = Math.pow(
+    1 + inflation,
+    Math.max(0, baselineRetirementAge - currentAge),
+  );
+  const experimentInflationFactor = Math.pow(
+    1 + inflation,
+    Math.max(0, retirementAge - currentAge),
+  );
+  const showingToday = displayMode === "today";
+  const displayedBaselinePension = showingToday
+    ? baselineProjectedPension
+    : baselineProjectedPension * baselineInflationFactor;
+  const displayedPension = showingToday
+    ? projectedPension
+    : projectedPension * experimentInflationFactor;
+  const displayedBaselineIncome = showingToday
+    ? baselineAnnualIncome
+    : baselineAnnualIncome * baselineInflationFactor;
+  const displayedIncome = showingToday
+    ? annualIncome
+    : annualIncome * experimentInflationFactor;
+  const pensionDifference = displayedPension - displayedBaselinePension;
+  const incomeDifference = displayedIncome - displayedBaselineIncome;
+  const preparednessDifference = preparedness - baselinePreparedness;
   const story = createStory({
     activePlanName,
     ageDifference,
     retirementAge,
     currentAge,
-    projectedPension,
+    projectedPension: displayedPension,
     pensionDifference,
   });
   const simpleStory = createSimpleStory({
@@ -89,31 +116,42 @@ export function RetirementAgeExperiment({
           <p className="planner-eyebrow">Current experiment</p>
           <h2 id="retirement-age-experiment-title">Retirement age</h2>
         </div>
-        <div className="what-if-workspace-header-actions">
-          <span className="what-if-baseline-pill">Based on {activePlanName}</span>
-          <div className="what-if-view-mode-control">
-            <span>How much detail?</span>
-            <div className="what-if-view-mode-toggle" role="group" aria-label="What If view">
-              <button
-                type="button"
-                className={viewMode === "simple" ? "is-active" : undefined}
-                aria-pressed={viewMode === "simple"}
-                onClick={() => setViewMode("simple")}
-              >
-                Simple
-              </button>
-              <button
-                type="button"
-                className={viewMode === "detailed" ? "is-active" : undefined}
-                aria-pressed={viewMode === "detailed"}
-                onClick={() => setViewMode("detailed")}
-              >
-                Detailed
-              </button>
-            </div>
-          </div>
-        </div>
+        <span className="what-if-baseline-pill">Based on {activePlanName}</span>
       </header>
+
+      <div className="drawdown-view-controls what-if-view-controls">
+        <div>
+          <p className="panel-eyebrow">Explore this change</p>
+          <h2>Choose how much detail you want to see</h2>
+          <p>
+            {viewMode === "simple"
+              ? "Start with the impact in plain English and the few numbers that matter most."
+              : "See the financial figures behind the change and compare them with your saved plan."}
+          </p>
+        </div>
+
+        <div className="drawdown-view-actions">
+          <div className="drawdown-view-mode-toggle" role="group" aria-label="What If view">
+            <button
+              type="button"
+              className={viewMode === "simple" ? "is-active" : undefined}
+              aria-pressed={viewMode === "simple"}
+              onClick={() => setViewMode("simple")}
+            >
+              Simple
+            </button>
+            <button
+              type="button"
+              className={viewMode === "detailed" ? "is-active" : undefined}
+              aria-pressed={viewMode === "detailed"}
+              onClick={() => setViewMode("detailed")}
+            >
+              Detailed
+            </button>
+          </div>
+          <MoneyDisplayToggle value={displayMode} onChange={setDisplayMode} />
+        </div>
+      </div>
 
       <div className="what-if-decision-layout">
         <section className="what-if-change-panel" aria-labelledby="retirement-age-change-title">
@@ -187,13 +225,13 @@ export function RetirementAgeExperiment({
 
               <div className="what-if-simple-results" aria-label="Simple retirement age outcomes">
                 <SimpleResult
-                  value={`${formatCurrency(annualIncome)}/year`}
+                  value={`${formatCurrency(displayedIncome)}/year`}
                   label="Estimated retirement income"
                   note={createIncomeTargetNote(preparedness)}
                   tone={preparedness >= 100 ? "positive" : "negative"}
                 />
                 <SimpleResult
-                  value={formatCurrency(projectedPension)}
+                  value={formatCurrency(displayedPension)}
                   label="Pension when retirement starts"
                   note={createPensionDifferenceNote(pensionDifference, baselineRetirementAge)}
                   tone={pensionDifference >= 0 ? "positive" : "negative"}
@@ -224,12 +262,12 @@ export function RetirementAgeExperiment({
               <div className="what-if-key-results" aria-label="Detailed retirement age outcomes">
                 <KeyResult
                   label="Pension at retirement"
-                  value={formatCurrency(projectedPension)}
+                  value={formatCurrency(displayedPension)}
                   difference={formatSignedCurrency(pensionDifference)}
                 />
                 <KeyResult
                   label="Illustrated income"
-                  value={`${formatCurrency(annualIncome)}/year`}
+                  value={`${formatCurrency(displayedIncome)}/year`}
                   difference={`${formatSignedCurrency(incomeDifference)}/year`}
                 />
                 <KeyResult
@@ -293,14 +331,14 @@ export function RetirementAgeExperiment({
             <div className="what-if-detail-comparison">
               <OutcomeCard
                 label="Projected pension"
-                baseline={formatCurrency(baselineProjectedPension)}
-                experiment={formatCurrency(projectedPension)}
+                baseline={formatCurrency(displayedBaselinePension)}
+                experiment={formatCurrency(displayedPension)}
                 difference={formatSignedCurrency(pensionDifference)}
               />
               <OutcomeCard
                 label="Illustrated annual income"
-                baseline={`${formatCurrency(baselineAnnualIncome)}/year`}
-                experiment={`${formatCurrency(annualIncome)}/year`}
+                baseline={`${formatCurrency(displayedBaselineIncome)}/year`}
+                experiment={`${formatCurrency(displayedIncome)}/year`}
                 difference={`${formatSignedCurrency(incomeDifference)}/year`}
               />
               <OutcomeCard
@@ -320,12 +358,58 @@ export function RetirementAgeExperiment({
         </div>
       )}
 
+      {displayMode === "nominal" && retirementAge !== baselineRetirementAge && (
+        <p className="what-if-money-basis-note">
+          Future-money figures are shown in pounds at each plan&apos;s retirement date, so the comparison also reflects the different amount of inflation before each retirement age.
+        </p>
+      )}
+
       {saveMessage && (
         <p className="what-if-save-message" role="status">
           {saveMessage}
         </p>
       )}
     </section>
+  );
+}
+
+function MoneyDisplayToggle({
+  value,
+  onChange,
+}: {
+  value: MoneyDisplayMode;
+  onChange: (value: MoneyDisplayMode) => void;
+}) {
+  const showingToday = value === "today";
+  const nextValue: MoneyDisplayMode = showingToday ? "nominal" : "today";
+
+  return (
+    <div className="money-display-toggle-group">
+      <span className="money-display-toggle-label">How would you like to view the figures?</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={!showingToday}
+        aria-label={`Display values as ${showingToday ? "today's money" : "future money"}. Switch to ${showingToday ? "future money" : "today's money"}.`}
+        className="money-display-toggle"
+        onClick={() => onChange(nextValue)}
+      >
+        <span className="money-display-toggle-icon" aria-hidden="true">
+          <FontAwesomeIcon icon={showingToday ? AppIcons.money : AppIcons.growth} fixedWidth />
+        </span>
+        <span>{showingToday ? "Today’s money" : "Future money"}</span>
+        <span className="money-display-toggle-track" aria-hidden="true">
+          <span className="money-display-toggle-thumb" />
+        </span>
+      </button>
+      <InfoTooltip ariaLabel="Explain today’s money and future money" size="medium">
+        <strong>Today&apos;s money</strong>
+        <p>Shows the figures using today&apos;s buying power, making the impact easier to compare with what money is worth now.</p>
+        <strong>Future money</strong>
+        <p>Shows the projected pound amounts at retirement, including the effect of inflation before you reach that age.</p>
+        <small>Both views use the same experiment. Only the way the money values are displayed changes.</small>
+      </InfoTooltip>
+    </div>
   );
 }
 
