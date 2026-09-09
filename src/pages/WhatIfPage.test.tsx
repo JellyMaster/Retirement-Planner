@@ -88,6 +88,7 @@ describe("WhatIfPage", () => {
     ...input,
   }));
   const deleteWhatIfScenario = vi.fn();
+  const setHasUnsavedExperiment = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -128,6 +129,8 @@ describe("WhatIfPage", () => {
 
     mockedUseWhatIfScenarios.mockReturnValue({
       scenarios: [],
+      hasUnsavedExperiment: false,
+      setHasUnsavedExperiment,
       saveScenario: saveWhatIfScenario,
       deleteScenario: deleteWhatIfScenario,
     });
@@ -167,6 +170,7 @@ describe("WhatIfPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/You could retire 2 years earlier/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
+    expect(setHasUnsavedExperiment).toHaveBeenCalledWith(true);
   });
 
   it("allows immediate retirement at the current age", () => {
