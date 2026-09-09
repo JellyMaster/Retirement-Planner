@@ -37,13 +37,26 @@ import "../styles/what-if-scenarios.css";
 export function WhatIfPage() {
   const scenarios = useScenarios();
   const whatIfScenarios = useWhatIfScenarios();
+  const [baseScenarioId, setBaseScenarioId] = useState(scenarios.activeScenario.id);
+
+  const allScenarios = useMemo(() => {
+    const scenariosById = new Map<string, Scenario>();
+    scenarios.scenarios.forEach((scenario) => scenariosById.set(scenario.id, scenario));
+    scenariosById.set(scenarios.activeScenario.id, scenarios.activeScenario);
+    return [...scenariosById.values()];
+  }, [scenarios.activeScenario, scenarios.scenarios]);
+
+  const baseScenario =
+    allScenarios.find((scenario) => scenario.id === baseScenarioId) ??
+    scenarios.activeScenario;
 
   return (
     <WhatIfWorkspace
-      key={scenarios.activeScenario.id}
-      activeScenario={scenarios.activeScenario}
-      allScenarios={scenarios.scenarios}
-      setActiveScenario={scenarios.setActiveScenario}
+      key={baseScenario.id}
+      activeScenario={baseScenario}
+      appActiveScenarioName={scenarios.activeScenario.name}
+      allScenarios={allScenarios}
+      onBaseScenarioChange={setBaseScenarioId}
       createScenario={scenarios.createScenario}
       updateScenarioPlan={scenarios.updateScenarioPlan}
       savedWhatIfScenarios={whatIfScenarios.scenarios}
@@ -54,9 +67,10 @@ export function WhatIfPage() {
 }
 
 interface WhatIfWorkspaceProps {
-  activeScenario: ReturnType<typeof useScenarios>["activeScenario"];
+  activeScenario: Scenario;
+  appActiveScenarioName: string;
   allScenarios: Scenario[];
-  setActiveScenario: ReturnType<typeof useScenarios>["setActiveScenario"];
+  onBaseScenarioChange: (id: string) => void;
   createScenario: ReturnType<typeof useScenarios>["createScenario"];
   updateScenarioPlan: ReturnType<typeof useScenarios>["updateScenarioPlan"];
   savedWhatIfScenarios: WhatIfScenario[];
@@ -66,8 +80,9 @@ interface WhatIfWorkspaceProps {
 
 function WhatIfWorkspace({
   activeScenario,
+  appActiveScenarioName,
   allScenarios,
-  setActiveScenario,
+  onBaseScenarioChange,
   createScenario,
   updateScenarioPlan,
   savedWhatIfScenarios,
@@ -459,54 +474,97 @@ function WhatIfWorkspace({
       <section className="what-if-scenario-bar" aria-labelledby="what-if-base-plan-title">
         <div className="what-if-base-plan-control">
           <div>
-            <p className="planner-eyebrow">Experimenting with</p>
+            <p className="planner-eyebrow">Experiment base</p>
             <h2 id="what-if-base-plan-title">Choose the plan to explore</h2>
-            <p>Each saved What If scenario stays linked to the plan it was created from.</p>
+            <p>
+              Switch the starting plan for this workspace without changing the active plan
+              used elsewhere in Polaris.
+            </p>
           </div>
           <label>
-            <span>Base plan</span>
+            <span>Base plan for this experiment</span>
             <select
               value={activeScenario.id}
-              onChange={(event) => setActiveScenario(event.target.value)}
+              onChange={(event) => onBaseScenarioChange(event.target.value)}
             >
-              {allScenarios.map((scenario) => (
-                <option key={scenario.id} value={scenario.id}>
-                  {scenario.name}
-                </option>
-              ))}
+              {allScenarios.map((scenario) => {
+                const savedCount = savedWhatIfScenarios.filter(
+                  (saved) => saved.baseScenarioId === scenario.id,
+                ).length;
+                return (
+                  <option key={scenario.id} value={scenario.id}>
+                    {scenario.name}{savedCount > 0 ? ` · ${savedCount} saved` : ""}
+                  </option>
+                );
+              })}
             </select>
+            <small className="what-if-base-plan-note">
+              Active plan elsewhere: <strong>{appActiveScenarioName}</strong>
+            </small>
           </label>
         </div>
 
-        {savedForActivePlan.length > 0 && (
-          <div className="what-if-saved-scenarios" aria-label={`Saved What If scenarios for ${activeScenario.name}`}>
-            <div className="what-if-saved-scenarios-heading">
+        <div
+          className="what-if-saved-scenarios"
+          aria-label={`Saved What If scenarios for ${activeScenario.name}`}
+        >
+          <div className="what-if-saved-scenarios-heading">
+            <div>
               <strong>Saved experiments</strong>
-              <span>{savedForActivePlan.length} for {activeScenario.name}</span>
+              <span>Load an idea again or promote it when you want to keep it as a plan.</span>
             </div>
+            <span>{savedForActivePlan.length} for {activeScenario.name}</span>
+          </div>
+
+          {savedForActivePlan.length > 0 ? (
             <div className="what-if-saved-scenario-list">
               {savedForActivePlan.map((scenario) => (
                 <article
                   key={scenario.id}
                   className={`what-if-saved-scenario${loadedWhatIfScenarioId === scenario.id ? " is-active" : ""}`}
                 >
-                  <button type="button" className="what-if-saved-scenario-main" onClick={() => loadSavedExperiment(scenario)}>
-                    <strong>{scenario.name}</strong>
+                  <button
+                    type="button"
+                    className="what-if-saved-scenario-main"
+                    aria-label={`Load ${scenario.name}`}
+                    onClick={() => loadSavedExperiment(scenario)}
+                  >
+                    <span className="what-if-saved-scenario-title-row">
+                      <strong>{scenario.name}</strong>
+                      {loadedWhatIfScenarioId === scenario.id && (
+                        <span className="what-if-saved-scenario-loaded">Loaded</span>
+                      )}
+                    </span>
                     <span>{formatExperimentName(scenario.experimentType)}</span>
                   </button>
                   <div className="what-if-saved-scenario-actions">
-                    <button type="button" className="ui-button ui-button-secondary ui-button-small" onClick={() => promoteSavedExperiment(scenario)}>
+                    <button
+                      type="button"
+                      className="ui-button ui-button-secondary ui-button-small"
+                      title={`Add ${scenario.name} to My Plans`}
+                      onClick={() => promoteSavedExperiment(scenario)}
+                    >
                       Use as plan
                     </button>
-                    <button type="button" className="what-if-saved-scenario-delete" aria-label={`Delete ${scenario.name}`} onClick={() => deleteWhatIfScenario(scenario.id)}>
+                    <button
+                      type="button"
+                      className="what-if-saved-scenario-delete"
+                      aria-label={`Delete ${scenario.name}`}
+                      onClick={() => deleteWhatIfScenario(scenario.id)}
+                    >
                       ×
                     </button>
                   </div>
                 </article>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="what-if-saved-scenarios-empty">
+              <strong>No saved experiments for this plan yet.</strong>
+              <span>Change one decision below, then save it if the result is worth revisiting.</span>
+            </div>
+          )}
+        </div>
       </section>
 
       <ExperimentLauncher
