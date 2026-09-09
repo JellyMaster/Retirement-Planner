@@ -13,25 +13,30 @@
 }
 
 .what-if-simple-outcome-copy {
+  order: 2;
   display: grid;
   gap: var(--space-2);
-  max-width: 48rem;
-  padding: var(--space-2) 0;
+  max-width: none;
+  margin-top: var(--space-1);
+  padding: var(--space-4) 0 var(--space-2);
+  border-top: 1px solid var(--colour-border);
 }
 
 .what-if-simple-outcome-copy > strong {
-  max-width: 44rem;
+  max-width: 52rem;
   font-size: clamp(1.15rem, 2vw, 1.45rem);
   line-height: 1.35;
 }
 
 .what-if-simple-outcome-copy > p {
+  max-width: 52rem;
   margin: 0;
   color: var(--colour-text-muted);
   line-height: 1.55;
 }
 
 .what-if-simple-results {
+  order: 1;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-2);
@@ -73,6 +78,10 @@
 
 .what-if-simple-result > small.is-negative {
   color: var(--colour-negative, #c2414b);
+}
+
+.what-if-result-panel > .what-if-inline-actions {
+  order: 3;
 }
 
 .what-if-money-basis-note {
