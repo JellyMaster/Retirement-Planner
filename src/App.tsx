@@ -11,6 +11,7 @@ import {
 import { ThemeToggle } from "./components/theme/ThemeToggle";
 import { SkipLink } from "./components/ui";
 import { WhatIfScenarioProvider } from "./components/what-if/WhatIfScenarioContext";
+import { useWhatIfScenarios } from "./components/what-if/useWhatIfScenarios";
 import { AppIcons, type AppIcon } from "./icons";
 import { CompareScenariosPage } from "./pages/CompareScenariosPage";
 import { DrawdownPlannerPage } from "./pages/DrawdownPlannerPage";
@@ -39,6 +40,9 @@ const navigationItems: readonly NavigationItem[] = [
   { to: "/guidance", label: "Guidance", icon: AppIcons.navigation.guidance },
 ];
 
+const UNSAVED_WHAT_IF_MESSAGE =
+  "You have an unsaved What If experiment. If you continue, those temporary changes will be lost.";
+
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
@@ -53,6 +57,7 @@ export default function App() {
 
 function AppContent() {
   const { activeScenarioId } = useScenarios();
+  const { hasUnsavedExperiment, setHasUnsavedExperiment } = useWhatIfScenarios();
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
 
   useEffect(() => {
@@ -66,6 +71,25 @@ function AppContent() {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isNavigationOpen]);
 
+  useEffect(() => {
+    if (!hasUnsavedExperiment) return;
+
+    function handleBeforeUnload(event: BeforeUnloadEvent) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedExperiment]);
+
+  function confirmDiscardUnsavedExperiment(): boolean {
+    if (!hasUnsavedExperiment) return true;
+    const shouldContinue = window.confirm(UNSAVED_WHAT_IF_MESSAGE);
+    if (shouldContinue) setHasUnsavedExperiment(false);
+    return shouldContinue;
+  }
+
   return (
     <div className="app-shell">
       <SkipLink />
@@ -76,7 +100,13 @@ function AppContent() {
           <NavLink
             to="/"
             className="app-brand"
-            onClick={() => setIsNavigationOpen(false)}
+            onClick={(event) => {
+              if (!confirmDiscardUnsavedExperiment()) {
+                event.preventDefault();
+                return;
+              }
+              setIsNavigationOpen(false);
+            }}
           >
             <span className="app-brand-mark" aria-hidden="true">
               RP
@@ -119,7 +149,13 @@ function AppContent() {
                   className={({ isActive }) =>
                     isActive ? "nav-link nav-link-active" : "nav-link"
                   }
-                  onClick={() => setIsNavigationOpen(false)}
+                  onClick={(event) => {
+                    if (!confirmDiscardUnsavedExperiment()) {
+                      event.preventDefault();
+                      return;
+                    }
+                    setIsNavigationOpen(false);
+                  }}
                 >
                   <span className="nav-link-icon" aria-hidden="true">
                     <FontAwesomeIcon icon={icon} fixedWidth />
@@ -131,7 +167,9 @@ function AppContent() {
 
             <div className="app-navigation-plan">
               <span className="app-navigation-divider" aria-hidden="true" />
-              <ActiveScenarioSwitcher />
+              <ActiveScenarioSwitcher
+                onBeforeChange={() => confirmDiscardUnsavedExperiment()}
+              />
             </div>
           </nav>
 
