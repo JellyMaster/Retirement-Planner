@@ -1,0 +1,77 @@
+/* =========================================================
+   Shared top-level page header
+
+   Keep the primary page title and subtitle consistent across the
+   application. Page-specific header classes may still control their
+   secondary actions, summaries and decorative marks.
+   ========================================================= */
+
+.polaris-overview-header,
+.my-plan-header,
+.drawdown-workspace-header,
+.what-if-header,
+.scenario-manager-header,
+.explore-header,
+.guidance-header {
+  align-items: center;
+  gap: var(--ui-space-6, var(--space-6));
+}
+
+.polaris-overview-header > div:first-child,
+.my-plan-header > div:first-child,
+.drawdown-workspace-header > div:first-child,
+.what-if-header > div:first-child,
+.scenario-manager-header > div:first-child,
+.explore-header > div:first-child,
+.guidance-header > div:first-child {
+  max-width: 68ch;
+}
+
+.polaris-overview-header h1,
+.my-plan-header h1,
+.drawdown-workspace-header h1,
+.what-if-header h1,
+.scenario-manager-header h1,
+.explore-header h1,
+.guidance-header h1 {
+  margin: 0;
+  font-size: var(--ui-font-size-2xl, clamp(1.6rem, 3vw, 2.25rem));
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.polaris-overview-header > div:first-child > p:not(.planner-eyebrow),
+.my-plan-header > div:first-child > p:not(.planner-eyebrow),
+.drawdown-workspace-header > div:first-child > p:not(.planner-eyebrow),
+.what-if-header > div:first-child > p:not(.planner-eyebrow),
+.scenario-manager-header > div:first-child > p:not(.planner-eyebrow),
+.explore-header > div:first-child > p:not(.planner-eyebrow),
+.guidance-header > div:first-child > p:not(.planner-eyebrow) {
+  max-width: 68ch;
+  margin: var(--ui-space-2, var(--space-2)) 0 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-md, 1rem);
+  line-height: 1.55;
+}
+
+@media (max-width: 800px) {
+  .polaris-overview-header,
+  .my-plan-header,
+  .drawdown-workspace-header,
+  .what-if-header,
+  .scenario-manager-header,
+  .explore-header,
+  .guidance-header {
+    align-items: stretch;
+  }
+
+  .polaris-overview-header h1,
+  .my-plan-header h1,
+  .drawdown-workspace-header h1,
+  .what-if-header h1,
+  .scenario-manager-header h1,
+  .explore-header h1,
+  .guidance-header h1 {
+    font-size: clamp(1.75rem, 7vw, 2.1rem);
+  }
+}
