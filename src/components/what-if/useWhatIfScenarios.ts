@@ -1,6 +1,9 @@
 import { useContext } from "react";
 
-import { WhatIfScenarioContext, type WhatIfScenarioContextValue } from "./WhatIfScenarioContext";
+import {
+  WhatIfScenarioContext,
+  type WhatIfScenarioContextValue,
+} from "./WhatIfScenarioStore";
 
 export function useWhatIfScenarios(): WhatIfScenarioContextValue {
   const context = useContext(WhatIfScenarioContext);
