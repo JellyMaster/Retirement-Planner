@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useInRouterContext, useSearchParams } from "react-router-dom";
 
 import { AppIcons } from "../../icons";
+import "../../styles/what-if-v1-3.css";
 
 export type ExperimentId =
   | "retirement-age"
