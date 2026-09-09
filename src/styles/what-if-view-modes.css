@@ -1,11 +1,11 @@
-.what-if-view-controls {
-  margin: var(--space-2) 0 0;
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--colour-border);
+.what-if-main-display-controls {
+  padding: var(--space-2) var(--space-4) 0;
 }
 
-.what-if-view-controls h2 {
-  font-size: clamp(1rem, 1.8vw, 1.2rem);
+.what-if-view-controls {
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .what-if-view-controls .money-display-toggle-group {
@@ -107,6 +107,10 @@
 }
 
 @media (max-width: 800px) {
+  .what-if-main-display-controls {
+    padding-inline: var(--space-3);
+  }
+
   .what-if-view-controls,
   .what-if-view-controls .drawdown-view-actions {
     align-items: stretch;
@@ -125,6 +129,10 @@
 }
 
 @media (max-width: 560px) {
+  .what-if-main-display-controls {
+    padding-inline: 0;
+  }
+
   .what-if-simple-result {
     grid-template-columns: 1fr;
   }
