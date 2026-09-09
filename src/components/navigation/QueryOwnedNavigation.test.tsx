@@ -24,13 +24,13 @@ describe("query-owned workspace navigation", () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: /Lower fees/i })).toHaveAttribute(
-        "aria-pressed",
+      expect(screen.getByRole("tab", { name: "Fees" })).toHaveAttribute(
+        "aria-selected",
         "true",
       ),
     );
 
-    await user.click(screen.getByRole("button", { name: /Inflation/i }));
+    await user.click(screen.getByRole("tab", { name: "Inflation" }));
     expect(screen.getByTestId("location")).toHaveTextContent(
       "/what-if?experiment=inflation",
     );
