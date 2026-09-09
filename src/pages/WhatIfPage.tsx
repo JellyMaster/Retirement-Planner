@@ -15,11 +15,14 @@ import { RetirementAgeExperiment } from "../components/what-if/RetirementAgeExpe
 import { ReturnExperiment } from "../components/what-if/ReturnExperiment";
 import { SpendingExperiment } from "../components/what-if/SpendingExperiment";
 import { StatePensionExperiment } from "../components/what-if/StatePensionExperiment";
+import { useWhatIfScenarios } from "../components/what-if/WhatIfScenarioContext";
 import { ExperimentInsights } from "../components/what-if/shared/ExperimentInsights";
 import {
   createDefaultScenarioDrawdownPreferences,
+  type Scenario,
   type ScenarioDrawdownPreferences,
 } from "../domain/scenarios";
+import type { WhatIfScenario } from "../domain/what-if/WhatIfScenario";
 import { createRetirementSpendingOutcome } from "../engine/drawdown/createRetirementSpendingOutcome";
 import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
 import type { PensionInputs } from "../engine/models/PensionInputs";
@@ -29,30 +32,47 @@ import { AppIcons } from "../icons";
 import "../styles/what-if-page.css";
 import "../styles/what-if-controls.css";
 import "../styles/what-if-insights.css";
+import "../styles/what-if-scenarios.css";
 
 export function WhatIfPage() {
   const scenarios = useScenarios();
+  const whatIfScenarios = useWhatIfScenarios();
 
   return (
     <WhatIfWorkspace
       key={scenarios.activeScenario.id}
       activeScenario={scenarios.activeScenario}
+      allScenarios={scenarios.scenarios}
+      setActiveScenario={scenarios.setActiveScenario}
       createScenario={scenarios.createScenario}
       updateScenarioPlan={scenarios.updateScenarioPlan}
+      savedWhatIfScenarios={whatIfScenarios.scenarios}
+      saveWhatIfScenario={whatIfScenarios.saveScenario}
+      deleteWhatIfScenario={whatIfScenarios.deleteScenario}
     />
   );
 }
 
 interface WhatIfWorkspaceProps {
   activeScenario: ReturnType<typeof useScenarios>["activeScenario"];
+  allScenarios: Scenario[];
+  setActiveScenario: ReturnType<typeof useScenarios>["setActiveScenario"];
   createScenario: ReturnType<typeof useScenarios>["createScenario"];
   updateScenarioPlan: ReturnType<typeof useScenarios>["updateScenarioPlan"];
+  savedWhatIfScenarios: WhatIfScenario[];
+  saveWhatIfScenario: ReturnType<typeof useWhatIfScenarios>["saveScenario"];
+  deleteWhatIfScenario: ReturnType<typeof useWhatIfScenarios>["deleteScenario"];
 }
 
 function WhatIfWorkspace({
   activeScenario,
+  allScenarios,
+  setActiveScenario,
   createScenario,
   updateScenarioPlan,
+  savedWhatIfScenarios,
+  saveWhatIfScenario,
+  deleteWhatIfScenario,
 }: WhatIfWorkspaceProps) {
   const [retirementGoals] = useStoredRetirementGoals();
   const baselineDrawdown =
@@ -74,6 +94,12 @@ function WhatIfWorkspace({
   const [alternativeDrawdown, setAlternativeDrawdown] =
     useState<ScenarioDrawdownPreferences>(() => ({ ...baselineDrawdown }));
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [loadedWhatIfScenarioId, setLoadedWhatIfScenarioId] = useState<string | null>(null);
+
+  const savedForActivePlan = useMemo(
+    () => savedWhatIfScenarios.filter((scenario) => scenario.baseScenarioId === activeScenario.id),
+    [activeScenario.id, savedWhatIfScenarios],
+  );
 
   const alternativeStateIncluded =
     alternativeDrawdown.includeStatePension ?? baselineStateIncluded;
@@ -200,6 +226,7 @@ function WhatIfWorkspace({
     setAlternativeInputs(
       createRetirementAgeExperimentInputs(activeScenario.inputs, retirementAge),
     );
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -208,6 +235,7 @@ function WhatIfWorkspace({
       ...current,
       monthlyEmployeeContribution: Math.max(0, amount),
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -216,6 +244,7 @@ function WhatIfWorkspace({
       ...current,
       monthlyEmployerContribution: Math.max(0, amount),
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -234,6 +263,7 @@ function WhatIfWorkspace({
       next.extraMonthlyContribution = baselineExtraContribution || 250;
       return next;
     });
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -244,6 +274,7 @@ function WhatIfWorkspace({
         current.extraContributionAge ?? baselineExtraContributionAge,
       extraMonthlyContribution: amount,
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -257,6 +288,7 @@ function WhatIfWorkspace({
       extraMonthlyContribution:
         current.extraMonthlyContribution ?? (baselineExtraContribution || 250),
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -265,6 +297,7 @@ function WhatIfWorkspace({
       ...current,
       desiredAnnualIncome: Math.max(0, Math.round(amount)),
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -273,6 +306,7 @@ function WhatIfWorkspace({
       ...current,
       annualFee: Math.min(0.02, Math.max(0, annualFee)),
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -281,6 +315,7 @@ function WhatIfWorkspace({
       ...current,
       annualReturn: Math.min(0.12, Math.max(0, annualReturn)),
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -289,6 +324,7 @@ function WhatIfWorkspace({
       ...current,
       inflation: Math.min(0.08, Math.max(0, inflation)),
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -300,6 +336,7 @@ function WhatIfWorkspace({
         current.statePensionAnnualAmount ?? baselineStateAmount,
       statePensionAge: current.statePensionAge ?? baselineStateAge,
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -310,6 +347,7 @@ function WhatIfWorkspace({
       statePensionAnnualAmount: Math.max(0, Math.round(statePensionAnnualAmount)),
       statePensionAge: current.statePensionAge ?? baselineStateAge,
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -324,6 +362,7 @@ function WhatIfWorkspace({
         Math.max(activeScenario.inputs.retirementAge, Math.round(statePensionAge)),
       ),
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -336,6 +375,7 @@ function WhatIfWorkspace({
       ),
       marketDownturnPercentage: current.marketDownturnPercentage ?? 0.2,
     }));
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -352,12 +392,14 @@ function WhatIfWorkspace({
       }
       return next;
     });
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
   function resetExperiment() {
     setAlternativeInputs({ ...activeScenario.inputs });
     setAlternativeDrawdown({ ...baselineDrawdown });
+    setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
   }
 
@@ -370,15 +412,32 @@ function WhatIfWorkspace({
       alternativeStateIncluded,
       alternativeStateAge,
     );
-    const name = window.prompt("Name this scenario", suggestedName)?.trim();
+    const name = window.prompt("Name this What If scenario", suggestedName)?.trim();
     if (!name) return;
-    const scenario = createScenario(name, activeScenario.id);
-    updateScenarioPlan(
-      scenario.id,
-      { ...alternativeInputs },
-      { ...alternativeDrawdown },
-    );
-    setSaveMessage(`${name} has been saved and is ready to compare.`);
+
+    const saved = saveWhatIfScenario({
+      name,
+      baseScenarioId: activeScenario.id,
+      experimentType: activeExperiment,
+      inputs: { ...alternativeInputs },
+      drawdown: { ...alternativeDrawdown },
+    });
+    setLoadedWhatIfScenarioId(saved.id);
+    setSaveMessage(`${name} has been saved against ${activeScenario.name}.`);
+  }
+
+  function loadSavedExperiment(scenario: WhatIfScenario) {
+    setActiveExperiment(scenario.experimentType);
+    setAlternativeInputs({ ...scenario.inputs });
+    setAlternativeDrawdown({ ...scenario.drawdown });
+    setLoadedWhatIfScenarioId(scenario.id);
+    setSaveMessage(`${scenario.name} loaded.`);
+  }
+
+  function promoteSavedExperiment(scenario: WhatIfScenario) {
+    const plan = createScenario(scenario.name, scenario.baseScenarioId);
+    updateScenarioPlan(plan.id, { ...scenario.inputs }, { ...scenario.drawdown });
+    setSaveMessage(`${scenario.name} has been added to My Plans and is ready to compare.`);
   }
 
   return (
@@ -388,14 +447,67 @@ function WhatIfWorkspace({
           <p className="planner-eyebrow">Decision lab · {activeScenario.name}</p>
           <h1>What would happen if you changed one decision?</h1>
           <p>
-            Explore one meaningful lever at a time. Every experiment starts from
-            the active plan and remains temporary until you choose to save it.
+            Explore one meaningful lever at a time. Save useful experiments against a plan,
+            then promote only the alternatives you want to keep as full plans.
           </p>
         </div>
         <div className="what-if-header-mark" aria-hidden="true">
           <FontAwesomeIcon icon={AppIcons.lightbulb} fixedWidth />
         </div>
       </header>
+
+      <section className="what-if-scenario-bar" aria-labelledby="what-if-base-plan-title">
+        <div className="what-if-base-plan-control">
+          <div>
+            <p className="planner-eyebrow">Experimenting with</p>
+            <h2 id="what-if-base-plan-title">Choose the plan to explore</h2>
+            <p>Each saved What If scenario stays linked to the plan it was created from.</p>
+          </div>
+          <label>
+            <span>Base plan</span>
+            <select
+              value={activeScenario.id}
+              onChange={(event) => setActiveScenario(event.target.value)}
+            >
+              {allScenarios.map((scenario) => (
+                <option key={scenario.id} value={scenario.id}>
+                  {scenario.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        {savedForActivePlan.length > 0 && (
+          <div className="what-if-saved-scenarios" aria-label={`Saved What If scenarios for ${activeScenario.name}`}>
+            <div className="what-if-saved-scenarios-heading">
+              <strong>Saved experiments</strong>
+              <span>{savedForActivePlan.length} for {activeScenario.name}</span>
+            </div>
+            <div className="what-if-saved-scenario-list">
+              {savedForActivePlan.map((scenario) => (
+                <article
+                  key={scenario.id}
+                  className={`what-if-saved-scenario${loadedWhatIfScenarioId === scenario.id ? " is-active" : ""}`}
+                >
+                  <button type="button" className="what-if-saved-scenario-main" onClick={() => loadSavedExperiment(scenario)}>
+                    <strong>{scenario.name}</strong>
+                    <span>{formatExperimentName(scenario.experimentType)}</span>
+                  </button>
+                  <div className="what-if-saved-scenario-actions">
+                    <button type="button" className="ui-button ui-button-secondary ui-button-small" onClick={() => promoteSavedExperiment(scenario)}>
+                      Use as plan
+                    </button>
+                    <button type="button" className="what-if-saved-scenario-delete" aria-label={`Delete ${scenario.name}`} onClick={() => deleteWhatIfScenario(scenario.id)}>
+                      ×
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
 
       <ExperimentLauncher
         activeExperiment={activeExperiment}
@@ -605,6 +717,19 @@ function WhatIfWorkspace({
       />
     </main>
   );
+}
+
+function formatExperimentName(experiment: WhatIfScenario["experimentType"]): string {
+  switch (experiment) {
+    case "retirement-age": return "Retirement age";
+    case "contributions": return "Save more";
+    case "spending": return "Spending";
+    case "fees": return "Fees";
+    case "returns": return "Returns";
+    case "inflation": return "Inflation";
+    case "state-pension": return "State Pension";
+    case "market-downturn": return "Market downturn";
+  }
 }
 
 function hasExperimentChanged(
