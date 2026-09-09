@@ -50,6 +50,11 @@ export function RetirementAgeExperiment({
   const hasChanged = ageDifference !== 0;
   const minAge = currentAge;
   const maxAge = Math.max(currentAge, Math.min(100, statePensionAge + 5));
+  const ageRange = Math.max(1, maxAge - minAge);
+  const baselinePosition = Math.max(
+    0,
+    Math.min(100, ((baselineRetirementAge - minAge) / ageRange) * 100),
+  );
   const immediateRetirement = retirementAge === currentAge;
   const story = createStory({
     activePlanName,
@@ -60,6 +65,7 @@ export function RetirementAgeExperiment({
     pensionDifference,
   });
   const outcomeStatus = createOutcomeStatus(preparedness, hasChanged);
+  const savedPlanTiming = createSavedPlanTiming(ageDifference);
 
   return (
     <section
@@ -86,25 +92,37 @@ export function RetirementAgeExperiment({
             <span>Experimental retirement age</span>
             <strong>Age {retirementAge}</strong>
             <small>
-              Saved plan: age {baselineRetirementAge} · {Math.max(0, retirementAge - currentAge)} years away
+              Saved plan: age {baselineRetirementAge} · {savedPlanTiming}
             </small>
           </div>
 
           <div className="what-if-slider-wrap what-if-slider-wrap-primary">
-            <input
-              id="what-if-retirement-age"
-              type="range"
-              min={minAge}
-              max={maxAge}
-              step={1}
-              value={retirementAge}
-              aria-label="Experimental retirement age"
-              aria-valuetext={`Age ${retirementAge}`}
-              onChange={(event) => onRetirementAgeChange(Number(event.target.value))}
-            />
-            <div className="what-if-slider-labels" aria-hidden="true">
+            <div className="what-if-slider-track-wrap">
+              <input
+                id="what-if-retirement-age"
+                type="range"
+                min={minAge}
+                max={maxAge}
+                step={1}
+                value={retirementAge}
+                aria-label="Experimental retirement age"
+                aria-valuetext={`Age ${retirementAge}`}
+                onChange={(event) => onRetirementAgeChange(Number(event.target.value))}
+              />
+              <span
+                className="what-if-slider-reference-marker"
+                style={{ left: `${baselinePosition}%` }}
+                aria-hidden="true"
+              />
+            </div>
+            <div className="what-if-slider-labels what-if-slider-labels-reference" aria-hidden="true">
               <span>Age {minAge}</span>
-              <span>Saved · {baselineRetirementAge}</span>
+              <span
+                className="what-if-slider-saved-label"
+                style={{ left: `${baselinePosition}%` }}
+              >
+                Saved · {baselineRetirementAge}
+              </span>
               <span>Age {maxAge}</span>
             </div>
           </div>
@@ -345,6 +363,14 @@ function createStory({
     title: `Retiring ${years} ${years === 1 ? "year" : "years"} ${timing}`,
     description: `Stopping work at age ${retirementAge} could ${direction} the projected pension by ${formatCurrency(Math.abs(pensionDifference))} under the saved assumptions.`,
   };
+}
+
+function createSavedPlanTiming(ageDifference: number): string {
+  if (ageDifference === 0) return "matches this experiment";
+
+  const years = Math.abs(ageDifference);
+  const direction = ageDifference < 0 ? "later" : "earlier";
+  return `${years} ${years === 1 ? "year" : "years"} ${direction} than this experiment`;
 }
 
 function createReasons(
