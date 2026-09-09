@@ -10,6 +10,7 @@ import {
 } from "./components/scenarios";
 import { ThemeToggle } from "./components/theme/ThemeToggle";
 import { SkipLink } from "./components/ui";
+import { WhatIfScenarioProvider } from "./components/what-if/WhatIfScenarioContext";
 import { AppIcons, type AppIcon } from "./icons";
 import { CompareScenariosPage } from "./pages/CompareScenariosPage";
 import { DrawdownPlannerPage } from "./pages/DrawdownPlannerPage";
@@ -42,7 +43,9 @@ export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ScenarioProvider>
-        <AppContent />
+        <WhatIfScenarioProvider>
+          <AppContent />
+        </WhatIfScenarioProvider>
       </ScenarioProvider>
     </BrowserRouter>
   );
@@ -154,10 +157,7 @@ function AppContent() {
             path="/plan"
             element={<RetirementPlannerPage key={activeScenarioId} />}
           />
-          <Route
-            path="/what-if"
-            element={<WhatIfPage key={activeScenarioId} />}
-          />
+          <Route path="/what-if" element={<WhatIfPage />} />
           <Route path="/compare" element={<CompareScenariosPage />} />
           <Route
             path="/drawdown"
