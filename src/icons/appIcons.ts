@@ -67,6 +67,7 @@ const iconRegistry = {
   fees: faPercent,
   health: faHeartPulse,
   recommendations: faLightbulb,
+  lightbulb: faLightbulb,
   milestones: faFlagCheckered,
   assumptions: faClipboardList,
   projection: faTable,
