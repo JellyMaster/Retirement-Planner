@@ -42,7 +42,7 @@ describe("MarketDownturnExperiment", () => {
         name: "Experimental market downturn percentage",
       }),
     ).toHaveValue("0");
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeDisabled();
   });
 
   it("passes the selected severity and timing to the workspace", () => {
@@ -90,7 +90,7 @@ describe("MarketDownturnExperiment", () => {
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Reset experiment" }));
-    await user.click(screen.getByRole("button", { name: "Save as scenario" }));
+    await user.click(screen.getByRole("button", { name: "Save experiment" }));
 
     expect(onReset).toHaveBeenCalledOnce();
     expect(onSave).toHaveBeenCalledOnce();
