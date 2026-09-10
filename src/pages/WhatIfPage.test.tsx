@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -337,7 +337,7 @@ describe("WhatIfPage", () => {
     expect(nameInput).toHaveValue("Save 1000 monthly");
     await user.clear(nameInput);
     await user.type(nameInput, "Save earlier");
-    await user.click(screen.getByRole("button", { name: "Save experiment" }));
+    await user.click(within(dialog).getByRole("button", { name: "Save experiment" }));
 
     expect(saveWhatIfScenario).toHaveBeenCalledWith(
       expect.objectContaining({
