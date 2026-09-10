@@ -104,23 +104,49 @@ function WhatIfWorkspace({
       ),
     [activeExperiment, activeScenario.id, savedWhatIfScenarios],
   );
-  const loadedWhatIfScenario = useMemo(
-    () =>
-      loadedWhatIfScenarioId
-        ? savedWhatIfScenarios.find(
-            (scenario) =>
-              scenario.id === loadedWhatIfScenarioId &&
-              scenario.baseScenarioId === activeScenario.id,
-          ) ?? null
-        : null,
-    [activeScenario.id, loadedWhatIfScenarioId, savedWhatIfScenarios],
-  );
 
   const alternativeStateIncluded =
     alternativeDrawdown.includeStatePension ?? baselineStateIncluded;
   const alternativeStateAmount =
     alternativeDrawdown.statePensionAnnualAmount ?? baselineStateAmount;
   const alternativeStateAge = alternativeDrawdown.statePensionAge ?? baselineStateAge;
+
+  const matchingSavedExperiment = useMemo(
+    () =>
+      savedForActiveExperiment.find((scenario) =>
+        isSavedExperimentMatch({
+          experiment: activeExperiment,
+          scenario,
+          inputs: alternativeInputs,
+          drawdown: alternativeDrawdown,
+          stateIncluded: alternativeStateIncluded,
+          stateAmount: alternativeStateAmount,
+          stateAge: alternativeStateAge,
+        }),
+      ) ?? null,
+    [
+      activeExperiment,
+      alternativeDrawdown,
+      alternativeInputs,
+      alternativeStateAge,
+      alternativeStateAmount,
+      alternativeStateIncluded,
+      savedForActiveExperiment,
+    ],
+  );
+  const appliedWhatIfScenarioId =
+    loadedWhatIfScenarioId ?? matchingSavedExperiment?.id ?? null;
+  const loadedWhatIfScenario = useMemo(
+    () =>
+      appliedWhatIfScenarioId
+        ? savedWhatIfScenarios.find(
+            (scenario) =>
+              scenario.id === appliedWhatIfScenarioId &&
+              scenario.baseScenarioId === activeScenario.id,
+          ) ?? null
+        : null,
+    [activeScenario.id, appliedWhatIfScenarioId, savedWhatIfScenarios],
+  );
 
   const baselineScenario = usePensionProjection(activeScenario.inputs);
   const alternativeScenario = usePensionProjection(alternativeInputs);
@@ -226,28 +252,18 @@ function WhatIfWorkspace({
     baselineStateAge,
     alternativeStateAge,
   );
-  const experimentAlreadySaved = savedForActiveExperiment.some((scenario) =>
-    isSavedExperimentMatch({
-      experiment: activeExperiment,
-      scenario,
-      inputs: alternativeInputs,
-      drawdown: alternativeDrawdown,
-      stateIncluded: alternativeStateIncluded,
-      stateAmount: alternativeStateAmount,
-      stateAge: alternativeStateAge,
-    }),
-  );
+  const experimentAlreadySaved = matchingSavedExperiment !== null;
   const canSaveExperiment = !alternativeScenario.hasErrors && !experimentAlreadySaved;
 
   useEffect(() => {
     setHasUnsavedExperiment(
-      experimentHasChanged && loadedWhatIfScenarioId === null && !experimentAlreadySaved,
+      experimentHasChanged && appliedWhatIfScenarioId === null && !experimentAlreadySaved,
     );
     return () => setHasUnsavedExperiment(false);
   }, [
+    appliedWhatIfScenarioId,
     experimentAlreadySaved,
     experimentHasChanged,
-    loadedWhatIfScenarioId,
     setHasUnsavedExperiment,
   ]);
 
@@ -475,7 +491,7 @@ function WhatIfWorkspace({
   }
 
   function deleteSavedExperiment(scenarioId: string) {
-    const deletingLoaded = scenarioId === loadedWhatIfScenarioId;
+    const deletingLoaded = scenarioId === appliedWhatIfScenarioId;
     deleteWhatIfScenario(scenarioId);
     if (deletingLoaded) {
       resetExperiment();
@@ -521,7 +537,7 @@ function WhatIfWorkspace({
           activeExperiment={activeExperiment}
           activePlanName={activeScenario.name}
           scenarios={savedForActiveExperiment}
-          loadedScenarioId={loadedWhatIfScenarioId}
+          loadedScenarioId={appliedWhatIfScenarioId}
           onLoad={loadSavedExperiment}
           onUnload={unloadSavedExperiment}
           onDelete={deleteSavedExperiment}
