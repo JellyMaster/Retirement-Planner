@@ -86,6 +86,24 @@ const experiments = [
   },
 ] as const;
 
+const experimentGroups = [
+  {
+    title: "Your decisions",
+    description: "Choices you can directly change in the plan.",
+    experimentIds: ["retirement-age", "contributions", "spending"] as ExperimentId[],
+  },
+  {
+    title: "Planning assumptions",
+    description: "Test how different long-term assumptions affect the outcome.",
+    experimentIds: ["fees", "returns", "inflation"] as ExperimentId[],
+  },
+  {
+    title: "Income & resilience",
+    description: "Explore other income and difficult market conditions.",
+    experimentIds: ["state-pension", "market-downturn"] as ExperimentId[],
+  },
+] as const;
+
 const experimentIds = new Set<ExperimentId>(
   experiments.map((experiment) => experiment.id),
 );
@@ -173,31 +191,53 @@ function ExperimentLauncherContent({
         <div className="what-if-launcher-heading">
           <div>
             <p className="planner-eyebrow">Explore one change</p>
-            <h2 id="what-if-launcher-title">Choose a decision</h2>
+            <h2 id="what-if-launcher-title">Choose an experiment to explore</h2>
           </div>
-          <p>Change one lever at a time. Your saved plan stays untouched.</p>
+          <p>
+            One experiment is open at a time. The highlighted choice is the one loaded below.
+          </p>
         </div>
 
-        <div className="what-if-experiment-nav" role="tablist" aria-label="What If experiments">
-          {experiments.map((experiment) => {
-            const isActive = activeExperiment === experiment.id;
+        <div className="what-if-experiment-groups">
+          {experimentGroups.map((group) => (
+            <section key={group.title} className="what-if-experiment-group" aria-label={group.title}>
+              <div className="what-if-experiment-group-heading">
+                <strong>{group.title}</strong>
+                <span>{group.description}</span>
+              </div>
 
-            return (
-              <button
-                key={experiment.id}
-                type="button"
-                role="tab"
-                className={`what-if-experiment-tab${isActive ? " is-active" : ""}`}
-                aria-selected={isActive}
-                title={experiment.description}
-                disabled={!experiment.available}
-                onClick={() => onSelect(experiment.id)}
-              >
-                <FontAwesomeIcon icon={experiment.icon} fixedWidth aria-hidden="true" />
-                <span>{experiment.title}</span>
-              </button>
-            );
-          })}
+              <div className="what-if-experiment-nav" role="tablist" aria-label={`${group.title} experiments`}>
+                {group.experimentIds.map((experimentId) => {
+                  const experiment = experiments.find((item) => item.id === experimentId);
+                  if (!experiment) return null;
+                  const isActive = activeExperiment === experiment.id;
+
+                  return (
+                    <button
+                      key={experiment.id}
+                      type="button"
+                      role="tab"
+                      className={`what-if-experiment-tab${isActive ? " is-active" : ""}`}
+                      aria-selected={isActive}
+                      title={experiment.description}
+                      disabled={!experiment.available}
+                      onClick={() => onSelect(experiment.id)}
+                    >
+                      <span className="what-if-experiment-tab-icon" aria-hidden="true">
+                        {isActive ? (
+                          <FontAwesomeIcon icon={AppIcons.check} fixedWidth />
+                        ) : (
+                          <FontAwesomeIcon icon={experiment.icon} fixedWidth />
+                        )}
+                      </span>
+                      <span>{experiment.title}</span>
+                      {isActive && <small>Exploring</small>}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </div>
       </section>
     </>
