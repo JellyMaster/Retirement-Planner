@@ -15,7 +15,9 @@
 .what-if-simple-outcome-copy {
   order: 2;
   display: grid;
+  align-content: start;
   gap: var(--space-2);
+  min-block-size: 9rem;
   max-width: none;
   margin-top: var(--space-1);
   padding: var(--space-4) 0 var(--space-2);
@@ -134,6 +136,10 @@
   .what-if-view-controls .money-display-toggle-group {
     width: 100%;
     min-width: 0;
+  }
+
+  .what-if-simple-outcome-copy {
+    min-block-size: 0;
   }
 }
 
