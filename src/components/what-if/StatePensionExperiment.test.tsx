@@ -52,7 +52,7 @@ describe("StatePensionExperiment", () => {
         name: "Include State Pension in experiment",
       }),
     ).toBeChecked();
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeDisabled();
   });
 
   it("passes the selected annual amount and start age to the workspace", () => {
@@ -95,7 +95,7 @@ describe("StatePensionExperiment", () => {
     expect(screen.getByText("Not included")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Reset experiment" }));
-    await user.click(screen.getByRole("button", { name: "Save as scenario" }));
+    await user.click(screen.getByRole("button", { name: "Save experiment" }));
 
     expect(onReset).toHaveBeenCalledOnce();
     expect(onSave).toHaveBeenCalledOnce();
