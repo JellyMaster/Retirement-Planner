@@ -60,7 +60,7 @@ describe("ExperimentInsights", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows retirement impact details when drawdown outcomes are supplied", () => {
+  it("keeps retirement impact details out of simple view and shows them in detailed view", () => {
     const baseline = {
       targetNetSpending: 30_000,
       sustainableNetSpending: 28_000,
@@ -82,9 +82,46 @@ describe("ExperimentInsights", () => {
       livingStandard: "moderate" as const,
     };
 
-    renderInsights({ baselineRetirementOutcome: baseline, retirementOutcome: outcome });
+    const { rerender } = render(<ExperimentInsights
+      activeExperiment="fees"
+      baselineProjectedPension={700_000}
+      projectedPension={725_000}
+      baselineAnnualIncome={28_000}
+      annualIncome={29_000}
+      baselinePreparedness={93}
+      preparedness={97}
+      baselineRetirementOutcome={baseline}
+      retirementOutcome={outcome}
+      currentAge={47}
+      retirementAge={65}
+      statePensionAge={67}
+      extraContributionAge={56}
+      hasChanged
+      onSelectExperiment={vi.fn()}
+    />);
 
-    expect(screen.getByText("Retirement impact details")).toBeInTheDocument();
+    expect(screen.queryByText("Retirement impact details")).not.toBeInTheDocument();
+
+    setWhatIfViewMode("detailed");
+    rerender(<ExperimentInsights
+      activeExperiment="fees"
+      baselineProjectedPension={700_000}
+      projectedPension={725_000}
+      baselineAnnualIncome={28_000}
+      annualIncome={29_000}
+      baselinePreparedness={93}
+      preparedness={97}
+      baselineRetirementOutcome={baseline}
+      retirementOutcome={outcome}
+      currentAge={47}
+      retirementAge={65}
+      statePensionAge={67}
+      extraContributionAge={56}
+      hasChanged
+      onSelectExperiment={vi.fn()}
+    />);
+
+    expect(screen.getByRole("heading", { name: "Retirement impact details" })).toBeInTheDocument();
   });
 
   it("explains a retirement-age change in plain English and opens detailed view", () => {
@@ -128,10 +165,11 @@ describe("ExperimentInsights", () => {
       screen.getByRole("heading", { name: "Your income target would not be met" }),
     ).toBeInTheDocument();
     expect(screen.getByText(/modelled through to age 90/i)).toBeInTheDocument();
+    expect(screen.queryByText("Retirement impact details")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /see the financial details/i }));
 
-    expect(screen.getByText("Retirement impact details")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Retirement impact details" })).toBeInTheDocument();
     expect(screen.getByText("Pension at retirement")).toBeInTheDocument();
   });
 });
