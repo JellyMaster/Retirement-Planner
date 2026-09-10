@@ -16,6 +16,7 @@ export interface RetirementSpendingOutcome {
   targetEndingBalance: number;
   modelledEndingBalance: number;
   livingStandard: RetirementLivingStandardLevel | null;
+  includesStatePension?: boolean;
 }
 
 export function createRetirementSpendingOutcome(
@@ -67,6 +68,7 @@ export function createRetirementSpendingOutcome(
     targetEndingBalance,
     modelledEndingBalance: sustainable.result.finalBalance,
     livingStandard,
+    includesStatePension: inputs.annualStatePension > 0,
   };
 }
 
