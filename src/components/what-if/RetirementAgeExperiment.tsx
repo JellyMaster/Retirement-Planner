@@ -56,79 +56,34 @@ export function RetirementAgeExperiment({
   const { activeScenario } = useScenarios();
   const { viewMode, displayMode } = useWhatIfDisplaySettings();
   const ageDifference = retirementAge - baselineRetirementAge;
-  const retirementYearsDifference = baselineRetirementAge - retirementAge;
   const hasChanged = ageDifference !== 0;
+  const retirementYears = Math.max(0, planningAge - retirementAge);
+  const baselineRetirementYears = Math.max(0, planningAge - baselineRetirementAge);
+  const retirementYearsDifference = retirementYears - baselineRetirementYears;
   const minAge = currentAge;
   const maxAge = Math.max(currentAge, Math.min(100, statePensionAge + 5));
   const ageRange = Math.max(1, maxAge - minAge);
-  const baselinePosition = Math.max(
-    0,
-    Math.min(100, ((baselineRetirementAge - minAge) / ageRange) * 100),
-  );
-  const savedRetirementAgeMarkers = savedExperiments
-    .filter(
-      (scenario) =>
-        scenario.retirementAge >= minAge &&
-        scenario.retirementAge <= maxAge,
-    )
-    .map((scenario) => ({
-      id: scenario.id,
-      name: scenario.name,
-      age: scenario.retirementAge,
-      position: ((scenario.retirementAge - minAge) / ageRange) * 100,
-    }))
-    .sort((left, right) => left.age - right.age);
+  const baselinePosition = Math.max(0, Math.min(100, ((baselineRetirementAge - minAge) / ageRange) * 100));
   const immediateRetirement = retirementAge === currentAge;
   const inflation = activeScenario.inputs.inflation;
-  const baselineInflationFactor = Math.pow(
-    1 + inflation,
-    Math.max(0, baselineRetirementAge - currentAge),
-  );
-  const experimentInflationFactor = Math.pow(
-    1 + inflation,
-    Math.max(0, retirementAge - currentAge),
-  );
+  const baselineInflationFactor = Math.pow(1 + inflation, Math.max(0, baselineRetirementAge - currentAge));
+  const experimentInflationFactor = Math.pow(1 + inflation, Math.max(0, retirementAge - currentAge));
   const showingToday = displayMode === "today";
-  const displayedBaselinePension = showingToday
-    ? baselineProjectedPension
-    : baselineProjectedPension * baselineInflationFactor;
-  const displayedPension = showingToday
-    ? projectedPension
-    : projectedPension * experimentInflationFactor;
-  const displayedBaselineIncome = showingToday
-    ? baselineAnnualIncome
-    : baselineAnnualIncome * baselineInflationFactor;
-  const displayedIncome = showingToday
-    ? annualIncome
-    : annualIncome * experimentInflationFactor;
+  const displayedBaselinePension = showingToday ? baselineProjectedPension : baselineProjectedPension * baselineInflationFactor;
+  const displayedPension = showingToday ? projectedPension : projectedPension * experimentInflationFactor;
+  const displayedBaselineIncome = showingToday ? baselineAnnualIncome : baselineAnnualIncome * baselineInflationFactor;
+  const displayedIncome = showingToday ? annualIncome : annualIncome * experimentInflationFactor;
   const pensionDifference = displayedPension - displayedBaselinePension;
   const incomeDifference = displayedIncome - displayedBaselineIncome;
   const preparednessDifference = preparedness - baselinePreparedness;
-  const story = createStory({
-    activePlanName,
-    ageDifference,
-    retirementAge,
-    currentAge,
-    projectedPension: displayedPension,
-    pensionDifference,
-  });
-  const simpleStory = createSimpleStory({
-    activePlanName,
-    ageDifference,
-    retirementAge,
-    preparedness,
-  });
-  const outcomeStatus = createOutcomeStatus(preparedness, hasChanged);
   const savedPlanTiming = createSavedPlanTiming(ageDifference);
-  const retirementYears = Math.max(0, planningAge - retirementAge);
   const saveAlreadyExists = hasChanged && !canSave && saveMessage === null;
-  const saveButtonLabel = saveAlreadyExists ? "Already saved" : "Save experiment";
+  const savedMarkers = savedExperiments
+    .filter((item) => item.retirementAge >= minAge && item.retirementAge <= maxAge)
+    .map((item) => ({ ...item, position: ((item.retirementAge - minAge) / ageRange) * 100 }));
 
   return (
-    <section
-      className="what-if-workspace what-if-workspace-compact"
-      aria-labelledby="retirement-age-experiment-title"
-    >
+    <section className="what-if-workspace what-if-workspace-compact" aria-labelledby="retirement-age-experiment-title">
       <header className="what-if-workspace-header what-if-workspace-header-compact">
         <div>
           <p className="planner-eyebrow">Current experiment</p>
@@ -144,163 +99,60 @@ export function RetirementAgeExperiment({
             <h3 id="retirement-age-change-title">When would you like to retire?</h3>
             <p>Move one lever. Everything else stays as saved in your plan.</p>
           </div>
-
           <div className="what-if-primary-value">
             <span>Experimental retirement age</span>
             <strong>Age {retirementAge}</strong>
-            <small>
-              Saved plan: age {baselineRetirementAge} · {savedPlanTiming}
-            </small>
+            <small>Saved plan: age {baselineRetirementAge} · {savedPlanTiming}</small>
           </div>
-
           <div className="what-if-slider-wrap what-if-slider-wrap-primary">
             <div className="what-if-slider-track-wrap">
-              <input
-                id="what-if-retirement-age"
-                type="range"
-                min={minAge}
-                max={maxAge}
-                step={1}
-                value={retirementAge}
-                aria-label="Experimental retirement age"
-                aria-valuetext={`Age ${retirementAge}`}
-                onChange={(event) => onRetirementAgeChange(Number(event.target.value))}
-              />
-              {savedRetirementAgeMarkers.map((marker) => (
-                <span
-                  key={marker.id}
-                  className={`what-if-slider-experiment-marker${
-                    marker.age === retirementAge ? " is-current" : ""
-                  }`}
-                  style={{ left: `${marker.position}%` }}
-                  title={`${marker.name} · Retire at age ${marker.age}`}
-                  aria-hidden="true"
-                />
-              ))}
-              <span
-                className="what-if-slider-reference-marker"
-                style={{ left: `${baselinePosition}%` }}
-                aria-hidden="true"
-              />
+              <input id="what-if-retirement-age" type="range" min={minAge} max={maxAge} step={1} value={retirementAge} aria-label="Experimental retirement age" aria-valuetext={`Age ${retirementAge}`} onChange={(event) => onRetirementAgeChange(Number(event.target.value))} />
+              {savedMarkers.map((marker) => <span key={marker.id} className={`what-if-slider-experiment-marker${marker.retirementAge === retirementAge ? " is-current" : ""}`} style={{ left: `${marker.position}%` }} title={`${marker.name} · Retire at age ${marker.retirementAge}`} aria-hidden="true" />)}
+              <span className="what-if-slider-reference-marker" style={{ left: `${baselinePosition}%` }} aria-hidden="true" />
             </div>
             <div className="what-if-slider-labels what-if-slider-labels-reference" aria-hidden="true">
-              <span>Age {minAge}</span>
-              <span
-                className="what-if-slider-saved-label"
-                style={{ left: `${baselinePosition}%` }}
-              >
-                Saved · {baselineRetirementAge}
-              </span>
-              <span>Age {maxAge}</span>
+              <span>Age {minAge}</span><span className="what-if-slider-saved-label" style={{ left: `${baselinePosition}%` }}>Saved · {baselineRetirementAge}</span><span>Age {maxAge}</span>
             </div>
-            {savedRetirementAgeMarkers.length > 0 && (
-              <p className="what-if-slider-marker-key">
-                <span className="what-if-slider-marker-key-dot" aria-hidden="true" />
-                {savedRetirementAgeMarkers.length === 1
-                  ? "1 saved experiment is marked on the slider"
-                  : `${savedRetirementAgeMarkers.length} saved experiments are marked on the slider`}
-              </p>
-            )}
+            {savedMarkers.length > 0 && <p className="what-if-slider-marker-key"><span className="what-if-slider-marker-key-dot" aria-hidden="true" />{savedMarkers.length === 1 ? "1 saved experiment is marked on the slider" : `${savedMarkers.length} saved experiments are marked on the slider`}</p>}
           </div>
-
-          <p className="what-if-control-note">
-            {immediateRetirement
-              ? "Retiring now uses the pension already built, with no further contribution or accumulation years."
-              : "Changing retirement age affects both how long the pension can grow and how many retirement years it may need to support."}
-          </p>
+          <p className="what-if-control-note">{immediateRetirement ? "Retiring now uses the pension already built, with no further contribution or accumulation years." : "Changing retirement age affects both how long the pension can grow and how many retirement years it may need to support."}</p>
         </section>
 
         <section className="what-if-result-panel" aria-labelledby="retirement-age-outcome-title" aria-live="polite">
           <div className="what-if-result-heading">
-            <div>
-              <p className="planner-eyebrow">Outcome</p>
-              <h3 id="retirement-age-outcome-title">{hasChanged ? `Retire at ${retirementAge}` : "Your saved retirement age"}</h3>
-            </div>
-            <span className={`what-if-result-status ${outcomeStatus.tone}`}>{outcomeStatus.label}</span>
+            <div><p className="planner-eyebrow">Outcome</p><h3 id="retirement-age-outcome-title">{hasChanged ? `Retire at ${retirementAge}` : "Your saved retirement age"}</h3></div>
+            <span className="what-if-result-status is-neutral">{hasChanged ? `${Math.abs(ageDifference)} ${Math.abs(ageDifference) === 1 ? "year" : "years"} ${ageDifference < 0 ? "earlier" : "later"}` : "Saved plan"}</span>
           </div>
 
           {viewMode === "simple" ? (
             <>
               <div className="what-if-simple-outcome-copy">
-                <strong>{simpleStory.title}</strong>
-                <p>{simpleStory.description}</p>
+                <strong>{hasChanged ? `What changes if you retire at ${retirementAge}?` : `${activePlanName} is unchanged`}</strong>
+                <p>{directImpactExplanation(ageDifference, retirementAge)}</p>
               </div>
-
               <div className="what-if-simple-results" aria-label="Simple retirement age outcomes">
-                <SimpleResult
-                  value={`${formatCurrency(displayedIncome)}/year`}
-                  label="Estimated retirement income"
-                  note={createIncomeTargetNote(preparedness)}
-                  tone={preparedness >= 100 ? "positive" : "negative"}
-                />
-                <SimpleResult
-                  value={formatCurrency(displayedPension)}
-                  label="Pension when retirement starts"
-                  note={createPensionDifferenceNote(pensionDifference, baselineRetirementAge)}
-                  tone={pensionDifference >= 0 ? "positive" : "negative"}
-                />
-                <SimpleResult
-                  value={`${retirementYears} years`}
-                  label="How long retirement is planned for"
-                  note={createRetirementYearsNote(retirementYearsDifference, baselineRetirementAge)}
-                  tone={retirementYearsDifference <= 0 ? "positive" : "neutral"}
-                />
+                <SimpleResult value={formatCurrency(displayedPension)} label="Pension when retirement starts" note={hasChanged ? `${formatSignedCurrency(pensionDifference)} compared with retiring at ${baselineRetirementAge}` : "Your saved plan starting pension"} tone={pensionDifference < 0 ? "negative" : pensionDifference > 0 ? "positive" : "neutral"} />
+                <SimpleResult value={`${retirementYears} years`} label="Planned retirement period" note={hasChanged ? retirementYearsNote(retirementYearsDifference) : `Modelled through to age ${planningAge}`} tone="neutral" />
               </div>
             </>
           ) : (
             <>
               <div className={`what-if-result-story${hasChanged ? " is-changed" : ""}`}>
-                <span className="what-if-story-icon" aria-hidden="true">
-                  <FontAwesomeIcon
-                    icon={immediateRetirement ? AppIcons.concepts.retirement : AppIcons.clock}
-                    fixedWidth
-                  />
-                </span>
-                <div>
-                  <strong>{story.title}</strong>
-                  <p>{story.description}</p>
-                </div>
+                <span className="what-if-story-icon" aria-hidden="true"><FontAwesomeIcon icon={immediateRetirement ? AppIcons.concepts.retirement : AppIcons.clock} fixedWidth /></span>
+                <div><strong>Direct impact of changing retirement age</strong><p>{directImpactExplanation(ageDifference, retirementAge)}</p></div>
               </div>
-
               <div className="what-if-key-results" aria-label="Detailed retirement age outcomes">
-                <KeyResult
-                  label="Pension at retirement"
-                  value={formatCurrency(displayedPension)}
-                  difference={formatSignedCurrency(pensionDifference)}
-                />
-                <KeyResult
-                  label="Sustainable retirement income"
-                  value={`${formatCurrency(displayedIncome)}/year`}
-                  difference={`${formatSignedCurrency(incomeDifference)}/year`}
-                />
-                <KeyResult
-                  label="Target coverage"
-                  value={`${preparedness}%`}
-                  difference={formatSignedPercentage(preparednessDifference)}
-                />
+                <KeyResult label="Pension at retirement" value={formatCurrency(displayedPension)} difference={formatSignedCurrency(pensionDifference)} />
+                <KeyResult label="Years planned in retirement" value={`${retirementYears} years`} difference={formatSignedYears(retirementYearsDifference)} />
+                <KeyResult label="Sustainable retirement income" value={`${formatCurrency(displayedIncome)}/year`} difference={`${formatSignedCurrency(incomeDifference)}/year`} />
+                <KeyResult label="Target coverage" value={`${preparedness}%`} difference={formatSignedPercentage(preparednessDifference)} />
               </div>
             </>
           )}
 
           <div className="what-if-inline-actions">
-            <button
-              type="button"
-              className="ui-button ui-button-secondary ui-button-medium"
-              disabled={!hasChanged}
-              title={hasChanged ? `Reset to ${activePlanName}` : undefined}
-              onClick={onReset}
-            >
-              Reset
-            </button>
-            <button
-              type="button"
-              className="ui-button ui-button-primary ui-button-medium"
-              disabled={!hasChanged || !canSave}
-              title={saveAlreadyExists ? "This retirement-age experiment is already saved." : undefined}
-              onClick={onSave}
-            >
-              {saveButtonLabel}
-            </button>
+            <button type="button" className="ui-button ui-button-secondary ui-button-medium" disabled={!hasChanged} title={hasChanged ? `Reset to ${activePlanName}` : undefined} onClick={onReset}>Reset</button>
+            <button type="button" className="ui-button ui-button-primary ui-button-medium" disabled={!hasChanged || !canSave} title={saveAlreadyExists ? "This retirement-age experiment is already saved." : undefined} onClick={onSave}>{saveAlreadyExists ? "Already saved" : "Save experiment"}</button>
           </div>
         </section>
       </div>
@@ -308,331 +160,88 @@ export function RetirementAgeExperiment({
       {viewMode === "detailed" && (
         <div className="what-if-detail-disclosures">
           <details className="what-if-detail-card">
-            <summary>
-              <span>
-                <strong>Why did this change?</strong>
-                <small>See the mechanics behind the outcome.</small>
-              </span>
-              <span aria-hidden="true">+</span>
-            </summary>
-            <ul className="what-if-detail-list">
-              {createReasons(ageDifference, immediateRetirement).map((reason) => (
-                <li key={reason}>
-                  <FontAwesomeIcon icon={AppIcons.check} aria-hidden="true" />
-                  <span>{reason}</span>
-                </li>
-              ))}
-            </ul>
+            <summary><span><strong>Why did this change?</strong><small>See the mechanics behind the direct pension impact.</small></span><span aria-hidden="true">+</span></summary>
+            <ul className="what-if-detail-list">{createReasons(ageDifference, immediateRetirement).map((reason) => <li key={reason}><FontAwesomeIcon icon={AppIcons.check} aria-hidden="true" /><span>{reason}</span></li>)}</ul>
           </details>
-
           <details className="what-if-detail-card">
-            <summary>
-              <span>
-                <strong>Detailed comparison</strong>
-                <small>Compare the saved plan with this experiment.</small>
-              </span>
-              <span aria-hidden="true">+</span>
-            </summary>
+            <summary><span><strong>Detailed comparison</strong><small>Compare the saved plan with this experiment.</small></span><span aria-hidden="true">+</span></summary>
             <div className="what-if-detail-comparison">
-              <OutcomeCard
-                label="Projected pension"
-                baseline={formatCurrency(displayedBaselinePension)}
-                experiment={formatCurrency(displayedPension)}
-                difference={formatSignedCurrency(pensionDifference)}
-              />
-              <OutcomeCard
-                label="Sustainable annual income"
-                baseline={`${formatCurrency(displayedBaselineIncome)}/year`}
-                experiment={`${formatCurrency(displayedIncome)}/year`}
-                difference={`${formatSignedCurrency(incomeDifference)}/year`}
-              />
-              <OutcomeCard
-                label="Target coverage"
-                baseline={`${baselinePreparedness}%`}
-                experiment={`${preparedness}%`}
-                difference={formatSignedPercentage(preparednessDifference)}
-              />
-              <OutcomeCard
-                label="Years planned in retirement"
-                baseline={`${Math.max(0, planningAge - baselineRetirementAge)} years`}
-                experiment={`${Math.max(0, planningAge - retirementAge)} years`}
-                difference={formatSignedYears(retirementYearsDifference)}
-              />
+              <OutcomeCard label="Pension at retirement" baseline={formatCurrency(displayedBaselinePension)} experiment={formatCurrency(displayedPension)} difference={formatSignedCurrency(pensionDifference)} />
+              <OutcomeCard label="Years planned in retirement" baseline={`${baselineRetirementYears} years`} experiment={`${retirementYears} years`} difference={formatSignedYears(retirementYearsDifference)} />
+              <OutcomeCard label="Sustainable retirement income" baseline={`${formatCurrency(displayedBaselineIncome)}/year`} experiment={`${formatCurrency(displayedIncome)}/year`} difference={`${formatSignedCurrency(incomeDifference)}/year`} />
+              <OutcomeCard label="Target coverage" baseline={`${baselinePreparedness}%`} experiment={`${preparedness}%`} difference={formatSignedPercentage(preparednessDifference)} />
             </div>
           </details>
         </div>
       )}
 
-      {displayMode === "nominal" && retirementAge !== baselineRetirementAge && (
-        <p className="what-if-money-basis-note">
-          Future-money figures are shown in pounds at each plan&apos;s retirement date, so the comparison also reflects the different amount of inflation before each retirement age.
-        </p>
-      )}
-
-      {saveMessage && (
-        <p className="what-if-save-message" role="status">
-          {saveMessage}
-        </p>
-      )}
+      {displayMode === "nominal" && hasChanged && <p className="what-if-money-basis-note">Future-money figures are shown in pounds at each plan&apos;s retirement date, so the comparison also reflects the different amount of inflation before each retirement age.</p>}
+      {saveMessage && <p className="what-if-save-message" role="status">{saveMessage}</p>}
     </section>
   );
 }
 
-function SimpleResult({
-  value,
-  label,
-  note,
-  tone,
-}: {
-  value: string;
-  label: string;
-  note: string;
-  tone: "positive" | "negative" | "neutral";
-}) {
-  return (
-    <article className="what-if-simple-result">
-      <strong>{value}</strong>
-      <span>{label}</span>
-      <small className={`is-${tone}`}>{note}</small>
-    </article>
-  );
+function SimpleResult({ value, label, note, tone }: { value: string; label: string; note: string; tone: "positive" | "negative" | "neutral" }) {
+  return <article className="what-if-simple-result"><strong>{value}</strong><span>{label}</span><small className={`is-${tone}`}>{note}</small></article>;
 }
 
-function KeyResult({
-  label,
-  value,
-  difference,
-}: {
-  label: string;
-  value: string;
-  difference: string;
-}) {
-  return (
-    <article className="what-if-key-result">
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small className={toneClassName(difference)}>{difference}</small>
-    </article>
-  );
+function KeyResult({ label, value, difference }: { label: string; value: string; difference: string }) {
+  return <article className="what-if-key-result"><span>{label}</span><strong>{value}</strong><small className={toneClassName(difference)}>{difference}</small></article>;
 }
 
-function OutcomeCard({
-  label,
-  baseline,
-  experiment,
-  difference,
-}: {
-  label: string;
-  baseline: string;
-  experiment: string;
-  difference: string;
-}) {
-  return (
-    <article className="what-if-outcome-card what-if-outcome-card-compact">
-      <span>{label}</span>
-      <div>
-        <small>Saved plan</small>
-        <strong>{baseline}</strong>
-      </div>
-      <FontAwesomeIcon
-        className="what-if-outcome-arrow"
-        icon={AppIcons.chartLine}
-        aria-hidden="true"
-      />
-      <div>
-        <small>Experiment</small>
-        <strong>{experiment}</strong>
-      </div>
-      <em className={`what-if-outcome-difference${toneSuffix(difference)}`}>
-        {difference}
-      </em>
-    </article>
-  );
+function OutcomeCard({ label, baseline, experiment, difference }: { label: string; baseline: string; experiment: string; difference: string }) {
+  return <article className="what-if-outcome-card what-if-outcome-card-compact"><span>{label}</span><div><small>Saved plan</small><strong>{baseline}</strong></div><FontAwesomeIcon className="what-if-outcome-arrow" icon={AppIcons.chartLine} aria-hidden="true" /><div><small>Experiment</small><strong>{experiment}</strong></div><em className={`what-if-outcome-difference${toneSuffix(difference)}`}>{difference}</em></article>;
 }
 
-function createOutcomeStatus(preparedness: number, hasChanged: boolean) {
-  if (!hasChanged) {
-    return { label: "Saved plan", tone: "is-neutral" };
-  }
-  if (preparedness >= 100) {
-    return { label: "Target supported", tone: "is-positive" };
-  }
-  if (preparedness >= 85) {
-    return { label: "Close to target", tone: "is-caution" };
-  }
-  return { label: "Below target", tone: "is-negative" };
+function directImpactExplanation(ageDifference: number, retirementAge: number): string {
+  if (ageDifference === 0) return "Move the retirement-age slider to see how changing when you retire affects the pension you start with and how long it may need to support you.";
+  if (ageDifference < 0) return `Retiring at ${retirementAge} gives your pension less time to grow and means it may need to support more years of retirement.`;
+  return `Retiring at ${retirementAge} gives your pension more time to grow and means it may need to support fewer years of retirement.`;
 }
 
-function createSimpleStory({
-  activePlanName,
-  ageDifference,
-  retirementAge,
-  preparedness,
-}: {
-  activePlanName: string;
-  ageDifference: number;
-  retirementAge: number;
-  preparedness: number;
-}) {
-  if (ageDifference === 0) {
-    return {
-      title: `${activePlanName} is unchanged`,
-      description: "Move the retirement-age slider to see what retiring earlier or later could mean for your income and pension.",
-    };
-  }
-
-  const years = Math.abs(ageDifference);
-  const yearLabel = years === 1 ? "year" : "years";
-
-  if (ageDifference < 0) {
-    return {
-      title:
-        preparedness >= 100
-          ? `You could retire ${years} ${yearLabel} earlier and still meet your income target.`
-          : `You could retire ${years} ${yearLabel} earlier, but your plan would fall short of your income target.`,
-      description: `Retiring at ${retirementAge} gives your pension less time to grow and means it may need to support you for longer.`,
-    };
-  }
-
-  return {
-    title:
-      preparedness >= 100
-        ? `Retiring ${years} ${yearLabel} later gives your plan more breathing room.`
-        : `Retiring ${years} ${yearLabel} later improves your position, but the plan still falls short of your income target.`,
-    description: `Retiring at ${retirementAge} gives your pension more time to grow and means it needs to support fewer retirement years.`,
-  };
-}
-
-function createStory({
-  activePlanName,
-  ageDifference,
-  retirementAge,
-  currentAge,
-  projectedPension,
-  pensionDifference,
-}: {
-  activePlanName: string;
-  ageDifference: number;
-  retirementAge: number;
-  currentAge: number;
-  projectedPension: number;
-  pensionDifference: number;
-}) {
-  if (ageDifference === 0) {
-    return {
-      title: `${activePlanName} is unchanged`,
-      description:
-        "Move the retirement-age slider to see the effect of having more or less time to contribute and invest.",
-    };
-  }
-
-  if (retirementAge === currentAge) {
-    return {
-      title: `Retiring now means stopping work at age ${currentAge}`,
-      description: `The illustration starts retirement with the ${formatCurrency(projectedPension)} pension already built and assumes no further contribution or investment-growth years.`,
-    };
-  }
-
-  const years = Math.abs(ageDifference);
-  const timing = ageDifference < 0 ? "earlier" : "later";
-  const direction = pensionDifference < 0 ? "reduce" : "increase";
-
-  return {
-    title: `Retiring ${years} ${years === 1 ? "year" : "years"} ${timing}`,
-    description: `Stopping work at age ${retirementAge} could ${direction} the projected pension by ${formatCurrency(Math.abs(pensionDifference))} under the saved assumptions.`,
-  };
-}
-
-function createIncomeTargetNote(preparedness: number): string {
-  if (preparedness >= 100) return "Your income target is supported";
-  return `Around ${Math.max(0, 100 - preparedness)}% below your income target`;
-}
-
-function createPensionDifferenceNote(
-  pensionDifference: number,
-  baselineRetirementAge: number,
-): string {
-  if (Math.abs(pensionDifference) < 0.5) return "Same as your saved plan";
-  const direction = pensionDifference > 0 ? "more" : "less";
-  return `${formatCurrency(Math.abs(pensionDifference))} ${direction} than at age ${baselineRetirementAge}`;
-}
-
-function createRetirementYearsNote(
-  retirementYearsDifference: number,
-  baselineRetirementAge: number,
-): string {
-  if (retirementYearsDifference === 0) return "Same length as your saved plan";
-  const years = Math.abs(retirementYearsDifference);
-  const direction = retirementYearsDifference > 0 ? "more" : "fewer";
-  return `${years} ${years === 1 ? "year" : "years"} ${direction} than retiring at ${baselineRetirementAge}`;
+function retirementYearsNote(difference: number): string {
+  if (difference === 0) return "Same length as your saved plan";
+  const years = Math.abs(difference);
+  return `${years} ${years === 1 ? "year" : "years"} ${difference > 0 ? "more" : "fewer"} to support`;
 }
 
 function createSavedPlanTiming(ageDifference: number): string {
   if (ageDifference === 0) return "matches this experiment";
-
   const years = Math.abs(ageDifference);
-  const direction = ageDifference < 0 ? "later" : "earlier";
-  return `${years} ${years === 1 ? "year" : "years"} ${direction} than this experiment`;
+  return `saved plan is ${years} ${years === 1 ? "year" : "years"} ${ageDifference < 0 ? "later" : "earlier"}`;
 }
 
-function createReasons(
-  ageDifference: number,
-  immediateRetirement: boolean,
-): string[] {
-  if (immediateRetirement) {
-    return [
-      "The current pension becomes the retirement fund immediately.",
-      "No further employee or employer contributions are added.",
-      "There are no additional accumulation years before retirement.",
-    ];
-  }
-
-  if (ageDifference < 0) {
-    return [
-      "Fewer years of employee and employer contributions enter the pension.",
-      "The pension has less time to benefit from compound growth.",
-      "The retirement-income plan needs to cover more years.",
-    ];
-  }
-
-  if (ageDifference > 0) {
-    return [
-      "More employee and employer contributions enter the pension.",
-      "The pension has longer to benefit from compound growth.",
-      "The retirement-income plan needs to cover fewer retirement years.",
-    ];
-  }
-
-  return [
-    "The experiment currently matches the saved retirement age.",
-    "No saved plan values have been changed.",
-    "Move the slider to create a temporary alternative.",
-  ];
+function createReasons(ageDifference: number, immediateRetirement: boolean): string[] {
+  if (immediateRetirement) return ["There are no further contribution years before retirement.", "The pension has no further accumulation period before withdrawals begin.", "The pension needs to support the full modelled retirement period immediately."];
+  if (ageDifference < 0) return ["There are fewer years of contributions before retirement.", "The pension has less time for investment growth before withdrawals begin.", "There are more retirement years for the pension to support."];
+  if (ageDifference > 0) return ["There are more years of contributions before retirement.", "The pension has longer for investment growth before withdrawals begin.", "There are fewer retirement years for the pension to support."];
+  return ["This matches the retirement age in your saved plan.", "Contribution years and the accumulation period are unchanged.", "The planned retirement period is unchanged."];
 }
 
 function formatSignedCurrency(value: number): string {
-  if (Math.abs(value) < 0.5) return "No change";
-  return `${value > 0 ? "+" : "-"}${formatCurrency(Math.abs(value))}`;
+  if (Math.abs(value) < 0.5) return "£0";
+  return `${value > 0 ? "+" : "−"}${formatCurrency(Math.abs(value))}`;
 }
 
 function formatSignedPercentage(value: number): string {
-  if (value === 0) return "No change";
-  return `${value > 0 ? "+" : ""}${value}%`;
+  if (Math.abs(value) < 0.5) return "0 pts";
+  return `${value > 0 ? "+" : "−"}${Math.abs(Math.round(value))} pts`;
 }
 
 function formatSignedYears(value: number): string {
   if (value === 0) return "No change";
-  return `${value > 0 ? "+" : ""}${value} ${Math.abs(value) === 1 ? "year" : "years"}`;
+  const years = Math.abs(value);
+  return `${value > 0 ? "+" : "−"}${years} ${years === 1 ? "year" : "years"}`;
 }
 
 function toneSuffix(value: string): string {
   if (value.startsWith("+")) return " is-positive";
-  if (value.startsWith("-")) return " is-negative";
+  if (value.startsWith("−")) return " is-negative";
   return "";
 }
 
-function toneClassName(value: string): string | undefined {
+function toneClassName(value: string): string {
   if (value.startsWith("+")) return "is-positive";
-  if (value.startsWith("-")) return "is-negative";
-  return undefined;
+  if (value.startsWith("−")) return "is-negative";
+  return "";
 }
