@@ -7,7 +7,7 @@ import { createDefaultPensionInputs } from "../../config/defaultPensionInputs";
 import { createDefaultScenarioDrawdownPreferences } from "../../domain/scenarios";
 import { SavedExperimentsPanel } from "./SavedExperimentsPanel";
 
-function createScenario(id: string, name: string): WhatIfScenario {
+function createScenario(id: string, name: string, retirementAge = 67): WhatIfScenario {
   return {
     id,
     name,
@@ -18,14 +18,14 @@ function createScenario(id: string, name: string): WhatIfScenario {
     inputs: {
       ...createDefaultPensionInputs(),
       currentAge: 47,
-      retirementAge: 67,
+      retirementAge,
     },
     drawdown: createDefaultScenarioDrawdownPreferences(),
   };
 }
 
 describe("SavedExperimentsPanel", () => {
-  it("shows saved experiments for the selected experiment and loads one", async () => {
+  it("shows saved experiments and applies one with an explicit action", async () => {
     const user = userEvent.setup();
     const scenario = createScenario("retire-67", "Retire at 67");
     const onLoad = vi.fn();
@@ -44,12 +44,13 @@ describe("SavedExperimentsPanel", () => {
 
     expect(screen.getByText("Retire at 67")).toBeInTheDocument();
     expect(screen.getByText("Age 67")).toBeInTheDocument();
+    expect(screen.getByText("No saved experiment applied")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Load Retire at 67" }));
+    await user.click(screen.getByRole("button", { name: "Apply Retire at 67" }));
     expect(onLoad).toHaveBeenCalledWith(scenario);
   });
 
-  it("unloads a loaded experiment without deleting it", async () => {
+  it("shows the applied state and stops applying without deleting", async () => {
     const user = userEvent.setup();
     const scenario = createScenario("retire-67", "Retire at 67");
     const onUnload = vi.fn();
@@ -67,11 +68,36 @@ describe("SavedExperimentsPanel", () => {
       />,
     );
 
-    expect(screen.getByText("Loaded")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Unload" }));
+    expect(screen.getAllByText("Applied").length).toBeGreaterThan(0);
+    expect(screen.getByText("Applied experiment")).toBeInTheDocument();
+
+    const stopApplyingButtons = screen.getAllByRole("button", { name: "Stop applying" });
+    await user.click(stopApplyingButtons[0]);
 
     expect(onUnload).toHaveBeenCalledOnce();
     expect(onDelete).not.toHaveBeenCalled();
+  });
+
+  it("lets another saved experiment replace the currently applied one directly", async () => {
+    const user = userEvent.setup();
+    const applied = createScenario("retire-67", "Retire at 67", 67);
+    const alternative = createScenario("retire-65", "Retire at 65", 65);
+    const onLoad = vi.fn();
+
+    render(
+      <SavedExperimentsPanel
+        activeExperiment="retirement-age"
+        activePlanName="Standard Plan"
+        scenarios={[applied, alternative]}
+        loadedScenarioId={applied.id}
+        onLoad={onLoad}
+        onUnload={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Apply Retire at 65" }));
+    expect(onLoad).toHaveBeenCalledWith(alternative);
   });
 
   it("keeps delete behind the experiment management menu and confirms in-app", async () => {
