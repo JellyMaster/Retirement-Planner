@@ -544,6 +544,11 @@ function WhatIfWorkspace({
               preparedness={alternativeHealth?.score ?? 0}
               canSave={canSaveExperiment}
               saveMessage={saveMessage}
+              savedExperiments={savedForActiveExperiment.map((scenario) => ({
+                id: scenario.id,
+                name: scenario.name,
+                retirementAge: scenario.inputs.retirementAge,
+              }))}
               onRetirementAgeChange={changeRetirementAge}
               onReset={resetExperiment}
               onSave={openSaveExperiment}
