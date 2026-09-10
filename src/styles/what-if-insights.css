@@ -28,6 +28,27 @@
   line-height: 1.5;
 }
 
+.what-if-no-change {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: clamp(var(--space-5), 4vw, var(--space-7));
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+  text-align: center;
+}
+
+.what-if-no-change strong {
+  font-size: 1.05rem;
+}
+
+.what-if-no-change span {
+  max-width: 44rem;
+  color: var(--colour-text-muted);
+  line-height: 1.5;
+}
+
 .what-if-before-after-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -36,7 +57,7 @@
 
 .what-if-before-after-card {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-2);
   min-width: 0;
   padding: var(--space-4);
   border: 1px solid var(--colour-border);
@@ -50,38 +71,23 @@
   font-weight: 800;
 }
 
-.what-if-before-after-values {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.what-if-before-after-values > div {
-  display: grid;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.what-if-before-after-values small {
-  color: var(--colour-text-muted);
-}
-
-.what-if-before-after-values strong {
+.what-if-outcome-value {
   overflow-wrap: anywhere;
-  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.15;
 }
 
-.what-if-before-after-values > span {
-  color: var(--colour-text-muted);
-  font-size: 1.25rem;
-  font-weight: 800;
-}
-
-.what-if-before-after-card > em {
+.what-if-before-after-card > em,
+.what-if-detail-card > em {
   font-size: var(--ui-font-size-sm);
   font-style: normal;
   font-weight: 800;
+}
+
+.what-if-before-after-card > small,
+.what-if-detail-card > small {
+  color: var(--colour-text-muted);
+  line-height: 1.4;
 }
 
 .what-if-before-after-card .is-positive,
@@ -125,7 +131,7 @@
 }
 
 .what-if-verdict h3 {
-  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
 }
 
 .what-if-verdict > p {
@@ -156,9 +162,7 @@
   gap: var(--space-2);
   min-width: 0;
   padding: var(--space-3);
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius-md);
-  background: var(--colour-surface);
+  border-top: 1px solid var(--colour-border);
 }
 
 .what-if-detail-card > span {
@@ -167,10 +171,10 @@
   font-weight: 800;
 }
 
-.what-if-detail-card > small,
 .what-if-detail-card > strong {
   display: block;
   overflow-wrap: anywhere;
+  font-size: 1.08rem;
 }
 
 @media (max-width: 800px) {
@@ -180,7 +184,8 @@
     grid-template-columns: 1fr;
   }
 
-  .what-if-before-after-grid {
+  .what-if-before-after-grid,
+  .what-if-details-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -188,18 +193,5 @@
 @media (max-width: 560px) {
   .what-if-insights {
     padding: var(--space-4);
-  }
-
-  .what-if-before-after-values {
-    grid-template-columns: 1fr;
-  }
-
-  .what-if-before-after-values > span {
-    transform: rotate(90deg);
-    justify-self: start;
-  }
-
-  .what-if-details-grid {
-    grid-template-columns: 1fr;
   }
 }
