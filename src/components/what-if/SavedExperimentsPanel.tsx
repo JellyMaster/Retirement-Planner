@@ -26,13 +26,16 @@ export function SavedExperimentsPanel({
 }: SavedExperimentsPanelProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-  function deleteScenario(scenario: WhatIfScenario) {
-    if (!window.confirm(`Delete ${scenario.name}? This saved experiment cannot be restored.`)) {
-      return;
-    }
+  function closeMenu() {
     setOpenMenuId(null);
-    onDelete(scenario.id);
+    setPendingDeleteId(null);
+  }
+
+  function confirmDelete(scenarioId: string) {
+    onDelete(scenarioId);
+    closeMenu();
   }
 
   return (
@@ -58,7 +61,10 @@ export function SavedExperimentsPanel({
           className="what-if-saved-panel-collapse"
           aria-label={collapsed ? "Expand saved experiments" : "Collapse saved experiments"}
           aria-expanded={!collapsed}
-          onClick={() => setCollapsed((current) => !current)}
+          onClick={() => {
+            setCollapsed((current) => !current);
+            closeMenu();
+          }}
         >
           <span className="what-if-saved-panel-count" aria-label={`${scenarios.length} saved`}>
             {scenarios.length}
@@ -78,6 +84,7 @@ export function SavedExperimentsPanel({
               {scenarios.map((scenario) => {
                 const isLoaded = loadedScenarioId === scenario.id;
                 const menuOpen = openMenuId === scenario.id;
+                const confirmingDelete = pendingDeleteId === scenario.id;
 
                 return (
                   <article
@@ -111,24 +118,50 @@ export function SavedExperimentsPanel({
                           className="what-if-saved-panel-more"
                           aria-label={`More actions for ${scenario.name}`}
                           aria-expanded={menuOpen}
-                          onClick={() =>
-                            setOpenMenuId((current) =>
-                              current === scenario.id ? null : scenario.id,
-                            )
-                          }
+                          onClick={() => {
+                            if (menuOpen) {
+                              closeMenu();
+                              return;
+                            }
+                            setOpenMenuId(scenario.id);
+                            setPendingDeleteId(null);
+                          }}
                         >
                           <span aria-hidden="true">•••</span>
                         </button>
                         {menuOpen && (
                           <div className="what-if-saved-panel-menu" role="menu">
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className="is-danger"
-                              onClick={() => deleteScenario(scenario)}
-                            >
-                              Delete experiment
-                            </button>
+                            {confirmingDelete ? (
+                              <>
+                                <span className="what-if-saved-panel-delete-copy">
+                                  Delete this saved experiment?
+                                </span>
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  className="is-danger"
+                                  onClick={() => confirmDelete(scenario.id)}
+                                >
+                                  Delete permanently
+                                </button>
+                                <button
+                                  type="button"
+                                  role="menuitem"
+                                  onClick={() => setPendingDeleteId(null)}
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="is-danger"
+                                onClick={() => setPendingDeleteId(scenario.id)}
+                              >
+                                Delete experiment
+                              </button>
+                            )}
                           </div>
                         )}
                       </div>
