@@ -62,6 +62,6 @@ describe("SpendingExperiment", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getAllByText("£8,000 gap").length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeEnabled();
   });
 });
