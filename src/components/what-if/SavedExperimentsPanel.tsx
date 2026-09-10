@@ -11,7 +11,7 @@ interface SavedExperimentsPanelProps {
   scenarios: WhatIfScenario[];
   loadedScenarioId: string | null;
   onLoad: (scenario: WhatIfScenario) => void;
-  onPromote: (scenario: WhatIfScenario) => void;
+  onUnload: () => void;
   onDelete: (scenarioId: string) => void;
 }
 
@@ -21,10 +21,19 @@ export function SavedExperimentsPanel({
   scenarios,
   loadedScenarioId,
   onLoad,
-  onPromote,
+  onUnload,
   onDelete,
 }: SavedExperimentsPanelProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  function deleteScenario(scenario: WhatIfScenario) {
+    if (!window.confirm(`Delete ${scenario.name}? This saved experiment cannot be restored.`)) {
+      return;
+    }
+    setOpenMenuId(null);
+    onDelete(scenario.id);
+  }
 
   return (
     <aside
@@ -66,46 +75,71 @@ export function SavedExperimentsPanel({
 
           {scenarios.length > 0 ? (
             <div className="what-if-saved-panel-list">
-              {scenarios.map((scenario) => (
-                <article
-                  key={scenario.id}
-                  className={`what-if-saved-panel-card${loadedScenarioId === scenario.id ? " is-loaded" : ""}`}
-                >
-                  <button
-                    type="button"
-                    className="what-if-saved-panel-card-main"
-                    aria-label={`Load ${scenario.name}`}
-                    onClick={() => onLoad(scenario)}
+              {scenarios.map((scenario) => {
+                const isLoaded = loadedScenarioId === scenario.id;
+                const menuOpen = openMenuId === scenario.id;
+
+                return (
+                  <article
+                    key={scenario.id}
+                    className={`what-if-saved-panel-card${isLoaded ? " is-loaded" : ""}`}
                   >
-                    <strong>{scenario.name}</strong>
-                    <span>{createExperimentSummary(scenario)}</span>
-                  </button>
-
-                  <div className="what-if-saved-panel-card-actions">
                     <button
                       type="button"
-                      className="what-if-saved-panel-more"
-                      aria-label={`Create plan from ${scenario.name}`}
-                      title="Create plan from experiment"
-                      onClick={() => onPromote(scenario)}
+                      className="what-if-saved-panel-card-main"
+                      aria-label={`Load ${scenario.name}`}
+                      aria-pressed={isLoaded}
+                      onClick={() => onLoad(scenario)}
                     >
-                      <span aria-hidden="true">•••</span>
+                      <strong>{scenario.name}</strong>
+                      <span>{createExperimentSummary(scenario)}</span>
                     </button>
-                    <button
-                      type="button"
-                      className="what-if-saved-panel-delete"
-                      aria-label={`Delete ${scenario.name}`}
-                      onClick={() => onDelete(scenario.id)}
-                    >
-                      ×
-                    </button>
-                  </div>
 
-                  {loadedScenarioId === scenario.id && (
-                    <span className="what-if-saved-panel-loaded">Loaded</span>
-                  )}
-                </article>
-              ))}
+                    <div className="what-if-saved-panel-card-actions">
+                      {isLoaded && (
+                        <button
+                          type="button"
+                          className="what-if-saved-panel-unload"
+                          onClick={onUnload}
+                        >
+                          Unload
+                        </button>
+                      )}
+                      <div className="what-if-saved-panel-menu-wrap">
+                        <button
+                          type="button"
+                          className="what-if-saved-panel-more"
+                          aria-label={`More actions for ${scenario.name}`}
+                          aria-expanded={menuOpen}
+                          onClick={() =>
+                            setOpenMenuId((current) =>
+                              current === scenario.id ? null : scenario.id,
+                            )
+                          }
+                        >
+                          <span aria-hidden="true">•••</span>
+                        </button>
+                        {menuOpen && (
+                          <div className="what-if-saved-panel-menu" role="menu">
+                            <button
+                              type="button"
+                              role="menuitem"
+                              className="is-danger"
+                              onClick={() => deleteScenario(scenario)}
+                            >
+                              Delete experiment
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {isLoaded && (
+                      <span className="what-if-saved-panel-loaded">Loaded</span>
+                    )}
+                  </article>
+                );
+              })}
             </div>
           ) : (
             <div className="what-if-saved-panel-empty">
@@ -115,7 +149,7 @@ export function SavedExperimentsPanel({
           )}
 
           <p className="what-if-saved-panel-note">
-            Only {formatExperimentName(activeExperiment).toLowerCase()} experiments are shown here.
+            Loading applies a saved idea temporarily. Unloading returns this experiment to {activePlanName} without deleting anything.
           </p>
         </>
       )}
