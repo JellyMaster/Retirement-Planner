@@ -14,7 +14,9 @@ interface ExperimentInsightsProps {
   baselineRetirementOutcome?: RetirementSpendingOutcome | null;
   retirementOutcome?: RetirementSpendingOutcome | null;
   currentAge: number;
+  baselineRetirementAge: number;
   retirementAge: number;
+  planningAge: number;
   statePensionAge: number;
   extraContributionAge?: number;
   downturnAge?: number;
@@ -41,7 +43,9 @@ export function ExperimentInsights({
   annualIncome,
   baselineRetirementOutcome,
   retirementOutcome,
+  baselineRetirementAge,
   retirementAge,
+  planningAge,
   statePensionAge,
   hasChanged,
 }: ExperimentInsightsProps) {
@@ -51,7 +55,23 @@ export function ExperimentInsights({
   const outcome = getOutcomeVerdict(activeExperiment, pensionDifference, incomeDifference);
   const targetIncome = retirementOutcome?.targetNetSpending ?? baselineRetirementOutcome?.targetNetSpending;
   const targetDifference = targetIncome === undefined ? null : annualIncome - targetIncome;
+  const isSimpleRetirementAge = activeExperiment === "retirement-age" && viewMode === "simple";
   const showBaselineMetrics = hasChanged || viewMode === "detailed";
+
+  if (isSimpleRetirementAge) {
+    return (
+      <SimpleRetirementAgeSummary
+        baselineRetirementAge={baselineRetirementAge}
+        retirementAge={retirementAge}
+        baselineAnnualIncome={baselineAnnualIncome}
+        annualIncome={annualIncome}
+        targetIncome={targetIncome ?? 0}
+        planningAge={planningAge}
+        statePensionAge={statePensionAge}
+        hasChanged={hasChanged}
+      />
+    );
+  }
 
   return (
     <section className="what-if-insights" aria-labelledby="decision-summary-title">
@@ -116,6 +136,133 @@ export function ExperimentInsights({
         />
       )}
     </section>
+  );
+}
+
+function SimpleRetirementAgeSummary({
+  baselineRetirementAge,
+  retirementAge,
+  baselineAnnualIncome,
+  annualIncome,
+  targetIncome,
+  planningAge,
+  statePensionAge,
+  hasChanged,
+}: {
+  baselineRetirementAge: number;
+  retirementAge: number;
+  baselineAnnualIncome: number;
+  annualIncome: number;
+  targetIncome: number;
+  planningAge: number;
+  statePensionAge: number;
+  hasChanged: boolean;
+}) {
+  const displayedIncome = hasChanged ? annualIncome : baselineAnnualIncome;
+  const targetDifference = displayedIncome - targetIncome;
+  const ageDifference = retirementAge - baselineRetirementAge;
+  const statePensionGap = Math.max(0, statePensionAge - retirementAge);
+  const targetSupported = targetDifference >= -0.5;
+
+  return (
+    <section className="what-if-insights what-if-insights-simple" aria-labelledby="decision-summary-title">
+      <header className="what-if-insights-header">
+        <div>
+          <p className="planner-eyebrow">Decision summary</p>
+          <h2 id="decision-summary-title">
+            {hasChanged ? `What happens if I retire at ${retirementAge}?` : "When could I retire?"}
+          </h2>
+          <p>
+            {hasChanged
+              ? createRetirementAgeComparison(ageDifference, baselineRetirementAge)
+              : `Your saved plan is to retire at age ${baselineRetirementAge}.`}
+          </p>
+        </div>
+      </header>
+
+      {!hasChanged && (
+        <div className="what-if-simple-intro" role="status">
+          <strong>No change yet</strong>
+          <span>You&apos;re currently looking at your saved retirement plan.</span>
+        </div>
+      )}
+
+      <div className="what-if-simple-impact-grid" aria-label="Retirement decision summary">
+        <SimpleImpactCard
+          label="Estimated retirement income"
+          value={`${formatCurrency(displayedIncome)}/year`}
+          note={hasChanged ? `Saved plan: ${formatCurrency(baselineAnnualIncome)}/year` : "Based on your saved plan"}
+        />
+        <SimpleImpactCard
+          label="Your income target"
+          value={`${formatCurrency(targetIncome)}/year`}
+          note="The yearly income you said you would like"
+        />
+        <SimpleImpactCard
+          label={targetSupported ? "Above your target" : "Below your target"}
+          value={`${formatCurrency(Math.abs(targetDifference))}/year`}
+          note={targetSupported ? "More than your target" : "Less than your target"}
+          tone={targetSupported ? "positive" : "negative"}
+        />
+        <SimpleImpactCard
+          label={statePensionGap > 0 ? "Until State Pension" : "State Pension"}
+          value={statePensionGap > 0 ? `${statePensionGap} ${statePensionGap === 1 ? "year" : "years"}` : `From age ${statePensionAge}`}
+          note={statePensionGap > 0 ? `State Pension starts at age ${statePensionAge}` : "Available from retirement"}
+        />
+      </div>
+
+      {hasChanged ? (
+        <article className={`what-if-simple-meaning ${targetSupported ? "is-positive" : "is-negative"}`}>
+          <p className="planner-eyebrow">What this means</p>
+          <h3>{targetSupported ? "Your income target is supported" : "Your income target would not be met"}</h3>
+          <p>
+            {createSimpleRetirementExplanation(
+              retirementAge,
+              baselineRetirementAge,
+              statePensionGap,
+              statePensionAge,
+              targetSupported,
+            )}
+          </p>
+        </article>
+      ) : (
+        <p className="what-if-simple-horizon">Your plan is modelled through to age {planningAge}.</p>
+      )}
+
+      <div className={`what-if-simple-outlook ${targetSupported ? "is-positive" : "is-negative"}`}>
+        <strong>{targetSupported ? "Your chosen income looks supported" : "Your chosen income needs attention"}</strong>
+        <span>
+          {targetSupported
+            ? `Under the current assumptions, your estimated retirement income is at least your ${formatCurrency(targetIncome)}/year target.`
+            : `Under the current assumptions, your estimated retirement income is ${formatCurrency(Math.abs(targetDifference))}/year below your target.`}
+        </span>
+        <small>Plan tested through to age {planningAge}.</small>
+      </div>
+
+      <p className="what-if-simple-detail-hint">
+        Switch to Detailed view to see pension balances, sustainable spending, headroom, ending-balance goals and other financial assumptions.
+      </p>
+    </section>
+  );
+}
+
+function SimpleImpactCard({
+  label,
+  value,
+  note,
+  tone = "neutral",
+}: {
+  label: string;
+  value: string;
+  note: string;
+  tone?: "positive" | "negative" | "neutral";
+}) {
+  return (
+    <article className={`what-if-simple-impact-card is-${tone}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{note}</small>
+    </article>
   );
 }
 
@@ -251,6 +398,35 @@ function DetailCard({
       {supporting && <small>{supporting}</small>}
     </div>
   );
+}
+
+function createRetirementAgeComparison(ageDifference: number, baselineRetirementAge: number): string {
+  if (ageDifference === 0) return `Your saved plan is to retire at age ${baselineRetirementAge}.`;
+  const years = Math.abs(ageDifference);
+  const direction = ageDifference < 0 ? "earlier" : "later";
+  return `You are retiring ${years} ${years === 1 ? "year" : "years"} ${direction} than your saved plan (${baselineRetirementAge}).`;
+}
+
+function createSimpleRetirementExplanation(
+  retirementAge: number,
+  baselineRetirementAge: number,
+  statePensionGap: number,
+  statePensionAge: number,
+  targetSupported: boolean,
+): string {
+  const ageDifference = retirementAge - baselineRetirementAge;
+  const timingExplanation = ageDifference < 0
+    ? `Retiring at ${retirementAge} gives your pension less time to grow and means it needs to support you for longer.`
+    : ageDifference > 0
+      ? `Retiring at ${retirementAge} gives your pension more time to grow and means it needs to support fewer retirement years.`
+      : "This matches your saved retirement age.";
+  const pensionExplanation = statePensionGap > 0
+    ? ` You would also need to fund ${statePensionGap} ${statePensionGap === 1 ? "year" : "years"} of retirement before State Pension starts at age ${statePensionAge}.`
+    : " State Pension is available from the start of retirement under your current assumptions.";
+  const targetExplanation = targetSupported
+    ? " Your estimated income remains at or above the amount you said you would like."
+    : " Your estimated income falls below the amount you said you would like.";
+  return `${timingExplanation}${pensionExplanation}${targetExplanation}`;
 }
 
 function createSummaryContext(experiment: ExperimentId, retirementAge: number, hasChanged: boolean): string {
