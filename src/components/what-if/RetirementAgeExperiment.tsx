@@ -269,7 +269,7 @@ export function RetirementAgeExperiment({
                   difference={formatSignedCurrency(pensionDifference)}
                 />
                 <KeyResult
-                  label="Illustrated income"
+                  label="Sustainable retirement income"
                   value={`${formatCurrency(displayedIncome)}/year`}
                   difference={`${formatSignedCurrency(incomeDifference)}/year`}
                 />
@@ -341,7 +341,7 @@ export function RetirementAgeExperiment({
                 difference={formatSignedCurrency(pensionDifference)}
               />
               <OutcomeCard
-                label="Illustrated annual income"
+                label="Sustainable annual income"
                 baseline={`${formatCurrency(displayedBaselineIncome)}/year`}
                 experiment={`${formatCurrency(displayedIncome)}/year`}
                 difference={`${formatSignedCurrency(incomeDifference)}/year`}
