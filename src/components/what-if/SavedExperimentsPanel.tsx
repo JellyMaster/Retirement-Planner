@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { WhatIfScenario } from "../../domain/what-if/WhatIfScenario";
 import { AppIcons } from "../../icons";
 import type { ExperimentId } from "./ExperimentLauncher";
+import "../../styles/what-if-applied-experiments.css";
 
 interface SavedExperimentsPanelProps {
   activeExperiment: ExperimentId;
@@ -27,6 +28,7 @@ export function SavedExperimentsPanel({
   const [collapsed, setCollapsed] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const appliedScenario = scenarios.find((scenario) => scenario.id === loadedScenarioId) ?? null;
 
   function closeMenu() {
     setOpenMenuId(null);
@@ -75,6 +77,12 @@ export function SavedExperimentsPanel({
 
       {!collapsed && (
         <>
+          <AppliedExperimentStatus
+            scenario={appliedScenario}
+            activePlanName={activePlanName}
+            onStopApplying={onUnload}
+          />
+
           <p className="what-if-saved-panel-copy">
             Saved {formatExperimentName(activeExperiment).toLowerCase()} ideas for {activePlanName}.
           </p>
@@ -82,36 +90,40 @@ export function SavedExperimentsPanel({
           {scenarios.length > 0 ? (
             <div className="what-if-saved-panel-list">
               {scenarios.map((scenario) => {
-                const isLoaded = loadedScenarioId === scenario.id;
+                const isApplied = loadedScenarioId === scenario.id;
                 const menuOpen = openMenuId === scenario.id;
                 const confirmingDelete = pendingDeleteId === scenario.id;
 
                 return (
                   <article
                     key={scenario.id}
-                    className={`what-if-saved-panel-card${isLoaded ? " is-loaded" : ""}`}
+                    className={`what-if-saved-panel-card${isApplied ? " is-loaded is-applied" : ""}`}
                   >
-                    <button
-                      type="button"
-                      className="what-if-saved-panel-card-main"
-                      aria-label={`Load ${scenario.name}`}
-                      aria-pressed={isLoaded}
-                      onClick={() => onLoad(scenario)}
-                    >
+                    <div className="what-if-saved-panel-card-main">
                       <strong>{scenario.name}</strong>
                       <span>{createExperimentSummary(scenario)}</span>
-                    </button>
+                    </div>
 
                     <div className="what-if-saved-panel-card-actions">
-                      {isLoaded && (
+                      {isApplied ? (
                         <button
                           type="button"
-                          className="what-if-saved-panel-unload"
+                          className="what-if-saved-panel-unload what-if-saved-panel-stop-applying"
                           onClick={onUnload}
                         >
-                          Unload
+                          Stop applying
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="what-if-saved-panel-apply"
+                          aria-label={`Apply ${scenario.name}`}
+                          onClick={() => onLoad(scenario)}
+                        >
+                          Apply
                         </button>
                       )}
+
                       <div className="what-if-saved-panel-menu-wrap">
                         <button
                           type="button"
@@ -167,8 +179,10 @@ export function SavedExperimentsPanel({
                       </div>
                     </div>
 
-                    {isLoaded && (
-                      <span className="what-if-saved-panel-loaded">Loaded</span>
+                    {isApplied && (
+                      <span className="what-if-saved-panel-loaded what-if-saved-panel-applied">
+                        Applied
+                      </span>
                     )}
                   </article>
                 );
@@ -182,11 +196,45 @@ export function SavedExperimentsPanel({
           )}
 
           <p className="what-if-saved-panel-note">
-            Loading applies a saved idea temporarily. Unloading returns this experiment to {activePlanName} without deleting anything.
+            Apply a saved idea to use it in this What If. Stop applying returns this experiment to {activePlanName} without deleting the saved idea.
           </p>
         </>
       )}
     </aside>
+  );
+}
+
+interface AppliedExperimentStatusProps {
+  scenario: WhatIfScenario | null;
+  activePlanName: string;
+  onStopApplying: () => void;
+}
+
+function AppliedExperimentStatus({
+  scenario,
+  activePlanName,
+  onStopApplying,
+}: AppliedExperimentStatusProps) {
+  if (!scenario) {
+    return (
+      <div className="what-if-applied-status is-empty">
+        <span className="what-if-applied-status-label">Exploring from {activePlanName}</span>
+        <strong>No saved experiment applied</strong>
+      </div>
+    );
+  }
+
+  return (
+    <div className="what-if-applied-status" aria-live="polite">
+      <div>
+        <span className="what-if-applied-status-label">Applied experiment</span>
+        <strong>{scenario.name}</strong>
+        <small>{createExperimentSummary(scenario)}</small>
+      </div>
+      <button type="button" onClick={onStopApplying}>
+        Stop applying
+      </button>
+    </div>
   );
 }
 
