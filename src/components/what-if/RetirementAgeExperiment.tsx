@@ -100,6 +100,8 @@ export function RetirementAgeExperiment({
   const outcomeStatus = createOutcomeStatus(preparedness, hasChanged);
   const savedPlanTiming = createSavedPlanTiming(ageDifference);
   const retirementYears = Math.max(0, planningAge - retirementAge);
+  const saveAlreadyExists = hasChanged && !canSave && saveMessage === null;
+  const saveButtonLabel = saveAlreadyExists ? "Already saved" : "Save experiment";
 
   return (
     <section
@@ -245,6 +247,7 @@ export function RetirementAgeExperiment({
               type="button"
               className="ui-button ui-button-secondary ui-button-medium"
               disabled={!hasChanged}
+              title={hasChanged ? `Reset to ${activePlanName}` : undefined}
               onClick={onReset}
             >
               Reset
@@ -253,9 +256,10 @@ export function RetirementAgeExperiment({
               type="button"
               className="ui-button ui-button-primary ui-button-medium"
               disabled={!hasChanged || !canSave}
+              title={saveAlreadyExists ? "This retirement-age experiment is already saved." : undefined}
               onClick={onSave}
             >
-              Save experiment
+              {saveButtonLabel}
             </button>
           </div>
         </section>
