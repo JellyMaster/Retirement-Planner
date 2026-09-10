@@ -20,20 +20,20 @@ export function CreatePlanFromExperiment({
       <div className="what-if-create-plan-heading">
         <div>
           <p className="planner-eyebrow">Create a plan</p>
-          <h2 id="what-if-create-plan-title">Turn a saved experiment into a plan</h2>
+          <h2 id="what-if-create-plan-title">Turn this experiment into a plan</h2>
           <p>
-            Load the saved experiment you want to use, review the change, then create a separate plan. {activePlanName} will not be changed.
+            Apply a saved experiment when you're ready to turn it into a separate maintained plan. {activePlanName} will not be changed.
           </p>
         </div>
         <span className={`what-if-create-plan-status${scenario ? " is-ready" : ""}`}>
-          {scenario ? "Ready to create" : "No experiment loaded"}
+          {scenario ? "Ready to create" : "No experiment applied"}
         </span>
       </div>
 
       {scenario ? (
         <div className="what-if-create-plan-body">
           <div className="what-if-create-plan-review">
-            <span>Loaded experiment</span>
+            <span>Applied experiment</span>
             <strong>{scenario.name}</strong>
             <small>{createExperimentSummary(scenario)}</small>
           </div>
@@ -68,9 +68,9 @@ export function CreatePlanFromExperiment({
         </div>
       ) : (
         <div className="what-if-create-plan-empty">
-          <strong>Load a saved experiment first</strong>
+          <strong>No experiment applied</strong>
           <span>
-            Select one from the Saved experiments panel above. Loading an experiment does not remove it from your saved list.
+            Apply one from the Saved experiments panel above when you're ready to create a separate plan.
           </span>
         </div>
       )}
@@ -93,9 +93,7 @@ function createExperimentSummary(scenario: WhatIfScenario): string {
     case "inflation":
       return `${(scenario.inputs.inflation * 100).toFixed(1)}% inflation assumption`;
     case "state-pension":
-      return scenario.drawdown.includeStatePension
-        ? "State Pension included"
-        : "State Pension excluded";
+      return scenario.drawdown.includeStatePension ? "State Pension included" : "State Pension excluded";
     case "market-downturn":
       return `${Math.round((scenario.inputs.marketDownturnPercentage ?? 0) * 100)}% market fall at age ${scenario.inputs.marketDownturnAge ?? scenario.inputs.currentAge}`;
   }
