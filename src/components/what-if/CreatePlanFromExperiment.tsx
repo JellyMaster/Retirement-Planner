@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { WhatIfScenario } from "../../domain/what-if/WhatIfScenario";
 
@@ -13,12 +13,7 @@ export function CreatePlanFromExperiment({
   scenario,
   onCreate,
 }: CreatePlanFromExperimentProps) {
-  const [name, setName] = useState("");
-
-  useEffect(() => {
-    setName(scenario?.name ?? "");
-  }, [scenario]);
-
+  const [name, setName] = useState(scenario?.name ?? "");
   const canCreate = scenario !== null && name.trim().length > 0;
 
   return (
