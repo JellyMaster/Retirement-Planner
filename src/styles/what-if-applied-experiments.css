@@ -9,116 +9,55 @@
   background: color-mix(in srgb, var(--colour-primary) 7%, var(--colour-surface));
 }
 
-.what-if-applied-status.is-empty {
-  grid-template-columns: 1fr;
-  border-style: dashed;
-  border-color: var(--colour-border);
-  background: color-mix(in srgb, var(--colour-surface-secondary) 68%, transparent);
-}
+.what-if-applied-status.is-empty { grid-template-columns: 1fr; border-style: dashed; border-color: var(--colour-border); background: color-mix(in srgb, var(--colour-surface-secondary) 68%, transparent); }
+.what-if-applied-status > div { display: grid; gap: 0.12rem; min-width: 0; }
+.what-if-applied-status-label { color: var(--colour-text-muted); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.what-if-applied-status strong, .what-if-applied-status small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.what-if-applied-status small { color: var(--colour-text-muted); font-size: var(--ui-font-size-xs); }
 
-.what-if-applied-status > div {
-  display: grid;
-  gap: 0.12rem;
-  min-width: 0;
+.what-if-applied-status > button, .what-if-saved-panel-apply {
+  min-height: 1.95rem; padding: 0.28rem 0.6rem; border: 1px solid color-mix(in srgb, var(--colour-primary) 42%, var(--colour-border)); border-radius: 999px; background: color-mix(in srgb, var(--colour-primary) 8%, transparent); color: var(--colour-primary); font: inherit; font-size: var(--ui-font-size-xs); font-weight: 800; cursor: pointer;
 }
+.what-if-applied-status > button:hover, .what-if-applied-status > button:focus-visible, .what-if-saved-panel-apply:hover, .what-if-saved-panel-apply:focus-visible { background: color-mix(in srgb, var(--colour-primary) 15%, transparent); }
+.what-if-saved-panel-card.is-applied { background: color-mix(in srgb, var(--colour-primary) 4%, var(--colour-background, var(--colour-surface))); }
+.what-if-saved-panel-card-main { cursor: default; }
+.what-if-saved-panel-apply { background: var(--colour-primary); color: var(--colour-on-primary, #fff); }
+.what-if-saved-panel-apply:hover, .what-if-saved-panel-apply:focus-visible { background: color-mix(in srgb, var(--colour-primary) 88%, #000); }
+.what-if-saved-panel-stop-applying { white-space: nowrap; }
+.what-if-saved-panel-applied { color: var(--colour-primary); }
 
-.what-if-applied-status-label {
-  color: var(--colour-text-muted);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.what-if-applied-status strong,
-.what-if-applied-status small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.what-if-applied-status small {
-  color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-xs);
-}
-
-.what-if-applied-status > button,
-.what-if-saved-panel-apply {
+.what-if-saved-panel-delete {
   min-height: 1.95rem;
-  padding: 0.28rem 0.6rem;
-  border: 1px solid color-mix(in srgb, var(--colour-primary) 42%, var(--colour-border));
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--colour-primary) 8%, transparent);
-  color: var(--colour-primary);
+  padding: 0.28rem 0.5rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--colour-negative, #c2414b);
   font: inherit;
   font-size: var(--ui-font-size-xs);
-  font-weight: 800;
+  font-weight: 750;
   cursor: pointer;
 }
+.what-if-saved-panel-delete:hover, .what-if-saved-panel-delete:focus-visible { background: color-mix(in srgb, var(--colour-negative, #c2414b) 10%, transparent); }
 
-.what-if-applied-status > button:hover,
-.what-if-applied-status > button:focus-visible,
-.what-if-saved-panel-apply:hover,
-.what-if-saved-panel-apply:focus-visible {
-  background: color-mix(in srgb, var(--colour-primary) 15%, transparent);
+.what-if-saved-panel-delete-confirm {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--colour-border);
+  background: color-mix(in srgb, var(--colour-negative, #c2414b) 5%, var(--colour-surface));
 }
+.what-if-saved-panel-delete-confirm > span { color: var(--colour-text-muted); font-size: var(--ui-font-size-xs); }
+.what-if-saved-panel-delete-confirm > div { display: flex; gap: var(--space-2); }
+.what-if-saved-panel-delete-confirm button { padding: 0.35rem 0.55rem; border: 1px solid var(--colour-border); border-radius: var(--radius-sm); background: transparent; color: var(--colour-text); font: inherit; font-size: var(--ui-font-size-xs); font-weight: 750; cursor: pointer; }
+.what-if-saved-panel-delete-confirm button.is-danger { border-color: color-mix(in srgb, var(--colour-negative, #c2414b) 45%, var(--colour-border)); color: var(--colour-negative, #c2414b); }
+.what-if-saved-panel-delete-confirm button:hover, .what-if-saved-panel-delete-confirm button:focus-visible { background: var(--colour-surface-secondary); }
 
-.what-if-saved-panel-card.is-applied {
-  background: color-mix(in srgb, var(--colour-primary) 4%, var(--colour-background, var(--colour-surface)));
-}
-
-.what-if-saved-panel-card-main {
-  cursor: default;
-}
-
-.what-if-saved-panel-apply {
-  background: var(--colour-primary);
-  color: var(--colour-on-primary, #fff);
-}
-
-.what-if-saved-panel-apply:hover,
-.what-if-saved-panel-apply:focus-visible {
-  background: color-mix(in srgb, var(--colour-primary) 88%, #000);
-}
-
-.what-if-saved-panel-stop-applying {
-  white-space: nowrap;
-}
-
-.what-if-saved-panel-applied {
-  color: var(--colour-primary);
-}
-
-.what-if-saved-panel-delete-copy {
-  display: block;
-  padding: 0.45rem 0.65rem 0.25rem;
-  color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-xs);
-  line-height: 1.35;
-}
-
-@media (max-width: 1120px) {
-  .what-if-applied-status {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-}
-
+@media (max-width: 1120px) { .what-if-applied-status { grid-template-columns: minmax(0, 1fr) auto; } }
 @media (max-width: 640px) {
-  .what-if-applied-status {
-    grid-template-columns: 1fr;
-    align-items: stretch;
-  }
-
-  .what-if-applied-status > button {
-    justify-self: start;
-  }
-
-  .what-if-saved-panel-card {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .what-if-saved-panel-card-actions {
-    justify-content: space-between;
-    padding: 0 var(--space-2) var(--space-2) var(--space-3);
-  }
+  .what-if-applied-status { grid-template-columns: 1fr; align-items: stretch; }
+  .what-if-applied-status > button { justify-self: start; }
+  .what-if-saved-panel-card { grid-template-columns: minmax(0, 1fr); }
+  .what-if-saved-panel-card-actions { justify-content: space-between; padding: 0 var(--space-2) var(--space-2) var(--space-3); }
 }
