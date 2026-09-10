@@ -34,7 +34,7 @@ export function SavedExperimentsPanel({
       <div className="what-if-saved-panel-header">
         <div className="what-if-saved-panel-title">
           <span className="what-if-saved-panel-icon" aria-hidden="true">
-            <FontAwesomeIcon icon={AppIcons.bookmark} fixedWidth />
+            <FontAwesomeIcon icon={AppIcons.assumptions} fixedWidth />
           </span>
           {!collapsed && (
             <div>
