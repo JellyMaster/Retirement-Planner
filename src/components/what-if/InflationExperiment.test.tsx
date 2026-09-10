@@ -41,7 +41,7 @@ describe("InflationExperiment", () => {
     expect(
       screen.getByRole("slider", { name: "Experimental annual inflation" }),
     ).toHaveValue("0.02");
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeDisabled();
   });
 
   it("reports the decimal inflation rate expected by the projection", () => {
@@ -79,7 +79,7 @@ describe("InflationExperiment", () => {
     expect(screen.getByText("Pension in today’s money")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Reset experiment" }));
-    await user.click(screen.getByRole("button", { name: "Save as scenario" }));
+    await user.click(screen.getByRole("button", { name: "Save experiment" }));
 
     expect(onReset).toHaveBeenCalledOnce();
     expect(onSave).toHaveBeenCalledOnce();
