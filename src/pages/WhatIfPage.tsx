@@ -221,6 +221,35 @@ function WhatIfWorkspace({
     retirementGoals,
   ]);
 
+  const retirementAgeBaselineIncome =
+    baselineRetirementOutcome?.sustainableNetSpending ?? baselineHealth?.estimatedAnnualIncome ?? 0;
+  const retirementAgeIncome =
+    alternativeRetirementOutcome?.sustainableNetSpending ?? alternativeHealth?.estimatedAnnualIncome ?? 0;
+  const retirementAgeBaselinePreparedness = coveragePercent(
+    retirementAgeBaselineIncome,
+    baselineDrawdown.desiredAnnualIncome,
+  );
+  const retirementAgePreparedness = coveragePercent(
+    retirementAgeIncome,
+    alternativeDrawdown.desiredAnnualIncome,
+  );
+  const insightBaselineIncome =
+    activeExperiment === "retirement-age"
+      ? retirementAgeBaselineIncome
+      : baselineHealth?.estimatedAnnualIncome ?? 0;
+  const insightIncome =
+    activeExperiment === "retirement-age"
+      ? retirementAgeIncome
+      : alternativeHealth?.estimatedAnnualIncome ?? 0;
+  const insightBaselinePreparedness =
+    activeExperiment === "retirement-age"
+      ? retirementAgeBaselinePreparedness
+      : baselineHealth?.score ?? 0;
+  const insightPreparedness =
+    activeExperiment === "retirement-age"
+      ? retirementAgePreparedness
+      : alternativeHealth?.score ?? 0;
+
   const planningAge = baselineDrawdown.planningAge;
   const yearsToRetirement = Math.max(
     0,
@@ -554,10 +583,10 @@ function WhatIfWorkspace({
               planningAge={planningAge}
               baselineProjectedPension={baselineScenario.projection.finalBalance.real}
               projectedPension={alternativeScenario.projection.finalBalance.real}
-              baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
-              annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
-              baselinePreparedness={baselineHealth?.score ?? 0}
-              preparedness={alternativeHealth?.score ?? 0}
+              baselineAnnualIncome={retirementAgeBaselineIncome}
+              annualIncome={retirementAgeIncome}
+              baselinePreparedness={retirementAgeBaselinePreparedness}
+              preparedness={retirementAgePreparedness}
               canSave={canSaveExperiment}
               saveMessage={saveMessage}
               savedExperiments={savedForActiveExperiment.map((scenario) => ({
@@ -738,10 +767,10 @@ function WhatIfWorkspace({
         activeExperiment={activeExperiment}
         baselineProjectedPension={baselineScenario.projection.finalBalance.real}
         projectedPension={alternativeScenario.projection.finalBalance.real}
-        baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
-        annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
-        baselinePreparedness={baselineHealth?.score ?? 0}
-        preparedness={alternativeHealth?.score ?? 0}
+        baselineAnnualIncome={insightBaselineIncome}
+        annualIncome={insightIncome}
+        baselinePreparedness={insightBaselinePreparedness}
+        preparedness={insightPreparedness}
         baselineRetirementOutcome={baselineRetirementOutcome}
         retirementOutcome={alternativeRetirementOutcome}
         currentAge={activeScenario.inputs.currentAge}
@@ -772,6 +801,11 @@ function WhatIfWorkspace({
       )}
     </main>
   );
+}
+
+function coveragePercent(income: number, target: number): number {
+  if (target <= 0) return 100;
+  return Math.max(0, Math.min(100, Math.round((income / target) * 100)));
 }
 
 function formatExperimentName(experiment: ExperimentId): string {
