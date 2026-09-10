@@ -12,6 +12,63 @@
   min-width: 250px;
 }
 
+.what-if-slider-experiment-marker {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  width: 3px;
+  height: 1.45rem;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--colour-primary);
+  box-shadow: 0 0 0 2px var(--colour-surface);
+  pointer-events: none;
+}
+
+.what-if-slider-experiment-marker::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.55rem;
+  height: 0.55rem;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--colour-surface);
+  border-radius: 50%;
+  background: var(--colour-primary);
+  content: "";
+}
+
+.what-if-slider-experiment-marker.is-current {
+  width: 4px;
+  height: 1.7rem;
+}
+
+.what-if-slider-experiment-marker.is-current::after {
+  width: 0.72rem;
+  height: 0.72rem;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--colour-primary) 18%, transparent);
+}
+
+.what-if-slider-marker-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.15rem 0 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.4;
+}
+
+.what-if-slider-marker-key-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border: 2px solid var(--colour-surface);
+  border-radius: 50%;
+  background: var(--colour-primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--colour-primary) 45%, transparent);
+}
+
 .what-if-simple-outcome-copy {
   order: 2;
   display: grid;
