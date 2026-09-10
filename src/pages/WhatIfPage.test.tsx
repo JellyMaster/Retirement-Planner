@@ -169,7 +169,7 @@ describe("WhatIfPage", () => {
       screen.getByRole("heading", { name: "Retire at 63" }),
     ).toBeInTheDocument();
     expect(screen.getByText(/You could retire 2 years earlier/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeEnabled();
     expect(setHasUnsavedExperiment).toHaveBeenCalledWith(true);
   });
 
@@ -240,7 +240,7 @@ describe("WhatIfPage", () => {
         monthlyEmployerContribution: 300,
       }),
     );
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeEnabled();
   });
 
   it("allows the scheduled extra contribution start age to change", async () => {
@@ -265,7 +265,7 @@ describe("WhatIfPage", () => {
     );
     expect(ageSlider).toHaveAttribute("aria-valuetext", "Starts at age 52");
     expect(screen.getByText("Start age: 52")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeEnabled();
   });
 
   it("can exclude the scheduled extra contribution", async () => {
@@ -326,7 +326,7 @@ describe("WhatIfPage", () => {
       }),
       { target: { value: "52" } },
     );
-    await user.click(screen.getByRole("button", { name: "Save as scenario" }));
+    await user.click(screen.getByRole("button", { name: "Save experiment" }));
 
     const dialog = screen.getByRole("dialog", { name: "Keep this What If result" });
     expect(dialog).toBeInTheDocument();
