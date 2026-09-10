@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { StatePensionExperiment } from "./StatePensionExperiment";
+import { setWhatIfViewMode } from "./whatIfDisplaySettings";
 
 function renderExperiment(
   overrides: Partial<React.ComponentProps<typeof StatePensionExperiment>> = {},
@@ -34,6 +35,10 @@ function renderExperiment(
 }
 
 describe("StatePensionExperiment", () => {
+  beforeEach(() => {
+    setWhatIfViewMode("simple");
+  });
+
   it("shows the saved amount and start age", () => {
     renderExperiment();
 
@@ -77,6 +82,23 @@ describe("StatePensionExperiment", () => {
     expect(onStartAgeChange).toHaveBeenCalledWith(68);
   });
 
+  it("hides amount and start-age controls when State Pension is excluded", () => {
+    renderExperiment({ included: false });
+
+    expect(
+      screen.queryByRole("slider", {
+        name: "Experimental annual State Pension amount",
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("slider", {
+        name: "Experimental State Pension start age",
+      }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("Not included")).toBeInTheDocument();
+    expect(screen.getByText(/No State Pension income is counted/i)).toBeInTheDocument();
+  });
+
   it("explains exclusion and enables reset and save", async () => {
     const user = userEvent.setup();
     const onReset = vi.fn();
@@ -89,15 +111,28 @@ describe("StatePensionExperiment", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Removing State Pension increases reliance on the private pension",
+        name: "Without State Pension, more income needs to come from elsewhere",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Not included")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Without State Pension in this experiment/i),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Reset experiment" }));
     await user.click(screen.getByRole("button", { name: "Save experiment" }));
 
     expect(onReset).toHaveBeenCalledOnce();
     expect(onSave).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the fuller financial comparison for Detailed view", () => {
+    setWhatIfViewMode("detailed");
+    renderExperiment({ included: false });
+
+    expect(
+      screen.getByRole("heading", { name: "How State Pension changes the income picture" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Target coverage")).toBeInTheDocument();
+    expect(screen.getByText("Private income still required")).toBeInTheDocument();
   });
 });
