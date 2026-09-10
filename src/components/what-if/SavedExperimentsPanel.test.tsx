@@ -37,7 +37,7 @@ describe("SavedExperimentsPanel", () => {
         scenarios={[scenario]}
         loadedScenarioId={null}
         onLoad={onLoad}
-        onPromote={vi.fn()}
+        onUnload={vi.fn()}
         onDelete={vi.fn()}
       />,
     );
@@ -47,6 +47,58 @@ describe("SavedExperimentsPanel", () => {
 
     await user.click(screen.getByRole("button", { name: "Load Retire at 67" }));
     expect(onLoad).toHaveBeenCalledWith(scenario);
+  });
+
+  it("unloads a loaded experiment without deleting it", async () => {
+    const user = userEvent.setup();
+    const scenario = createScenario("retire-67", "Retire at 67");
+    const onUnload = vi.fn();
+    const onDelete = vi.fn();
+
+    render(
+      <SavedExperimentsPanel
+        activeExperiment="retirement-age"
+        activePlanName="Standard Plan"
+        scenarios={[scenario]}
+        loadedScenarioId={scenario.id}
+        onLoad={vi.fn()}
+        onUnload={onUnload}
+        onDelete={onDelete}
+      />,
+    );
+
+    expect(screen.getByText("Loaded")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Unload" }));
+
+    expect(onUnload).toHaveBeenCalledOnce();
+    expect(onDelete).not.toHaveBeenCalled();
+  });
+
+  it("keeps delete behind the experiment management menu", async () => {
+    const user = userEvent.setup();
+    const scenario = createScenario("retire-67", "Retire at 67");
+    const onDelete = vi.fn();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    render(
+      <SavedExperimentsPanel
+        activeExperiment="retirement-age"
+        activePlanName="Standard Plan"
+        scenarios={[scenario]}
+        loadedScenarioId={null}
+        onLoad={vi.fn()}
+        onUnload={vi.fn()}
+        onDelete={onDelete}
+      />,
+    );
+
+    expect(screen.queryByRole("menuitem", { name: "Delete experiment" })).not.toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "More actions for Retire at 67" }),
+    );
+    await user.click(screen.getByRole("menuitem", { name: "Delete experiment" }));
+
+    expect(onDelete).toHaveBeenCalledWith("retire-67");
   });
 
   it("collapses and expands the saved experiment rail", async () => {
@@ -59,7 +111,7 @@ describe("SavedExperimentsPanel", () => {
         scenarios={[]}
         loadedScenarioId={null}
         onLoad={vi.fn()}
-        onPromote={vi.fn()}
+        onUnload={vi.fn()}
         onDelete={vi.fn()}
       />,
     );
