@@ -153,14 +153,13 @@ export function ExperimentInsights({
         </article>
       )}
 
-      {baselineRetirementOutcome && retirementOutcome && (
+      {viewMode === "detailed" && baselineRetirementOutcome && retirementOutcome && (
         <RetirementImpactDetails
           baseline={baselineRetirementOutcome}
           outcome={retirementOutcome}
           activeExperiment={activeExperiment}
           retirementAge={retirementAge}
           statePensionAge={statePensionAge}
-          detailed={viewMode === "detailed"}
         />
       )}
     </section>
@@ -368,14 +367,12 @@ function RetirementImpactDetails({
   activeExperiment,
   retirementAge,
   statePensionAge,
-  detailed,
 }: {
   baseline: RetirementSpendingOutcome;
   outcome: RetirementSpendingOutcome;
   activeExperiment: ExperimentId;
   retirementAge: number;
   statePensionAge: number;
-  detailed: boolean;
 }) {
   const sustainableDifference =
     outcome.sustainableNetSpending - baseline.sustainableNetSpending;
@@ -385,8 +382,8 @@ function RetirementImpactDetails({
   const statePensionGap = Math.max(0, statePensionAge - retirementAge);
 
   return (
-    <details className="what-if-details" open={detailed}>
-      <summary>Retirement impact details</summary>
+    <section className="what-if-details" aria-labelledby="retirement-impact-details-title">
+      <h3 id="retirement-impact-details-title">Retirement impact details</h3>
       <p>
         These use the same drawdown assumptions and ending-balance goal as your active plan.
       </p>
@@ -453,7 +450,7 @@ function RetirementImpactDetails({
           supporting="Based on your current planning horizon and ending-balance goal."
         />
       </div>
-    </details>
+    </section>
   );
 }
 
