@@ -37,16 +37,21 @@ describe("ExperimentInsights", () => {
     expect(screen.getByText("£725,000")).toBeInTheDocument();
     expect(screen.getByText("£29,000/year")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "More flexibility" })).toBeInTheDocument();
-    expect(screen.getByText("+£25,000")).toBeInTheDocument();
-    expect(screen.getByText("+£1,000/year")).toBeInTheDocument();
+    expect(screen.getByText(/\+£25,000/)).toBeInTheDocument();
+    expect(screen.getByText(/\+£1,000\/year/)).toBeInTheDocument();
   });
 
-  it("shows the saved-plan state before an experiment changes", () => {
+  it("shows the no-change state before an experiment changes", () => {
     renderInsights({ hasChanged: false, projectedPension: 700_000, annualIncome: 28_000 });
 
-    expect(screen.getByRole("heading", { name: "Your saved plan" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("No change yet");
     expect(
       screen.getByText("Move an experiment control to compare it with the saved plan."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Move the experiment control to see how it affects your pension and retirement income.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -74,6 +79,6 @@ describe("ExperimentInsights", () => {
 
     renderInsights({ baselineRetirementOutcome: baseline, retirementOutcome: outcome });
 
-    expect(screen.getByText("See retirement impact details")).toBeInTheDocument();
+    expect(screen.getByText("Retirement impact details")).toBeInTheDocument();
   });
 });
