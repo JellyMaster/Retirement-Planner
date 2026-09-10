@@ -5,7 +5,12 @@ import { AppIcons } from "../../icons";
 import "../../styles/what-if-view-modes.css";
 import { formatCurrency } from "../../utils/formatters";
 import { useWhatIfDisplaySettings } from "./whatIfDisplaySettings";
-import { useWhatIfScenarios } from "./useWhatIfScenarios";
+
+interface SavedRetirementAgeExperiment {
+  id: string;
+  name: string;
+  retirementAge: number;
+}
 
 interface RetirementAgeExperimentProps {
   activePlanName: string;
@@ -22,6 +27,7 @@ interface RetirementAgeExperimentProps {
   preparedness: number;
   canSave: boolean;
   saveMessage: string | null;
+  savedExperiments?: SavedRetirementAgeExperiment[];
   onRetirementAgeChange: (age: number) => void;
   onReset: () => void;
   onSave: () => void;
@@ -42,12 +48,12 @@ export function RetirementAgeExperiment({
   preparedness,
   canSave,
   saveMessage,
+  savedExperiments = [],
   onRetirementAgeChange,
   onReset,
   onSave,
 }: RetirementAgeExperimentProps) {
   const { activeScenario } = useScenarios();
-  const { scenarios: savedWhatIfScenarios } = useWhatIfScenarios();
   const { viewMode, displayMode } = useWhatIfDisplaySettings();
   const ageDifference = retirementAge - baselineRetirementAge;
   const retirementYearsDifference = baselineRetirementAge - retirementAge;
@@ -59,19 +65,17 @@ export function RetirementAgeExperiment({
     0,
     Math.min(100, ((baselineRetirementAge - minAge) / ageRange) * 100),
   );
-  const savedRetirementAgeMarkers = savedWhatIfScenarios
+  const savedRetirementAgeMarkers = savedExperiments
     .filter(
       (scenario) =>
-        scenario.baseScenarioId === activeScenario.id &&
-        scenario.experimentType === "retirement-age" &&
-        scenario.inputs.retirementAge >= minAge &&
-        scenario.inputs.retirementAge <= maxAge,
+        scenario.retirementAge >= minAge &&
+        scenario.retirementAge <= maxAge,
     )
     .map((scenario) => ({
       id: scenario.id,
       name: scenario.name,
-      age: scenario.inputs.retirementAge,
-      position: ((scenario.inputs.retirementAge - minAge) / ageRange) * 100,
+      age: scenario.retirementAge,
+      position: ((scenario.retirementAge - minAge) / ageRange) * 100,
     }))
     .sort((left, right) => left.age - right.age);
   const immediateRetirement = retirementAge === currentAge;
