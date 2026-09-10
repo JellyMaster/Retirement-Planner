@@ -13,6 +13,7 @@ import { InflationExperiment } from "../components/what-if/InflationExperiment";
 import { MarketDownturnExperiment } from "../components/what-if/MarketDownturnExperiment";
 import { RetirementAgeExperiment } from "../components/what-if/RetirementAgeExperiment";
 import { ReturnExperiment } from "../components/what-if/ReturnExperiment";
+import { SaveWhatIfScenarioModal } from "../components/what-if/SaveWhatIfScenarioModal";
 import { SpendingExperiment } from "../components/what-if/SpendingExperiment";
 import { StatePensionExperiment } from "../components/what-if/StatePensionExperiment";
 import { useWhatIfScenarios } from "../components/what-if/WhatIfScenarioContext";
@@ -91,6 +92,7 @@ function WhatIfWorkspace({
     useState<ScenarioDrawdownPreferences>(() => ({ ...baselineDrawdown }));
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [loadedWhatIfScenarioId, setLoadedWhatIfScenarioId] = useState<string | null>(null);
+  const [saveDialogSuggestedName, setSaveDialogSuggestedName] = useState<string | null>(null);
 
   const savedForActivePlan = useMemo(
     () => savedWhatIfScenarios.filter((scenario) => scenario.baseScenarioId === activeScenario.id),
@@ -402,20 +404,23 @@ function WhatIfWorkspace({
     setAlternativeDrawdown({ ...baselineDrawdown });
     setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
+    setSaveDialogSuggestedName(null);
   }
 
-  function saveExperiment() {
-    if (alternativeScenario.hasErrors) return;
-    const suggestedName = createSuggestedName(
-      activeExperiment,
-      alternativeInputs,
-      alternativeDrawdown,
-      alternativeStateIncluded,
-      alternativeStateAge,
+  function openSaveExperiment() {
+    if (alternativeScenario.hasErrors || !experimentHasChanged) return;
+    setSaveDialogSuggestedName(
+      createSuggestedName(
+        activeExperiment,
+        alternativeInputs,
+        alternativeDrawdown,
+        alternativeStateIncluded,
+        alternativeStateAge,
+      ),
     );
-    const name = window.prompt("Name this What If scenario", suggestedName)?.trim();
-    if (!name) return;
+  }
 
+  function confirmSaveExperiment(name: string) {
     const saved = saveWhatIfScenario({
       name,
       baseScenarioId: activeScenario.id,
@@ -424,7 +429,8 @@ function WhatIfWorkspace({
       drawdown: { ...alternativeDrawdown },
     });
     setLoadedWhatIfScenarioId(saved.id);
-    setSaveMessage(`${name} has been saved against ${activeScenario.name}.`);
+    setSaveDialogSuggestedName(null);
+    setSaveMessage(`${name} saved to ${activeScenario.name}.`);
   }
 
   function loadSavedExperiment(scenario: WhatIfScenario) {
@@ -432,6 +438,7 @@ function WhatIfWorkspace({
     setAlternativeInputs({ ...scenario.inputs });
     setAlternativeDrawdown({ ...scenario.drawdown });
     setLoadedWhatIfScenarioId(scenario.id);
+    setSaveDialogSuggestedName(null);
     setSaveMessage(`${scenario.name} loaded.`);
   }
 
@@ -555,7 +562,7 @@ function WhatIfWorkspace({
           saveMessage={saveMessage}
           onRetirementAgeChange={changeRetirementAge}
           onReset={resetExperiment}
-          onSave={saveExperiment}
+          onSave={openSaveExperiment}
         />
       )}
 
@@ -587,7 +594,7 @@ function WhatIfWorkspace({
           onExtraContributionChange={changeExtraContribution}
           onExtraContributionAgeChange={changeExtraContributionAge}
           onReset={resetExperiment}
-          onSave={saveExperiment}
+          onSave={openSaveExperiment}
         />
       )}
 
@@ -604,7 +611,7 @@ function WhatIfWorkspace({
           saveMessage={saveMessage}
           onTargetIncomeChange={changeTargetIncome}
           onReset={resetExperiment}
-          onSave={saveExperiment}
+          onSave={openSaveExperiment}
         />
       )}
 
@@ -626,7 +633,7 @@ function WhatIfWorkspace({
           saveMessage={saveMessage}
           onFeeChange={changeAnnualFee}
           onReset={resetExperiment}
-          onSave={saveExperiment}
+          onSave={openSaveExperiment}
         />
       )}
 
@@ -648,7 +655,7 @@ function WhatIfWorkspace({
           saveMessage={saveMessage}
           onReturnChange={changeAnnualReturn}
           onReset={resetExperiment}
-          onSave={saveExperiment}
+          onSave={openSaveExperiment}
         />
       )}
 
@@ -670,7 +677,7 @@ function WhatIfWorkspace({
           saveMessage={saveMessage}
           onInflationChange={changeInflation}
           onReset={resetExperiment}
-          onSave={saveExperiment}
+          onSave={openSaveExperiment}
         />
       )}
 
@@ -693,7 +700,7 @@ function WhatIfWorkspace({
           onAnnualAmountChange={changeStateAmount}
           onStartAgeChange={changeStateAge}
           onReset={resetExperiment}
-          onSave={saveExperiment}
+          onSave={openSaveExperiment}
         />
       )}
 
@@ -716,7 +723,7 @@ function WhatIfWorkspace({
           onAgeChange={changeDownturnAge}
           onPercentageChange={changeDownturnPercentage}
           onReset={resetExperiment}
-          onSave={saveExperiment}
+          onSave={openSaveExperiment}
         />
       )}
 
@@ -738,11 +745,21 @@ function WhatIfWorkspace({
         hasChanged={experimentHasChanged}
         onSelectExperiment={selectExperiment}
       />
+
+      {saveDialogSuggestedName !== null && (
+        <SaveWhatIfScenarioModal
+          suggestedName={saveDialogSuggestedName}
+          experimentName={formatExperimentName(activeExperiment)}
+          basePlanName={activeScenario.name}
+          onCancel={() => setSaveDialogSuggestedName(null)}
+          onSave={confirmSaveExperiment}
+        />
+      )}
     </main>
   );
 }
 
-function formatExperimentName(experiment: WhatIfScenario["experimentType"]): string {
+function formatExperimentName(experiment: ExperimentId): string {
   switch (experiment) {
     case "retirement-age": return "Retirement age";
     case "contributions": return "Save more";
