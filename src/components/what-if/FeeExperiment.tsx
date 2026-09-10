@@ -126,31 +126,10 @@ export function FeeExperiment({
         </div>
 
         <div className="what-if-outcome-grid">
-          <OutcomeCard
-            label="Total fees before retirement"
-            baseline={formatCurrency(baselineTotalFees)}
-            experiment={formatCurrency(totalFees)}
-            difference={formatSignedCurrency(totalFeeDifference)}
-            lowerIsBetter
-          />
-          <OutcomeCard
-            label="Projected pension"
-            baseline={formatCurrency(baselineProjectedPension)}
-            experiment={formatCurrency(projectedPension)}
-            difference={formatSignedCurrency(pensionDifference)}
-          />
-          <OutcomeCard
-            label="Illustrated annual income"
-            baseline={`${formatCurrency(baselineAnnualIncome)}/year`}
-            experiment={`${formatCurrency(annualIncome)}/year`}
-            difference={`${formatSignedCurrency(incomeDifference)}/year`}
-          />
-          <OutcomeCard
-            label="Target coverage"
-            baseline={`${baselinePreparedness}%`}
-            experiment={`${preparedness}%`}
-            difference={formatSignedPercentage(preparednessDifference)}
-          />
+          <OutcomeCard label="Total fees before retirement" baseline={formatCurrency(baselineTotalFees)} experiment={formatCurrency(totalFees)} difference={formatSignedCurrency(totalFeeDifference)} lowerIsBetter />
+          <OutcomeCard label="Projected pension" baseline={formatCurrency(baselineProjectedPension)} experiment={formatCurrency(projectedPension)} difference={formatSignedCurrency(pensionDifference)} />
+          <OutcomeCard label="Illustrated annual income" baseline={`${formatCurrency(baselineAnnualIncome)}/year`} experiment={`${formatCurrency(annualIncome)}/year`} difference={`${formatSignedCurrency(incomeDifference)}/year`} />
+          <OutcomeCard label="Target coverage" baseline={`${baselinePreparedness}%`} experiment={`${preparedness}%`} difference={formatSignedPercentage(preparednessDifference)} />
         </div>
       </section>
 
@@ -179,11 +158,11 @@ export function FeeExperiment({
       <footer className="what-if-toolbar">
         <div>
           <strong>{hasChanged ? "This experiment is temporary" : "Move the slider to begin"}</strong>
-          <span>{hasChanged ? "Save it as a scenario only when the outcome is worth keeping." : "Your saved plan has not been changed."}</span>
+          <span>{hasChanged ? "Save this experiment when the outcome is worth keeping." : "Your saved plan has not been changed."}</span>
         </div>
         <div className="what-if-toolbar-actions">
           <button type="button" className="ui-button ui-button-secondary ui-button-medium" disabled={!hasChanged} onClick={onReset}>Reset experiment</button>
-          <button type="button" className="ui-button ui-button-primary ui-button-medium" disabled={!hasChanged || !canSave} onClick={onSave}>Save as scenario</button>
+          <button type="button" className="ui-button ui-button-primary ui-button-medium" disabled={!hasChanged || !canSave} onClick={onSave}>Save experiment</button>
         </div>
       </footer>
 
