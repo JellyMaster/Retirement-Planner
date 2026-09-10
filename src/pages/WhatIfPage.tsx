@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { calculateRetirementHealth } from "../components/goals/calculateRetirementHealth";
 import { useScenarios } from "../components/scenarios";
 import { ContributionExperiment } from "../components/what-if/ContributionExperiment";
+import { CreatePlanFromExperiment } from "../components/what-if/CreatePlanFromExperiment";
 import {
   ExperimentLauncher,
   type ExperimentId,
@@ -103,6 +104,17 @@ function WhatIfWorkspace({
           scenario.experimentType === activeExperiment,
       ),
     [activeExperiment, activeScenario.id, savedWhatIfScenarios],
+  );
+  const loadedWhatIfScenario = useMemo(
+    () =>
+      loadedWhatIfScenarioId
+        ? savedWhatIfScenarios.find(
+            (scenario) =>
+              scenario.id === loadedWhatIfScenarioId &&
+              scenario.baseScenarioId === activeScenario.id,
+          ) ?? null
+        : null,
+    [activeScenario.id, loadedWhatIfScenarioId, savedWhatIfScenarios],
   );
 
   const alternativeStateIncluded =
@@ -413,6 +425,11 @@ function WhatIfWorkspace({
     setSaveDialogSuggestedName(null);
   }
 
+  function unloadSavedExperiment() {
+    resetExperiment();
+    setSaveMessage(`Returned to ${activeScenario.name}. The saved experiment is still available.`);
+  }
+
   function openSaveExperiment() {
     if (alternativeScenario.hasErrors || !experimentHasChanged) return;
     setSaveDialogSuggestedName(
@@ -448,10 +465,19 @@ function WhatIfWorkspace({
     setSaveMessage(`${scenario.name} loaded.`);
   }
 
-  function promoteSavedExperiment(scenario: WhatIfScenario) {
-    const plan = createScenario(scenario.name, scenario.baseScenarioId);
+  function deleteSavedExperiment(scenarioId: string) {
+    const deletingLoaded = scenarioId === loadedWhatIfScenarioId;
+    deleteWhatIfScenario(scenarioId);
+    if (deletingLoaded) {
+      resetExperiment();
+      setSaveMessage(`Experiment deleted. Returned to ${activeScenario.name}.`);
+    }
+  }
+
+  function createPlanFromExperiment(name: string, scenario: WhatIfScenario) {
+    const plan = createScenario(name, scenario.baseScenarioId);
     updateScenarioPlan(plan.id, { ...scenario.inputs }, { ...scenario.drawdown });
-    setSaveMessage(`${scenario.name} has been added to My Plans and is ready to compare.`);
+    setSaveMessage(`${name} has been added to My Plans and is ready to compare.`);
   }
 
   return (
@@ -462,7 +488,7 @@ function WhatIfWorkspace({
           <h1>What would happen if you changed one decision?</h1>
           <p>
             Explore one meaningful lever at a time. Save useful experiments against a plan,
-            then promote only the alternatives you want to keep as full plans.
+            then turn the alternatives you want to keep into full plans.
           </p>
         </div>
         <div className="what-if-header-mark" aria-hidden="true">
@@ -491,8 +517,8 @@ function WhatIfWorkspace({
           scenarios={savedForActiveExperiment}
           loadedScenarioId={loadedWhatIfScenarioId}
           onLoad={loadSavedExperiment}
-          onPromote={promoteSavedExperiment}
-          onDelete={deleteWhatIfScenario}
+          onUnload={unloadSavedExperiment}
+          onDelete={deleteSavedExperiment}
         />
 
         <div className="what-if-experiment-stage-main">
@@ -698,6 +724,12 @@ function WhatIfWorkspace({
         downturnAge={downturnAge}
         hasChanged={experimentHasChanged}
         onSelectExperiment={selectExperiment}
+      />
+
+      <CreatePlanFromExperiment
+        activePlanName={activeScenario.name}
+        scenario={loadedWhatIfScenario}
+        onCreate={createPlanFromExperiment}
       />
 
       {saveDialogSuggestedName !== null && (
