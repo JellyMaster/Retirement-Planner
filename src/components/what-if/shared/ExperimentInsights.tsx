@@ -14,9 +14,9 @@ interface ExperimentInsightsProps {
   baselineRetirementOutcome?: RetirementSpendingOutcome | null;
   retirementOutcome?: RetirementSpendingOutcome | null;
   currentAge: number;
-  baselineRetirementAge: number;
+  baselineRetirementAge?: number;
   retirementAge: number;
-  planningAge: number;
+  planningAge?: number;
   statePensionAge: number;
   extraContributionAge?: number;
   downturnAge?: number;
@@ -149,18 +149,18 @@ function SimpleRetirementAgeSummary({
   statePensionAge,
   hasChanged,
 }: {
-  baselineRetirementAge: number;
+  baselineRetirementAge?: number;
   retirementAge: number;
   baselineAnnualIncome: number;
   annualIncome: number;
   targetIncome: number;
-  planningAge: number;
+  planningAge?: number;
   statePensionAge: number;
   hasChanged: boolean;
 }) {
   const displayedIncome = hasChanged ? annualIncome : baselineAnnualIncome;
   const targetDifference = displayedIncome - targetIncome;
-  const ageDifference = retirementAge - baselineRetirementAge;
+  const ageDifference = baselineRetirementAge === undefined ? null : retirementAge - baselineRetirementAge;
   const statePensionGap = Math.max(0, statePensionAge - retirementAge);
   const targetSupported = targetDifference >= -0.5;
 
@@ -175,7 +175,9 @@ function SimpleRetirementAgeSummary({
           <p>
             {hasChanged
               ? createRetirementAgeComparison(ageDifference, baselineRetirementAge)
-              : `Your saved plan is to retire at age ${baselineRetirementAge}.`}
+              : baselineRetirementAge === undefined
+                ? "You are currently looking at your saved retirement plan."
+                : `Your saved plan is to retire at age ${baselineRetirementAge}.`}
           </p>
         </div>
       </header>
@@ -218,16 +220,16 @@ function SimpleRetirementAgeSummary({
           <p>
             {createSimpleRetirementExplanation(
               retirementAge,
-              baselineRetirementAge,
+              ageDifference,
               statePensionGap,
               statePensionAge,
               targetSupported,
             )}
           </p>
         </article>
-      ) : (
+      ) : planningAge !== undefined ? (
         <p className="what-if-simple-horizon">Your plan is modelled through to age {planningAge}.</p>
-      )}
+      ) : null}
 
       <div className={`what-if-simple-outlook ${targetSupported ? "is-positive" : "is-negative"}`}>
         <strong>{targetSupported ? "Your chosen income looks supported" : "Your chosen income needs attention"}</strong>
@@ -236,7 +238,7 @@ function SimpleRetirementAgeSummary({
             ? `Under the current assumptions, your estimated retirement income is at least your ${formatCurrency(targetIncome)}/year target.`
             : `Under the current assumptions, your estimated retirement income is ${formatCurrency(Math.abs(targetDifference))}/year below your target.`}
         </span>
-        <small>Plan tested through to age {planningAge}.</small>
+        {planningAge !== undefined && <small>Plan tested through to age {planningAge}.</small>}
       </div>
 
       <p className="what-if-simple-detail-hint">
@@ -400,7 +402,10 @@ function DetailCard({
   );
 }
 
-function createRetirementAgeComparison(ageDifference: number, baselineRetirementAge: number): string {
+function createRetirementAgeComparison(ageDifference: number | null, baselineRetirementAge?: number): string {
+  if (ageDifference === null || baselineRetirementAge === undefined) {
+    return "You are comparing this retirement age with your saved plan.";
+  }
   if (ageDifference === 0) return `Your saved plan is to retire at age ${baselineRetirementAge}.`;
   const years = Math.abs(ageDifference);
   const direction = ageDifference < 0 ? "earlier" : "later";
@@ -409,17 +414,18 @@ function createRetirementAgeComparison(ageDifference: number, baselineRetirement
 
 function createSimpleRetirementExplanation(
   retirementAge: number,
-  baselineRetirementAge: number,
+  ageDifference: number | null,
   statePensionGap: number,
   statePensionAge: number,
   targetSupported: boolean,
 ): string {
-  const ageDifference = retirementAge - baselineRetirementAge;
-  const timingExplanation = ageDifference < 0
-    ? `Retiring at ${retirementAge} gives your pension less time to grow and means it needs to support you for longer.`
-    : ageDifference > 0
-      ? `Retiring at ${retirementAge} gives your pension more time to grow and means it needs to support fewer retirement years.`
-      : "This matches your saved retirement age.";
+  const timingExplanation = ageDifference === null
+    ? `Retiring at ${retirementAge} changes how long your pension has to grow and how long it may need to support you.`
+    : ageDifference < 0
+      ? `Retiring at ${retirementAge} gives your pension less time to grow and means it needs to support you for longer.`
+      : ageDifference > 0
+        ? `Retiring at ${retirementAge} gives your pension more time to grow and means it needs to support fewer retirement years.`
+        : "This matches your saved retirement age.";
   const pensionExplanation = statePensionGap > 0
     ? ` You would also need to fund ${statePensionGap} ${statePensionGap === 1 ? "year" : "years"} of retirement before State Pension starts at age ${statePensionAge}.`
     : " State Pension is available from the start of retirement under your current assumptions.";
