@@ -192,10 +192,9 @@
 
 .what-if-simple-intro span,
 .what-if-simple-impact-card small,
-.what-if-simple-outlook span,
-.what-if-simple-outlook small,
-.what-if-simple-detail-hint,
-.what-if-simple-horizon {
+.what-if-simple-horizon,
+.what-if-simple-detail-action small,
+.what-if-simple-meaning small {
   color: var(--colour-text-muted);
   line-height: 1.45;
 }
@@ -260,38 +259,63 @@
   font-size: clamp(1.2rem, 2vw, 1.45rem);
 }
 
-.what-if-simple-meaning > p:last-child {
+.what-if-simple-meaning > p:last-of-type {
   margin: 0;
   max-width: 70rem;
   color: var(--colour-text-muted);
   line-height: 1.55;
 }
 
-.what-if-simple-outlook {
-  display: grid;
-  gap: 0.35rem;
-  padding: var(--space-3) var(--space-4);
-  border-left: 3px solid var(--colour-border);
-  background: color-mix(in srgb, var(--colour-surface-secondary) 70%, transparent);
+.what-if-simple-meaning > small {
+  display: block;
+  margin-top: var(--space-1);
 }
 
-.what-if-simple-outlook.is-positive {
-  border-left-color: var(--colour-positive, #16845b);
-}
-
-.what-if-simple-outlook.is-negative {
-  border-left-color: var(--colour-negative, #c2414b);
-}
-
-.what-if-simple-horizon,
-.what-if-simple-detail-hint {
+.what-if-simple-horizon {
   margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
 }
 
-.what-if-simple-detail-hint {
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--colour-border);
-  font-size: var(--ui-font-size-sm);
+.what-if-simple-detail-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.what-if-simple-detail-action:hover {
+  border-color: color-mix(in srgb, var(--colour-primary) 45%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-primary) 5%, var(--colour-surface-secondary));
+}
+
+.what-if-simple-detail-action:focus-visible {
+  outline: 2px solid var(--colour-primary);
+  outline-offset: 2px;
+}
+
+.what-if-simple-detail-action > span:first-child {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.what-if-simple-detail-action > span:last-child {
+  color: var(--colour-text-muted);
+  font-size: 1.6rem;
+  line-height: 1;
 }
 
 @media (max-width: 1100px) {
@@ -320,5 +344,9 @@
 
   .what-if-simple-impact-grid {
     grid-template-columns: 1fr;
+  }
+
+  .what-if-simple-detail-action {
+    align-items: flex-start;
   }
 }
