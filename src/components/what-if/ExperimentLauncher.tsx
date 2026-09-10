@@ -220,6 +220,7 @@ function ExperimentLauncherContent({
                       role="tab"
                       className={`what-if-experiment-tab${isActive ? " is-active" : ""}`}
                       aria-selected={isActive}
+                      aria-label={experiment.title}
                       title={experiment.description}
                       disabled={!experiment.available}
                       onClick={() => onSelect(experiment.id)}
@@ -232,7 +233,7 @@ function ExperimentLauncherContent({
                         )}
                       </span>
                       <span>{experiment.title}</span>
-                      {isActive && <small>Exploring</small>}
+                      {isActive && <small aria-hidden="true">Exploring</small>}
                     </button>
                   );
                 })}
