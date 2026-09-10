@@ -132,6 +132,7 @@ export function SaveWhatIfScenarioModal({
             <input
               ref={inputRef}
               id="what-if-save-name"
+              aria-label="Name"
               value={name}
               maxLength={80}
               autoComplete="off"
