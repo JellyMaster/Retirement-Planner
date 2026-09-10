@@ -255,7 +255,7 @@ export function RetirementAgeExperiment({
               disabled={!hasChanged || !canSave}
               onClick={onSave}
             >
-              Save as scenario
+              Save experiment
             </button>
           </div>
         </section>
