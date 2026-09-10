@@ -5,6 +5,7 @@ import { AppIcons } from "../../icons";
 import "../../styles/what-if-view-modes.css";
 import { formatCurrency } from "../../utils/formatters";
 import { useWhatIfDisplaySettings } from "./whatIfDisplaySettings";
+import { useWhatIfScenarios } from "./useWhatIfScenarios";
 
 interface RetirementAgeExperimentProps {
   activePlanName: string;
@@ -46,6 +47,7 @@ export function RetirementAgeExperiment({
   onSave,
 }: RetirementAgeExperimentProps) {
   const { activeScenario } = useScenarios();
+  const { scenarios: savedWhatIfScenarios } = useWhatIfScenarios();
   const { viewMode, displayMode } = useWhatIfDisplaySettings();
   const ageDifference = retirementAge - baselineRetirementAge;
   const retirementYearsDifference = baselineRetirementAge - retirementAge;
@@ -57,6 +59,21 @@ export function RetirementAgeExperiment({
     0,
     Math.min(100, ((baselineRetirementAge - minAge) / ageRange) * 100),
   );
+  const savedRetirementAgeMarkers = savedWhatIfScenarios
+    .filter(
+      (scenario) =>
+        scenario.baseScenarioId === activeScenario.id &&
+        scenario.experimentType === "retirement-age" &&
+        scenario.inputs.retirementAge >= minAge &&
+        scenario.inputs.retirementAge <= maxAge,
+    )
+    .map((scenario) => ({
+      id: scenario.id,
+      name: scenario.name,
+      age: scenario.inputs.retirementAge,
+      position: ((scenario.inputs.retirementAge - minAge) / ageRange) * 100,
+    }))
+    .sort((left, right) => left.age - right.age);
   const immediateRetirement = retirementAge === currentAge;
   const inflation = activeScenario.inputs.inflation;
   const baselineInflationFactor = Math.pow(
@@ -145,6 +162,17 @@ export function RetirementAgeExperiment({
                 aria-valuetext={`Age ${retirementAge}`}
                 onChange={(event) => onRetirementAgeChange(Number(event.target.value))}
               />
+              {savedRetirementAgeMarkers.map((marker) => (
+                <span
+                  key={marker.id}
+                  className={`what-if-slider-experiment-marker${
+                    marker.age === retirementAge ? " is-current" : ""
+                  }`}
+                  style={{ left: `${marker.position}%` }}
+                  title={`${marker.name} · Retire at age ${marker.age}`}
+                  aria-hidden="true"
+                />
+              ))}
               <span
                 className="what-if-slider-reference-marker"
                 style={{ left: `${baselinePosition}%` }}
@@ -161,6 +189,14 @@ export function RetirementAgeExperiment({
               </span>
               <span>Age {maxAge}</span>
             </div>
+            {savedRetirementAgeMarkers.length > 0 && (
+              <p className="what-if-slider-marker-key">
+                <span className="what-if-slider-marker-key-dot" aria-hidden="true" />
+                {savedRetirementAgeMarkers.length === 1
+                  ? "1 saved experiment is marked on the slider"
+                  : `${savedRetirementAgeMarkers.length} saved experiments are marked on the slider`}
+              </p>
+            )}
           </div>
 
           <p className="what-if-control-note">
@@ -559,7 +595,7 @@ function createReasons(
     return [
       "More employee and employer contributions enter the pension.",
       "The pension has longer to benefit from compound growth.",
-      "The retirement-income plan needs to cover fewer years.",
+      "The retirement-income plan needs to cover fewer retirement years.",
     ];
   }
 
