@@ -190,6 +190,135 @@
   font-size: var(--ui-font-size-xs);
 }
 
+.what-if-save-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, #000 55%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.what-if-save-modal {
+  width: min(34rem, 100%);
+  overflow: hidden;
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.28);
+}
+
+.what-if-save-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  border-bottom: 1px solid var(--colour-border);
+}
+
+.what-if-save-header h2 {
+  margin: 0;
+}
+
+.what-if-save-header p:last-child {
+  margin-bottom: 0;
+  color: var(--colour-text-muted);
+}
+
+.what-if-save-close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--colour-text-muted);
+  font: inherit;
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+.what-if-save-close:hover,
+.what-if-save-close:focus-visible {
+  background: var(--colour-background, var(--colour-surface));
+  color: var(--colour-text);
+}
+
+.what-if-save-context {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+.what-if-save-context > div {
+  display: grid;
+  gap: 0.2rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-background, var(--colour-surface));
+}
+
+.what-if-save-context span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 700;
+}
+
+.what-if-save-context strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.what-if-save-form {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.what-if-save-form label {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.what-if-save-form label > span {
+  font-weight: 800;
+}
+
+.what-if-save-form input {
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-background, var(--colour-surface));
+  color: var(--colour-text);
+  font: inherit;
+}
+
+.what-if-save-form input:focus {
+  border-color: var(--colour-primary);
+  outline: 2px solid color-mix(in srgb, var(--colour-primary) 35%, transparent);
+  outline-offset: 1px;
+}
+
+.what-if-save-form small {
+  color: var(--colour-text-muted);
+}
+
+.what-if-save-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
 @media (max-width: 800px) {
   .what-if-active-plan-context {
     align-items: flex-start;
@@ -225,5 +354,18 @@
   .what-if-saved-scenario-actions {
     justify-content: flex-end;
     padding: 0 var(--space-2) var(--space-2);
+  }
+
+  .what-if-save-backdrop {
+    padding: var(--space-2);
+  }
+
+  .what-if-save-context {
+    grid-template-columns: 1fr;
+  }
+
+  .what-if-save-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }
