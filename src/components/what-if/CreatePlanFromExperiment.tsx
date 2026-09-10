@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef } from "react";
 
 import type { WhatIfScenario } from "../../domain/what-if/WhatIfScenario";
 
@@ -13,8 +13,7 @@ export function CreatePlanFromExperiment({
   scenario,
   onCreate,
 }: CreatePlanFromExperimentProps) {
-  const [name, setName] = useState(scenario?.name ?? "");
-  const canCreate = scenario !== null && name.trim().length > 0;
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <section className="what-if-create-plan" aria-labelledby="what-if-create-plan-title">
@@ -42,10 +41,12 @@ export function CreatePlanFromExperiment({
           <label className="what-if-create-plan-name">
             <span>New plan name</span>
             <input
+              key={scenario.id}
+              ref={nameInputRef}
               type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
+              defaultValue={scenario.name}
               aria-label="New plan name"
+              required
             />
             <small>This creates a new plan. Your existing plan stays untouched.</small>
           </label>
@@ -53,10 +54,13 @@ export function CreatePlanFromExperiment({
           <button
             type="button"
             className="ui-button ui-button-primary ui-button-medium"
-            disabled={!canCreate}
             onClick={() => {
-              if (!scenario) return;
-              onCreate(name.trim(), scenario);
+              const name = nameInputRef.current?.value.trim() ?? "";
+              if (!name) {
+                nameInputRef.current?.focus();
+                return;
+              }
+              onCreate(name, scenario);
             }}
           >
             Create new plan
