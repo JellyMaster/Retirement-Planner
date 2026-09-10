@@ -729,7 +729,9 @@ function WhatIfWorkspace({
         baselineRetirementOutcome={baselineRetirementOutcome}
         retirementOutcome={alternativeRetirementOutcome}
         currentAge={activeScenario.inputs.currentAge}
+        baselineRetirementAge={activeScenario.inputs.retirementAge}
         retirementAge={alternativeInputs.retirementAge}
+        planningAge={planningAge}
         statePensionAge={alternativeStateAge}
         extraContributionAge={alternativeInputs.extraContributionAge}
         downturnAge={downturnAge}
