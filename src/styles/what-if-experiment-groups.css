@@ -1,0 +1,98 @@
+.what-if-experiment-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.what-if-experiment-group {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--colour-surface-secondary) 72%, transparent);
+}
+
+.what-if-experiment-group-heading {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.what-if-experiment-group-heading > strong {
+  font-size: var(--ui-font-size-sm);
+}
+
+.what-if-experiment-group-heading > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.4;
+}
+
+.what-if-experiment-group .what-if-experiment-nav {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+  overflow: visible;
+  padding: 0;
+}
+
+.what-if-experiment-group .what-if-experiment-tab {
+  width: 100%;
+  min-height: 2.8rem;
+  justify-content: flex-start;
+  border-radius: var(--radius-md);
+  padding-inline: var(--space-2);
+}
+
+.what-if-experiment-tab-icon {
+  display: grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--colour-text-muted) 9%, transparent);
+}
+
+.what-if-experiment-tab.is-active .what-if-experiment-tab-icon {
+  background: var(--colour-primary);
+  color: var(--colour-surface);
+}
+
+.what-if-experiment-group .what-if-experiment-tab small {
+  margin-left: auto;
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--colour-primary) 12%, transparent);
+  color: var(--colour-primary);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.what-if-experiment-group .what-if-experiment-tab.is-active {
+  box-shadow: inset 3px 0 0 var(--colour-primary);
+}
+
+@media (max-width: 1000px) {
+  .what-if-experiment-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .what-if-experiment-group .what-if-experiment-nav {
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .what-if-experiment-group {
+    padding: var(--space-2);
+  }
+
+  .what-if-experiment-group .what-if-experiment-nav {
+    grid-template-columns: 1fr;
+  }
+}
