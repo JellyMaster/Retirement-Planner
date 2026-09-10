@@ -1,31 +1,26 @@
-.what-if-scenario-bar {
+.what-if-plan-context {
   display: grid;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--colour-border);
   border-radius: var(--radius-lg);
   background: var(--colour-surface);
 }
 
-.what-if-active-plan-context {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.what-if-active-plan-context > div {
+.what-if-plan-context > div {
   min-width: 0;
 }
 
-.what-if-active-plan-context h2 {
+.what-if-plan-context h2,
+.what-if-plan-context p {
   margin: 0;
 }
 
-.what-if-active-plan-context p:last-child {
-  margin-bottom: 0;
-  max-width: 62ch;
+.what-if-plan-context > p {
   color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-sm);
 }
 
 .what-if-active-plan-badge {
@@ -38,64 +33,174 @@
   font-weight: 800;
 }
 
-.what-if-saved-scenarios {
+.what-if-experiment-stage {
   display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: var(--space-3);
+}
+
+.what-if-experiment-stage-main {
+  min-width: 0;
+}
+
+.what-if-experiment-stage-main > .what-if-workspace {
+  height: 100%;
+}
+
+.what-if-saved-panel {
+  width: clamp(16rem, 19vw, 20rem);
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface);
+  transition: width 180ms ease, padding 180ms ease;
+}
+
+.what-if-saved-panel.is-collapsed {
+  width: 4.25rem;
+  align-items: center;
+  padding-inline: var(--space-2);
+}
+
+.what-if-saved-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-2);
+}
+
+.what-if-saved-panel.is-collapsed .what-if-saved-panel-header {
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.what-if-saved-panel-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.what-if-saved-panel-title > div {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.what-if-saved-panel-title strong {
+  font-size: var(--ui-font-size-sm);
+}
+
+.what-if-saved-panel-title span:last-child {
+  overflow: hidden;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.what-if-saved-panel-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--colour-primary) 10%, var(--colour-surface-secondary));
+  color: var(--colour-primary);
+}
+
+.what-if-saved-panel-collapse {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.1rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--colour-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--colour-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.what-if-saved-panel-collapse:hover,
+.what-if-saved-panel-collapse:focus-visible {
+  border-color: color-mix(in srgb, var(--colour-primary) 45%, var(--colour-border));
+  color: var(--colour-text);
+}
+
+.what-if-saved-panel-count {
+  display: grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding-inline: 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--colour-primary) 12%, transparent);
+  color: var(--colour-primary);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 850;
+}
+
+.what-if-saved-panel.is-collapsed .what-if-saved-panel-collapse {
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  padding: 0.35rem;
+}
+
+.what-if-saved-panel-copy,
+.what-if-saved-panel-note {
+  margin: 0;
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1.45;
+}
+
+.what-if-saved-panel-note {
+  margin-top: auto;
   padding-top: var(--space-3);
   border-top: 1px solid var(--colour-border);
 }
 
-.what-if-saved-scenarios-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.what-if-saved-scenarios-heading > div {
+.what-if-saved-panel-list {
   display: grid;
-  gap: 0.2rem;
-}
-
-.what-if-saved-scenarios-heading > div > span,
-.what-if-saved-scenarios-heading > span {
-  color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-xs);
-}
-
-.what-if-saved-scenario-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
   gap: var(--space-2);
 }
 
-.what-if-saved-scenario {
-  display: flex;
-  align-items: stretch;
-  justify-content: space-between;
+.what-if-saved-panel-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   min-width: 0;
   border: 1px solid var(--colour-border);
   border-radius: var(--radius-md);
   background: var(--colour-background, var(--colour-surface));
   overflow: hidden;
-  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
 }
 
-.what-if-saved-scenario:hover {
-  border-color: color-mix(in srgb, var(--colour-primary) 35%, var(--colour-border));
+.what-if-saved-panel-card:hover {
+  border-color: color-mix(in srgb, var(--colour-primary) 38%, var(--colour-border));
 }
 
-.what-if-saved-scenario.is-active {
+.what-if-saved-panel-card.is-loaded {
   border-color: var(--colour-primary);
-  box-shadow: 0 0 0 1px var(--colour-primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--colour-primary) 65%, transparent);
 }
 
-.what-if-saved-scenario-main {
+.what-if-saved-panel-card-main {
   display: grid;
-  flex: 1;
-  gap: 0.25rem;
+  gap: 0.22rem;
   min-width: 0;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
   border: 0;
   background: transparent;
   color: inherit;
@@ -103,89 +208,77 @@
   cursor: pointer;
 }
 
-.what-if-saved-scenario-main:focus-visible {
-  outline: 2px solid var(--colour-primary);
-  outline-offset: -2px;
-}
-
-.what-if-saved-scenario-main strong,
-.what-if-saved-scenario-main > span {
+.what-if-saved-panel-card-main strong,
+.what-if-saved-panel-card-main span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.what-if-saved-scenario-main > span {
+.what-if-saved-panel-card-main span {
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
 }
 
-.what-if-saved-scenario-title-row {
+.what-if-saved-panel-card-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
-  min-width: 0;
+  gap: 0.15rem;
+  padding-right: var(--space-1);
 }
 
-.what-if-saved-scenario-title-row strong {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.what-if-saved-scenario-loaded {
-  flex: 0 0 auto;
-  padding: 0.12rem 0.42rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--colour-primary) 12%, transparent);
-  color: var(--colour-primary);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.what-if-saved-scenario-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-1) var(--space-1) 0;
-}
-
-.what-if-saved-scenario-delete {
+.what-if-saved-panel-more,
+.what-if-saved-panel-delete {
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
+  width: 1.9rem;
+  height: 1.9rem;
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--colour-text-muted);
-  font-size: 1.2rem;
+  font: inherit;
   cursor: pointer;
 }
 
-.what-if-saved-scenario-delete:hover,
-.what-if-saved-scenario-delete:focus-visible {
-  background: var(--colour-surface);
+.what-if-saved-panel-more:hover,
+.what-if-saved-panel-more:focus-visible,
+.what-if-saved-panel-delete:hover,
+.what-if-saved-panel-delete:focus-visible {
+  background: var(--colour-surface-secondary);
+  color: var(--colour-text);
+}
+
+.what-if-saved-panel-delete:hover,
+.what-if-saved-panel-delete:focus-visible {
   color: var(--colour-negative, #c2414b);
 }
 
-.what-if-saved-scenarios-empty {
+.what-if-saved-panel-loaded {
+  position: absolute;
+  right: var(--space-2);
+  bottom: 0.2rem;
+  color: var(--colour-primary);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.what-if-saved-panel-empty {
   display: grid;
   gap: 0.25rem;
   padding: var(--space-3);
   border: 1px dashed var(--colour-border);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--colour-surface) 80%, transparent);
+  background: color-mix(in srgb, var(--colour-surface-secondary) 72%, transparent);
 }
 
-.what-if-saved-scenarios-empty strong {
+.what-if-saved-panel-empty strong {
   font-size: var(--ui-font-size-sm);
 }
 
-.what-if-saved-scenarios-empty span {
+.what-if-saved-panel-empty span {
   color: var(--colour-text-muted);
   font-size: var(--ui-font-size-xs);
 }
@@ -319,41 +412,44 @@
   gap: var(--space-2);
 }
 
-@media (max-width: 800px) {
-  .what-if-active-plan-context {
-    align-items: flex-start;
-  }
-
-  .what-if-saved-scenarios-heading {
-    display: grid;
-    align-items: start;
-  }
-
-  .what-if-saved-scenario-list {
+@media (max-width: 1120px) {
+  .what-if-experiment-stage {
     grid-template-columns: 1fr;
+  }
+
+  .what-if-saved-panel,
+  .what-if-saved-panel.is-collapsed {
+    width: 100%;
+  }
+
+  .what-if-saved-panel.is-collapsed {
+    align-items: stretch;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .what-if-saved-panel.is-collapsed .what-if-saved-panel-header {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 800px) {
+  .what-if-plan-context {
+    grid-template-columns: 1fr auto;
+  }
+
+  .what-if-plan-context > p {
+    grid-column: 1 / -1;
   }
 }
 
 @media (max-width: 560px) {
-  .what-if-scenario-bar {
+  .what-if-plan-context {
+    grid-template-columns: 1fr;
     padding: var(--space-3);
-  }
-
-  .what-if-active-plan-context {
-    display: grid;
   }
 
   .what-if-active-plan-badge {
     width: fit-content;
-  }
-
-  .what-if-saved-scenario {
-    display: grid;
-  }
-
-  .what-if-saved-scenario-actions {
-    justify-content: flex-end;
-    padding: 0 var(--space-2) var(--space-2);
   }
 
   .what-if-save-backdrop {
