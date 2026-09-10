@@ -4,6 +4,7 @@ import { useInRouterContext, useSearchParams } from "react-router-dom";
 
 import { AppIcons } from "../../icons";
 import "../../styles/what-if-v1-3.css";
+import "../../styles/what-if-experiment-groups.css";
 import { InfoTooltip } from "../ui";
 import {
   setWhatIfMoneyDisplayMode,
