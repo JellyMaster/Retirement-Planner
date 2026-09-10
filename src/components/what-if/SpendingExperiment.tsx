@@ -167,11 +167,11 @@ export function SpendingExperiment({
       <footer className="what-if-toolbar">
         <div>
           <strong>{hasChanged ? "This experiment is temporary" : "Move the slider to begin"}</strong>
-          <span>{hasChanged ? "Save it as a scenario only when the lifestyle target is worth keeping." : "Your saved plan has not been changed."}</span>
+          <span>{hasChanged ? "Save this experiment when the lifestyle target is worth keeping." : "Your saved plan has not been changed."}</span>
         </div>
         <div className="what-if-toolbar-actions">
           <button type="button" className="ui-button ui-button-secondary ui-button-medium" disabled={!hasChanged} onClick={onReset}>Reset experiment</button>
-          <button type="button" className="ui-button ui-button-primary ui-button-medium" disabled={!hasChanged || !canSave} onClick={onSave}>Save as scenario</button>
+          <button type="button" className="ui-button ui-button-primary ui-button-medium" disabled={!hasChanged || !canSave} onClick={onSave}>Save experiment</button>
         </div>
       </footer>
 
