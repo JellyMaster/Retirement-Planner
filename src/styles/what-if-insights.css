@@ -177,6 +177,129 @@
   font-size: 1.08rem;
 }
 
+.what-if-insights-simple {
+  gap: var(--space-4);
+}
+
+.what-if-simple-intro {
+  display: grid;
+  gap: 0.35rem;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--colour-primary) 25%, var(--colour-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--colour-primary) 6%, var(--colour-surface-secondary));
+}
+
+.what-if-simple-intro span,
+.what-if-simple-impact-card small,
+.what-if-simple-outlook span,
+.what-if-simple-outlook small,
+.what-if-simple-detail-hint,
+.what-if-simple-horizon {
+  color: var(--colour-text-muted);
+  line-height: 1.45;
+}
+
+.what-if-simple-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.what-if-simple-impact-card {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-md);
+  background: var(--colour-surface-secondary);
+}
+
+.what-if-simple-impact-card > span {
+  color: var(--colour-text-muted);
+  font-size: var(--ui-font-size-xs);
+  font-weight: 800;
+}
+
+.what-if-simple-impact-card > strong {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  line-height: 1.15;
+}
+
+.what-if-simple-impact-card.is-positive > strong {
+  color: var(--colour-positive, #16845b);
+}
+
+.what-if-simple-impact-card.is-negative > strong {
+  color: var(--colour-negative, #c2414b);
+}
+
+.what-if-simple-meaning {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--colour-border);
+  border-radius: var(--radius-lg);
+  background: var(--colour-surface-secondary);
+}
+
+.what-if-simple-meaning.is-positive {
+  border-color: color-mix(in srgb, var(--colour-positive, #16845b) 34%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-positive, #16845b) 6%, var(--colour-surface));
+}
+
+.what-if-simple-meaning.is-negative {
+  border-color: color-mix(in srgb, var(--colour-warning, #a66b00) 38%, var(--colour-border));
+  background: color-mix(in srgb, var(--colour-warning, #a66b00) 7%, var(--colour-surface));
+}
+
+.what-if-simple-meaning h3 {
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+}
+
+.what-if-simple-meaning > p:last-child {
+  margin: 0;
+  max-width: 70rem;
+  color: var(--colour-text-muted);
+  line-height: 1.55;
+}
+
+.what-if-simple-outlook {
+  display: grid;
+  gap: 0.35rem;
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--colour-border);
+  background: color-mix(in srgb, var(--colour-surface-secondary) 70%, transparent);
+}
+
+.what-if-simple-outlook.is-positive {
+  border-left-color: var(--colour-positive, #16845b);
+}
+
+.what-if-simple-outlook.is-negative {
+  border-left-color: var(--colour-negative, #c2414b);
+}
+
+.what-if-simple-horizon,
+.what-if-simple-detail-hint {
+  margin: 0;
+}
+
+.what-if-simple-detail-hint {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--colour-border);
+  font-size: var(--ui-font-size-sm);
+}
+
+@media (max-width: 1100px) {
+  .what-if-simple-impact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 800px) {
   .what-if-insights-header,
   .what-if-verdict {
@@ -193,5 +316,9 @@
 @media (max-width: 560px) {
   .what-if-insights {
     padding: var(--space-4);
+  }
+
+  .what-if-simple-impact-grid {
+    grid-template-columns: 1fr;
   }
 }
