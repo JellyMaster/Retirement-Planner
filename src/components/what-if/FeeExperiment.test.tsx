@@ -39,7 +39,7 @@ describe("FeeExperiment", () => {
     expect(
       screen.getByRole("slider", { name: "Experimental annual pension fee" }),
     ).toHaveValue("0.0027");
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeDisabled();
   });
 
   it("reports a lower fee using the decimal rate expected by the projection", () => {
@@ -84,7 +84,7 @@ describe("FeeExperiment", () => {
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Reset experiment" }));
-    await user.click(screen.getByRole("button", { name: "Save as scenario" }));
+    await user.click(screen.getByRole("button", { name: "Save experiment" }));
 
     expect(onReset).toHaveBeenCalledOnce();
     expect(onSave).toHaveBeenCalledOnce();
