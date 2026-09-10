@@ -59,6 +59,10 @@ export function ExperimentInsights({
   const targetIncome =
     retirementOutcome?.targetNetSpending ?? baselineRetirementOutcome?.targetNetSpending;
   const targetDifference = targetIncome === undefined ? null : annualIncome - targetIncome;
+  const includesStatePension =
+    retirementOutcome?.includesStatePension ??
+    baselineRetirementOutcome?.includesStatePension ??
+    true;
   const isSimpleRetirementAge =
     activeExperiment === "retirement-age" && viewMode === "simple";
   const showBaselineMetrics = hasChanged || viewMode === "detailed";
@@ -73,6 +77,7 @@ export function ExperimentInsights({
         targetIncome={targetIncome ?? 0}
         planningAge={planningAge}
         statePensionAge={statePensionAge}
+        statePensionIncluded={includesStatePension}
         hasChanged={hasChanged}
       />
     );
@@ -160,6 +165,7 @@ export function ExperimentInsights({
           activeExperiment={activeExperiment}
           retirementAge={retirementAge}
           statePensionAge={statePensionAge}
+          statePensionIncluded={includesStatePension}
         />
       )}
     </section>
@@ -174,6 +180,7 @@ function SimpleRetirementAgeSummary({
   targetIncome,
   planningAge,
   statePensionAge,
+  statePensionIncluded,
   hasChanged,
 }: {
   baselineRetirementAge?: number;
@@ -183,6 +190,7 @@ function SimpleRetirementAgeSummary({
   targetIncome: number;
   planningAge?: number;
   statePensionAge: number;
+  statePensionIncluded: boolean;
   hasChanged: boolean;
 }) {
   const displayedIncome = hasChanged ? annualIncome : baselineAnnualIncome;
@@ -249,16 +257,26 @@ function SimpleRetirementAgeSummary({
           tone={targetSupported ? "positive" : "negative"}
         />
         <SimpleImpactCard
-          label={statePensionGap > 0 ? "Until State Pension" : "State Pension"}
+          label={
+            !statePensionIncluded
+              ? "State Pension"
+              : statePensionGap > 0
+                ? "Until State Pension"
+                : "State Pension"
+          }
           value={
-            statePensionGap > 0
-              ? `${statePensionGap} ${statePensionGap === 1 ? "year" : "years"}`
-              : `From age ${statePensionAge}`
+            !statePensionIncluded
+              ? "Not included"
+              : statePensionGap > 0
+                ? `${statePensionGap} ${statePensionGap === 1 ? "year" : "years"}`
+                : `From age ${statePensionAge}`
           }
           note={
-            statePensionGap > 0
-              ? `State Pension starts at age ${statePensionAge}`
-              : "Available from retirement"
+            !statePensionIncluded
+              ? "Your retirement income is modelled without State Pension"
+              : statePensionGap > 0
+                ? `State Pension starts at age ${statePensionAge}`
+                : "Included in this retirement plan"
           }
         />
       </div>
@@ -281,6 +299,7 @@ function SimpleRetirementAgeSummary({
               ageDifference,
               statePensionGap,
               statePensionAge,
+              statePensionIncluded,
               targetSupported,
             )}
           </p>
@@ -367,12 +386,14 @@ function RetirementImpactDetails({
   activeExperiment,
   retirementAge,
   statePensionAge,
+  statePensionIncluded,
 }: {
   baseline: RetirementSpendingOutcome;
   outcome: RetirementSpendingOutcome;
   activeExperiment: ExperimentId;
   retirementAge: number;
   statePensionAge: number;
+  statePensionIncluded: boolean;
 }) {
   const sustainableDifference =
     outcome.sustainableNetSpending - baseline.sustainableNetSpending;
@@ -420,18 +441,20 @@ function RetirementImpactDetails({
         {activeExperiment === "retirement-age" && (
           <DetailCard
             label="State Pension timing"
-            value={`Starts at age ${statePensionAge}`}
+            value={statePensionIncluded ? `Starts at age ${statePensionAge}` : "Not included"}
             baseline="State Pension assumption"
             difference={
-              statePensionGap > 0
-                ? `${statePensionGap} ${
-                    statePensionGap === 1 ? "year" : "years"
-                  } before State Pension`
-                : "Available from retirement"
+              !statePensionIncluded
+                ? "Retirement income is modelled without State Pension"
+                : statePensionGap > 0
+                  ? `${statePensionGap} ${
+                      statePensionGap === 1 ? "year" : "years"
+                    } before State Pension`
+                  : "Available from retirement"
             }
             tone=""
             supporting={
-              statePensionGap > 0
+              statePensionIncluded && statePensionGap > 0
                 ? "Your private pension needs to bridge this period."
                 : undefined
             }
@@ -502,6 +525,7 @@ function createSimpleRetirementExplanation(
   ageDifference: number | null,
   statePensionGap: number,
   statePensionAge: number,
+  statePensionIncluded: boolean,
   targetSupported: boolean,
 ): string {
   const timingExplanation =
@@ -512,12 +536,13 @@ function createSimpleRetirementExplanation(
         : ageDifference > 0
           ? `Retiring at ${retirementAge} gives your pension more time to grow and means it needs to support fewer retirement years.`
           : "This matches your saved retirement age.";
-  const pensionExplanation =
-    statePensionGap > 0
+  const pensionExplanation = !statePensionIncluded
+    ? " State Pension is not included in this plan, so the retirement-income model does not count it."
+    : statePensionGap > 0
       ? ` You would also need to fund ${statePensionGap} ${
           statePensionGap === 1 ? "year" : "years"
         } of retirement before State Pension starts at age ${statePensionAge}.`
-      : " State Pension is available from the start of retirement under your current assumptions.";
+      : " State Pension is included from the start of retirement under your current assumptions.";
   const targetExplanation = targetSupported
     ? " Your estimated income remains at or above the amount you said you would like."
     : " Your estimated income falls below the amount you said you would like.";
