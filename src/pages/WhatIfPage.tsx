@@ -14,6 +14,7 @@ import { MarketDownturnExperiment } from "../components/what-if/MarketDownturnEx
 import { RetirementAgeExperiment } from "../components/what-if/RetirementAgeExperiment";
 import { ReturnExperiment } from "../components/what-if/ReturnExperiment";
 import { SaveWhatIfScenarioModal } from "../components/what-if/SaveWhatIfScenarioModal";
+import { SavedExperimentsPanel } from "../components/what-if/SavedExperimentsPanel";
 import { SpendingExperiment } from "../components/what-if/SpendingExperiment";
 import { StatePensionExperiment } from "../components/what-if/StatePensionExperiment";
 import { useWhatIfScenarios } from "../components/what-if/WhatIfScenarioContext";
@@ -94,9 +95,14 @@ function WhatIfWorkspace({
   const [loadedWhatIfScenarioId, setLoadedWhatIfScenarioId] = useState<string | null>(null);
   const [saveDialogSuggestedName, setSaveDialogSuggestedName] = useState<string | null>(null);
 
-  const savedForActivePlan = useMemo(
-    () => savedWhatIfScenarios.filter((scenario) => scenario.baseScenarioId === activeScenario.id),
-    [activeScenario.id, savedWhatIfScenarios],
+  const savedForActiveExperiment = useMemo(
+    () =>
+      savedWhatIfScenarios.filter(
+        (scenario) =>
+          scenario.baseScenarioId === activeScenario.id &&
+          scenario.experimentType === activeExperiment,
+      ),
+    [activeExperiment, activeScenario.id, savedWhatIfScenarios],
   );
 
   const alternativeStateIncluded =
@@ -464,79 +470,13 @@ function WhatIfWorkspace({
         </div>
       </header>
 
-      <section className="what-if-scenario-bar" aria-labelledby="what-if-base-plan-title">
-        <div className="what-if-active-plan-context">
-          <div>
-            <p className="planner-eyebrow">Experimenting with</p>
-            <h2 id="what-if-base-plan-title">{activeScenario.name}</h2>
-            <p>
-              What If always uses the active plan selected in the top navigation.
-            </p>
-          </div>
-          <span className="what-if-active-plan-badge">Active plan</span>
+      <section className="what-if-plan-context" aria-labelledby="what-if-base-plan-title">
+        <div>
+          <p className="planner-eyebrow">Experimenting with</p>
+          <h2 id="what-if-base-plan-title">{activeScenario.name}</h2>
         </div>
-
-        <div
-          className="what-if-saved-scenarios"
-          aria-label={`Saved What If scenarios for ${activeScenario.name}`}
-        >
-          <div className="what-if-saved-scenarios-heading">
-            <div>
-              <strong>Saved experiments</strong>
-              <span>Load an idea again or promote it when you want to keep it as a plan.</span>
-            </div>
-            <span>{savedForActivePlan.length} for {activeScenario.name}</span>
-          </div>
-
-          {savedForActivePlan.length > 0 ? (
-            <div className="what-if-saved-scenario-list">
-              {savedForActivePlan.map((scenario) => (
-                <article
-                  key={scenario.id}
-                  className={`what-if-saved-scenario${loadedWhatIfScenarioId === scenario.id ? " is-active" : ""}`}
-                >
-                  <button
-                    type="button"
-                    className="what-if-saved-scenario-main"
-                    aria-label={`Load ${scenario.name}`}
-                    onClick={() => loadSavedExperiment(scenario)}
-                  >
-                    <span className="what-if-saved-scenario-title-row">
-                      <strong>{scenario.name}</strong>
-                      {loadedWhatIfScenarioId === scenario.id && (
-                        <span className="what-if-saved-scenario-loaded">Loaded</span>
-                      )}
-                    </span>
-                    <span>{formatExperimentName(scenario.experimentType)}</span>
-                  </button>
-                  <div className="what-if-saved-scenario-actions">
-                    <button
-                      type="button"
-                      className="ui-button ui-button-secondary ui-button-small"
-                      title={`Add ${scenario.name} to My Plans`}
-                      onClick={() => promoteSavedExperiment(scenario)}
-                    >
-                      Use as plan
-                    </button>
-                    <button
-                      type="button"
-                      className="what-if-saved-scenario-delete"
-                      aria-label={`Delete ${scenario.name}`}
-                      onClick={() => deleteWhatIfScenario(scenario.id)}
-                    >
-                      ×
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="what-if-saved-scenarios-empty">
-              <strong>No saved experiments for this plan yet.</strong>
-              <span>Change one decision below, then save it if the result is worth revisiting.</span>
-            </div>
-          )}
-        </div>
+        <p>What If uses the active plan selected in the top navigation.</p>
+        <span className="what-if-active-plan-badge">Active plan</span>
       </section>
 
       <ExperimentLauncher
@@ -544,188 +484,202 @@ function WhatIfWorkspace({
         onSelect={selectExperiment}
       />
 
-      {activeExperiment === "retirement-age" && (
-        <RetirementAgeExperiment
+      <div className="what-if-experiment-stage">
+        <SavedExperimentsPanel
+          activeExperiment={activeExperiment}
           activePlanName={activeScenario.name}
-          currentAge={activeScenario.inputs.currentAge}
-          statePensionAge={baselineStateAge}
-          baselineRetirementAge={activeScenario.inputs.retirementAge}
-          retirementAge={alternativeInputs.retirementAge}
-          planningAge={planningAge}
-          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
-          projectedPension={alternativeScenario.projection.finalBalance.real}
-          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
-          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
-          baselinePreparedness={baselineHealth?.score ?? 0}
-          preparedness={alternativeHealth?.score ?? 0}
-          canSave={!alternativeScenario.hasErrors}
-          saveMessage={saveMessage}
-          onRetirementAgeChange={changeRetirementAge}
-          onReset={resetExperiment}
-          onSave={openSaveExperiment}
+          scenarios={savedForActiveExperiment}
+          loadedScenarioId={loadedWhatIfScenarioId}
+          onLoad={loadSavedExperiment}
+          onPromote={promoteSavedExperiment}
+          onDelete={deleteWhatIfScenario}
         />
-      )}
 
-      {activeExperiment === "contributions" && (
-        <ContributionExperiment
-          activePlanName={activeScenario.name}
-          currentAge={activeScenario.inputs.currentAge}
-          retirementAge={activeScenario.inputs.retirementAge}
-          baselineEmployeeContribution={activeScenario.inputs.monthlyEmployeeContribution}
-          employeeContribution={alternativeInputs.monthlyEmployeeContribution}
-          baselineEmployerContribution={activeScenario.inputs.monthlyEmployerContribution}
-          employerContribution={alternativeInputs.monthlyEmployerContribution}
-          baselineExtraContribution={baselineExtraContribution}
-          baselineExtraContributionAge={baselineExtraContributionAge}
-          extraContribution={alternativeInputs.extraMonthlyContribution ?? (baselineExtraContribution || 250)}
-          extraContributionAge={alternativeInputs.extraContributionAge ?? baselineExtraContributionAge}
-          includeExtraContribution={alternativeInputs.extraContributionAge !== undefined && alternativeInputs.extraMonthlyContribution !== undefined}
-          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
-          projectedPension={alternativeScenario.projection.finalBalance.real}
-          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
-          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
-          baselinePreparedness={baselineHealth?.score ?? 0}
-          preparedness={alternativeHealth?.score ?? 0}
-          canSave={!alternativeScenario.hasErrors}
-          saveMessage={saveMessage}
-          onEmployeeContributionChange={changeEmployeeContribution}
-          onEmployerContributionChange={changeEmployerContribution}
-          onExtraContributionEnabledChange={changeExtraContributionEnabled}
-          onExtraContributionChange={changeExtraContribution}
-          onExtraContributionAgeChange={changeExtraContributionAge}
-          onReset={resetExperiment}
-          onSave={openSaveExperiment}
-        />
-      )}
+        <div className="what-if-experiment-stage-main">
+          {activeExperiment === "retirement-age" && (
+            <RetirementAgeExperiment
+              activePlanName={activeScenario.name}
+              currentAge={activeScenario.inputs.currentAge}
+              statePensionAge={baselineStateAge}
+              baselineRetirementAge={activeScenario.inputs.retirementAge}
+              retirementAge={alternativeInputs.retirementAge}
+              planningAge={planningAge}
+              baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+              projectedPension={alternativeScenario.projection.finalBalance.real}
+              baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+              annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+              baselinePreparedness={baselineHealth?.score ?? 0}
+              preparedness={alternativeHealth?.score ?? 0}
+              canSave={!alternativeScenario.hasErrors}
+              saveMessage={saveMessage}
+              onRetirementAgeChange={changeRetirementAge}
+              onReset={resetExperiment}
+              onSave={openSaveExperiment}
+            />
+          )}
 
-      {activeExperiment === "spending" && (
-        <SpendingExperiment
-          activePlanName={activeScenario.name}
-          baselineTargetIncome={baselineDrawdown.desiredAnnualIncome}
-          targetIncome={alternativeDrawdown.desiredAnnualIncome}
-          incomeTargetMode={alternativeDrawdown.incomeTargetMode}
-          illustratedAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
-          baselineCoverage={baselineHealth?.score ?? 0}
-          coverage={alternativeHealth?.score ?? 0}
-          canSave={!alternativeScenario.hasErrors}
-          saveMessage={saveMessage}
-          onTargetIncomeChange={changeTargetIncome}
-          onReset={resetExperiment}
-          onSave={openSaveExperiment}
-        />
-      )}
+          {activeExperiment === "contributions" && (
+            <ContributionExperiment
+              activePlanName={activeScenario.name}
+              currentAge={activeScenario.inputs.currentAge}
+              retirementAge={activeScenario.inputs.retirementAge}
+              baselineEmployeeContribution={activeScenario.inputs.monthlyEmployeeContribution}
+              employeeContribution={alternativeInputs.monthlyEmployeeContribution}
+              baselineEmployerContribution={activeScenario.inputs.monthlyEmployerContribution}
+              employerContribution={alternativeInputs.monthlyEmployerContribution}
+              baselineExtraContribution={baselineExtraContribution}
+              baselineExtraContributionAge={baselineExtraContributionAge}
+              extraContribution={alternativeInputs.extraMonthlyContribution ?? (baselineExtraContribution || 250)}
+              extraContributionAge={alternativeInputs.extraContributionAge ?? baselineExtraContributionAge}
+              includeExtraContribution={alternativeInputs.extraContributionAge !== undefined && alternativeInputs.extraMonthlyContribution !== undefined}
+              baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+              projectedPension={alternativeScenario.projection.finalBalance.real}
+              baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+              annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+              baselinePreparedness={baselineHealth?.score ?? 0}
+              preparedness={alternativeHealth?.score ?? 0}
+              canSave={!alternativeScenario.hasErrors}
+              saveMessage={saveMessage}
+              onEmployeeContributionChange={changeEmployeeContribution}
+              onEmployerContributionChange={changeEmployerContribution}
+              onExtraContributionEnabledChange={changeExtraContributionEnabled}
+              onExtraContributionChange={changeExtraContribution}
+              onExtraContributionAgeChange={changeExtraContributionAge}
+              onReset={resetExperiment}
+              onSave={openSaveExperiment}
+            />
+          )}
 
-      {activeExperiment === "fees" && (
-        <FeeExperiment
-          activePlanName={activeScenario.name}
-          baselineFee={activeScenario.inputs.annualFee}
-          fee={alternativeInputs.annualFee}
-          yearsToRetirement={yearsToRetirement}
-          baselineTotalFees={baselineScenario.projection.totalFees.real}
-          totalFees={alternativeScenario.projection.totalFees.real}
-          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
-          projectedPension={alternativeScenario.projection.finalBalance.real}
-          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
-          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
-          baselinePreparedness={baselineHealth?.score ?? 0}
-          preparedness={alternativeHealth?.score ?? 0}
-          canSave={!alternativeScenario.hasErrors}
-          saveMessage={saveMessage}
-          onFeeChange={changeAnnualFee}
-          onReset={resetExperiment}
-          onSave={openSaveExperiment}
-        />
-      )}
+          {activeExperiment === "spending" && (
+            <SpendingExperiment
+              activePlanName={activeScenario.name}
+              baselineTargetIncome={baselineDrawdown.desiredAnnualIncome}
+              targetIncome={alternativeDrawdown.desiredAnnualIncome}
+              incomeTargetMode={alternativeDrawdown.incomeTargetMode}
+              illustratedAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+              baselineCoverage={baselineHealth?.score ?? 0}
+              coverage={alternativeHealth?.score ?? 0}
+              canSave={!alternativeScenario.hasErrors}
+              saveMessage={saveMessage}
+              onTargetIncomeChange={changeTargetIncome}
+              onReset={resetExperiment}
+              onSave={openSaveExperiment}
+            />
+          )}
 
-      {activeExperiment === "returns" && (
-        <ReturnExperiment
-          activePlanName={activeScenario.name}
-          baselineReturn={activeScenario.inputs.annualReturn}
-          annualReturn={alternativeInputs.annualReturn}
-          yearsToRetirement={yearsToRetirement}
-          baselineGrowth={baselineScenario.projection.totalInvestmentGrowth.real}
-          growth={alternativeScenario.projection.totalInvestmentGrowth.real}
-          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
-          projectedPension={alternativeScenario.projection.finalBalance.real}
-          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
-          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
-          baselinePreparedness={baselineHealth?.score ?? 0}
-          preparedness={alternativeHealth?.score ?? 0}
-          canSave={!alternativeScenario.hasErrors}
-          saveMessage={saveMessage}
-          onReturnChange={changeAnnualReturn}
-          onReset={resetExperiment}
-          onSave={openSaveExperiment}
-        />
-      )}
+          {activeExperiment === "fees" && (
+            <FeeExperiment
+              activePlanName={activeScenario.name}
+              baselineFee={activeScenario.inputs.annualFee}
+              fee={alternativeInputs.annualFee}
+              yearsToRetirement={yearsToRetirement}
+              baselineTotalFees={baselineScenario.projection.totalFees.real}
+              totalFees={alternativeScenario.projection.totalFees.real}
+              baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+              projectedPension={alternativeScenario.projection.finalBalance.real}
+              baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+              annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+              baselinePreparedness={baselineHealth?.score ?? 0}
+              preparedness={alternativeHealth?.score ?? 0}
+              canSave={!alternativeScenario.hasErrors}
+              saveMessage={saveMessage}
+              onFeeChange={changeAnnualFee}
+              onReset={resetExperiment}
+              onSave={openSaveExperiment}
+            />
+          )}
 
-      {activeExperiment === "inflation" && (
-        <InflationExperiment
-          activePlanName={activeScenario.name}
-          baselineInflation={activeScenario.inputs.inflation}
-          inflation={alternativeInputs.inflation}
-          yearsToRetirement={yearsToRetirement}
-          baselineNominalPension={baselineScenario.projection.finalBalance.nominal}
-          nominalPension={alternativeScenario.projection.finalBalance.nominal}
-          baselineRealPension={baselineScenario.projection.finalBalance.real}
-          realPension={alternativeScenario.projection.finalBalance.real}
-          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
-          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
-          baselinePreparedness={baselineHealth?.score ?? 0}
-          preparedness={alternativeHealth?.score ?? 0}
-          canSave={!alternativeScenario.hasErrors}
-          saveMessage={saveMessage}
-          onInflationChange={changeInflation}
-          onReset={resetExperiment}
-          onSave={openSaveExperiment}
-        />
-      )}
+          {activeExperiment === "returns" && (
+            <ReturnExperiment
+              activePlanName={activeScenario.name}
+              baselineReturn={activeScenario.inputs.annualReturn}
+              annualReturn={alternativeInputs.annualReturn}
+              yearsToRetirement={yearsToRetirement}
+              baselineGrowth={baselineScenario.projection.totalInvestmentGrowth.real}
+              growth={alternativeScenario.projection.totalInvestmentGrowth.real}
+              baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+              projectedPension={alternativeScenario.projection.finalBalance.real}
+              baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+              annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+              baselinePreparedness={baselineHealth?.score ?? 0}
+              preparedness={alternativeHealth?.score ?? 0}
+              canSave={!alternativeScenario.hasErrors}
+              saveMessage={saveMessage}
+              onReturnChange={changeAnnualReturn}
+              onReset={resetExperiment}
+              onSave={openSaveExperiment}
+            />
+          )}
 
-      {activeExperiment === "state-pension" && (
-        <StatePensionExperiment
-          activePlanName={activeScenario.name}
-          retirementAge={activeScenario.inputs.retirementAge}
-          planningAge={planningAge}
-          baselineIncluded={baselineStateIncluded}
-          included={alternativeStateIncluded}
-          baselineAnnualAmount={baselineStateAmount}
-          annualAmount={alternativeStateAmount}
-          baselineStartAge={baselineStateAge}
-          startAge={alternativeStateAge}
-          privateAnnualIncome={baselineHealth?.annualPrivateIncome ?? 0}
-          targetIncome={alternativeDrawdown.desiredAnnualIncome}
-          canSave={!alternativeScenario.hasErrors}
-          saveMessage={saveMessage}
-          onIncludedChange={changeStateIncluded}
-          onAnnualAmountChange={changeStateAmount}
-          onStartAgeChange={changeStateAge}
-          onReset={resetExperiment}
-          onSave={openSaveExperiment}
-        />
-      )}
+          {activeExperiment === "inflation" && (
+            <InflationExperiment
+              activePlanName={activeScenario.name}
+              baselineInflation={activeScenario.inputs.inflation}
+              inflation={alternativeInputs.inflation}
+              yearsToRetirement={yearsToRetirement}
+              baselineNominalPension={baselineScenario.projection.finalBalance.nominal}
+              nominalPension={alternativeScenario.projection.finalBalance.nominal}
+              baselineRealPension={baselineScenario.projection.finalBalance.real}
+              realPension={alternativeScenario.projection.finalBalance.real}
+              baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+              annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+              baselinePreparedness={baselineHealth?.score ?? 0}
+              preparedness={alternativeHealth?.score ?? 0}
+              canSave={!alternativeScenario.hasErrors}
+              saveMessage={saveMessage}
+              onInflationChange={changeInflation}
+              onReset={resetExperiment}
+              onSave={openSaveExperiment}
+            />
+          )}
 
-      {activeExperiment === "market-downturn" && (
-        <MarketDownturnExperiment
-          activePlanName={activeScenario.name}
-          currentAge={activeScenario.inputs.currentAge}
-          retirementAge={activeScenario.inputs.retirementAge}
-          downturnAge={downturnAge}
-          downturnPercentage={downturnPercentage}
-          balanceAtDownturn={balanceAtDownturn}
-          baselineProjectedPension={baselineScenario.projection.finalBalance.real}
-          projectedPension={alternativeScenario.projection.finalBalance.real}
-          baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
-          annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
-          baselinePreparedness={baselineHealth?.score ?? 0}
-          preparedness={alternativeHealth?.score ?? 0}
-          canSave={!alternativeScenario.hasErrors}
-          saveMessage={saveMessage}
-          onAgeChange={changeDownturnAge}
-          onPercentageChange={changeDownturnPercentage}
-          onReset={resetExperiment}
-          onSave={openSaveExperiment}
-        />
-      )}
+          {activeExperiment === "state-pension" && (
+            <StatePensionExperiment
+              activePlanName={activeScenario.name}
+              retirementAge={activeScenario.inputs.retirementAge}
+              planningAge={planningAge}
+              baselineIncluded={baselineStateIncluded}
+              included={alternativeStateIncluded}
+              baselineAnnualAmount={baselineStateAmount}
+              annualAmount={alternativeStateAmount}
+              baselineStartAge={baselineStateAge}
+              startAge={alternativeStateAge}
+              privateAnnualIncome={baselineHealth?.annualPrivateIncome ?? 0}
+              targetIncome={alternativeDrawdown.desiredAnnualIncome}
+              canSave={!alternativeScenario.hasErrors}
+              saveMessage={saveMessage}
+              onIncludedChange={changeStateIncluded}
+              onAnnualAmountChange={changeStateAmount}
+              onStartAgeChange={changeStateAge}
+              onReset={resetExperiment}
+              onSave={openSaveExperiment}
+            />
+          )}
+
+          {activeExperiment === "market-downturn" && (
+            <MarketDownturnExperiment
+              activePlanName={activeScenario.name}
+              currentAge={activeScenario.inputs.currentAge}
+              retirementAge={activeScenario.inputs.retirementAge}
+              downturnAge={downturnAge}
+              downturnPercentage={downturnPercentage}
+              balanceAtDownturn={balanceAtDownturn}
+              baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+              projectedPension={alternativeScenario.projection.finalBalance.real}
+              baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
+              annualIncome={alternativeHealth?.estimatedAnnualIncome ?? 0}
+              baselinePreparedness={baselineHealth?.score ?? 0}
+              preparedness={alternativeHealth?.score ?? 0}
+              canSave={!alternativeScenario.hasErrors}
+              saveMessage={saveMessage}
+              onAgeChange={changeDownturnAge}
+              onPercentageChange={changeDownturnPercentage}
+              onReset={resetExperiment}
+              onSave={openSaveExperiment}
+            />
+          )}
+        </div>
+      </div>
 
       <ExperimentInsights
         activeExperiment={activeExperiment}
