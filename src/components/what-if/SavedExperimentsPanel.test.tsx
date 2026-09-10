@@ -74,11 +74,10 @@ describe("SavedExperimentsPanel", () => {
     expect(onDelete).not.toHaveBeenCalled();
   });
 
-  it("keeps delete behind the experiment management menu", async () => {
+  it("keeps delete behind the experiment management menu and confirms in-app", async () => {
     const user = userEvent.setup();
     const scenario = createScenario("retire-67", "Retire at 67");
     const onDelete = vi.fn();
-    vi.spyOn(window, "confirm").mockReturnValue(true);
 
     render(
       <SavedExperimentsPanel
@@ -98,6 +97,10 @@ describe("SavedExperimentsPanel", () => {
     );
     await user.click(screen.getByRole("menuitem", { name: "Delete experiment" }));
 
+    expect(screen.getByText("Delete this saved experiment?")).toBeInTheDocument();
+    expect(onDelete).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("menuitem", { name: "Delete permanently" }));
     expect(onDelete).toHaveBeenCalledWith("retire-67");
   });
 
