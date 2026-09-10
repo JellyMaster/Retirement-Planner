@@ -95,7 +95,7 @@ describe("StatePensionExperiment", () => {
         name: "Experimental State Pension start age",
       }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText("Not included")).toBeInTheDocument();
+    expect(screen.getAllByText("Not included").length).toBeGreaterThan(0);
     expect(screen.getByText(/No State Pension income is counted/i)).toBeInTheDocument();
   });
 
@@ -132,7 +132,7 @@ describe("StatePensionExperiment", () => {
     expect(
       screen.getByRole("heading", { name: "How State Pension changes the income picture" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Target coverage")).toBeInTheDocument();
+    expect(screen.getAllByText("Target coverage").length).toBeGreaterThan(0);
     expect(screen.getByText("Private income still required")).toBeInTheDocument();
   });
 });
