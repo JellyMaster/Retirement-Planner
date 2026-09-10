@@ -1,6 +1,7 @@
 import type { RetirementSpendingOutcome } from "../../../engine/drawdown/createRetirementSpendingOutcome";
 import { formatCurrency } from "../../../utils/formatters";
 import type { ExperimentId } from "../ExperimentLauncher";
+import { useWhatIfDisplaySettings } from "../whatIfDisplaySettings";
 
 interface ExperimentInsightsProps {
   activeExperiment: ExperimentId;
@@ -40,11 +41,17 @@ export function ExperimentInsights({
   annualIncome,
   baselineRetirementOutcome,
   retirementOutcome,
+  retirementAge,
+  statePensionAge,
   hasChanged,
 }: ExperimentInsightsProps) {
+  const { viewMode } = useWhatIfDisplaySettings();
   const pensionDifference = projectedPension - baselineProjectedPension;
   const incomeDifference = annualIncome - baselineAnnualIncome;
   const outcome = getOutcomeVerdict(activeExperiment, pensionDifference, incomeDifference);
+  const targetIncome = retirementOutcome?.targetNetSpending ?? baselineRetirementOutcome?.targetNetSpending;
+  const targetDifference = targetIncome === undefined ? null : annualIncome - targetIncome;
+  const showBaselineMetrics = hasChanged || viewMode === "detailed";
 
   return (
     <section className="what-if-insights" aria-labelledby="decision-summary-title">
@@ -52,81 +59,91 @@ export function ExperimentInsights({
         <div>
           <p className="planner-eyebrow">Decision summary</p>
           <h2 id="decision-summary-title">{experimentQuestion[activeExperiment]}</h2>
-          <p>
-            {hasChanged
-              ? "See the main effect of this change compared with your saved plan."
-              : "Move an experiment control to compare it with the saved plan."}
-          </p>
+          <p>{createSummaryContext(activeExperiment, retirementAge, hasChanged)}</p>
         </div>
       </header>
 
-      <div className="what-if-before-after-grid">
-        <BeforeAfterCard
-          label="Pension at retirement"
-          before={formatCurrency(baselineProjectedPension)}
-          after={formatCurrency(projectedPension)}
-          difference={formatSignedCurrency(pensionDifference)}
-          tone={toneClass(pensionDifference)}
-        />
-        <BeforeAfterCard
-          label="Estimated retirement income"
-          before={`${formatCurrency(baselineAnnualIncome)}/year`}
-          after={`${formatCurrency(annualIncome)}/year`}
-          difference={`${formatSignedCurrency(incomeDifference)}/year`}
-          tone={toneClass(incomeDifference)}
-        />
-      </div>
-
-      <article className={`what-if-verdict ${outcome.className}`}>
-        <div>
-          <p className="planner-eyebrow">Overall effect</p>
-          <h3>{hasChanged ? outcome.label : "Your saved plan"}</h3>
+      {!showBaselineMetrics && (
+        <div className="what-if-no-change" role="status">
+          <strong>No change yet</strong>
+          <span>Move the experiment control to see how it affects your pension and retirement income.</span>
         </div>
-        <p>
-          {hasChanged
-            ? createExplanation(activeExperiment, pensionDifference, incomeDifference)
-            : "The figures above are your baseline. Change one control to see the effect."}
-        </p>
-      </article>
+      )}
+
+      {showBaselineMetrics && (
+        <div className="what-if-before-after-grid">
+          <OutcomeCard
+            label="Pension at retirement"
+            value={formatCurrency(projectedPension)}
+            baseline={formatCurrency(baselineProjectedPension)}
+            difference={hasChanged ? formatSignedCurrency(pensionDifference) : null}
+            percent={hasChanged ? formatPercentDifference(pensionDifference, baselineProjectedPension) : null}
+            tone={toneClass(pensionDifference)}
+          />
+          <OutcomeCard
+            label="Estimated retirement income"
+            value={`${formatCurrency(annualIncome)}/year`}
+            baseline={`${formatCurrency(baselineAnnualIncome)}/year`}
+            difference={hasChanged ? `${formatSignedCurrency(incomeDifference)}/year` : null}
+            percent={hasChanged ? formatPercentDifference(incomeDifference, baselineAnnualIncome) : null}
+            tone={toneClass(incomeDifference)}
+          />
+        </div>
+      )}
+
+      {hasChanged && (
+        <article className={`what-if-verdict ${targetDifference === null ? outcome.className : toneClass(targetDifference)}`}>
+          <div>
+            <p className="planner-eyebrow">Overall effect</p>
+            <h3>{targetDifference === null ? outcome.label : targetVerdict(targetDifference)}</h3>
+          </div>
+          <p>
+            {targetDifference === null
+              ? createExplanation(activeExperiment, pensionDifference, incomeDifference)
+              : createTargetExplanation(activeExperiment, retirementAge, targetIncome ?? 0, targetDifference)}
+          </p>
+        </article>
+      )}
 
       {baselineRetirementOutcome && retirementOutcome && (
         <RetirementImpactDetails
           baseline={baselineRetirementOutcome}
           outcome={retirementOutcome}
+          activeExperiment={activeExperiment}
+          retirementAge={retirementAge}
+          statePensionAge={statePensionAge}
+          detailed={viewMode === "detailed"}
         />
       )}
     </section>
   );
 }
 
-function BeforeAfterCard({
+function OutcomeCard({
   label,
-  before,
-  after,
+  value,
+  baseline,
   difference,
+  percent,
   tone,
 }: {
   label: string;
-  before: string;
-  after: string;
-  difference: string;
+  value: string;
+  baseline: string;
+  difference: string | null;
+  percent: string | null;
   tone: string;
 }) {
   return (
     <article className="what-if-before-after-card">
       <span>{label}</span>
-      <div className="what-if-before-after-values">
-        <div>
-          <small>Saved plan</small>
-          <strong>{before}</strong>
-        </div>
-        <span aria-hidden="true">→</span>
-        <div>
-          <small>What if</small>
-          <strong>{after}</strong>
-        </div>
-      </div>
-      <em className={tone}>{difference}</em>
+      <strong className="what-if-outcome-value">{value}</strong>
+      {difference && (
+        <em className={tone}>
+          {difference}{percent ? ` (${percent})` : ""}
+        </em>
+      )}
+      <small>Saved plan: {baseline}</small>
     </article>
   );
 }
@@ -134,47 +151,76 @@ function BeforeAfterCard({
 function RetirementImpactDetails({
   baseline,
   outcome,
+  activeExperiment,
+  retirementAge,
+  statePensionAge,
+  detailed,
 }: {
   baseline: RetirementSpendingOutcome;
   outcome: RetirementSpendingOutcome;
+  activeExperiment: ExperimentId;
+  retirementAge: number;
+  statePensionAge: number;
+  detailed: boolean;
 }) {
   const sustainableDifference = outcome.sustainableNetSpending - baseline.sustainableNetSpending;
   const headroomDifference = outcome.annualHeadroom - baseline.annualHeadroom;
+  const endingDifference = outcome.modelledEndingBalance - baseline.modelledEndingBalance;
+  const statePensionGap = Math.max(0, statePensionAge - retirementAge);
 
   return (
-    <details className="what-if-details">
-      <summary>See retirement impact details</summary>
+    <details className="what-if-details" open={detailed}>
+      <summary>Retirement impact details</summary>
       <p>
         These use the same drawdown assumptions and ending-balance goal as your active plan.
       </p>
       <div className="what-if-details-grid">
         <DetailCard
           label="Sustainable net spending"
-          before={`${formatCurrency(baseline.sustainableNetSpending)}/year`}
-          after={`${formatCurrency(outcome.sustainableNetSpending)}/year`}
+          value={`${formatCurrency(outcome.sustainableNetSpending)}/year`}
+          baseline={`${formatCurrency(baseline.sustainableNetSpending)}/year`}
           difference={`${formatSignedCurrency(sustainableDifference)}/year`}
           tone={toneClass(sustainableDifference)}
         />
         <DetailCard
           label="Annual headroom"
-          before={formatSignedCurrency(baseline.annualHeadroom)}
-          after={formatSignedCurrency(outcome.annualHeadroom)}
-          difference={formatSignedCurrency(headroomDifference)}
+          value={`${formatSignedCurrency(outcome.annualHeadroom)}/year`}
+          baseline={`${formatSignedCurrency(baseline.annualHeadroom)}/year`}
+          difference={`${formatSignedCurrency(headroomDifference)}/year`}
           tone={toneClass(headroomDifference)}
         />
         <DetailCard
-          label="Ending pot"
-          before={formatCurrency(baseline.modelledEndingBalance)}
-          after={formatCurrency(outcome.modelledEndingBalance)}
-          difference={`Target ${formatCurrency(outcome.targetEndingBalance)}`}
-          tone=""
+          label="Ending pension position"
+          value={formatCurrency(outcome.modelledEndingBalance)}
+          baseline={formatCurrency(baseline.modelledEndingBalance)}
+          difference={formatSignedCurrency(endingDifference)}
+          tone={toneClass(endingDifference)}
+          supporting={`Ending-balance goal: ${formatCurrency(outcome.targetEndingBalance)}`}
         />
         <DetailCard
           label="Living Standard supported"
-          before={livingStandardLabel(baseline.livingStandard)}
-          after={livingStandardLabel(outcome.livingStandard)}
-          difference={`${statusLabel(baseline.status)} → ${statusLabel(outcome.status)}`}
+          value={livingStandardLabel(outcome.livingStandard)}
+          baseline={livingStandardLabel(baseline.livingStandard)}
+          difference={statusLabel(outcome.status)}
           tone=""
+        />
+        {activeExperiment === "retirement-age" && (
+          <DetailCard
+            label="State Pension timing"
+            value={`Starts at age ${statePensionAge}`}
+            baseline="State Pension assumption"
+            difference={statePensionGap > 0 ? `${statePensionGap} ${statePensionGap === 1 ? "year" : "years"} before State Pension` : "Available from retirement"}
+            tone=""
+            supporting={statePensionGap > 0 ? "Your private pension needs to bridge this period." : undefined}
+          />
+        )}
+        <DetailCard
+          label="Plan sustainability"
+          value={statusLabel(outcome.status)}
+          baseline={statusLabel(baseline.status)}
+          difference={outcome.status === "shortfall" ? "Target spending is above the sustainable level" : "Target spending is within the modelled sustainable level"}
+          tone={outcome.status === "shortfall" ? "is-negative" : "is-positive"}
+          supporting="Based on your current planning horizon and ending-balance goal."
         />
       </div>
     </details>
@@ -183,24 +229,52 @@ function RetirementImpactDetails({
 
 function DetailCard({
   label,
-  before,
-  after,
+  value,
+  baseline,
   difference,
   tone,
+  supporting,
 }: {
   label: string;
-  before: string;
-  after: string;
+  value: string;
+  baseline: string;
   difference: string;
   tone: string;
+  supporting?: string;
 }) {
   return (
     <div className="what-if-detail-card">
       <span>{label}</span>
-      <small>{before} → {after}</small>
-      <strong className={tone}>{difference}</strong>
+      <strong>{value}</strong>
+      <em className={tone}>{difference}</em>
+      <small>Saved plan: {baseline}</small>
+      {supporting && <small>{supporting}</small>}
     </div>
   );
+}
+
+function createSummaryContext(experiment: ExperimentId, retirementAge: number, hasChanged: boolean): string {
+  if (!hasChanged) return "Move an experiment control to compare it with the saved plan.";
+  if (experiment === "retirement-age") return `Retiring at ${retirementAge} compared with your saved plan.`;
+  return "See the main effect of this change compared with your saved plan.";
+}
+
+function targetVerdict(difference: number): string {
+  if (Math.abs(difference) < 0.5) return "Income target met";
+  return difference > 0 ? "Above your income target" : "Below your income target";
+}
+
+function createTargetExplanation(
+  experiment: ExperimentId,
+  retirementAge: number,
+  targetIncome: number,
+  difference: number,
+): string {
+  const amount = `${formatCurrency(Math.abs(difference))}/year`;
+  const target = `${formatCurrency(targetIncome)}/year`;
+  const position = difference >= 0 ? "above" : "below";
+  const prefix = experiment === "retirement-age" ? `Retiring at ${retirementAge} would leave your illustrated income` : "This change would leave your illustrated income";
+  return `${prefix} ${amount} ${position} your ${target} income target.`;
 }
 
 function getOutcomeVerdict(
@@ -212,16 +286,12 @@ function getOutcomeVerdict(
   const baselineScale = Math.max(Math.abs(pensionDifference), Math.abs(incomeDifference), 1);
   const isSimilar = Math.abs(financialDifference) < Math.max(50, baselineScale * 0.005);
 
-  if (isSimilar) {
-    return { label: "Similar outcome", className: "is-similar" };
-  }
-
+  if (isSimilar) return { label: "Similar outcome", className: "is-similar" };
   if (experiment === "spending") {
     return financialDifference >= 0
       ? { label: "More flexibility", className: "is-positive" }
       : { label: "More pressure", className: "is-negative" };
   }
-
   return financialDifference > 0
     ? { label: "More flexibility", className: "is-positive" }
     : { label: "More pressure", className: "is-negative" };
@@ -241,7 +311,7 @@ function createExplanation(
     case "contributions":
       return `Changing contributions leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income.`;
     case "spending":
-      return "A higher spending target can improve retirement lifestyle, but it also asks more of the pension. Open the details below to see the effect on sustainable spending and headroom.";
+      return "A higher spending target can improve retirement lifestyle, but it also asks more of the pension.";
     case "fees":
       return `The fee change leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income.`;
     case "returns":
@@ -270,6 +340,12 @@ function formatSignedCurrency(value: number): string {
   if (Math.abs(value) < 0.5) return "£0";
   const prefix = value > 0 ? "+" : "−";
   return `${prefix}${formatCurrency(Math.abs(value))}`;
+}
+
+function formatPercentDifference(value: number, baseline: number): string | null {
+  if (Math.abs(baseline) < 0.5 || Math.abs(value) < 0.5) return null;
+  const percent = Math.round((value / Math.abs(baseline)) * 100);
+  return `${percent > 0 ? "+" : ""}${percent}%`;
 }
 
 function toneClass(value: number): string {
