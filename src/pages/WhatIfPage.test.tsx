@@ -315,9 +315,8 @@ describe("WhatIfPage", () => {
     ).toHaveValue("56");
   });
 
-  it("saves the selected extra contribution age as a What If scenario", async () => {
+  it("saves the selected extra contribution age through the What If modal", async () => {
     const user = userEvent.setup();
-    vi.spyOn(window, "prompt").mockReturnValue("Save earlier");
     render(<WhatIfPage />);
     await user.click(screen.getByRole("tab", { name: /save more/i }));
 
@@ -328,6 +327,17 @@ describe("WhatIfPage", () => {
       { target: { value: "52" } },
     );
     await user.click(screen.getByRole("button", { name: "Save as scenario" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Keep this What If result" });
+    expect(dialog).toBeInTheDocument();
+    expect(screen.getByText("Save more", { selector: "strong" })).toBeInTheDocument();
+    expect(screen.getByText("Main Plan", { selector: "strong" })).toBeInTheDocument();
+
+    const nameInput = screen.getByRole("textbox", { name: "Name" });
+    expect(nameInput).toHaveValue("Save 1000 monthly");
+    await user.clear(nameInput);
+    await user.type(nameInput, "Save earlier");
+    await user.click(screen.getByRole("button", { name: "Save experiment" }));
 
     expect(saveWhatIfScenario).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -343,8 +353,9 @@ describe("WhatIfPage", () => {
     );
     expect(createScenario).not.toHaveBeenCalled();
     expect(updateScenarioPlan).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent(
-      "Save earlier has been saved against Main Plan.",
+      "Save earlier saved to Main Plan.",
     );
   });
 });
