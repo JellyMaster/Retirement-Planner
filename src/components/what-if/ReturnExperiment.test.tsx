@@ -39,7 +39,7 @@ describe("ReturnExperiment", () => {
         name: "The saved return assumption is unchanged",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeDisabled();
   });
 
   it("passes the selected percentage back as a decimal rate", () => {
@@ -73,7 +73,7 @@ describe("ReturnExperiment", () => {
         name: "A lower assumed return gives a more cautious illustration",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save as scenario" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Save experiment" })).toBeEnabled();
   });
 
   it("supports reset and save actions", async () => {
@@ -95,7 +95,7 @@ describe("ReturnExperiment", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Reset experiment" }));
-    await user.click(screen.getByRole("button", { name: "Save as scenario" }));
+    await user.click(screen.getByRole("button", { name: "Save experiment" }));
 
     expect(onReset).toHaveBeenCalledOnce();
     expect(onSave).toHaveBeenCalledOnce();
