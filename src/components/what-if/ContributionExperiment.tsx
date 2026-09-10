@@ -327,7 +327,7 @@ export function ContributionExperiment({
           </strong>
           <span>
             {hasChanged
-              ? "Save it as a scenario only when the outcome is worth keeping."
+              ? "Save this experiment when the outcome is worth keeping."
               : "Your saved plan has not been changed."}
           </span>
         </div>
@@ -346,7 +346,7 @@ export function ContributionExperiment({
             disabled={!hasChanged || !canSave}
             onClick={onSave}
           >
-            Save as scenario
+            Save experiment
           </button>
         </div>
       </footer>
