@@ -168,7 +168,8 @@ describe("WhatIfPage", () => {
     expect(
       screen.getByRole("heading", { name: "Retire at 63" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/You could retire 2 years earlier/i)).toBeInTheDocument();
+    expect(screen.getByText("2 years earlier")).toBeInTheDocument();
+    expect(screen.getByText("Pension when retirement starts")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Save experiment" })).toBeEnabled();
     expect(setHasUnsavedExperiment).toHaveBeenCalledWith(true);
   });
