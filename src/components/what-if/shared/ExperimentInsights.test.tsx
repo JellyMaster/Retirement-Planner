@@ -70,6 +70,7 @@ describe("ExperimentInsights", () => {
       targetEndingBalance: 100_000,
       modelledEndingBalance: 100_000,
       livingStandard: "minimum" as const,
+      includesStatePension: true,
     };
     const outcome = {
       targetNetSpending: 29_500,
@@ -80,6 +81,7 @@ describe("ExperimentInsights", () => {
       targetEndingBalance: 100_000,
       modelledEndingBalance: 110_000,
       livingStandard: "moderate" as const,
+      includesStatePension: true,
     };
 
     const { rerender } = render(<ExperimentInsights
@@ -124,7 +126,7 @@ describe("ExperimentInsights", () => {
     expect(screen.getByRole("heading", { name: "Retirement impact details" })).toBeInTheDocument();
   });
 
-  it("explains a retirement-age change in plain English and opens detailed view", () => {
+  it("assesses a retirement-age change against the saved plan assumptions", () => {
     const baseline = {
       targetNetSpending: 45_400,
       sustainableNetSpending: 44_685,
@@ -134,10 +136,11 @@ describe("ExperimentInsights", () => {
       targetEndingBalance: 966_983,
       modelledEndingBalance: 967_046,
       livingStandard: "moderate" as const,
+      includesStatePension: true,
     };
     const outcome = {
       ...baseline,
-      targetNetSpending: 45_400,
+      sustainableNetSpending: 45_081,
     };
 
     renderInsights({
@@ -146,7 +149,7 @@ describe("ExperimentInsights", () => {
       retirementAge: 66,
       planningAge: 90,
       statePensionAge: 68,
-      baselineAnnualIncome: 49_379,
+      baselineAnnualIncome: 44_685,
       annualIncome: 45_081,
       baselineProjectedPension: 966_983,
       projectedPension: 900_000,
@@ -156,20 +159,24 @@ describe("ExperimentInsights", () => {
     });
 
     expect(
-      screen.getByRole("heading", { name: "What happens if I retire at 66?" }),
+      screen.getByRole("heading", { name: "Could retiring at 66 support your plan?" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/2 years earlier than your saved plan \(68\)/i)).toBeInTheDocument();
-    expect(screen.getByText("£319/year")).toBeInTheDocument();
-    expect(screen.getByText("2 years", { selector: "strong" })).toBeInTheDocument();
+    expect(screen.getByText("Your income target")).toBeInTheDocument();
+    expect(screen.getByText("Estimated supportable retirement income")).toBeInTheDocument();
+    expect(screen.getByText("£45,400/year")).toBeInTheDocument();
+    expect(screen.getByText("£45,081/year")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Your income target would not be met" }),
+      screen.getByRole("heading", { name: "Your target income may not be fully supported" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/modelled through to age 90/i)).toBeInTheDocument();
+    expect(screen.getByText(/State Pension is included in this assessment from age 68/i)).toBeInTheDocument();
     expect(screen.queryByText("Retirement impact details")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /see the financial details/i }));
 
     expect(screen.getByRole("heading", { name: "Retirement impact details" })).toBeInTheDocument();
-    expect(screen.getByText("Pension at retirement")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Could retiring at 66 support your plan?" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Sustainable retirement income")).toBeInTheDocument();
   });
 });
