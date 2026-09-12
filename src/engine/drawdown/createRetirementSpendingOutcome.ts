@@ -17,6 +17,7 @@ export interface RetirementSpendingOutcome {
   modelledEndingBalance: number;
   livingStandard: RetirementLivingStandardLevel | null;
   includesStatePension?: boolean;
+  taxFreeCashTaken: number;
   savedPlanSupportsTarget: boolean;
   savedPlanFirstNetIncomeShortfallAge: number | null;
   savedPlanDepletionAge: number | null;
@@ -76,6 +77,7 @@ export function createRetirementSpendingOutcome(
     modelledEndingBalance: sustainable.result.finalBalance,
     livingStandard,
     includesStatePension: inputs.annualStatePension > 0,
+    taxFreeCashTaken: inputs.taxFreeCash,
     savedPlanSupportsTarget,
     savedPlanFirstNetIncomeShortfallAge: currentPlan.firstNetIncomeShortfallAge,
     savedPlanDepletionAge: currentPlan.depletionAge,
