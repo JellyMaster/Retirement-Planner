@@ -207,15 +207,15 @@ function RetirementAgePlanAssessment({
   const targetIncome = assessed.targetNetSpending;
   const planHorizon = planningAge === undefined ? "your planning age" : `age ${planningAge}`;
   const resultValue = supportsTarget
-    ? `Supported to ${planHorizon}`
+    ? `Yes — to ${planHorizon}`
     : firstProblemAge === null
-      ? "Not fully supported"
-      : `Shortfall from age ${firstProblemAge}`;
+      ? "No — not for the full plan"
+      : `No — shortfall from age ${firstProblemAge}`;
   const resultNote = supportsTarget
-    ? "The saved income strategy has no modelled shortfall or depletion"
+    ? `Your saved retirement income lasts through ${planHorizon}`
     : firstProblemAge === null
-      ? "The changed plan no longer supports all of the saved income assumptions"
-      : `The saved income strategy first stops meeting the target at age ${firstProblemAge}`;
+      ? "Your saved retirement income does not last for the full plan"
+      : `Your saved retirement income first falls short at age ${firstProblemAge}`;
 
   return (
     <section
@@ -232,25 +232,25 @@ function RetirementAgePlanAssessment({
           </h2>
           <p>
             {hasChanged
-              ? `The retirement-age result above is now benchmarked against the other assumptions in your saved plan, with everything else left unchanged.`
+              ? `We've kept the rest of your plan the same and checked whether your saved retirement income still lasts through ${planHorizon}.`
               : baselineRetirementAge === undefined
-                ? "This benchmarks your saved retirement age against the rest of your saved plan."
-                : `This benchmarks retiring at ${baselineRetirementAge} against the rest of your saved plan.`}
+                ? `We've kept your saved plan unchanged and checked whether your retirement income lasts through ${planHorizon}.`
+                : `We've kept your saved plan unchanged and checked whether retiring at ${baselineRetirementAge} provides your retirement income through ${planHorizon}.`}
           </p>
         </div>
       </header>
 
       <div
         className="what-if-simple-impact-grid"
-        aria-label="Retirement plan benchmark"
+        aria-label="Retirement plan check"
       >
         <SimpleImpactCard
-          label="Your saved income target"
+          label="Your retirement income goal"
           value={`${formatCurrency(targetIncome)}/year`}
-          note="Everything else in the plan is held equal"
+          note="Everything else in your plan stays the same"
         />
         <SimpleImpactCard
-          label="Plan benchmark"
+          label="Does your income plan last?"
           value={resultValue}
           note={resultNote}
           tone={supportsTarget ? "positive" : "negative"}
@@ -270,10 +270,10 @@ function RetirementAgePlanAssessment({
         </h3>
         <p>
           {supportsTarget
-            ? `With the other assumptions left unchanged, the model continues to provide your ${formatCurrency(targetIncome)}/year net income target through ${planHorizon} without a modelled income shortfall or pension depletion.`
+            ? `With everything else left unchanged, your saved income plan continues to provide your ${formatCurrency(targetIncome)}/year net income goal through ${planHorizon}.`
             : firstProblemAge === null
-              ? `With the other assumptions left unchanged, the model can no longer provide your ${formatCurrency(targetIncome)}/year net income target through ${planHorizon}.`
-              : `With the other assumptions left unchanged, your ${formatCurrency(targetIncome)}/year net income target is initially met, but the model first shows a shortfall around age ${firstProblemAge}.`}
+              ? `With everything else left unchanged, your saved income plan can no longer provide your ${formatCurrency(targetIncome)}/year net income goal through ${planHorizon}.`
+              : `With everything else left unchanged, your ${formatCurrency(targetIncome)}/year net income goal is initially met, but your saved income plan first falls short around age ${firstProblemAge}.`}
         </p>
         <small>
           {statePensionIncluded
@@ -300,7 +300,7 @@ function RetirementAgePlanAssessment({
           <span>
             <strong>See the financial details</strong>
             <small>
-              See State Pension timing and the separate capital-preservation test.
+              See State Pension timing and the extra ending-balance check.
             </small>
           </span>
           <span aria-hidden="true">›</span>
@@ -384,38 +384,38 @@ function RetirementImpactDetails({
 
   return (
     <section className="what-if-details" aria-labelledby="retirement-impact-details-title">
-      <h3 id="retirement-impact-details-title">Financial details</h3>
+      <h3 id="retirement-impact-details-title">Extra financial checks</h3>
       <p>
-        The plan benchmark above follows your saved withdrawal strategy. The figures below
-        separately test how much could be spent while still meeting your configured
-        ending-balance goal.
+        The plan check above follows the retirement income strategy you actually saved. These
+        extra figures ask a different question: how much could you spend while still keeping
+        the pension balance you chose to leave at your planning age?
       </p>
       <div className="what-if-details-grid">
         <DetailCard
-          label="Income with ending-balance goal"
+          label="Income while keeping your target balance"
           value={`${formatCurrency(outcome.sustainableNetSpending)}/year`}
           baseline={`${formatCurrency(baseline.sustainableNetSpending)}/year`}
           difference={`${formatSignedCurrency(sustainableDifference)}/year`}
           tone={toneClass(sustainableDifference)}
-          supporting={`This is a capital-preservation test, not the income produced by your saved withdrawal strategy.`}
+          supporting="This is an extra ending-balance check, not the income produced by your saved withdrawal strategy."
         />
         <DetailCard
-          label="Headroom against that goal"
+          label="Difference from your income target"
           value={`${formatSignedCurrency(outcome.annualHeadroom)}/year`}
           baseline={`${formatSignedCurrency(baseline.annualHeadroom)}/year`}
           difference={`${formatSignedCurrency(headroomDifference)}/year`}
           tone={toneClass(headroomDifference)}
         />
         <DetailCard
-          label="Ending balance in preservation test"
+          label="Pension left at your planning age"
           value={formatCurrency(outcome.modelledEndingBalance)}
           baseline={formatCurrency(baseline.modelledEndingBalance)}
           difference={formatSignedCurrency(endingDifference)}
           tone={toneClass(endingDifference)}
-          supporting={`Ending-balance goal: ${formatCurrency(outcome.targetEndingBalance)}`}
+          supporting={`Your target balance: ${formatCurrency(outcome.targetEndingBalance)}`}
         />
         <DetailCard
-          label="Living Standard supported"
+          label="Retirement living standard"
           value={livingStandardLabel(outcome.livingStandard)}
           baseline={livingStandardLabel(baseline.livingStandard)}
           difference={statusLabel(outcome.status)}
@@ -444,16 +444,16 @@ function RetirementImpactDetails({
           />
         )}
         <DetailCard
-          label="Capital-preservation result"
+          label="Ending-balance check"
           value={statusLabel(outcome.status)}
           baseline={statusLabel(baseline.status)}
           difference={
             outcome.status === "shortfall"
-              ? "Saved spending is above the amount compatible with the ending-balance goal"
-              : "Saved spending is compatible with the ending-balance goal"
+              ? "Your saved spending is above the amount that would keep your target balance"
+              : "Your saved spending is compatible with keeping your target balance"
           }
           tone={outcome.status === "shortfall" ? "is-negative" : "is-positive"}
-          supporting="This is deliberately separate from whether the saved income strategy lasts to your planning age."
+          supporting="This is a separate check. It does not change the answer above about whether your saved income plan lasts to your planning age."
         />
       </div>
     </section>
