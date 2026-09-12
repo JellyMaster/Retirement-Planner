@@ -17,6 +17,10 @@ export interface RetirementSpendingOutcome {
   modelledEndingBalance: number;
   livingStandard: RetirementLivingStandardLevel | null;
   includesStatePension?: boolean;
+  savedPlanSupportsTarget: boolean;
+  savedPlanFirstNetIncomeShortfallAge: number | null;
+  savedPlanDepletionAge: number | null;
+  savedPlanEndingBalance: number;
 }
 
 export function createRetirementSpendingOutcome(
@@ -36,6 +40,9 @@ export function createRetirementSpendingOutcome(
 
   const currentPlan = drawdownEngine.calculate(inputs);
   const targetNetSpending = currentPlan.years[0]?.netIncome ?? 0;
+  const savedPlanSupportsTarget =
+    currentPlan.firstNetIncomeShortfallAge === null &&
+    currentPlan.depletionAge === null;
 
   const sustainable = calculateIncomeForEndingBalance(
     {
@@ -69,6 +76,10 @@ export function createRetirementSpendingOutcome(
     modelledEndingBalance: sustainable.result.finalBalance,
     livingStandard,
     includesStatePension: inputs.annualStatePension > 0,
+    savedPlanSupportsTarget,
+    savedPlanFirstNetIncomeShortfallAge: currentPlan.firstNetIncomeShortfallAge,
+    savedPlanDepletionAge: currentPlan.depletionAge,
+    savedPlanEndingBalance: currentPlan.finalBalance,
   };
 }
 
