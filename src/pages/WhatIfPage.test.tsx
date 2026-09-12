@@ -70,6 +70,11 @@ function createProjection(inputs: PensionInputs) {
   };
 }
 
+async function openScheduledFutureSaving(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: "Detailed" }));
+  await user.click(screen.getByText("Scheduled future saving"));
+}
+
 describe("WhatIfPage", () => {
   const createScenario = vi.fn(() => ({
     id: "saved-plan",
@@ -210,8 +215,8 @@ describe("WhatIfPage", () => {
         name: "Experimental monthly employer contribution change",
       }),
     ).toHaveValue("0");
-    expect(screen.getByText("Saved plan · £800")).toBeInTheDocument();
-    expect(screen.getByText("Saved plan · £200")).toBeInTheDocument();
+    expect(screen.getByText("Saved · £800")).toBeInTheDocument();
+    expect(screen.getByText("Saved · £200")).toBeInTheDocument();
   });
 
   it("changes employee and employer contributions relative to the saved plan", async () => {
@@ -246,6 +251,7 @@ describe("WhatIfPage", () => {
     const user = userEvent.setup();
     render(<WhatIfPage />);
     await user.click(screen.getByRole("tab", { name: /save more/i }));
+    await openScheduledFutureSaving(user);
 
     const ageSlider = screen.getByRole("slider", {
       name: "Experimental extra contribution start age",
@@ -271,6 +277,7 @@ describe("WhatIfPage", () => {
     const user = userEvent.setup();
     render(<WhatIfPage />);
     await user.click(screen.getByRole("tab", { name: /save more/i }));
+    await openScheduledFutureSaving(user);
 
     await user.click(
       screen.getByRole("switch", {
@@ -287,6 +294,7 @@ describe("WhatIfPage", () => {
     const user = userEvent.setup();
     render(<WhatIfPage />);
     await user.click(screen.getByRole("tab", { name: /save more/i }));
+    await openScheduledFutureSaving(user);
 
     fireEvent.change(
       screen.getByRole("slider", {
@@ -318,6 +326,7 @@ describe("WhatIfPage", () => {
     const user = userEvent.setup();
     render(<WhatIfPage />);
     await user.click(screen.getByRole("tab", { name: /save more/i }));
+    await openScheduledFutureSaving(user);
 
     fireEvent.change(
       screen.getByRole("slider", {
