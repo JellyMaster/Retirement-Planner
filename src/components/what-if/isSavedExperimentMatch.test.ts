@@ -74,14 +74,14 @@ describe("isSavedExperimentMatch", () => {
     ).toBe(false);
   });
 
-  it("compares all contribution controls together", () => {
+  it("keeps regular contributions independent from scheduled extra saving", () => {
     const scenario = { ...createScenario(), experimentType: "contributions" as const };
 
     expect(
       isSavedExperimentMatch({
         experiment: "contributions",
         scenario,
-        inputs: { ...scenario.inputs },
+        inputs: { ...scenario.inputs, extraContributionAge: 57, extraMonthlyContribution: 750 },
         drawdown: scenario.drawdown,
         stateIncluded: true,
         stateAmount: 11_500,
@@ -93,13 +93,49 @@ describe("isSavedExperimentMatch", () => {
       isSavedExperimentMatch({
         experiment: "contributions",
         scenario,
-        inputs: { ...scenario.inputs, extraContributionAge: 57 },
+        inputs: { ...scenario.inputs, monthlyEmployeeContribution: 900 },
         drawdown: scenario.drawdown,
         stateIncluded: true,
         stateAmount: 11_500,
         stateAge: 67,
       }),
     ).toBe(false);
+  });
+
+  it("matches scheduled extra saving amount and start age separately", () => {
+    const scenario = { ...createScenario(), experimentType: "extra-saving" as const };
+    const common = {
+      experiment: "extra-saving" as const,
+      scenario,
+      drawdown: scenario.drawdown,
+      stateIncluded: true,
+      stateAmount: 11_500,
+      stateAge: 67,
+    };
+
+    expect(isSavedExperimentMatch({ ...common, inputs: { ...scenario.inputs } })).toBe(true);
+    expect(isSavedExperimentMatch({ ...common, inputs: { ...scenario.inputs, extraContributionAge: 57 } })).toBe(false);
+    expect(isSavedExperimentMatch({ ...common, inputs: { ...scenario.inputs, extraMonthlyContribution: 750 } })).toBe(false);
+  });
+
+  it("ignores the extra-saving age when no extra payment is included", () => {
+    const scenario = {
+      ...createScenario(),
+      experimentType: "extra-saving" as const,
+      inputs: { ...createScenario().inputs, extraMonthlyContribution: 0, extraContributionAge: 56 },
+    };
+
+    expect(
+      isSavedExperimentMatch({
+        experiment: "extra-saving",
+        scenario,
+        inputs: { ...scenario.inputs, extraContributionAge: 60 },
+        drawdown: scenario.drawdown,
+        stateIncluded: true,
+        stateAmount: 11_500,
+        stateAge: 67,
+      }),
+    ).toBe(true);
   });
 
   it("matches spending, assumptions, State Pension and downturn values", () => {
