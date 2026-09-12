@@ -200,26 +200,27 @@ describe("WhatIfPage", () => {
     expect(experimentalCall?.[0]).not.toHaveProperty("extraMonthlyContribution");
   });
 
-  it("centres employee and employer sliders on the saved plan", async () => {
+  it("shows employee and employer sliders on absolute contribution scales", async () => {
     const user = userEvent.setup();
     render(<WhatIfPage />);
     await user.click(screen.getByRole("tab", { name: /save more/i }));
 
-    expect(
-      screen.getByRole("slider", {
-        name: "Experimental monthly employee contribution change",
-      }),
-    ).toHaveValue("0");
-    expect(
-      screen.getByRole("slider", {
-        name: "Experimental monthly employer contribution change",
-      }),
-    ).toHaveValue("0");
+    const employeeSlider = screen.getByRole("slider", {
+      name: "Experimental monthly employee contribution change",
+    });
+    const employerSlider = screen.getByRole("slider", {
+      name: "Experimental monthly employer contribution change",
+    });
+
+    expect(employeeSlider).toHaveValue("800");
+    expect(employeeSlider).toHaveAttribute("min", "0");
+    expect(employerSlider).toHaveValue("200");
+    expect(employerSlider).toHaveAttribute("min", "0");
     expect(screen.getByText("Saved · £800")).toBeInTheDocument();
     expect(screen.getByText("Saved · £200")).toBeInTheDocument();
   });
 
-  it("changes employee and employer contributions relative to the saved plan", async () => {
+  it("changes employee and employer contributions using their actual monthly amounts", async () => {
     const user = userEvent.setup();
     render(<WhatIfPage />);
     await user.click(screen.getByRole("tab", { name: /save more/i }));
@@ -228,13 +229,13 @@ describe("WhatIfPage", () => {
       screen.getByRole("slider", {
         name: "Experimental monthly employee contribution change",
       }),
-      { target: { value: "200" } },
+      { target: { value: "1000" } },
     );
     fireEvent.change(
       screen.getByRole("slider", {
         name: "Experimental monthly employer contribution change",
       }),
-      { target: { value: "100" } },
+      { target: { value: "300" } },
     );
 
     const experimentalCall = mockedUsePensionProjection.mock.calls.at(-1)?.[0];
@@ -300,7 +301,7 @@ describe("WhatIfPage", () => {
       screen.getByRole("slider", {
         name: "Experimental monthly employee contribution change",
       }),
-      { target: { value: "200" } },
+      { target: { value: "1000" } },
     );
     fireEvent.change(
       screen.getByRole("slider", {
@@ -314,7 +315,7 @@ describe("WhatIfPage", () => {
       screen.getByRole("slider", {
         name: "Experimental monthly employee contribution change",
       }),
-    ).toHaveValue("0");
+    ).toHaveValue("800");
     expect(
       screen.getByRole("slider", {
         name: "Experimental extra contribution start age",
