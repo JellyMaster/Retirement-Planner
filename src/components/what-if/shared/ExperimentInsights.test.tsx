@@ -116,7 +116,7 @@ describe("ExperimentInsights", () => {
       onSelectExperiment={vi.fn()}
     />);
 
-    expect(screen.queryByRole("heading", { name: "Financial details" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Extra financial checks" })).not.toBeInTheDocument();
 
     setWhatIfViewMode("detailed");
     rerender(<ExperimentInsights
@@ -137,10 +137,10 @@ describe("ExperimentInsights", () => {
       onSelectExperiment={vi.fn()}
     />);
 
-    expect(screen.getByRole("heading", { name: "Financial details" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Extra financial checks" })).toBeInTheDocument();
   });
 
-  it("benchmarks a retirement-age change against the saved plan while keeping sustainability separate", () => {
+  it("benchmarks a retirement-age change against the saved plan while keeping the ending-balance check separate", () => {
     const baseline = createRetirementOutcome({
       targetNetSpending: 45_400,
       sustainableNetSpending: 44_685,
@@ -186,10 +186,10 @@ describe("ExperimentInsights", () => {
     expect(
       screen.getByRole("heading", { name: "Does retiring at 60 still support your plan?" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Your saved income target")).toBeInTheDocument();
-    expect(screen.getByText("Plan benchmark")).toBeInTheDocument();
+    expect(screen.getByText("Your retirement income goal")).toBeInTheDocument();
+    expect(screen.getByText("Does your income plan last?")).toBeInTheDocument();
     expect(screen.getByText("£45,400/year")).toBeInTheDocument();
-    expect(screen.getByText("Shortfall from age 74")).toBeInTheDocument();
+    expect(screen.getByText("No — shortfall from age 74")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
         name: "Your saved plan no longer works through the full planning period",
@@ -198,14 +198,15 @@ describe("ExperimentInsights", () => {
     expect(
       screen.getByText(/State Pension remains included from age 68; only the retirement-age decision has changed/i),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Financial details" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Extra financial checks" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /see the financial details/i }));
 
-    expect(screen.getByRole("heading", { name: "Financial details" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Extra financial checks" })).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Does retiring at 60 still support your plan?" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Income with ending-balance goal")).toBeInTheDocument();
+    expect(screen.getByText("Income while keeping your target balance")).toBeInTheDocument();
+    expect(screen.getByText("Ending-balance check")).toBeInTheDocument();
   });
 });
