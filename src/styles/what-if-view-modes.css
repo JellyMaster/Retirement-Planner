@@ -140,10 +140,11 @@
 .what-if-marker-tone-4 { --what-if-marker-colour: #ae86d5; }
 .what-if-marker-tone-5 { --what-if-marker-colour: #74b56b; }
 
+/* Saved experiments use pin markers above the track so the live slider thumb stays visible. */
 .what-if-contribution-experiment-marker {
   position: absolute;
   z-index: 4;
-  top: 50%;
+  top: calc(50% - 1.05rem);
   display: grid;
   width: 1rem;
   height: 1rem;
@@ -151,13 +152,26 @@
   transform: translate(-50%, -50%);
   border: 2px solid var(--what-if-marker-colour);
   border-radius: 50%;
-  background: var(--colour-surface);
+  background: color-mix(in srgb, var(--what-if-marker-colour) 10%, var(--colour-surface));
   color: var(--what-if-marker-colour);
   box-shadow: 0 0 0 2px var(--colour-surface);
   font-size: .56rem;
   font-weight: 900;
   line-height: 1;
   pointer-events: none;
+}
+
+.what-if-contribution-experiment-marker::after {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  width: 2px;
+  height: .52rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--what-if-marker-colour);
+  box-shadow: 0 0 0 1px var(--colour-surface);
+  content: "";
 }
 
 .what-if-contribution-slider-labels {
