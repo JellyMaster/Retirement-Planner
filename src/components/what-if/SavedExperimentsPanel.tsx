@@ -78,7 +78,12 @@ export function SavedExperimentsPanel({
               {scenarios.map((scenario, index) => {
                 const isApplied = loadedScenarioId === scenario.id;
                 const confirmingDelete = pendingDeleteId === scenario.id;
-                const showMarkerKey = activeExperiment === "contributions";
+                const showMarkerKey =
+                  activeExperiment === "contributions" || activeExperiment === "retirement-age";
+                const markerTarget =
+                  activeExperiment === "retirement-age"
+                    ? "retirement-age slider"
+                    : "contribution sliders";
                 return (
                   <article
                     key={scenario.id}
@@ -88,7 +93,7 @@ export function SavedExperimentsPanel({
                       {showMarkerKey && (
                         <span
                           className={`what-if-saved-experiment-marker-key what-if-marker-tone-${index % 6}`}
-                          title={`Marker ${index + 1} on the contribution sliders`}
+                          title={`Marker ${index + 1} on the ${markerTarget}`}
                           aria-label={`Slider marker ${index + 1}`}
                         >
                           {index + 1}
