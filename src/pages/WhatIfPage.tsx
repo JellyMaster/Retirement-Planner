@@ -9,6 +9,7 @@ import {
   ExperimentLauncher,
   type ExperimentId,
 } from "../components/what-if/ExperimentLauncher";
+import { ExtraSavingExperiment } from "../components/what-if/ExtraSavingExperiment";
 import { FeeExperiment } from "../components/what-if/FeeExperiment";
 import { InflationExperiment } from "../components/what-if/InflationExperiment";
 import { isSavedExperimentMatch } from "../components/what-if/isSavedExperimentMatch";
@@ -325,30 +326,11 @@ function WhatIfWorkspace({
     setSaveMessage(null);
   }
 
-  function changeExtraContributionEnabled(enabled: boolean) {
-    setAlternativeInputs((current) => {
-      const next: PensionInputs = { ...current };
-      if (!enabled) {
-        delete next.extraContributionAge;
-        delete next.extraMonthlyContribution;
-        return next;
-      }
-      next.extraContributionAge = Math.min(
-        baselineExtraContributionAge,
-        Math.max(next.currentAge, next.retirementAge - 1),
-      );
-      next.extraMonthlyContribution = baselineExtraContribution || 250;
-      return next;
-    });
-    setLoadedWhatIfScenarioId(null);
-    setSaveMessage(null);
-  }
-
   function changeExtraContribution(amount: number) {
     setAlternativeInputs((current) => ({
       ...current,
       extraContributionAge: current.extraContributionAge ?? baselineExtraContributionAge,
-      extraMonthlyContribution: amount,
+      extraMonthlyContribution: Math.max(0, amount),
     }));
     setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
@@ -361,8 +343,7 @@ function WhatIfWorkspace({
         Math.max(current.currentAge, Math.round(age)),
         current.retirementAge - 1,
       ),
-      extraMonthlyContribution:
-        current.extraMonthlyContribution ?? (baselineExtraContribution || 250),
+      extraMonthlyContribution: current.extraMonthlyContribution ?? baselineExtraContribution,
     }));
     setLoadedWhatIfScenarioId(null);
     setSaveMessage(null);
@@ -609,11 +590,6 @@ function WhatIfWorkspace({
               employeeContribution={alternativeInputs.monthlyEmployeeContribution}
               baselineEmployerContribution={activeScenario.inputs.monthlyEmployerContribution}
               employerContribution={alternativeInputs.monthlyEmployerContribution}
-              baselineExtraContribution={baselineExtraContribution}
-              baselineExtraContributionAge={baselineExtraContributionAge}
-              extraContribution={alternativeInputs.extraMonthlyContribution ?? (baselineExtraContribution || 250)}
-              extraContributionAge={alternativeInputs.extraContributionAge ?? baselineExtraContributionAge}
-              includeExtraContribution={alternativeInputs.extraContributionAge !== undefined && alternativeInputs.extraMonthlyContribution !== undefined}
               baselineProjectedPension={baselineScenario.projection.finalBalance.real}
               projectedPension={alternativeScenario.projection.finalBalance.real}
               baselineAnnualIncome={baselineHealth?.estimatedAnnualIncome ?? 0}
@@ -624,7 +600,24 @@ function WhatIfWorkspace({
               saveMessage={saveMessage}
               onEmployeeContributionChange={changeEmployeeContribution}
               onEmployerContributionChange={changeEmployerContribution}
-              onExtraContributionEnabledChange={changeExtraContributionEnabled}
+              onReset={resetExperiment}
+              onSave={openSaveExperiment}
+            />
+          )}
+
+          {activeExperiment === "extra-saving" && (
+            <ExtraSavingExperiment
+              activePlanName={activeScenario.name}
+              currentAge={activeScenario.inputs.currentAge}
+              retirementAge={activeScenario.inputs.retirementAge}
+              baselineExtraContribution={baselineExtraContribution}
+              baselineExtraContributionAge={baselineExtraContributionAge}
+              extraContribution={alternativeInputs.extraMonthlyContribution ?? baselineExtraContribution}
+              extraContributionAge={alternativeInputs.extraContributionAge ?? baselineExtraContributionAge}
+              baselineProjectedPension={baselineScenario.projection.finalBalance.real}
+              projectedPension={alternativeScenario.projection.finalBalance.real}
+              canSave={canSaveExperiment}
+              saveMessage={saveMessage}
               onExtraContributionChange={changeExtraContribution}
               onExtraContributionAgeChange={changeExtraContributionAge}
               onReset={resetExperiment}
@@ -812,6 +805,7 @@ function formatExperimentName(experiment: ExperimentId): string {
   switch (experiment) {
     case "retirement-age": return "Retirement age";
     case "contributions": return "Save more";
+    case "extra-saving": return "Save more later";
     case "spending": return "Spending";
     case "fees": return "Fees";
     case "returns": return "Returns";
@@ -840,10 +834,15 @@ function hasExperimentChanged(
     case "contributions":
       return (
         inputs.monthlyEmployeeContribution !== baselineInputs.monthlyEmployeeContribution ||
-        inputs.monthlyEmployerContribution !== baselineInputs.monthlyEmployerContribution ||
-        inputs.extraMonthlyContribution !== baselineInputs.extraMonthlyContribution ||
-        inputs.extraContributionAge !== baselineInputs.extraContributionAge
+        inputs.monthlyEmployerContribution !== baselineInputs.monthlyEmployerContribution
       );
+    case "extra-saving": {
+      const baselineAmount = baselineInputs.extraMonthlyContribution ?? 0;
+      const amount = inputs.extraMonthlyContribution ?? 0;
+      if (amount !== baselineAmount) return true;
+      if (amount <= 0 && baselineAmount <= 0) return false;
+      return inputs.extraContributionAge !== baselineInputs.extraContributionAge;
+    }
     case "spending":
       return drawdown.desiredAnnualIncome !== baselineDrawdown.desiredAnnualIncome;
     case "fees":
@@ -876,6 +875,12 @@ function createSuggestedName(
 ): string {
   if (experiment === "contributions") {
     return `Save ${Math.round(inputs.monthlyEmployeeContribution + inputs.monthlyEmployerContribution)} monthly`;
+  }
+  if (experiment === "extra-saving") {
+    const amount = Math.round(inputs.extraMonthlyContribution ?? 0);
+    return amount > 0
+      ? `Extra ${amount} monthly from ${inputs.extraContributionAge ?? inputs.currentAge}`
+      : "No extra saving";
   }
   if (experiment === "spending") {
     return `Spend ${Math.round(drawdown.desiredAnnualIncome)} yearly`;
