@@ -4,9 +4,8 @@ import { useScenarios } from "../scenarios";
 import { AppIcons } from "../../icons";
 import "../../styles/what-if-view-modes.css";
 import { formatCurrency } from "../../utils/formatters";
+import { useWhatIfScenarios } from "./WhatIfScenarioContext";
 import { useWhatIfDisplaySettings } from "./whatIfDisplaySettings";
-
-const CONTRIBUTION_HEADROOM = 1_000;
 
 interface ContributionExperimentProps {
   activePlanName: string;
@@ -38,6 +37,14 @@ interface ContributionExperimentProps {
   onSave: () => void;
 }
 
+interface SavedContributionMarker {
+  id: string;
+  name: string;
+  markerNumber: number;
+  employeeContribution: number;
+  employerContribution: number;
+}
+
 export function ContributionExperiment({
   activePlanName,
   currentAge,
@@ -64,6 +71,7 @@ export function ContributionExperiment({
   onSave,
 }: ContributionExperimentProps) {
   const { activeScenario } = useScenarios();
+  const { scenarios: whatIfScenarios } = useWhatIfScenarios();
   const { viewMode, displayMode } = useWhatIfDisplaySettings();
   const employeeDifference = employeeContribution - baselineEmployeeContribution;
   const employerDifference = employerContribution - baselineEmployerContribution;
@@ -89,8 +97,7 @@ export function ContributionExperiment({
     ? projectedPension
     : projectedPension * inflationFactor;
   const pensionDifference = displayedPension - displayedBaselinePension;
-  const totalSavedContribution =
-    baselineEmployeeContribution + baselineEmployerContribution;
+  const totalSavedContribution = baselineEmployeeContribution + baselineEmployerContribution;
   const totalExperimentContribution = employeeContribution + employerContribution;
   const regularDifference = totalExperimentContribution - totalSavedContribution;
   const extraMaximum = roundUp(
@@ -99,6 +106,29 @@ export function ContributionExperiment({
   );
   const latestExtraContributionAge = Math.max(currentAge, retirementAge - 1);
   const saveAlreadyExists = hasChanged && !canSave && saveMessage === null;
+  const savedContributionMarkers: SavedContributionMarker[] = whatIfScenarios
+    .filter(
+      (scenario) =>
+        scenario.baseScenarioId === activeScenario.id &&
+        scenario.experimentType === "contributions",
+    )
+    .map((scenario, index) => ({
+      id: scenario.id,
+      name: scenario.name,
+      markerNumber: index + 1,
+      employeeContribution: scenario.inputs.monthlyEmployeeContribution,
+      employerContribution: scenario.inputs.monthlyEmployerContribution,
+    }));
+  const employeeMaximum = contributionMaximum(
+    baselineEmployeeContribution,
+    employeeContribution,
+    savedContributionMarkers.map((marker) => marker.employeeContribution),
+  );
+  const employerMaximum = contributionMaximum(
+    baselineEmployerContribution,
+    employerContribution,
+    savedContributionMarkers.map((marker) => marker.employerContribution),
+  );
 
   return (
     <section
@@ -117,9 +147,7 @@ export function ContributionExperiment({
         <section className="what-if-change-panel" aria-labelledby="contribution-change-title">
           <div className="what-if-panel-heading">
             <p className="planner-eyebrow">Change</p>
-            <h3 id="contribution-change-title">
-              How much goes into your pension each month?
-            </h3>
+            <h3 id="contribution-change-title">How much goes into your pension each month?</h3>
             <p>
               Change what you pay in and what your employer contributes. Everything else stays
               the same.
@@ -130,6 +158,13 @@ export function ContributionExperiment({
               label="Your contribution"
               baseline={baselineEmployeeContribution}
               amount={employeeContribution}
+              maximum={employeeMaximum}
+              markers={savedContributionMarkers.map((marker) => ({
+                id: marker.id,
+                name: marker.name,
+                markerNumber: marker.markerNumber,
+                amount: marker.employeeContribution,
+              }))}
               ariaLabel="Experimental monthly employee contribution change"
               onChange={onEmployeeContributionChange}
             />
@@ -137,10 +172,23 @@ export function ContributionExperiment({
               label="Employer contribution"
               baseline={baselineEmployerContribution}
               amount={employerContribution}
+              maximum={employerMaximum}
+              markers={savedContributionMarkers.map((marker) => ({
+                id: marker.id,
+                name: marker.name,
+                markerNumber: marker.markerNumber,
+                amount: marker.employerContribution,
+              }))}
               ariaLabel="Experimental monthly employer contribution change"
               onChange={onEmployerContributionChange}
             />
           </div>
+          {savedContributionMarkers.length > 0 && (
+            <p className="what-if-contribution-marker-key">
+              Numbered markers match the saved experiments in the panel. The same number and
+              colour identify an experiment on both sliders.
+            </p>
+          )}
           <div className="what-if-contribution-total">
             <span>Total going into your pension</span>
             <strong>{formatCurrency(totalExperimentContribution)}/month</strong>
@@ -170,7 +218,6 @@ export function ContributionExperiment({
                 : "Saved plan"}
             </span>
           </div>
-
           {viewMode === "simple" ? (
             <>
               <div className="what-if-simple-results" aria-label="Simple saving outcomes">
@@ -256,7 +303,6 @@ export function ContributionExperiment({
               </div>
             </>
           )}
-
           <div className="what-if-inline-actions">
             <button
               type="button"
@@ -434,7 +480,6 @@ export function ContributionExperiment({
           </details>
         </div>
       )}
-
       {displayMode === "nominal" && hasChanged && (
         <p className="what-if-money-basis-note">
           Future-money figures show the estimated pound value at retirement. The saving amounts
@@ -454,12 +499,21 @@ function ContributionLever({
   label,
   baseline,
   amount,
+  maximum,
+  markers,
   ariaLabel,
   onChange,
 }: {
   label: string;
   baseline: number;
   amount: number;
+  maximum: number;
+  markers: Array<{
+    id: string;
+    name: string;
+    markerNumber: number;
+    amount: number;
+  }>;
   ariaLabel: string;
   onChange: (amount: number) => void;
 }) {
@@ -477,6 +531,8 @@ function ContributionLever({
       <AbsoluteContributionSlider
         baseline={baseline}
         amount={amount}
+        maximum={maximum}
+        markers={markers}
         ariaLabel={ariaLabel}
         onChange={onChange}
       />
@@ -487,20 +543,28 @@ function ContributionLever({
 function AbsoluteContributionSlider({
   baseline,
   amount,
+  maximum,
+  markers,
   ariaLabel,
   onChange,
 }: {
   baseline: number;
   amount: number;
+  maximum: number;
+  markers: Array<{
+    id: string;
+    name: string;
+    markerNumber: number;
+    amount: number;
+  }>;
   ariaLabel: string;
   onChange: (amount: number) => void;
 }) {
-  const maximum = roundUp(Math.max(baseline + CONTRIBUTION_HEADROOM, amount), 100);
-  const savedPosition = maximum <= 0 ? 0 : Math.min(100, (baseline / maximum) * 100);
+  const baselinePosition = maximum <= 0 ? 0 : (baseline / maximum) * 100;
 
   return (
-    <div className="what-if-slider-wrap what-if-slider-wrap-primary what-if-absolute-contribution-slider">
-      <div className="what-if-absolute-slider-track-wrap">
+    <div className="what-if-slider-wrap what-if-slider-wrap-primary what-if-contribution-slider">
+      <div className="what-if-contribution-range-track">
         <input
           type="range"
           min={0}
@@ -508,19 +572,32 @@ function AbsoluteContributionSlider({
           step={25}
           value={amount}
           aria-label={ariaLabel}
-          aria-valuetext={`${formatCurrency(amount)} per month; saved plan ${formatCurrency(baseline)} per month`}
+          aria-valuetext={`${formatCurrency(amount)} per month; saved amount ${formatCurrency(baseline)}`}
           onChange={(event) => onChange(Number(event.target.value))}
         />
         <span
-          className="what-if-saved-contribution-marker"
-          style={{ left: `${savedPosition}%` }}
+          className="what-if-contribution-saved-marker"
+          style={{ left: `${baselinePosition}%` }}
           title={`Saved plan · ${formatCurrency(baseline)}/month`}
           aria-hidden="true"
         />
+        {markers
+          .filter((marker) => marker.amount >= 0 && marker.amount <= maximum)
+          .map((marker) => (
+            <span
+              key={marker.id}
+              className={`what-if-contribution-experiment-marker what-if-marker-tone-${(marker.markerNumber - 1) % 6}`}
+              style={{ left: `${(marker.amount / maximum) * 100}%` }}
+              title={`${marker.markerNumber}. ${marker.name} · ${formatCurrency(marker.amount)}/month`}
+              aria-hidden="true"
+            >
+              {marker.markerNumber}
+            </span>
+          ))}
       </div>
       <div className="what-if-slider-labels what-if-contribution-slider-labels" aria-hidden="true">
         <span>£0</span>
-        <span className="what-if-contribution-saved-label" style={{ left: `${savedPosition}%` }}>
+        <span className="what-if-contribution-saved-label" style={{ left: `${baselinePosition}%` }}>
           Saved · {formatCurrency(baseline)}
         </span>
         <span>{formatCurrency(maximum)}</span>
@@ -594,23 +671,15 @@ function OutcomeCard({
         <small>Experiment</small>
         <strong>{experiment}</strong>
       </div>
-      <em className={`what-if-outcome-difference${toneSuffix(difference)}`}>
-        {difference}
-      </em>
+      <em className={`what-if-outcome-difference${toneSuffix(difference)}`}>{difference}</em>
     </article>
   );
 }
 
 function createSimpleTitle(regularDifference: number, pensionDifference: number): string {
-  if (regularDifference > 0) {
-    return "More going in each month gives your pension more to build on";
-  }
-  if (regularDifference < 0) {
-    return "Less going in each month reduces what reaches retirement";
-  }
-  if (pensionDifference !== 0) {
-    return "The wider saving changes affect your pension at retirement";
-  }
+  if (regularDifference > 0) return "More going in each month gives your pension more to build on";
+  if (regularDifference < 0) return "Less going in each month reduces what reaches retirement";
+  if (pensionDifference !== 0) return "The wider saving changes affect your pension at retirement";
   return "Your regular monthly saving is unchanged";
 }
 
@@ -706,6 +775,17 @@ function contributionStatus(
   if (difference > 0) return "Saving more";
   if (difference < 0) return "Saving less";
   return "Timing changed";
+}
+
+function contributionMaximum(
+  baseline: number,
+  amount: number,
+  savedExperimentAmounts: number[],
+): number {
+  return roundUp(
+    Math.max(1_000, baseline + 1_000, amount, ...savedExperimentAmounts),
+    250,
+  );
 }
 
 function roundUp(value: number, interval: number): number {
