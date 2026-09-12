@@ -40,19 +40,19 @@
 .what-if-contribution-total > strong { font-size: clamp(1rem, 1.35vw, 1.2rem); }
 .what-if-contribution-total > small { grid-column: 1 / -1; color: var(--colour-text-muted); font-size: var(--ui-font-size-xs); }
 
-/* Regular-contribution sliders show absolute £/month positions, not +/- deltas. */
-.what-if-absolute-slider-track-wrap {
+/* Regular-contribution sliders show absolute £/month positions. */
+.what-if-contribution-range-track {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 1.25rem;
+  min-height: 1.4rem;
 }
 
-.what-if-absolute-slider-track-wrap input[type="range"] {
+.what-if-contribution-range-track input[type="range"] {
   position: relative;
   z-index: 2;
   width: 100%;
-  height: 1.25rem;
+  height: 1.4rem;
   margin: 0;
   appearance: none;
   -webkit-appearance: none;
@@ -60,14 +60,14 @@
   cursor: pointer;
 }
 
-.what-if-absolute-slider-track-wrap input[type="range"]::-webkit-slider-runnable-track {
+.what-if-contribution-range-track input[type="range"]::-webkit-slider-runnable-track {
   height: .38rem;
   border: 1px solid color-mix(in srgb, var(--colour-text-muted) 65%, transparent);
   border-radius: 999px;
   background: color-mix(in srgb, var(--colour-text-muted) 16%, var(--colour-surface));
 }
 
-.what-if-absolute-slider-track-wrap input[type="range"]::-webkit-slider-thumb {
+.what-if-contribution-range-track input[type="range"]::-webkit-slider-thumb {
   width: .95rem;
   height: .95rem;
   margin-top: -.33rem;
@@ -79,21 +79,21 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--colour-primary) 55%, transparent);
 }
 
-.what-if-absolute-slider-track-wrap input[type="range"]::-moz-range-track {
+.what-if-contribution-range-track input[type="range"]::-moz-range-track {
   height: .38rem;
   border: 1px solid color-mix(in srgb, var(--colour-text-muted) 65%, transparent);
   border-radius: 999px;
   background: color-mix(in srgb, var(--colour-text-muted) 16%, var(--colour-surface));
 }
 
-.what-if-absolute-slider-track-wrap input[type="range"]::-moz-range-progress {
+.what-if-contribution-range-track input[type="range"]::-moz-range-progress {
   height: .38rem;
   border: 0;
   border-radius: 999px;
   background: color-mix(in srgb, var(--colour-text-muted) 16%, var(--colour-surface));
 }
 
-.what-if-absolute-slider-track-wrap input[type="range"]::-moz-range-thumb {
+.what-if-contribution-range-track input[type="range"]::-moz-range-thumb {
   width: .82rem;
   height: .82rem;
   border: 2px solid var(--colour-surface);
@@ -102,7 +102,7 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--colour-primary) 55%, transparent);
 }
 
-.what-if-saved-contribution-marker {
+.what-if-contribution-saved-marker {
   position: absolute;
   z-index: 1;
   top: 50%;
@@ -115,7 +115,7 @@
   pointer-events: none;
 }
 
-.what-if-saved-contribution-marker::after {
+.what-if-contribution-saved-marker::after {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -128,27 +128,79 @@
   content: "";
 }
 
+.what-if-contribution-experiment-marker,
+.what-if-saved-experiment-marker-key {
+  --what-if-marker-colour: var(--colour-primary);
+}
+
+.what-if-marker-tone-0 { --what-if-marker-colour: #e69b83; }
+.what-if-marker-tone-1 { --what-if-marker-colour: #52b7a7; }
+.what-if-marker-tone-2 { --what-if-marker-colour: #7f9ff0; }
+.what-if-marker-tone-3 { --what-if-marker-colour: #d4aa52; }
+.what-if-marker-tone-4 { --what-if-marker-colour: #ae86d5; }
+.what-if-marker-tone-5 { --what-if-marker-colour: #74b56b; }
+
+.what-if-contribution-experiment-marker {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  display: grid;
+  width: 1rem;
+  height: 1rem;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--what-if-marker-colour);
+  border-radius: 50%;
+  background: var(--colour-surface);
+  color: var(--what-if-marker-colour);
+  box-shadow: 0 0 0 2px var(--colour-surface);
+  font-size: .56rem;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .what-if-contribution-slider-labels {
   position: relative;
   min-height: 1.2rem;
 }
 
-.what-if-contribution-slider-labels > span:first-child {
-  position: absolute;
-  left: 0;
-}
+.what-if-contribution-slider-labels > span:first-child { position: absolute; left: 0; }
+.what-if-contribution-slider-labels > span:last-child { position: absolute; right: 0; }
+.what-if-contribution-saved-label { position: absolute; transform: translateX(-50%); white-space: nowrap; color: var(--colour-text-muted); font-weight: 750; }
 
-.what-if-contribution-slider-labels > span:last-child {
-  position: absolute;
-  right: 0;
-}
-
-.what-if-contribution-saved-label {
-  position: absolute;
-  transform: translateX(-50%);
-  white-space: nowrap;
+.what-if-contribution-marker-key {
+  margin: .1rem 0 0;
   color: var(--colour-text-muted);
-  font-weight: 750;
+  font-size: .68rem;
+  line-height: 1.35;
+}
+
+.what-if-saved-panel-card-main {
+  display: flex;
+  align-items: flex-start;
+  gap: .55rem;
+}
+
+.what-if-saved-panel-card-main > div {
+  display: grid;
+  min-width: 0;
+  gap: .12rem;
+}
+
+.what-if-saved-experiment-marker-key {
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 2px solid var(--what-if-marker-colour);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--what-if-marker-colour) 10%, var(--colour-surface));
+  color: var(--what-if-marker-colour);
+  font-size: .65rem;
+  font-weight: 900;
+  line-height: 1;
 }
 
 @media (max-width: 1100px) {
