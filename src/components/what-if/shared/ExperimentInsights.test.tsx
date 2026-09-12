@@ -18,6 +18,7 @@ function createRetirementOutcome(
     modelledEndingBalance: 100_000,
     livingStandard: "minimum",
     includesStatePension: true,
+    taxFreeCashTaken: 0,
     savedPlanSupportsTarget: false,
     savedPlanFirstNetIncomeShortfallAge: 80,
     savedPlanDepletionAge: 80,
@@ -149,6 +150,7 @@ describe("ExperimentInsights", () => {
       targetEndingBalance: 966_983,
       modelledEndingBalance: 967_046,
       livingStandard: "moderate",
+      taxFreeCashTaken: 0,
       savedPlanSupportsTarget: true,
       savedPlanFirstNetIncomeShortfallAge: null,
       savedPlanDepletionAge: null,
@@ -162,6 +164,7 @@ describe("ExperimentInsights", () => {
       targetEndingBalance: 589_047,
       modelledEndingBalance: 589_103,
       livingStandard: "moderate",
+      taxFreeCashTaken: 0,
       savedPlanSupportsTarget: false,
       savedPlanFirstNetIncomeShortfallAge: 74,
       savedPlanDepletionAge: 74,
@@ -198,10 +201,16 @@ describe("ExperimentInsights", () => {
     expect(
       screen.getByText(/State Pension remains included from age 68; only the retirement-age decision has changed/i),
     ).toBeInTheDocument();
+    expect(screen.queryByLabelText("What we've kept the same")).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Extra financial checks" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /see the financial details/i }));
 
+    const unchangedSummary = screen.getByLabelText("What we've kept the same");
+    expect(unchangedSummary).toHaveTextContent("Income goal£45,400/year");
+    expect(unchangedSummary).toHaveTextContent("Planning to age90");
+    expect(unchangedSummary).toHaveTextContent("State Pension includedYes");
+    expect(unchangedSummary).toHaveTextContent("Taking lump sum cashNo");
     expect(screen.getByRole("heading", { name: "Extra financial checks" })).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Does retiring at 60 still support your plan?" }),
