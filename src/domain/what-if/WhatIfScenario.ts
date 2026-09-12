@@ -4,6 +4,7 @@ import type { PensionInputs } from "../../engine/models/PensionInputs";
 export type WhatIfExperimentId =
   | "retirement-age"
   | "contributions"
+  | "extra-saving"
   | "spending"
   | "fees"
   | "returns"
