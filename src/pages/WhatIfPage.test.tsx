@@ -150,9 +150,7 @@ describe("WhatIfPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /retirement age/i })).toBeEnabled();
     expect(screen.getByRole("tab", { name: /save more/i })).toBeEnabled();
-    expect(
-      screen.getByRole("slider", { name: "Experimental retirement age" }),
-    ).toHaveValue("65");
+    expect(screen.getByRole("slider", { name: "Retirement age" })).toHaveValue("65");
     expect(screen.getByText("Main Plan is unchanged")).toBeInTheDocument();
   });
 
@@ -160,7 +158,7 @@ describe("WhatIfPage", () => {
     render(<WhatIfPage />);
 
     fireEvent.change(
-      screen.getByRole("slider", { name: "Experimental retirement age" }),
+      screen.getByRole("slider", { name: "Retirement age" }),
       { target: { value: "63" } },
     );
 
@@ -169,7 +167,7 @@ describe("WhatIfPage", () => {
       screen.getByRole("heading", { name: "Retire at 63" }),
     ).toBeInTheDocument();
     expect(screen.getByText("2 years earlier")).toBeInTheDocument();
-    expect(screen.getByText("Pension when retirement starts")).toBeInTheDocument();
+    expect(screen.getByText("Pension when you retire")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Save experiment" })).toBeEnabled();
     expect(setHasUnsavedExperiment).toHaveBeenCalledWith(true);
   });
@@ -178,7 +176,7 @@ describe("WhatIfPage", () => {
     render(<WhatIfPage />);
 
     fireEvent.change(
-      screen.getByRole("slider", { name: "Experimental retirement age" }),
+      screen.getByRole("slider", { name: "Retirement age" }),
       { target: { value: "47" } },
     );
 
@@ -187,7 +185,7 @@ describe("WhatIfPage", () => {
       screen.getByRole("heading", { name: "Retire at 47" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Retiring now uses the pension already built/i),
+      screen.getByText(/Retiring now means using the pension you have already built/i),
     ).toBeInTheDocument();
 
     const experimentalCall = mockedUsePensionProjection.mock.calls.find(
