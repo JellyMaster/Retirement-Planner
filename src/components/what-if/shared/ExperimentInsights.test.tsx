@@ -116,7 +116,7 @@ describe("ExperimentInsights", () => {
       onSelectExperiment={vi.fn()}
     />);
 
-    expect(screen.queryByText("Retirement impact details")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Financial details" })).not.toBeInTheDocument();
 
     setWhatIfViewMode("detailed");
     rerender(<ExperimentInsights
@@ -137,7 +137,7 @@ describe("ExperimentInsights", () => {
       onSelectExperiment={vi.fn()}
     />);
 
-    expect(screen.getByRole("heading", { name: "Retirement impact details" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Financial details" })).toBeInTheDocument();
   });
 
   it("benchmarks a retirement-age change against the saved plan while keeping sustainability separate", () => {
@@ -198,14 +198,14 @@ describe("ExperimentInsights", () => {
     expect(
       screen.getByText(/State Pension remains included from age 68; only the retirement-age decision has changed/i),
     ).toBeInTheDocument();
-    expect(screen.queryByText("Retirement impact details")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Financial details" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /see the financial details/i }));
 
-    expect(screen.getByRole("heading", { name: "Retirement impact details" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Financial details" })).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Does retiring at 60 still support your plan?" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Capital-preservation income")).toBeInTheDocument();
+    expect(screen.getByText("Income with ending-balance goal")).toBeInTheDocument();
   });
 });
