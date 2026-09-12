@@ -71,6 +71,7 @@ export function RetirementAgeExperiment({
   const savedPlanTiming = createSavedPlanTiming(ageDifference);
   const saveAlreadyExists = hasChanged && !canSave && saveMessage === null;
   const savedMarkers = savedExperiments
+    .map((item, index) => ({ ...item, markerNumber: index + 1, markerTone: index % 6 }))
     .filter((item) => item.retirementAge >= minAge && item.retirementAge <= maxAge)
     .map((item) => ({ ...item, position: ((item.retirementAge - minAge) / ageRange) * 100 }));
 
@@ -96,7 +97,15 @@ export function RetirementAgeExperiment({
             <div className="what-if-slider-track-wrap">
               <input id="what-if-retirement-age" type="range" min={minAge} max={maxAge} step={1} value={retirementAge} aria-label="Retirement age" aria-valuetext={`Age ${retirementAge}`} onChange={(event) => onRetirementAgeChange(Number(event.target.value))} />
               {savedMarkers.map((marker) => (
-                <span key={marker.id} className={`what-if-slider-experiment-marker${marker.retirementAge === retirementAge ? " is-current" : ""}`} style={{ left: `${marker.position}%` }} title={`${marker.name} · Retire at age ${marker.retirementAge}`} aria-hidden="true" />
+                <span
+                  key={marker.id}
+                  className={`what-if-contribution-experiment-marker what-if-marker-tone-${marker.markerTone}`}
+                  style={{ left: `${marker.position}%` }}
+                  title={`${marker.name} · Retire at age ${marker.retirementAge}`}
+                  aria-hidden="true"
+                >
+                  {marker.markerNumber}
+                </span>
               ))}
               <span className="what-if-slider-reference-marker" style={{ left: `${baselinePosition}%` }} aria-hidden="true" />
             </div>
@@ -104,7 +113,7 @@ export function RetirementAgeExperiment({
               <span>Age {minAge}</span><span className="what-if-slider-saved-label" style={{ left: `${baselinePosition}%` }}>Saved · {baselineRetirementAge}</span><span>Age {maxAge}</span>
             </div>
             {savedMarkers.length > 0 && (
-              <p className="what-if-slider-marker-key"><span className="what-if-slider-marker-key-dot" aria-hidden="true" />{savedMarkers.length === 1 ? "1 saved experiment is marked on the slider" : `${savedMarkers.length} saved experiments are marked on the slider`}</p>
+              <p className="what-if-contribution-marker-key">Numbered markers match the saved retirement-age experiments in the panel.</p>
             )}
           </div>
           <p className="what-if-control-note">{immediateRetirement ? "Retiring now means using the pension you have already built, with no more years to pay in or let it grow before retirement." : "Changing when you retire changes how long you can pay into your pension, how long it can grow, and how many years it may need to support you."}</p>
