@@ -79,11 +79,15 @@ export function SavedExperimentsPanel({
                 const isApplied = loadedScenarioId === scenario.id;
                 const confirmingDelete = pendingDeleteId === scenario.id;
                 const showMarkerKey =
-                  activeExperiment === "contributions" || activeExperiment === "retirement-age";
+                  activeExperiment === "contributions" ||
+                  activeExperiment === "extra-saving" ||
+                  activeExperiment === "retirement-age";
                 const markerTarget =
                   activeExperiment === "retirement-age"
                     ? "retirement-age slider"
-                    : "contribution sliders";
+                    : activeExperiment === "extra-saving"
+                      ? "extra-saving sliders"
+                      : "contribution sliders";
                 return (
                   <article
                     key={scenario.id}
@@ -134,16 +138,10 @@ export function SavedExperimentsPanel({
                       </button>
                     </div>
                     {isApplied && (
-                      <span className="what-if-saved-panel-loaded what-if-saved-panel-applied">
-                        Applied
-                      </span>
+                      <span className="what-if-saved-panel-loaded what-if-saved-panel-applied">Applied</span>
                     )}
                     {confirmingDelete && (
-                      <div
-                        className="what-if-saved-panel-delete-confirm"
-                        role="group"
-                        aria-label={`Confirm deletion of ${scenario.name}`}
-                      >
+                      <div className="what-if-saved-panel-delete-confirm" role="group" aria-label={`Confirm deletion of ${scenario.name}`}>
                         <span>Delete this saved experiment?</span>
                         <div>
                           <button
@@ -156,9 +154,7 @@ export function SavedExperimentsPanel({
                           >
                             Delete
                           </button>
-                          <button type="button" onClick={() => setPendingDeleteId(null)}>
-                            Cancel
-                          </button>
+                          <button type="button" onClick={() => setPendingDeleteId(null)}>Cancel</button>
                         </div>
                       </div>
                     )}
@@ -173,8 +169,7 @@ export function SavedExperimentsPanel({
             </div>
           )}
           <p className="what-if-saved-panel-note">
-            Apply a saved idea to use it in this What If. Stop applying returns this experiment to{" "}
-            {activePlanName} without deleting the saved idea.
+            Apply a saved idea to use it in this What If. Stop applying returns this experiment to {activePlanName} without deleting the saved idea.
           </p>
         </>
       )}
@@ -182,11 +177,7 @@ export function SavedExperimentsPanel({
   );
 }
 
-function AppliedExperimentStatus({
-  scenario,
-  activePlanName,
-  onStopApplying,
-}: {
+function AppliedExperimentStatus({ scenario, activePlanName, onStopApplying }: {
   scenario: WhatIfScenario | null;
   activePlanName: string;
   onStopApplying: () => void;
@@ -206,31 +197,22 @@ function AppliedExperimentStatus({
         <strong>{scenario.name}</strong>
         <small>{createExperimentSummary(scenario)}</small>
       </div>
-      <button type="button" onClick={onStopApplying}>
-        Stop applying
-      </button>
+      <button type="button" onClick={onStopApplying}>Stop applying</button>
     </div>
   );
 }
 
 function formatExperimentName(experiment: ExperimentId): string {
   switch (experiment) {
-    case "retirement-age":
-      return "Retirement age";
-    case "contributions":
-      return "Save more";
-    case "spending":
-      return "Spending";
-    case "fees":
-      return "Fees";
-    case "returns":
-      return "Returns";
-    case "inflation":
-      return "Inflation";
-    case "state-pension":
-      return "State Pension";
-    case "market-downturn":
-      return "Market downturn";
+    case "retirement-age": return "Retirement age";
+    case "contributions": return "Save more";
+    case "extra-saving": return "Save more later";
+    case "spending": return "Spending";
+    case "fees": return "Fees";
+    case "returns": return "Returns";
+    case "inflation": return "Inflation";
+    case "state-pension": return "State Pension";
+    case "market-downturn": return "Market downturn";
   }
 }
 
@@ -239,9 +221,13 @@ function createExperimentSummary(scenario: WhatIfScenario): string {
     case "retirement-age":
       return `Age ${scenario.inputs.retirementAge}`;
     case "contributions":
-      return `£${Math.round(
-        scenario.inputs.monthlyEmployeeContribution + scenario.inputs.monthlyEmployerContribution,
-      ).toLocaleString("en-GB")}/month`;
+      return `£${Math.round(scenario.inputs.monthlyEmployeeContribution + scenario.inputs.monthlyEmployerContribution).toLocaleString("en-GB")}/month`;
+    case "extra-saving": {
+      const amount = scenario.inputs.extraMonthlyContribution ?? 0;
+      return amount > 0
+        ? `£${Math.round(amount).toLocaleString("en-GB")}/month from age ${scenario.inputs.extraContributionAge ?? scenario.inputs.currentAge}`
+        : "No scheduled extra saving";
+    }
     case "spending":
       return `£${Math.round(scenario.drawdown.desiredAnnualIncome).toLocaleString("en-GB")}/year target`;
     case "fees":
@@ -251,9 +237,7 @@ function createExperimentSummary(scenario: WhatIfScenario): string {
     case "inflation":
       return `${(scenario.inputs.inflation * 100).toFixed(1)}% inflation`;
     case "state-pension":
-      return scenario.drawdown.includeStatePension
-        ? "State Pension included"
-        : "State Pension excluded";
+      return scenario.drawdown.includeStatePension ? "State Pension included" : "State Pension excluded";
     case "market-downturn":
       return `${Math.round((scenario.inputs.marketDownturnPercentage ?? 0) * 100)}% fall at age ${scenario.inputs.marketDownturnAge ?? scenario.inputs.currentAge}`;
   }
