@@ -1,8 +1,30 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { RetirementSpendingOutcome } from "../../../engine/drawdown/createRetirementSpendingOutcome";
 import { setWhatIfViewMode } from "../whatIfDisplaySettings";
 import { ExperimentInsights } from "./ExperimentInsights";
+
+function createRetirementOutcome(
+  overrides: Partial<RetirementSpendingOutcome> = {},
+): RetirementSpendingOutcome {
+  return {
+    targetNetSpending: 30_000,
+    sustainableNetSpending: 28_000,
+    annualHeadroom: -2_000,
+    headroomPercent: -2_000 / 30_000,
+    status: "shortfall",
+    targetEndingBalance: 100_000,
+    modelledEndingBalance: 100_000,
+    livingStandard: "minimum",
+    includesStatePension: true,
+    savedPlanSupportsTarget: false,
+    savedPlanFirstNetIncomeShortfallAge: 80,
+    savedPlanDepletionAge: 80,
+    savedPlanEndingBalance: 0,
+    ...overrides,
+  };
+}
 
 function renderInsights(
   overrides: Partial<React.ComponentProps<typeof ExperimentInsights>> = {},
@@ -61,28 +83,20 @@ describe("ExperimentInsights", () => {
   });
 
   it("keeps retirement impact details out of simple view and shows them in detailed view", () => {
-    const baseline = {
-      targetNetSpending: 30_000,
-      sustainableNetSpending: 28_000,
-      annualHeadroom: -2_000,
-      headroomPercent: -2_000 / 30_000,
-      status: "shortfall" as const,
-      targetEndingBalance: 100_000,
-      modelledEndingBalance: 100_000,
-      livingStandard: "minimum" as const,
-      includesStatePension: true,
-    };
-    const outcome = {
+    const baseline = createRetirementOutcome();
+    const outcome = createRetirementOutcome({
       targetNetSpending: 29_500,
       sustainableNetSpending: 33_000,
       annualHeadroom: 3_500,
       headroomPercent: 3_500 / 29_500,
-      status: "comfortable" as const,
-      targetEndingBalance: 100_000,
+      status: "comfortable",
       modelledEndingBalance: 110_000,
-      livingStandard: "moderate" as const,
-      includesStatePension: true,
-    };
+      livingStandard: "moderate",
+      savedPlanSupportsTarget: true,
+      savedPlanFirstNetIncomeShortfallAge: null,
+      savedPlanDepletionAge: null,
+      savedPlanEndingBalance: 90_000,
+    });
 
     const { rerender } = render(<ExperimentInsights
       activeExperiment="fees"
@@ -126,57 +140,72 @@ describe("ExperimentInsights", () => {
     expect(screen.getByRole("heading", { name: "Retirement impact details" })).toBeInTheDocument();
   });
 
-  it("assesses a retirement-age change against the saved plan assumptions", () => {
-    const baseline = {
+  it("benchmarks a retirement-age change against the saved plan while keeping sustainability separate", () => {
+    const baseline = createRetirementOutcome({
       targetNetSpending: 45_400,
       sustainableNetSpending: 44_685,
       annualHeadroom: -715,
       headroomPercent: -715 / 45_400,
-      status: "shortfall" as const,
       targetEndingBalance: 966_983,
       modelledEndingBalance: 967_046,
-      livingStandard: "moderate" as const,
-      includesStatePension: true,
-    };
-    const outcome = {
-      ...baseline,
-      sustainableNetSpending: 45_081,
-    };
+      livingStandard: "moderate",
+      savedPlanSupportsTarget: true,
+      savedPlanFirstNetIncomeShortfallAge: null,
+      savedPlanDepletionAge: null,
+      savedPlanEndingBalance: 748_820,
+    });
+    const outcome = createRetirementOutcome({
+      targetNetSpending: 45_400,
+      sustainableNetSpending: 28_515,
+      annualHeadroom: -16_885,
+      headroomPercent: -16_885 / 45_400,
+      targetEndingBalance: 589_047,
+      modelledEndingBalance: 589_103,
+      livingStandard: "moderate",
+      savedPlanSupportsTarget: false,
+      savedPlanFirstNetIncomeShortfallAge: 74,
+      savedPlanDepletionAge: 74,
+      savedPlanEndingBalance: 0,
+    });
 
     renderInsights({
       activeExperiment: "retirement-age",
       baselineRetirementAge: 68,
-      retirementAge: 66,
+      retirementAge: 60,
       planningAge: 90,
       statePensionAge: 68,
       baselineAnnualIncome: 44_685,
-      annualIncome: 45_081,
+      annualIncome: 28_515,
       baselineProjectedPension: 966_983,
-      projectedPension: 900_000,
+      projectedPension: 589_047,
       baselineRetirementOutcome: baseline,
       retirementOutcome: outcome,
       hasChanged: true,
     });
 
     expect(
-      screen.getByRole("heading", { name: "Could retiring at 66 support your plan?" }),
+      screen.getByRole("heading", { name: "Does retiring at 60 still support your plan?" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Your income target")).toBeInTheDocument();
-    expect(screen.getByText("Estimated supportable retirement income")).toBeInTheDocument();
+    expect(screen.getByText("Your saved income target")).toBeInTheDocument();
+    expect(screen.getByText("Plan benchmark")).toBeInTheDocument();
     expect(screen.getByText("£45,400/year")).toBeInTheDocument();
-    expect(screen.getByText("£45,081/year")).toBeInTheDocument();
+    expect(screen.getByText("Shortfall from age 74")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Your target income may not be fully supported" }),
+      screen.getByRole("heading", {
+        name: "Your saved plan no longer works through the full planning period",
+      }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/State Pension is included in this assessment from age 68/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/State Pension remains included from age 68; only the retirement-age decision has changed/i),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Retirement impact details")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /see the financial details/i }));
 
     expect(screen.getByRole("heading", { name: "Retirement impact details" })).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Could retiring at 66 support your plan?" }),
+      screen.getByRole("heading", { name: "Does retiring at 60 still support your plan?" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Sustainable retirement income")).toBeInTheDocument();
+    expect(screen.getByText("Capital-preservation income")).toBeInTheDocument();
   });
 });
