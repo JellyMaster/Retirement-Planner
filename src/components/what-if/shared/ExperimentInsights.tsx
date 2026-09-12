@@ -240,6 +240,15 @@ function RetirementAgePlanAssessment({
         </div>
       </header>
 
+      {detailed && (
+        <PlanConstantsSummary
+          incomeGoal={targetIncome}
+          planningAge={planningAge}
+          statePensionIncluded={statePensionIncluded}
+          takingLumpSumCash={baseline.taxFreeCashTaken > 0}
+        />
+      )}
+
       <div
         className="what-if-simple-impact-grid"
         aria-label="Retirement plan check"
@@ -307,6 +316,45 @@ function RetirementAgePlanAssessment({
         </button>
       )}
     </section>
+  );
+}
+
+function PlanConstantsSummary({
+  incomeGoal,
+  planningAge,
+  statePensionIncluded,
+  takingLumpSumCash,
+}: {
+  incomeGoal: number;
+  planningAge?: number;
+  statePensionIncluded: boolean;
+  takingLumpSumCash: boolean;
+}) {
+  return (
+    <aside className="what-if-plan-constants" aria-label="What we've kept the same">
+      <div className="what-if-plan-constants-heading">
+        <strong>What we’ve kept the same</strong>
+        <span>Key choices from your saved plan that haven’t changed in this experiment.</span>
+      </div>
+      <dl>
+        <div>
+          <dt>Income goal</dt>
+          <dd>{formatCurrency(incomeGoal)}/year</dd>
+        </div>
+        <div>
+          <dt>Planning to age</dt>
+          <dd>{planningAge ?? "—"}</dd>
+        </div>
+        <div>
+          <dt>State Pension included</dt>
+          <dd>{statePensionIncluded ? "Yes" : "No"}</dd>
+        </div>
+        <div>
+          <dt>Taking lump sum cash</dt>
+          <dd>{takingLumpSumCash ? "Yes" : "No"}</dd>
+        </div>
+      </dl>
+    </aside>
   );
 }
 
