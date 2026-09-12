@@ -27,6 +27,7 @@ interface ExperimentInsightsProps {
 const experimentQuestion: Record<ExperimentId, string> = {
   "retirement-age": "When could I retire?",
   contributions: "What if I saved more?",
+  "extra-saving": "What if I saved more later?",
   spending: "Could I spend more?",
   fees: "Would lower fees matter?",
   returns: "How sensitive is the plan to returns?",
@@ -55,7 +56,7 @@ export function ExperimentInsights({
   const includesStatePension = retirementOutcome?.includesStatePension ?? baselineRetirementOutcome?.includesStatePension ?? true;
 
   if (
-    (activeExperiment === "retirement-age" || activeExperiment === "contributions") &&
+    (activeExperiment === "retirement-age" || activeExperiment === "contributions" || activeExperiment === "extra-saving") &&
     baselineRetirementOutcome &&
     retirementOutcome
   ) {
@@ -120,10 +121,7 @@ export function ExperimentInsights({
 
       {hasChanged && (
         <article className={`what-if-verdict ${targetDifference === null ? outcomeVerdict.className : toneClass(targetDifference)}`}>
-          <div>
-            <p className="planner-eyebrow">Plan assessment</p>
-            <h3>{targetDifference === null ? outcomeVerdict.label : targetVerdict(targetDifference)}</h3>
-          </div>
+          <div><p className="planner-eyebrow">Plan assessment</p><h3>{targetDifference === null ? outcomeVerdict.label : targetVerdict(targetDifference)}</h3></div>
           <p>
             {targetDifference === null
               ? createExplanation(activeExperiment, pensionDifference, incomeDifference)
@@ -158,7 +156,7 @@ function SavedPlanAssessment({
   hasChanged,
   detailed,
 }: {
-  experiment: "retirement-age" | "contributions";
+  experiment: "retirement-age" | "contributions" | "extra-saving";
   baselineRetirementAge?: number;
   retirementAge: number;
   planningAge?: number;
@@ -185,6 +183,8 @@ function SavedPlanAssessment({
       ? "Your saved retirement income does not last for the full plan"
       : `Your saved retirement income first falls short at age ${firstProblemAge}`;
   const isRetirementAge = experiment === "retirement-age";
+  const isExtraSaving = experiment === "extra-saving";
+  const experimentLabel = isExtraSaving ? "future extra-saving" : "saving";
 
   return (
     <section className={`what-if-insights${detailed ? "" : " what-if-insights-simple"}`} aria-labelledby="decision-summary-title">
@@ -196,9 +196,13 @@ function SavedPlanAssessment({
               ? hasChanged
                 ? `Does retiring at ${retirementAge} still support your plan?`
                 : "Does your saved retirement age support your plan?"
-              : hasChanged
-                ? "Does this saving change improve your retirement plan?"
-                : "Does your saved contribution plan support your retirement?"}
+              : isExtraSaving
+                ? hasChanged
+                  ? "Does this future extra saving improve your retirement plan?"
+                  : "Does your saved future-saving plan support your retirement?"
+                : hasChanged
+                  ? "Does this saving change improve your retirement plan?"
+                  : "Does your saved contribution plan support your retirement?"}
           </h2>
           <p>
             {isRetirementAge
@@ -208,7 +212,7 @@ function SavedPlanAssessment({
                   ? `We've kept your saved plan unchanged and checked whether your retirement income lasts through ${planHorizon}.`
                   : `We've kept your saved plan unchanged and checked whether retiring at ${baselineRetirementAge} provides your retirement income through ${planHorizon}.`
               : hasChanged
-                ? `We've changed only the saving choices in this experiment and checked whether your saved retirement income now lasts through ${planHorizon}.`
+                ? `We've changed only the ${experimentLabel} choices in this experiment and checked whether your saved retirement income now lasts through ${planHorizon}.`
                 : `We've kept your saved plan unchanged and checked whether your retirement income lasts through ${planHorizon}.`}
           </p>
         </div>
@@ -243,10 +247,14 @@ function SavedPlanAssessment({
           {supportsTarget
             ? isRetirementAge
               ? "Your saved plan still works with this retirement age"
-              : "Your retirement income plan works with this saving change"
+              : isExtraSaving
+                ? "Your retirement income plan works with this future saving change"
+                : "Your retirement income plan works with this saving change"
             : isRetirementAge
               ? "Your saved plan no longer works through the full planning period"
-              : "This saving change is not enough for the full planning period"}
+              : isExtraSaving
+                ? "This future saving change is not enough for the full planning period"
+                : "This saving change is not enough for the full planning period"}
         </h3>
         <p>
           {supportsTarget
@@ -257,8 +265,8 @@ function SavedPlanAssessment({
         </p>
         <small>
           {statePensionIncluded
-            ? `State Pension remains included from age ${statePensionAge}; only ${isRetirementAge ? "the retirement-age decision" : "the saving choices"} changed.`
-            : `State Pension remains excluded; only ${isRetirementAge ? "the retirement-age decision" : "the saving choices"} changed.`}
+            ? `State Pension remains included from age ${statePensionAge}; only ${isRetirementAge ? "the retirement-age decision" : isExtraSaving ? "the future extra-saving choices" : "the saving choices"} changed.`
+            : `State Pension remains excluded; only ${isRetirementAge ? "the retirement-age decision" : isExtraSaving ? "the future extra-saving choices" : "the saving choices"} changed.`}
         </small>
       </article>
 
@@ -273,10 +281,7 @@ function SavedPlanAssessment({
         />
       ) : (
         <button type="button" className="what-if-simple-detail-action" onClick={() => setWhatIfViewMode("detailed")}>
-          <span>
-            <strong>See the financial details</strong>
-            <small>See the unchanged retirement choices and the extra ending-balance check.</small>
-          </span>
+          <span><strong>See the financial details</strong><small>See the unchanged retirement choices and the extra ending-balance check.</small></span>
           <span aria-hidden="true">›</span>
         </button>
       )}
@@ -384,6 +389,7 @@ function createExplanation(experiment: ExperimentId, pensionDifference: number, 
   switch (experiment) {
     case "retirement-age": return `Changing retirement age ${direction} the sustainable retirement income and leaves a ${pensionDirection} pension pot at retirement.`;
     case "contributions": return `Changing contributions leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income.`;
+    case "extra-saving": return `Changing future extra saving leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income.`;
     case "spending": return "A higher spending target can improve retirement lifestyle, but it also asks more of the pension.";
     case "fees": return `The fee change leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income.`;
     case "returns": return `The return assumption leaves a ${pensionDirection} pension pot at retirement and ${direction} the illustrated retirement income. Returns are an assumption, not a guaranteed outcome.`;
