@@ -102,7 +102,7 @@ export function RetirementAgeExperiment({
     >
       <header className="what-if-workspace-header what-if-workspace-header-compact">
         <div>
-          <p className="planner-eyebrow">Current experiment</p>
+          <p className="planner-eyebrow">What if</p>
           <h2 id="retirement-age-experiment-title">Retirement age</h2>
         </div>
         <span className="what-if-baseline-pill">Based on {activePlanName}</span>
@@ -116,10 +116,10 @@ export function RetirementAgeExperiment({
           <div className="what-if-panel-heading">
             <p className="planner-eyebrow">Change</p>
             <h3 id="retirement-age-change-title">When would you like to retire?</h3>
-            <p>Move one lever. Everything else stays as saved in your plan.</p>
+            <p>Change your retirement age. Everything else stays the same.</p>
           </div>
           <div className="what-if-primary-value">
-            <span>Experimental retirement age</span>
+            <span>Retirement age</span>
             <strong>Age {retirementAge}</strong>
             <small>
               Saved plan: age {baselineRetirementAge} · {savedPlanTiming}
@@ -134,7 +134,7 @@ export function RetirementAgeExperiment({
                 max={maxAge}
                 step={1}
                 value={retirementAge}
-                aria-label="Experimental retirement age"
+                aria-label="Retirement age"
                 aria-valuetext={`Age ${retirementAge}`}
                 onChange={(event) =>
                   onRetirementAgeChange(Number(event.target.value))
@@ -181,8 +181,8 @@ export function RetirementAgeExperiment({
           </div>
           <p className="what-if-control-note">
             {immediateRetirement
-              ? "Retiring now uses the pension already built, with no further contribution or accumulation years."
-              : "Changing retirement age affects both how long the pension can grow and how many retirement years it may need to support."}
+              ? "Retiring now means using the pension you have already built, with no more years to pay in or let it grow before retirement."
+              : "Changing when you retire changes how long you can pay into your pension, how long it can grow, and how many years it may need to support you."}
           </p>
         </section>
 
@@ -212,10 +212,17 @@ export function RetirementAgeExperiment({
               <div className="what-if-simple-outcome-copy">
                 <strong>
                   {hasChanged
-                    ? `What changes if you retire at ${retirementAge}?`
+                    ? `What happens if you retire at ${retirementAge}?`
                     : `${activePlanName} is unchanged`}
                 </strong>
-                <p>{directImpactExplanation(ageDifference, retirementAge)}</p>
+                <p>
+                  {directImpactExplanation(
+                    ageDifference,
+                    retirementAge,
+                    pensionDifference,
+                    retirementYearsDifference,
+                  )}
+                </p>
               </div>
               <div
                 className="what-if-simple-results"
@@ -223,13 +230,13 @@ export function RetirementAgeExperiment({
               >
                 <SimpleResult
                   value={formatCurrency(displayedPension)}
-                  label="Pension when retirement starts"
+                  label="Pension when you retire"
                   note={
                     hasChanged
-                      ? `${formatSignedCurrency(
+                      ? `${formatPlainCurrencyDifference(
                           pensionDifference,
-                        )} compared with retiring at ${baselineRetirementAge}`
-                      : "Your saved plan starting pension"
+                        )} than retiring at ${baselineRetirementAge}`
+                      : `Your pension if you retire at ${baselineRetirementAge}`
                   }
                   tone={
                     pensionDifference < 0
@@ -241,11 +248,11 @@ export function RetirementAgeExperiment({
                 />
                 <SimpleResult
                   value={`${retirementYears} years`}
-                  label="Modelled retirement years"
+                  label="Years in retirement"
                   note={
                     hasChanged
                       ? retirementYearsNote(retirementYearsDifference)
-                      : `Ages ${retirementAge} to ${planningAge}, inclusive`
+                      : `From age ${retirementAge} to ${planningAge}`
                   }
                   tone="neutral"
                 />
@@ -267,8 +274,15 @@ export function RetirementAgeExperiment({
                   />
                 </span>
                 <div>
-                  <strong>Direct impact of changing retirement age</strong>
-                  <p>{directImpactExplanation(ageDifference, retirementAge)}</p>
+                  <strong>What changing your retirement age does</strong>
+                  <p>
+                    {directImpactExplanation(
+                      ageDifference,
+                      retirementAge,
+                      pensionDifference,
+                      retirementYearsDifference,
+                    )}
+                  </p>
                 </div>
               </div>
               <div
@@ -276,12 +290,12 @@ export function RetirementAgeExperiment({
                 aria-label="Detailed retirement age outcomes"
               >
                 <KeyResult
-                  label="Pension at retirement"
+                  label="Pension when you retire"
                   value={formatCurrency(displayedPension)}
                   difference={formatSignedCurrency(pensionDifference)}
                 />
                 <KeyResult
-                  label="Modelled retirement years"
+                  label="Years in retirement"
                   value={`${retirementYears} years`}
                   difference={formatSignedYears(retirementYearsDifference)}
                 />
@@ -322,7 +336,7 @@ export function RetirementAgeExperiment({
             <summary>
               <span>
                 <strong>Why did this change?</strong>
-                <small>See the mechanics behind the direct pension impact.</small>
+                <small>See what is driving the change in your pension.</small>
               </span>
               <span aria-hidden="true">+</span>
             </summary>
@@ -339,19 +353,19 @@ export function RetirementAgeExperiment({
             <summary>
               <span>
                 <strong>Detailed comparison</strong>
-                <small>Compare the direct effect with the saved plan.</small>
+                <small>Compare what changes with your saved plan.</small>
               </span>
               <span aria-hidden="true">+</span>
             </summary>
             <div className="what-if-detail-comparison">
               <OutcomeCard
-                label="Pension at retirement"
+                label="Pension when you retire"
                 baseline={formatCurrency(displayedBaselinePension)}
                 experiment={formatCurrency(displayedPension)}
                 difference={formatSignedCurrency(pensionDifference)}
               />
               <OutcomeCard
-                label="Modelled retirement years"
+                label="Years in retirement"
                 baseline={`${baselineRetirementYears} years`}
                 experiment={`${retirementYears} years`}
                 difference={formatSignedYears(retirementYearsDifference)}
@@ -452,22 +466,31 @@ function OutcomeCard({
 function directImpactExplanation(
   ageDifference: number,
   retirementAge: number,
+  pensionDifference: number,
+  retirementYearsDifference: number,
 ): string {
   if (ageDifference === 0) {
-    return "Move the retirement-age slider to see how changing when you retire affects the pension you start with and how long it may need to support you.";
+    return "Move the retirement-age slider to see how changing when you retire affects the pension you start with and how many years it may need to support you.";
   }
+
+  const years = Math.abs(ageDifference);
+  const yearWord = years === 1 ? "year" : "years";
+  const retirementYears = Math.abs(retirementYearsDifference);
+  const retirementYearWord = retirementYears === 1 ? "year" : "years";
+  const pensionChange = formatCurrency(Math.abs(pensionDifference));
+
   if (ageDifference < 0) {
-    return `Retiring at ${retirementAge} gives your pension less time for contributions and growth, so you start retirement with less money and need it to support more retirement years.`;
+    return `You'd have ${years} fewer ${yearWord} to pay into your pension and for it to grow. You'd start retirement with ${pensionChange} less and need your pension to support you for ${retirementYears} ${retirementYearWord} longer.`;
   }
-  return `Retiring at ${retirementAge} gives your pension more time for contributions and growth, so you start retirement with more money and need it to support fewer retirement years.`;
+  return `You'd have ${years} more ${yearWord} to pay into your pension and for it to grow. You'd start retirement with ${pensionChange} more and need your pension to support you for ${retirementYears} fewer ${retirementYearWord}.`;
 }
 
 function retirementYearsNote(difference: number): string {
-  if (difference === 0) return "Same length as your saved plan";
+  if (difference === 0) return "Same as your saved plan";
   const years = Math.abs(difference);
   return `${years} ${years === 1 ? "year" : "years"} ${
-    difference > 0 ? "more" : "fewer"
-  } to support`;
+    difference > 0 ? "longer" : "shorter"
+  } than your saved plan`;
 }
 
 function createSavedPlanTiming(ageDifference: number): string {
@@ -484,30 +507,35 @@ function createReasons(
 ): string[] {
   if (immediateRetirement) {
     return [
-      "There are no further contribution years before retirement.",
-      "The pension has no further accumulation period before withdrawals begin.",
-      "The pension needs to support the full modelled retirement period immediately.",
+      "You stop paying into your pension when retirement starts.",
+      "Your pension has no more time to grow before you begin taking money from it.",
+      "Your pension needs to support you from now until your planning age.",
     ];
   }
   if (ageDifference < 0) {
     return [
-      "There are fewer years of contributions before retirement.",
-      "The pension has less time for investment growth before withdrawals begin.",
-      "There are more retirement years for the pension to support.",
+      "You have fewer years to pay into your pension before retirement.",
+      "Your pension has less time to grow before you begin taking money from it.",
+      "Your pension needs to support you for more years in retirement.",
     ];
   }
   if (ageDifference > 0) {
     return [
-      "There are more years of contributions before retirement.",
-      "The pension has longer for investment growth before withdrawals begin.",
-      "There are fewer retirement years for the pension to support.",
+      "You have more years to pay into your pension before retirement.",
+      "Your pension has more time to grow before you begin taking money from it.",
+      "Your pension needs to support you for fewer years in retirement.",
     ];
   }
   return [
-    "This matches the retirement age in your saved plan.",
-    "Contribution years and the accumulation period are unchanged.",
-    "The planned retirement period is unchanged.",
+    "This is the retirement age in your saved plan.",
+    "The time you have to pay in and let your pension grow is unchanged.",
+    "The number of years your pension needs to support you is unchanged.",
   ];
+}
+
+function formatPlainCurrencyDifference(value: number): string {
+  if (Math.abs(value) < 0.5) return "The same";
+  return `${formatCurrency(Math.abs(value))} ${value > 0 ? "more" : "less"}`;
 }
 
 function formatSignedCurrency(value: number): string {
