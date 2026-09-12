@@ -4,7 +4,7 @@
 
 .what-if-view-controls { margin: 0; padding: 0; border: 0; }
 .what-if-view-controls .money-display-toggle-group { min-width: 250px; }
-.what-if-slider-experiment-marker { position: absolute; z-index: 1; top: 50%; width: 3px; height: 1.45rem; transform: translate(-50%, -50%); border-radius: 999px; background: var(--colour-primary); box-shadow: 0 0 0 2px var(--colour-surface); pointer-events: none; }
+.what-if-slider-experiment-marker { position: absolute; z-index: 4; top: 50%; width: 3px; height: 1.45rem; transform: translate(-50%, -50%); border-radius: 999px; background: var(--colour-primary); box-shadow: 0 0 0 2px var(--colour-surface); pointer-events: none; }
 .what-if-slider-experiment-marker::after { position: absolute; top: 50%; left: 50%; width: .55rem; height: .55rem; transform: translate(-50%, -50%); border: 2px solid var(--colour-surface); border-radius: 50%; background: var(--colour-primary); content: ""; }
 .what-if-slider-experiment-marker.is-current { width: 4px; height: 1.7rem; }
 .what-if-slider-experiment-marker.is-current::after { width: .72rem; height: .72rem; box-shadow: 0 0 0 3px color-mix(in srgb, var(--colour-primary) 18%, transparent); }
@@ -142,7 +142,7 @@
 
 .what-if-contribution-experiment-marker {
   position: absolute;
-  z-index: 1;
+  z-index: 4;
   top: 50%;
   display: grid;
   width: 1rem;
