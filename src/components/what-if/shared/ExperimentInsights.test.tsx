@@ -199,7 +199,7 @@ describe("ExperimentInsights", () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/State Pension remains included from age 68; only the retirement-age decision has changed/i),
+      screen.getByText(/State Pension remains included from age 68; only the retirement-age decision changed/i),
     ).toBeInTheDocument();
     expect(screen.queryByLabelText("What we've kept the same")).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Extra financial checks" })).not.toBeInTheDocument();
