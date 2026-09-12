@@ -84,6 +84,12 @@ function createExperimentSummary(scenario: WhatIfScenario): string {
       return `Retirement age ${scenario.inputs.retirementAge}`;
     case "contributions":
       return `£${Math.round(scenario.inputs.monthlyEmployeeContribution + scenario.inputs.monthlyEmployerContribution).toLocaleString("en-GB")}/month regular contributions`;
+    case "extra-saving": {
+      const amount = scenario.inputs.extraMonthlyContribution ?? 0;
+      return amount > 0
+        ? `£${Math.round(amount).toLocaleString("en-GB")}/month extra from age ${scenario.inputs.extraContributionAge ?? scenario.inputs.currentAge}`
+        : "No scheduled extra saving";
+    }
     case "spending":
       return `£${Math.round(scenario.drawdown.desiredAnnualIncome).toLocaleString("en-GB")}/year retirement income target`;
     case "fees":
