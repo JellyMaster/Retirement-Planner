@@ -13,6 +13,7 @@ import type { PensionInputs } from "../engine/models/PensionInputs";
 import { usePensionProjection } from "../hooks/usePensionProjection";
 import { AppIcons } from "../icons";
 import { savePensionInputs } from "../state/planStorage";
+import "../styles/my-plan-dev-panel.css";
 
 const advancedIncomeSectionLabels: Record<string, string> = {
   chapters: "Will your spending change during retirement?",
@@ -194,7 +195,69 @@ function RetirementPlannerPageContent({
           Changes here update your Overview, What If? and Drawdown results automatically.
         </p>
       </aside>
+
+      {import.meta.env.DEV && (
+        <PlanJsonDevPanel
+          scenario={{
+            ...activeScenario,
+            inputs,
+            drawdown: activeScenario.drawdown ?? null,
+          }}
+        />
+      )}
     </main>
+  );
+}
+
+function PlanJsonDevPanel({ scenario }: { scenario: unknown }) {
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
+  const json = JSON.stringify(scenario, null, 2);
+
+  async function copyJson() {
+    try {
+      await navigator.clipboard.writeText(json);
+      setCopyStatus("Copied plan JSON to clipboard.");
+    } catch {
+      setCopyStatus("Could not copy automatically. Select the JSON below and copy it manually.");
+    }
+  }
+
+  return (
+    <details className="my-plan-dev-panel">
+      <summary>
+        <span className="my-plan-dev-panel-summary-copy">
+          <strong>Developer · Plan JSON</strong>
+          <small>Current active plan snapshot for debugging and calculation audits.</small>
+        </span>
+        <span className="my-plan-dev-badge">Dev only</span>
+      </summary>
+
+      <div className="my-plan-dev-panel-body">
+        <div className="my-plan-dev-panel-toolbar">
+          <p>
+            This is the exact plan configuration currently being edited, including inputs
+            and drawdown settings.
+          </p>
+          <button
+            type="button"
+            className="ui-button ui-button-secondary ui-button-small"
+            onClick={copyJson}
+          >
+            Copy JSON
+          </button>
+        </div>
+
+        <pre className="my-plan-dev-json" aria-label="Current plan JSON">
+          <code>{json}</code>
+        </pre>
+
+        {copyStatus && (
+          <p className="my-plan-dev-copy-status" role="status">
+            {copyStatus}
+          </p>
+        )}
+      </div>
+    </details>
   );
 }
 
