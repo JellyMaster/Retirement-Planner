@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Link,
@@ -9,8 +9,12 @@ import {
 import { EssentialAdvancedPensionInputsForm } from "../components/inputs/guided";
 import { useScenarios } from "../components/scenarios";
 import { createDefaultPensionInputs } from "../config/defaultPensionInputs";
+import { createRetirementSpendingOutcome } from "../engine/drawdown/createRetirementSpendingOutcome";
+import { DrawdownEngine } from "../engine/drawdown/DrawdownEngine";
+import { createDrawdownInputsFromPlan } from "../engine/drawdown/factories/createDrawdownInputsFromPlan";
 import type { PensionInputs } from "../engine/models/PensionInputs";
 import { usePensionProjection } from "../hooks/usePensionProjection";
+import { useStoredRetirementGoals } from "../hooks/useStoredRetirementGoals";
 import { AppIcons } from "../icons";
 import { savePensionInputs } from "../state/planStorage";
 import "../styles/my-plan-dev-panel.css";
@@ -20,6 +24,8 @@ const advancedIncomeSectionLabels: Record<string, string> = {
   "retirement-chapters": "Will your spending change during retirement?",
   "tax-free-cash": "What income and cash should the plan include?",
 };
+
+const drawdownEngine = new DrawdownEngine();
 
 export function RetirementPlannerPage() {
   return useInRouterContext() ? (
@@ -40,6 +46,7 @@ function RetirementPlannerPageContent({
   searchParams: URLSearchParams;
 }) {
   const { activeScenario, updateScenarioInputs } = useScenarios();
+  const [retirementGoals] = useStoredRetirementGoals();
   const [inputs, setInputs] = useState<PensionInputs>(() => ({
     ...activeScenario.inputs,
   }));
@@ -115,6 +122,109 @@ function RetirementPlannerPageContent({
   }
 
   const planComplete = !scenario.hasErrors;
+  const calculationAudit = useMemo(() => {
+    if (scenario.hasErrors) return null;
+
+    const effectiveDrawdownInputs = createDrawdownInputsFromPlan({
+      pensionInputs: inputs,
+      projection: scenario.projection,
+      retirementGoals,
+      drawdown: activeScenario.drawdown,
+    });
+    const drawdownResult = drawdownEngine.calculate(effectiveDrawdownInputs);
+    const spendingOutcome = createRetirementSpendingOutcome(
+      effectiveDrawdownInputs,
+      activeScenario.drawdown,
+    );
+    const firstYear = drawdownResult.years[0] ?? null;
+    const lastYear = drawdownResult.years.at(-1) ?? null;
+    const retirementPeriods = drawdownResult.years.length;
+    const endingBalanceToday =
+      lastYear && retirementPeriods > 0
+        ? lastYear.closingBalance /
+          Math.pow(1 + effectiveDrawdownInputs.inflationRate, retirementPeriods)
+        : drawdownResult.finalBalance;
+
+    return {
+      generatedFor: {
+        scenarioId: activeScenario.id,
+        scenarioName: activeScenario.name,
+      },
+      projection: {
+        retirementAge: inputs.retirementAge,
+        pensionAtRetirement: {
+          todayMoney: scenario.projection.finalBalance.real,
+          futureMoney: scenario.projection.finalBalance.nominal,
+        },
+        totalContributions: scenario.projection.totalContributions,
+        totalInvestmentGrowth: scenario.projection.totalInvestmentGrowth,
+        totalFees: scenario.projection.totalFees,
+      },
+      effectiveDrawdownInputs: {
+        ...effectiveDrawdownInputs,
+        retirementPeriods,
+        statePensionIncluded: effectiveDrawdownInputs.annualStatePension > 0,
+        preStatePensionRetirementYears: Math.max(
+          0,
+          Math.min(
+            effectiveDrawdownInputs.endAge + 1,
+            effectiveDrawdownInputs.statePensionAge,
+          ) - effectiveDrawdownInputs.retirementAge,
+        ),
+      },
+      savedStrategyResult: {
+        taxFreeCashTaken: drawdownResult.taxFreeCashTaken,
+        balanceEnteringDrawdown: drawdownResult.balanceAfterTaxFreeCash,
+        firstYear: firstYear
+          ? {
+              age: firstYear.age,
+              desiredNetIncome: firstYear.desiredIncome,
+              privatePensionWithdrawal: firstYear.pensionWithdrawal,
+              statePensionIncome: firstYear.statePensionIncome,
+              grossIncome: firstYear.grossIncome,
+              incomeTax: firstYear.incomeTax,
+              netIncome: firstYear.netIncome,
+              openingBalance: firstYear.openingBalance,
+              investmentGrowth: firstYear.investmentGrowth,
+              fees: firstYear.fees,
+              closingBalance: firstYear.closingBalance,
+            }
+          : null,
+        firstNetIncomeShortfallAge: drawdownResult.firstNetIncomeShortfallAge,
+        depletionAge: drawdownResult.depletionAge,
+        endingBalance: {
+          futureMoney: drawdownResult.finalBalance,
+          todayMoneyApprox: endingBalanceToday,
+        },
+        totalsFutureMoney: {
+          desiredIncome: drawdownResult.totalDesiredIncome,
+          statePensionIncome: drawdownResult.totalStatePensionIncome,
+          privatePensionWithdrawals: drawdownResult.totalPensionWithdrawals,
+          grossIncome: drawdownResult.totalGrossIncome,
+          incomeTax: drawdownResult.totalIncomeTax,
+          netIncome: drawdownResult.totalNetIncome,
+          netIncomeShortfall: drawdownResult.totalNetIncomeShortfall,
+          investmentGrowth: drawdownResult.totalInvestmentGrowth,
+          fees: drawdownResult.totalFees,
+        },
+      },
+      sustainabilityResult: {
+        interpretation:
+          "Maximum constant annual net spending that satisfies the configured ending-balance goal through the planning age.",
+        endingBalanceMode: activeScenario.drawdown?.endingBalanceMode ?? "preserve",
+        savedEndingBalancePercentage:
+          activeScenario.drawdown?.endingBalancePercentage ?? null,
+        targetEndingBalance: spendingOutcome.targetEndingBalance,
+        targetNetSpending: spendingOutcome.targetNetSpending,
+        supportableNetSpending: spendingOutcome.sustainableNetSpending,
+        annualHeadroom: spendingOutcome.annualHeadroom,
+        headroomPercent: spendingOutcome.headroomPercent,
+        status: spendingOutcome.status,
+        modelledEndingBalance: spendingOutcome.modelledEndingBalance,
+        includesStatePension: spendingOutcome.includesStatePension ?? false,
+      },
+    };
+  }, [activeScenario, inputs, retirementGoals, scenario.hasErrors, scenario.projection]);
 
   return (
     <main className="planner-page my-plan-page">
@@ -203,20 +313,34 @@ function RetirementPlannerPageContent({
             inputs,
             drawdown: activeScenario.drawdown ?? null,
           }}
+          calculationAudit={calculationAudit}
         />
       )}
     </main>
   );
 }
 
-function PlanJsonDevPanel({ scenario }: { scenario: unknown }) {
+function PlanJsonDevPanel({
+  scenario,
+  calculationAudit,
+}: {
+  scenario: unknown;
+  calculationAudit: unknown;
+}) {
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
-  const json = JSON.stringify(scenario, null, 2);
+  const json = JSON.stringify(
+    {
+      savedPlan: scenario,
+      calculationAudit,
+    },
+    null,
+    2,
+  );
 
   async function copyJson() {
     try {
       await navigator.clipboard.writeText(json);
-      setCopyStatus("Copied plan JSON to clipboard.");
+      setCopyStatus("Copied calculation audit JSON to clipboard.");
     } catch {
       setCopyStatus("Could not copy automatically. Select the JSON below and copy it manually.");
     }
@@ -226,8 +350,8 @@ function PlanJsonDevPanel({ scenario }: { scenario: unknown }) {
     <details className="my-plan-dev-panel">
       <summary>
         <span className="my-plan-dev-panel-summary-copy">
-          <strong>Developer · Plan JSON</strong>
-          <small>Current active plan snapshot for debugging and calculation audits.</small>
+          <strong>Developer · Calculation Audit JSON</strong>
+          <small>Saved inputs plus the effective values and outputs used by the calculation engines.</small>
         </span>
         <span className="my-plan-dev-badge">Dev only</span>
       </summary>
@@ -235,19 +359,19 @@ function PlanJsonDevPanel({ scenario }: { scenario: unknown }) {
       <div className="my-plan-dev-panel-body">
         <div className="my-plan-dev-panel-toolbar">
           <p>
-            This is the exact plan configuration currently being edited, including inputs
-            and drawdown settings.
+            Copy this snapshot to reconcile projection, drawdown and sustainability results
+            without having to infer values from the UI.
           </p>
           <button
             type="button"
             className="ui-button ui-button-secondary ui-button-small"
             onClick={copyJson}
           >
-            Copy JSON
+            Copy audit JSON
           </button>
         </div>
 
-        <pre className="my-plan-dev-json" aria-label="Current plan JSON">
+        <pre className="my-plan-dev-json" aria-label="Calculation audit JSON">
           <code>{json}</code>
         </pre>
 
