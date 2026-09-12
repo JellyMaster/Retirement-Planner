@@ -16,6 +16,7 @@ import {
 export type ExperimentId =
   | "retirement-age"
   | "contributions"
+  | "extra-saving"
   | "spending"
   | "fees"
   | "returns"
@@ -39,8 +40,15 @@ const experiments = [
   {
     id: "contributions" as const,
     title: "Save more",
-    description: "Test a different monthly pension contribution.",
+    description: "Test a different regular monthly pension contribution.",
     icon: AppIcons.plus,
+    available: true,
+  },
+  {
+    id: "extra-saving" as const,
+    title: "Save more later",
+    description: "Test an extra monthly payment that starts later in the plan.",
+    icon: AppIcons.clock,
     available: true,
   },
   {
@@ -91,7 +99,7 @@ const experimentGroups = [
   {
     title: "Your decisions",
     description: "Choices you can directly change in the plan.",
-    experimentIds: ["retirement-age", "contributions", "spending"] as ExperimentId[],
+    experimentIds: ["retirement-age", "contributions", "extra-saving", "spending"] as ExperimentId[],
   },
   {
     title: "Planning assumptions",
