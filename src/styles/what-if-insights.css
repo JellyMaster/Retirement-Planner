@@ -16,9 +16,7 @@
 }
 
 .what-if-insights-header h2,
-.what-if-insights h3 {
-  margin: 0;
-}
+.what-if-insights h3 { margin: 0; }
 
 .what-if-insights-header p:not(.planner-eyebrow),
 .what-if-verdict > p,
@@ -38,315 +36,85 @@
   background: var(--colour-surface-secondary);
   text-align: center;
 }
+.what-if-no-change strong { font-size: 1.05rem; }
+.what-if-no-change span { max-width: 44rem; color: var(--colour-text-muted); line-height: 1.5; }
 
-.what-if-no-change strong {
-  font-size: 1.05rem;
-}
-
-.what-if-no-change span {
-  max-width: 44rem;
-  color: var(--colour-text-muted);
-  line-height: 1.5;
-}
-
-.what-if-before-after-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
-.what-if-before-after-card {
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
-  padding: var(--space-4);
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius-md);
-  background: var(--colour-surface-secondary);
-}
-
-.what-if-before-after-card > span {
-  color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-sm);
-  font-weight: 800;
-}
-
-.what-if-outcome-value {
-  overflow-wrap: anywhere;
-  font-size: clamp(1.35rem, 2vw, 1.75rem);
-  line-height: 1.15;
-}
-
+.what-if-before-after-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.what-if-before-after-card { display: grid; gap: var(--space-2); min-width: 0; padding: var(--space-4); border: 1px solid var(--colour-border); border-radius: var(--radius-md); background: var(--colour-surface-secondary); }
+.what-if-before-after-card > span { color: var(--colour-text-muted); font-size: var(--ui-font-size-sm); font-weight: 800; }
+.what-if-outcome-value { overflow-wrap: anywhere; font-size: clamp(1.35rem, 2vw, 1.75rem); line-height: 1.15; }
 .what-if-before-after-card > em,
-.what-if-detail-card > em {
-  font-size: var(--ui-font-size-sm);
-  font-style: normal;
-  font-weight: 800;
-}
-
+.what-if-detail-card > em { font-size: var(--ui-font-size-sm); font-style: normal; font-weight: 800; }
 .what-if-before-after-card > small,
-.what-if-detail-card > small {
-  color: var(--colour-text-muted);
-  line-height: 1.4;
-}
-
+.what-if-detail-card > small { color: var(--colour-text-muted); line-height: 1.4; }
 .what-if-before-after-card .is-positive,
-.what-if-detail-card .is-positive {
-  color: var(--colour-positive, #16845b);
-}
-
+.what-if-detail-card .is-positive { color: var(--colour-positive, #16845b); }
 .what-if-before-after-card .is-negative,
-.what-if-detail-card .is-negative {
-  color: var(--colour-negative, #c2414b);
-}
+.what-if-detail-card .is-negative { color: var(--colour-negative, #c2414b); }
 
-.what-if-verdict {
-  display: grid;
-  grid-template-columns: minmax(12rem, 0.35fr) minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-5);
-  padding: var(--space-4);
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius-lg);
-  background: var(--colour-surface-secondary);
-}
+.what-if-verdict { display: grid; grid-template-columns: minmax(12rem, 0.35fr) minmax(0, 1fr); align-items: center; gap: var(--space-5); padding: var(--space-4); border: 1px solid var(--colour-border); border-radius: var(--radius-lg); background: var(--colour-surface-secondary); }
+.what-if-verdict.is-positive { border-color: color-mix(in srgb, var(--colour-positive, #16845b) 35%, var(--colour-border)); background: color-mix(in srgb, var(--colour-positive, #16845b) 6%, var(--colour-surface)); }
+.what-if-verdict.is-negative { border-color: color-mix(in srgb, var(--colour-negative, #c2414b) 35%, var(--colour-border)); background: color-mix(in srgb, var(--colour-negative, #c2414b) 6%, var(--colour-surface)); }
+.what-if-verdict.is-similar { border-color: color-mix(in srgb, var(--colour-primary) 30%, var(--colour-border)); }
+.what-if-verdict > div { display: grid; gap: var(--space-1); }
+.what-if-verdict h3 { font-size: clamp(1.2rem, 2vw, 1.55rem); }
+.what-if-verdict > p { margin: 0; }
 
-.what-if-verdict.is-positive {
-  border-color: color-mix(in srgb, var(--colour-positive, #16845b) 35%, var(--colour-border));
-  background: color-mix(in srgb, var(--colour-positive, #16845b) 6%, var(--colour-surface));
-}
+.what-if-details { padding: var(--space-4); border: 1px solid var(--colour-border); border-radius: var(--radius-md); background: var(--colour-surface-secondary); }
+.what-if-details > summary { cursor: pointer; font-weight: 800; }
+.what-if-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
+.what-if-detail-card { display: grid; gap: var(--space-2); min-width: 0; padding: var(--space-3); border-top: 1px solid var(--colour-border); }
+.what-if-detail-card > span { color: var(--colour-text-muted); font-size: var(--ui-font-size-sm); font-weight: 800; }
+.what-if-detail-card > strong { display: block; overflow-wrap: anywhere; font-size: 1.08rem; }
 
-.what-if-verdict.is-negative {
-  border-color: color-mix(in srgb, var(--colour-negative, #c2414b) 35%, var(--colour-border));
-  background: color-mix(in srgb, var(--colour-negative, #c2414b) 6%, var(--colour-surface));
-}
-
-.what-if-verdict.is-similar {
-  border-color: color-mix(in srgb, var(--colour-primary) 30%, var(--colour-border));
-}
-
-.what-if-verdict > div {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.what-if-verdict h3 {
-  font-size: clamp(1.2rem, 2vw, 1.55rem);
-}
-
-.what-if-verdict > p {
-  margin: 0;
-}
-
-.what-if-details {
-  padding: var(--space-4);
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius-md);
-  background: var(--colour-surface-secondary);
-}
-
-.what-if-details > summary {
-  cursor: pointer;
-  font-weight: 800;
-}
-
-.what-if-details-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-}
-
-.what-if-detail-card {
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
-  padding: var(--space-3);
-  border-top: 1px solid var(--colour-border);
-}
-
-.what-if-detail-card > span {
-  color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-sm);
-  font-weight: 800;
-}
-
-.what-if-detail-card > strong {
-  display: block;
-  overflow-wrap: anywhere;
-  font-size: 1.08rem;
-}
-
-.what-if-insights-simple {
-  gap: var(--space-4);
-}
-
-.what-if-simple-intro {
-  display: grid;
-  gap: 0.35rem;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--colour-primary) 25%, var(--colour-border));
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--colour-primary) 6%, var(--colour-surface-secondary));
-}
-
+.what-if-insights-simple { gap: var(--space-4); }
+.what-if-simple-intro { display: grid; gap: 0.35rem; padding: var(--space-3) var(--space-4); border: 1px solid color-mix(in srgb, var(--colour-primary) 25%, var(--colour-border)); border-radius: var(--radius-md); background: color-mix(in srgb, var(--colour-primary) 6%, var(--colour-surface-secondary)); }
 .what-if-simple-intro span,
 .what-if-simple-impact-card small,
 .what-if-simple-horizon,
 .what-if-simple-detail-action small,
-.what-if-simple-meaning small {
-  color: var(--colour-text-muted);
-  line-height: 1.45;
-}
+.what-if-simple-meaning small { color: var(--colour-text-muted); line-height: 1.45; }
+.what-if-simple-impact-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); }
+.what-if-simple-impact-card { display: grid; align-content: start; gap: 0.35rem; min-width: 0; padding: var(--space-4); border: 1px solid var(--colour-border); border-radius: var(--radius-md); background: var(--colour-surface-secondary); }
+.what-if-simple-impact-card > span { color: var(--colour-text-muted); font-size: var(--ui-font-size-xs); font-weight: 800; }
+.what-if-simple-impact-card > strong { overflow-wrap: anywhere; font-size: clamp(1.25rem, 2vw, 1.65rem); line-height: 1.15; }
+.what-if-simple-impact-card.is-positive > strong { color: var(--colour-positive, #16845b); }
+.what-if-simple-impact-card.is-negative > strong { color: var(--colour-negative, #c2414b); }
 
-.what-if-simple-impact-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-3);
-}
+.what-if-plan-constants { display: grid; gap: var(--space-3); padding: var(--space-4); border: 1px solid color-mix(in srgb, var(--colour-primary) 22%, var(--colour-border)); border-radius: var(--radius-md); background: color-mix(in srgb, var(--colour-primary) 4%, var(--colour-surface-secondary)); }
+.what-if-plan-constants-heading { display: grid; gap: 0.2rem; }
+.what-if-plan-constants-heading span { color: var(--colour-text-muted); font-size: var(--ui-font-size-sm); line-height: 1.4; }
+.what-if-plan-constants dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin: 0; }
+.what-if-plan-constants dl > div { display: grid; gap: 0.25rem; min-width: 0; }
+.what-if-plan-constants dt { color: var(--colour-text-muted); font-size: var(--ui-font-size-xs); font-weight: 800; }
+.what-if-plan-constants dd { margin: 0; overflow-wrap: anywhere; font-weight: 800; }
 
-.what-if-simple-impact-card {
-  display: grid;
-  align-content: start;
-  gap: 0.35rem;
-  min-width: 0;
-  padding: var(--space-4);
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius-md);
-  background: var(--colour-surface-secondary);
-}
-
-.what-if-simple-impact-card > span {
-  color: var(--colour-text-muted);
-  font-size: var(--ui-font-size-xs);
-  font-weight: 800;
-}
-
-.what-if-simple-impact-card > strong {
-  overflow-wrap: anywhere;
-  font-size: clamp(1.25rem, 2vw, 1.65rem);
-  line-height: 1.15;
-}
-
-.what-if-simple-impact-card.is-positive > strong {
-  color: var(--colour-positive, #16845b);
-}
-
-.what-if-simple-impact-card.is-negative > strong {
-  color: var(--colour-negative, #c2414b);
-}
-
-.what-if-simple-meaning {
-  display: grid;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius-lg);
-  background: var(--colour-surface-secondary);
-}
-
-.what-if-simple-meaning.is-positive {
-  border-color: color-mix(in srgb, var(--colour-positive, #16845b) 34%, var(--colour-border));
-  background: color-mix(in srgb, var(--colour-positive, #16845b) 6%, var(--colour-surface));
-}
-
-.what-if-simple-meaning.is-negative {
-  border-color: color-mix(in srgb, var(--colour-warning, #a66b00) 38%, var(--colour-border));
-  background: color-mix(in srgb, var(--colour-warning, #a66b00) 7%, var(--colour-surface));
-}
-
-.what-if-simple-meaning h3 {
-  font-size: clamp(1.2rem, 2vw, 1.45rem);
-}
-
-.what-if-simple-meaning > p:last-of-type {
-  margin: 0;
-  max-width: 70rem;
-  color: var(--colour-text-muted);
-  line-height: 1.55;
-}
-
-.what-if-simple-meaning > small {
-  display: block;
-  margin-top: var(--space-1);
-}
-
-.what-if-simple-horizon {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  background: var(--colour-surface-secondary);
-}
-
-.what-if-simple-detail-action {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  width: 100%;
-  padding: var(--space-4);
-  border: 1px solid var(--colour-border);
-  border-radius: var(--radius-md);
-  background: var(--colour-surface-secondary);
-  color: var(--colour-text);
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color 160ms ease,
-    background-color 160ms ease,
-    transform 160ms ease;
-}
-
-.what-if-simple-detail-action:hover {
-  border-color: color-mix(in srgb, var(--colour-primary) 45%, var(--colour-border));
-  background: color-mix(in srgb, var(--colour-primary) 5%, var(--colour-surface-secondary));
-}
-
-.what-if-simple-detail-action:focus-visible {
-  outline: 2px solid var(--colour-primary);
-  outline-offset: 2px;
-}
-
-.what-if-simple-detail-action > span:first-child {
-  display: grid;
-  gap: 0.2rem;
-}
-
-.what-if-simple-detail-action > span:last-child {
-  color: var(--colour-text-muted);
-  font-size: 1.6rem;
-  line-height: 1;
-}
+.what-if-simple-meaning { display: grid; gap: var(--space-2); padding: var(--space-4); border: 1px solid var(--colour-border); border-radius: var(--radius-lg); background: var(--colour-surface-secondary); }
+.what-if-simple-meaning.is-positive { border-color: color-mix(in srgb, var(--colour-positive, #16845b) 34%, var(--colour-border)); background: color-mix(in srgb, var(--colour-positive, #16845b) 6%, var(--colour-surface)); }
+.what-if-simple-meaning.is-negative { border-color: color-mix(in srgb, var(--colour-warning, #a66b00) 38%, var(--colour-border)); background: color-mix(in srgb, var(--colour-warning, #a66b00) 7%, var(--colour-surface)); }
+.what-if-simple-meaning h3 { font-size: clamp(1.2rem, 2vw, 1.45rem); }
+.what-if-simple-meaning > p:last-of-type { margin: 0; max-width: 70rem; color: var(--colour-text-muted); line-height: 1.55; }
+.what-if-simple-meaning > small { display: block; margin-top: var(--space-1); }
+.what-if-simple-horizon { margin: 0; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--colour-surface-secondary); }
+.what-if-simple-detail-action { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); width: 100%; padding: var(--space-4); border: 1px solid var(--colour-border); border-radius: var(--radius-md); background: var(--colour-surface-secondary); color: var(--colour-text); text-align: left; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease; }
+.what-if-simple-detail-action:hover { border-color: color-mix(in srgb, var(--colour-primary) 45%, var(--colour-border)); background: color-mix(in srgb, var(--colour-primary) 5%, var(--colour-surface-secondary)); }
+.what-if-simple-detail-action:focus-visible { outline: 2px solid var(--colour-primary); outline-offset: 2px; }
+.what-if-simple-detail-action > span:first-child { display: grid; gap: 0.2rem; }
+.what-if-simple-detail-action > span:last-child { color: var(--colour-text-muted); font-size: 1.6rem; line-height: 1; }
 
 @media (max-width: 1100px) {
-  .what-if-simple-impact-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  .what-if-simple-impact-grid,
+  .what-if-plan-constants dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-
 @media (max-width: 800px) {
   .what-if-insights-header,
-  .what-if-verdict {
-    align-items: stretch;
-    grid-template-columns: 1fr;
-  }
-
+  .what-if-verdict { align-items: stretch; grid-template-columns: 1fr; }
   .what-if-before-after-grid,
-  .what-if-details-grid {
-    grid-template-columns: 1fr;
-  }
+  .what-if-details-grid { grid-template-columns: 1fr; }
 }
-
 @media (max-width: 560px) {
-  .what-if-insights {
-    padding: var(--space-4);
-  }
-
-  .what-if-simple-impact-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .what-if-simple-detail-action {
-    align-items: flex-start;
-  }
+  .what-if-insights { padding: var(--space-4); }
+  .what-if-simple-impact-grid,
+  .what-if-plan-constants dl { grid-template-columns: 1fr; }
+  .what-if-simple-detail-action { align-items: flex-start; }
 }
