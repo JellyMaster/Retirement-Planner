@@ -34,12 +34,15 @@ export function isSavedExperimentMatch({
         sameNumber(
           scenario.inputs.monthlyEmployerContribution,
           inputs.monthlyEmployerContribution,
+        )
+      );
+    case "extra-saving":
+      return (
+        sameNumber(
+          scenario.inputs.extraMonthlyContribution ?? 0,
+          inputs.extraMonthlyContribution ?? 0,
         ) &&
-        sameOptionalNumber(
-          scenario.inputs.extraMonthlyContribution,
-          inputs.extraMonthlyContribution,
-        ) &&
-        scenario.inputs.extraContributionAge === inputs.extraContributionAge
+        effectiveExtraContributionAge(scenario.inputs) === effectiveExtraContributionAge(inputs)
       );
     case "spending":
       return sameNumber(
@@ -70,6 +73,10 @@ export function isSavedExperimentMatch({
         scenario.inputs.marketDownturnAge === inputs.marketDownturnAge
       );
   }
+}
+
+function effectiveExtraContributionAge(inputs: PensionInputs): number | undefined {
+  return (inputs.extraMonthlyContribution ?? 0) > 0 ? inputs.extraContributionAge : undefined;
 }
 
 function sameNumber(left: number, right: number): boolean {
