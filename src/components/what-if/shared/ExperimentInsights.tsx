@@ -55,47 +55,47 @@ export function ExperimentInsights({
   const { viewMode } = useWhatIfDisplaySettings();
   const pensionDifference = projectedPension - baselineProjectedPension;
   const incomeDifference = annualIncome - baselineAnnualIncome;
-  const outcome = getOutcomeVerdict(activeExperiment, pensionDifference, incomeDifference);
-  const targetIncome =
-    retirementOutcome?.targetNetSpending ?? baselineRetirementOutcome?.targetNetSpending;
-  const targetDifference = targetIncome === undefined ? null : annualIncome - targetIncome;
   const includesStatePension =
     retirementOutcome?.includesStatePension ??
     baselineRetirementOutcome?.includesStatePension ??
     true;
-  const isSimpleRetirementAge =
-    activeExperiment === "retirement-age" && viewMode === "simple";
-  const showBaselineMetrics = hasChanged || viewMode === "detailed";
 
-  if (isSimpleRetirementAge) {
+  if (
+    activeExperiment === "retirement-age" &&
+    baselineRetirementOutcome &&
+    retirementOutcome
+  ) {
     return (
-      <SimpleRetirementAgeSummary
+      <RetirementAgePlanAssessment
         baselineRetirementAge={baselineRetirementAge}
         retirementAge={retirementAge}
-        baselineAnnualIncome={baselineAnnualIncome}
-        annualIncome={annualIncome}
-        targetIncome={targetIncome ?? 0}
         planningAge={planningAge}
         statePensionAge={statePensionAge}
         statePensionIncluded={includesStatePension}
+        baseline={baselineRetirementOutcome}
+        outcome={retirementOutcome}
         hasChanged={hasChanged}
+        detailed={viewMode === "detailed"}
       />
     );
   }
 
-  const retirementAgeQuestion =
-    activeExperiment === "retirement-age"
-      ? hasChanged
-        ? `Could retiring at ${retirementAge} support your plan?`
-        : "Could your saved retirement age support your plan?"
-      : experimentQuestion[activeExperiment];
+  const outcome = getOutcomeVerdict(
+    activeExperiment,
+    pensionDifference,
+    incomeDifference,
+  );
+  const targetIncome =
+    retirementOutcome?.targetNetSpending ?? baselineRetirementOutcome?.targetNetSpending;
+  const targetDifference = targetIncome === undefined ? null : annualIncome - targetIncome;
+  const showBaselineMetrics = hasChanged || viewMode === "detailed";
 
   return (
     <section className="what-if-insights" aria-labelledby="decision-summary-title">
       <header className="what-if-insights-header">
         <div>
           <p className="planner-eyebrow">Decision summary</p>
-          <h2 id="decision-summary-title">{retirementAgeQuestion}</h2>
+          <h2 id="decision-summary-title">{experimentQuestion[activeExperiment]}</h2>
           <p>{createSummaryContext(activeExperiment, retirementAge, hasChanged)}</p>
         </div>
       </header>
@@ -124,7 +124,7 @@ export function ExperimentInsights({
             tone={toneClass(pensionDifference)}
           />
           <OutcomeCard
-            label="Sustainable retirement income"
+            label="Illustrated retirement income"
             value={`${formatCurrency(annualIncome)}/year`}
             baseline={`${formatCurrency(baselineAnnualIncome)}/year`}
             difference={hasChanged ? `${formatSignedCurrency(incomeDifference)}/year` : null}
@@ -179,34 +179,47 @@ export function ExperimentInsights({
   );
 }
 
-function SimpleRetirementAgeSummary({
+function RetirementAgePlanAssessment({
   baselineRetirementAge,
   retirementAge,
-  baselineAnnualIncome,
-  annualIncome,
-  targetIncome,
   planningAge,
   statePensionAge,
   statePensionIncluded,
+  baseline,
+  outcome,
   hasChanged,
+  detailed,
 }: {
   baselineRetirementAge?: number;
   retirementAge: number;
-  baselineAnnualIncome: number;
-  annualIncome: number;
-  targetIncome: number;
   planningAge?: number;
   statePensionAge: number;
   statePensionIncluded: boolean;
+  baseline: RetirementSpendingOutcome;
+  outcome: RetirementSpendingOutcome;
   hasChanged: boolean;
+  detailed: boolean;
 }) {
-  const displayedIncome = hasChanged ? annualIncome : baselineAnnualIncome;
-  const targetDifference = displayedIncome - targetIncome;
-  const targetSupported = targetDifference >= -0.5;
+  const assessed = hasChanged ? outcome : baseline;
+  const supportsTarget = assessed.savedPlanSupportsTarget;
+  const firstProblemAge =
+    assessed.savedPlanFirstNetIncomeShortfallAge ?? assessed.savedPlanDepletionAge;
+  const targetIncome = assessed.targetNetSpending;
+  const planHorizon = planningAge === undefined ? "your planning age" : `age ${planningAge}`;
+  const resultValue = supportsTarget
+    ? `Supported to ${planHorizon}`
+    : firstProblemAge === null
+      ? "Not fully supported"
+      : `Shortfall from age ${firstProblemAge}`;
+  const resultNote = supportsTarget
+    ? "The saved income strategy has no modelled shortfall or depletion"
+    : firstProblemAge === null
+      ? "The changed plan no longer supports all of the saved income assumptions"
+      : `The saved income strategy first stops meeting the target at age ${firstProblemAge}`;
 
   return (
     <section
-      className="what-if-insights what-if-insights-simple"
+      className={`what-if-insights${detailed ? "" : " what-if-insights-simple"}`}
       aria-labelledby="decision-summary-title"
     >
       <header className="what-if-insights-header">
@@ -214,76 +227,85 @@ function SimpleRetirementAgeSummary({
           <p className="planner-eyebrow">What does this mean for your plan?</p>
           <h2 id="decision-summary-title">
             {hasChanged
-              ? `Could retiring at ${retirementAge} support your plan?`
-              : "Could your saved retirement age support your plan?"}
+              ? `Does retiring at ${retirementAge} still support your plan?`
+              : "Does your saved retirement age support your plan?"}
           </h2>
           <p>
             {hasChanged
-              ? `This checks age ${retirementAge} against the other assumptions already saved in your plan.`
+              ? `The retirement-age result above is now benchmarked against the other assumptions in your saved plan, with everything else left unchanged.`
               : baselineRetirementAge === undefined
-                ? "This checks your saved retirement age against the rest of your plan."
-                : `This checks your saved retirement age of ${baselineRetirementAge} against the rest of your plan.`}
+                ? "This benchmarks your saved retirement age against the rest of your saved plan."
+                : `This benchmarks retiring at ${baselineRetirementAge} against the rest of your saved plan.`}
           </p>
         </div>
       </header>
 
       <div
         className="what-if-simple-impact-grid"
-        aria-label="Retirement plan assessment"
+        aria-label="Retirement plan benchmark"
       >
         <SimpleImpactCard
-          label="Your income target"
+          label="Your saved income target"
           value={`${formatCurrency(targetIncome)}/year`}
-          note="The yearly income you said you would like"
+          note="Everything else in the plan is held equal"
         />
         <SimpleImpactCard
-          label="Estimated supportable retirement income"
-          value={`${formatCurrency(displayedIncome)}/year`}
-          note={
-            hasChanged
-              ? `Using retirement age ${retirementAge} and your saved assumptions`
-              : "Using your saved retirement age and assumptions"
-          }
-          tone={targetSupported ? "positive" : "negative"}
+          label="Plan benchmark"
+          value={resultValue}
+          note={resultNote}
+          tone={supportsTarget ? "positive" : "negative"}
         />
       </div>
 
       <article
         className={`what-if-simple-meaning ${
-          targetSupported ? "is-positive" : "is-negative"
+          supportsTarget ? "is-positive" : "is-negative"
         }`}
       >
         <p className="planner-eyebrow">Plan assessment</p>
         <h3>
-          {targetSupported
-            ? "Your target income looks supported"
-            : "Your target income may not be fully supported"}
+          {supportsTarget
+            ? "Your saved plan still works with this retirement age"
+            : "Your saved plan no longer works through the full planning period"}
         </h3>
         <p>
-          {targetSupported
-            ? `Based on your other saved assumptions, this retirement age could support your ${formatCurrency(targetIncome)}/year income target${planningAge !== undefined ? ` through to age ${planningAge}` : ""}.`
-            : `Based on your other saved assumptions, this retirement age supports about ${formatCurrency(displayedIncome)}/year against your ${formatCurrency(targetIncome)}/year target${planningAge !== undefined ? ` through to age ${planningAge}` : ""}.`}
+          {supportsTarget
+            ? `With the other assumptions left unchanged, the model continues to provide your ${formatCurrency(targetIncome)}/year net income target through ${planHorizon} without a modelled income shortfall or pension depletion.`
+            : firstProblemAge === null
+              ? `With the other assumptions left unchanged, the model can no longer provide your ${formatCurrency(targetIncome)}/year net income target through ${planHorizon}.`
+              : `With the other assumptions left unchanged, your ${formatCurrency(targetIncome)}/year net income target is initially met, but the model first shows a shortfall around age ${firstProblemAge}.`}
         </p>
         <small>
           {statePensionIncluded
-            ? `State Pension is included in this assessment from age ${statePensionAge}.`
-            : "State Pension is not included in this assessment."}
+            ? `State Pension remains included from age ${statePensionAge}; only the retirement-age decision has changed.`
+            : "State Pension remains excluded; only the retirement-age decision has changed."}
         </small>
       </article>
 
-      <button
-        type="button"
-        className="what-if-simple-detail-action"
-        onClick={() => setWhatIfViewMode("detailed")}
-      >
-        <span>
-          <strong>See the financial details</strong>
-          <small>
-            View sustainable spending, headroom, State Pension timing and ending-balance assumptions.
-          </small>
-        </span>
-        <span aria-hidden="true">›</span>
-      </button>
+      {detailed ? (
+        <RetirementImpactDetails
+          baseline={baseline}
+          outcome={outcome}
+          activeExperiment="retirement-age"
+          retirementAge={retirementAge}
+          statePensionAge={statePensionAge}
+          statePensionIncluded={statePensionIncluded}
+        />
+      ) : (
+        <button
+          type="button"
+          className="what-if-simple-detail-action"
+          onClick={() => setWhatIfViewMode("detailed")}
+        >
+          <span>
+            <strong>See the financial details</strong>
+            <small>
+              See State Pension timing and the separate capital-preservation test.
+            </small>
+          </span>
+          <span aria-hidden="true">›</span>
+        </button>
+      )}
     </section>
   );
 }
@@ -362,27 +384,30 @@ function RetirementImpactDetails({
 
   return (
     <section className="what-if-details" aria-labelledby="retirement-impact-details-title">
-      <h3 id="retirement-impact-details-title">Retirement impact details</h3>
+      <h3 id="retirement-impact-details-title">Financial details</h3>
       <p>
-        These use the same drawdown assumptions and ending-balance goal as your active plan.
+        The plan benchmark above follows your saved withdrawal strategy. The figures below
+        separately test how much could be spent while still meeting your configured
+        ending-balance goal.
       </p>
       <div className="what-if-details-grid">
         <DetailCard
-          label="Sustainable net spending"
+          label="Income with ending-balance goal"
           value={`${formatCurrency(outcome.sustainableNetSpending)}/year`}
           baseline={`${formatCurrency(baseline.sustainableNetSpending)}/year`}
           difference={`${formatSignedCurrency(sustainableDifference)}/year`}
           tone={toneClass(sustainableDifference)}
+          supporting={`This is a capital-preservation test, not the income produced by your saved withdrawal strategy.`}
         />
         <DetailCard
-          label="Annual headroom"
+          label="Headroom against that goal"
           value={`${formatSignedCurrency(outcome.annualHeadroom)}/year`}
           baseline={`${formatSignedCurrency(baseline.annualHeadroom)}/year`}
           difference={`${formatSignedCurrency(headroomDifference)}/year`}
           tone={toneClass(headroomDifference)}
         />
         <DetailCard
-          label="Ending pension position"
+          label="Ending balance in preservation test"
           value={formatCurrency(outcome.modelledEndingBalance)}
           baseline={formatCurrency(baseline.modelledEndingBalance)}
           difference={formatSignedCurrency(endingDifference)}
@@ -419,16 +444,16 @@ function RetirementImpactDetails({
           />
         )}
         <DetailCard
-          label="Plan sustainability"
+          label="Capital-preservation result"
           value={statusLabel(outcome.status)}
           baseline={statusLabel(baseline.status)}
           difference={
             outcome.status === "shortfall"
-              ? "Target spending is above the sustainable level"
-              : "Target spending is within the modelled sustainable level"
+              ? "Saved spending is above the amount compatible with the ending-balance goal"
+              : "Saved spending is compatible with the ending-balance goal"
           }
           tone={outcome.status === "shortfall" ? "is-negative" : "is-positive"}
-          supporting="Based on your current planning horizon and ending-balance goal."
+          supporting="This is deliberately separate from whether the saved income strategy lasts to your planning age."
         />
       </div>
     </section>
