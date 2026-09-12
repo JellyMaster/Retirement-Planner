@@ -15,11 +15,6 @@ interface ContributionExperimentProps {
   employeeContribution: number;
   baselineEmployerContribution: number;
   employerContribution: number;
-  baselineExtraContribution: number;
-  baselineExtraContributionAge: number;
-  extraContribution: number;
-  extraContributionAge: number;
-  includeExtraContribution: boolean;
   baselineProjectedPension: number;
   projectedPension: number;
   baselineAnnualIncome: number;
@@ -30,9 +25,6 @@ interface ContributionExperimentProps {
   saveMessage: string | null;
   onEmployeeContributionChange: (amount: number) => void;
   onEmployerContributionChange: (amount: number) => void;
-  onExtraContributionEnabledChange: (enabled: boolean) => void;
-  onExtraContributionChange: (amount: number) => void;
-  onExtraContributionAgeChange: (age: number) => void;
   onReset: () => void;
   onSave: () => void;
 }
@@ -53,20 +45,12 @@ export function ContributionExperiment({
   employeeContribution,
   baselineEmployerContribution,
   employerContribution,
-  baselineExtraContribution,
-  baselineExtraContributionAge,
-  extraContribution,
-  extraContributionAge,
-  includeExtraContribution,
   baselineProjectedPension,
   projectedPension,
   canSave,
   saveMessage,
   onEmployeeContributionChange,
   onEmployerContributionChange,
-  onExtraContributionEnabledChange,
-  onExtraContributionChange,
-  onExtraContributionAgeChange,
   onReset,
   onSave,
 }: ContributionExperimentProps) {
@@ -75,18 +59,7 @@ export function ContributionExperiment({
   const { viewMode, displayMode } = useWhatIfDisplaySettings();
   const employeeDifference = employeeContribution - baselineEmployeeContribution;
   const employerDifference = employerContribution - baselineEmployerContribution;
-  const selectedExtra = includeExtraContribution ? extraContribution : 0;
-  const extraDifference = selectedExtra - baselineExtraContribution;
-  const extraAgeDifference = includeExtraContribution
-    ? extraContributionAge - baselineExtraContributionAge
-    : baselineExtraContribution > 0
-      ? -1
-      : 0;
-  const hasChanged =
-    employeeDifference !== 0 ||
-    employerDifference !== 0 ||
-    extraDifference !== 0 ||
-    extraAgeDifference !== 0;
+  const hasChanged = employeeDifference !== 0 || employerDifference !== 0;
   const yearsToRetirement = Math.max(0, retirementAge - currentAge);
   const inflationFactor = Math.pow(1 + activeScenario.inputs.inflation, yearsToRetirement);
   const showingToday = displayMode === "today";
@@ -100,11 +73,6 @@ export function ContributionExperiment({
   const totalSavedContribution = baselineEmployeeContribution + baselineEmployerContribution;
   const totalExperimentContribution = employeeContribution + employerContribution;
   const regularDifference = totalExperimentContribution - totalSavedContribution;
-  const extraMaximum = roundUp(
-    Math.max(2_000, baselineExtraContribution * 2, extraContribution),
-    250,
-  );
-  const latestExtraContributionAge = Math.max(currentAge, retirementAge - 1);
   const saveAlreadyExists = hasChanged && !canSave && saveMessage === null;
   const savedContributionMarkers: SavedContributionMarker[] = whatIfScenarios
     .filter(
@@ -148,10 +116,7 @@ export function ContributionExperiment({
           <div className="what-if-panel-heading">
             <p className="planner-eyebrow">Change</p>
             <h3 id="contribution-change-title">How much goes into your pension each month?</h3>
-            <p>
-              Change what you pay in and what your employer contributes. Everything else stays
-              the same.
-            </p>
+            <p>Change what you pay in and what your employer contributes. Everything else stays the same.</p>
           </div>
           <div className="what-if-contribution-levers">
             <ContributionLever
@@ -185,8 +150,7 @@ export function ContributionExperiment({
           </div>
           {savedContributionMarkers.length > 0 && (
             <p className="what-if-contribution-marker-key">
-              Numbered markers match the saved experiments in the panel. The same number and
-              colour identify an experiment on both sliders.
+              Numbered markers match the saved experiments in the panel. The same number and colour identify an experiment on both sliders.
             </p>
           )}
           <div className="what-if-contribution-total">
@@ -200,11 +164,7 @@ export function ContributionExperiment({
           </div>
         </section>
 
-        <section
-          className="what-if-result-panel"
-          aria-labelledby="contribution-outcome-title"
-          aria-live="polite"
-        >
+        <section className="what-if-result-panel" aria-labelledby="contribution-outcome-title" aria-live="polite">
           <div className="what-if-result-heading">
             <div>
               <p className="planner-eyebrow">Outcome</p>
@@ -213,60 +173,29 @@ export function ContributionExperiment({
               </h3>
             </div>
             <span className="what-if-result-status is-neutral">
-              {hasChanged
-                ? contributionStatus(employeeDifference, employerDifference, extraDifference)
-                : "Saved plan"}
+              {hasChanged ? contributionStatus(regularDifference) : "Saved plan"}
             </span>
           </div>
+
           {viewMode === "simple" ? (
             <>
               <div className="what-if-simple-results" aria-label="Simple saving outcomes">
                 <SimpleResult
                   value={`${formatCurrency(totalExperimentContribution)}/month`}
                   label="Total going into your pension"
-                  note={
-                    regularDifference === 0
-                      ? "Same as your saved plan"
-                      : `${formatSignedCurrency(regularDifference)}/month compared with your saved plan`
-                  }
-                  tone={
-                    regularDifference > 0
-                      ? "positive"
-                      : regularDifference < 0
-                        ? "negative"
-                        : "neutral"
-                  }
+                  note={regularDifference === 0 ? "Same as your saved plan" : `${formatSignedCurrency(regularDifference)}/month compared with your saved plan`}
+                  tone={regularDifference > 0 ? "positive" : regularDifference < 0 ? "negative" : "neutral"}
                 />
                 <SimpleResult
                   value={formatCurrency(displayedPension)}
                   label="Pension when you retire"
-                  note={
-                    hasChanged
-                      ? `${formatPlainCurrencyDifference(pensionDifference)} than your saved plan`
-                      : `Your pension at age ${retirementAge}`
-                  }
-                  tone={
-                    pensionDifference > 0
-                      ? "positive"
-                      : pensionDifference < 0
-                        ? "negative"
-                        : "neutral"
-                  }
+                  note={hasChanged ? `${formatPlainCurrencyDifference(pensionDifference)} than your saved plan` : `Your pension at age ${retirementAge}`}
+                  tone={pensionDifference > 0 ? "positive" : pensionDifference < 0 ? "negative" : "neutral"}
                 />
               </div>
               <div className="what-if-simple-outcome-copy">
-                <strong>
-                  {hasChanged
-                    ? createSimpleTitle(regularDifference, pensionDifference)
-                    : `${activePlanName} is unchanged`}
-                </strong>
-                <p>
-                  {createSimpleExplanation(
-                    regularDifference,
-                    pensionDifference,
-                    yearsToRetirement,
-                  )}
-                </p>
+                <strong>{hasChanged ? createSimpleTitle(regularDifference, pensionDifference) : `${activePlanName} is unchanged`}</strong>
+                <p>{createSimpleExplanation(regularDifference, pensionDifference, yearsToRetirement)}</p>
               </div>
             </>
           ) : (
@@ -276,17 +205,8 @@ export function ContributionExperiment({
                   <FontAwesomeIcon icon={AppIcons.concepts.pension} fixedWidth />
                 </span>
                 <div>
-                  <strong>What changing your saving does</strong>
-                  <p>
-                    {createDetailedExplanation(
-                      employeeDifference,
-                      employerDifference,
-                      extraDifference,
-                      extraAgeDifference,
-                      pensionDifference,
-                      yearsToRetirement,
-                    )}
-                  </p>
+                  <strong>What changing your regular contributions does</strong>
+                  <p>{createDetailedExplanation(employeeDifference, employerDifference, pensionDifference, yearsToRetirement)}</p>
                 </div>
               </div>
               <div className="what-if-key-results" aria-label="Detailed saving outcomes">
@@ -303,13 +223,9 @@ export function ContributionExperiment({
               </div>
             </>
           )}
+
           <div className="what-if-inline-actions">
-            <button
-              type="button"
-              className="ui-button ui-button-secondary ui-button-medium"
-              disabled={!hasChanged}
-              onClick={onReset}
-            >
+            <button type="button" className="ui-button ui-button-secondary ui-button-medium" disabled={!hasChanged} onClick={onReset}>
               Reset experiment
             </button>
             <button
@@ -329,239 +245,69 @@ export function ContributionExperiment({
         <div className="what-if-detail-disclosures">
           <details className="what-if-detail-card">
             <summary>
-              <span>
-                <strong>Scheduled future saving</strong>
-                <small>Add an extra monthly payment later in the plan.</small>
-              </span>
-              <span aria-hidden="true">+</span>
-            </summary>
-            <div className="what-if-controls-stack">
-              <div className="what-if-control-panel what-if-extra-control">
-                <div className="what-if-control-copy">
-                  <span>Scheduled extra contribution</span>
-                  <strong>
-                    {includeExtraContribution
-                      ? `${formatCurrency(extraContribution)}/month from age ${extraContributionAge}`
-                      : "Not included"}
-                  </strong>
-                  <small>
-                    Saved plan:{" "}
-                    {baselineExtraContribution > 0
-                      ? `${formatCurrency(baselineExtraContribution)}/month from age ${baselineExtraContributionAge}`
-                      : "not included"}
-                  </small>
-                </div>
-                <div className="what-if-extra-controls">
-                  <label className="what-if-toggle-row">
-                    <span>
-                      <strong>Include a scheduled extra payment</strong>
-                      <small>Choose the monthly amount and when it begins.</small>
-                    </span>
-                    <input
-                      type="checkbox"
-                      role="switch"
-                      checked={includeExtraContribution}
-                      aria-label="Include scheduled extra contribution"
-                      onChange={(event) =>
-                        onExtraContributionEnabledChange(event.target.checked)
-                      }
-                    />
-                  </label>
-                  <div className="what-if-slider-wrap">
-                    <label htmlFor="what-if-extra-contribution-age">
-                      <strong>Start age: {extraContributionAge}</strong>
-                    </label>
-                    <input
-                      id="what-if-extra-contribution-age"
-                      type="range"
-                      min={currentAge}
-                      max={latestExtraContributionAge}
-                      step={1}
-                      value={extraContributionAge}
-                      disabled={!includeExtraContribution}
-                      aria-label="Experimental extra contribution start age"
-                      aria-valuetext={`Starts at age ${extraContributionAge}`}
-                      onChange={(event) =>
-                        onExtraContributionAgeChange(Number(event.target.value))
-                      }
-                    />
-                    <div className="what-if-slider-labels" aria-hidden="true">
-                      <span>Age {currentAge}</span>
-                      <span>Saved · age {baselineExtraContributionAge}</span>
-                      <span>Age {latestExtraContributionAge}</span>
-                    </div>
-                  </div>
-                  <div className="what-if-slider-wrap">
-                    <label htmlFor="what-if-extra-contribution-amount">
-                      <strong>Monthly amount: {formatCurrency(extraContribution)}</strong>
-                    </label>
-                    <input
-                      id="what-if-extra-contribution-amount"
-                      type="range"
-                      min={0}
-                      max={extraMaximum}
-                      step={25}
-                      value={extraContribution}
-                      disabled={!includeExtraContribution}
-                      aria-label="Experimental extra monthly contribution"
-                      aria-valuetext={`${formatCurrency(extraContribution)} per month from age ${extraContributionAge}`}
-                      onChange={(event) =>
-                        onExtraContributionChange(Number(event.target.value))
-                      }
-                    />
-                    <div className="what-if-slider-labels" aria-hidden="true">
-                      <span>£0</span>
-                      <span>Saved · {formatCurrency(baselineExtraContribution)}</span>
-                      <span>{formatCurrency(extraMaximum)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </details>
-          <details className="what-if-detail-card">
-            <summary>
-              <span>
-                <strong>Why did this change?</strong>
-                <small>See what is driving the change in your pension.</small>
-              </span>
+              <span><strong>Why did this change?</strong><small>See what is driving the change in your pension.</small></span>
               <span aria-hidden="true">+</span>
             </summary>
             <ul className="what-if-detail-list">
-              {createReasons({
-                employeeDifference,
-                employerDifference,
-                extraDifference,
-                extraAgeDifference,
-                extraContributionAge,
-                yearsToRetirement,
-              }).map((reason) => (
-                <li key={reason}>
-                  <FontAwesomeIcon icon={AppIcons.check} aria-hidden="true" />
-                  <span>{reason}</span>
-                </li>
+              {createReasons(employeeDifference, employerDifference).map((reason) => (
+                <li key={reason}><FontAwesomeIcon icon={AppIcons.check} aria-hidden="true" /><span>{reason}</span></li>
               ))}
             </ul>
           </details>
           <details className="what-if-detail-card">
             <summary>
-              <span>
-                <strong>Detailed comparison</strong>
-                <small>Compare the saving pattern with your saved plan.</small>
-              </span>
+              <span><strong>Detailed comparison</strong><small>Compare the regular contributions with your saved plan.</small></span>
               <span aria-hidden="true">+</span>
             </summary>
             <div className="what-if-detail-comparison">
-              <OutcomeCard
-                label="Your monthly contribution"
-                baseline={`${formatCurrency(baselineEmployeeContribution)}/month`}
-                experiment={`${formatCurrency(employeeContribution)}/month`}
-                difference={`${formatSignedCurrency(employeeDifference)}/month`}
-              />
-              <OutcomeCard
-                label="Employer contribution"
-                baseline={`${formatCurrency(baselineEmployerContribution)}/month`}
-                experiment={`${formatCurrency(employerContribution)}/month`}
-                difference={`${formatSignedCurrency(employerDifference)}/month`}
-              />
-              <OutcomeCard
-                label="Total regular contributions"
-                baseline={`${formatCurrency(totalSavedContribution)}/month`}
-                experiment={`${formatCurrency(totalExperimentContribution)}/month`}
-                difference={`${formatSignedCurrency(regularDifference)}/month`}
-              />
-              <OutcomeCard
-                label="Pension when you retire"
-                baseline={formatCurrency(displayedBaselinePension)}
-                experiment={formatCurrency(displayedPension)}
-                difference={formatSignedCurrency(pensionDifference)}
-              />
+              <OutcomeCard label="Your monthly contribution" baseline={`${formatCurrency(baselineEmployeeContribution)}/month`} experiment={`${formatCurrency(employeeContribution)}/month`} difference={`${formatSignedCurrency(employeeDifference)}/month`} />
+              <OutcomeCard label="Employer contribution" baseline={`${formatCurrency(baselineEmployerContribution)}/month`} experiment={`${formatCurrency(employerContribution)}/month`} difference={`${formatSignedCurrency(employerDifference)}/month`} />
+              <OutcomeCard label="Total regular contributions" baseline={`${formatCurrency(totalSavedContribution)}/month`} experiment={`${formatCurrency(totalExperimentContribution)}/month`} difference={`${formatSignedCurrency(regularDifference)}/month`} />
+              <OutcomeCard label="Pension when you retire" baseline={formatCurrency(displayedBaselinePension)} experiment={formatCurrency(displayedPension)} difference={formatSignedCurrency(pensionDifference)} />
             </div>
           </details>
         </div>
       )}
+
       {displayMode === "nominal" && hasChanged && (
-        <p className="what-if-money-basis-note">
-          Future-money figures show the estimated pound value at retirement. The saving amounts
-          above remain the monthly amounts you entered.
-        </p>
+        <p className="what-if-money-basis-note">Future-money figures show the estimated pound value at retirement. The contribution amounts above remain the monthly amounts you entered.</p>
       )}
-      {saveMessage && (
-        <p className="what-if-save-message" role="status">
-          {saveMessage}
-        </p>
-      )}
+      {saveMessage && <p className="what-if-save-message" role="status">{saveMessage}</p>}
     </section>
   );
 }
 
-function ContributionLever({
-  label,
-  baseline,
-  amount,
-  maximum,
-  markers,
-  ariaLabel,
-  onChange,
-}: {
+function ContributionLever({ label, baseline, amount, maximum, markers, ariaLabel, onChange }: {
   label: string;
   baseline: number;
   amount: number;
   maximum: number;
-  markers: Array<{
-    id: string;
-    name: string;
-    markerNumber: number;
-    amount: number;
-  }>;
+  markers: Array<{ id: string; name: string; markerNumber: number; amount: number }>;
   ariaLabel: string;
   onChange: (amount: number) => void;
 }) {
   const difference = amount - baseline;
-
   return (
     <div className="what-if-contribution-lever">
       <div className="what-if-contribution-lever-heading">
         <span>{label}</span>
         <strong>{formatCurrency(amount)}/month</strong>
-        <small>
-          Saved: {formatCurrency(baseline)} · {formatSignedCurrency(difference)}
-        </small>
+        <small>Saved: {formatCurrency(baseline)} · {formatSignedCurrency(difference)}</small>
       </div>
-      <AbsoluteContributionSlider
-        baseline={baseline}
-        amount={amount}
-        maximum={maximum}
-        markers={markers}
-        ariaLabel={ariaLabel}
-        onChange={onChange}
-      />
+      <AbsoluteContributionSlider baseline={baseline} amount={amount} maximum={maximum} markers={markers} ariaLabel={ariaLabel} onChange={onChange} />
     </div>
   );
 }
 
-function AbsoluteContributionSlider({
-  baseline,
-  amount,
-  maximum,
-  markers,
-  ariaLabel,
-  onChange,
-}: {
+function AbsoluteContributionSlider({ baseline, amount, maximum, markers, ariaLabel, onChange }: {
   baseline: number;
   amount: number;
   maximum: number;
-  markers: Array<{
-    id: string;
-    name: string;
-    markerNumber: number;
-    amount: number;
-  }>;
+  markers: Array<{ id: string; name: string; markerNumber: number; amount: number }>;
   ariaLabel: string;
   onChange: (amount: number) => void;
 }) {
   const baselinePosition = maximum <= 0 ? 0 : (baseline / maximum) * 100;
-
   return (
     <div className="what-if-slider-wrap what-if-slider-wrap-primary what-if-contribution-slider">
       <div className="what-if-contribution-range-track">
@@ -575,102 +321,43 @@ function AbsoluteContributionSlider({
           aria-valuetext={`${formatCurrency(amount)} per month; saved amount ${formatCurrency(baseline)}`}
           onChange={(event) => onChange(Number(event.target.value))}
         />
-        <span
-          className="what-if-contribution-saved-marker"
-          style={{ left: `${baselinePosition}%` }}
-          title={`Saved plan · ${formatCurrency(baseline)}/month`}
-          aria-hidden="true"
-        />
-        {markers
-          .filter((marker) => marker.amount >= 0 && marker.amount <= maximum)
-          .map((marker) => (
-            <span
-              key={marker.id}
-              className={`what-if-contribution-experiment-marker what-if-marker-tone-${(marker.markerNumber - 1) % 6}`}
-              style={{ left: `${(marker.amount / maximum) * 100}%` }}
-              title={`${marker.markerNumber}. ${marker.name} · ${formatCurrency(marker.amount)}/month`}
-              aria-hidden="true"
-            >
-              {marker.markerNumber}
-            </span>
-          ))}
+        <span className="what-if-contribution-saved-marker" style={{ left: `${baselinePosition}%` }} title={`Saved plan · ${formatCurrency(baseline)}/month`} aria-hidden="true" />
+        {markers.filter((marker) => marker.amount >= 0 && marker.amount <= maximum).map((marker) => (
+          <span
+            key={marker.id}
+            className={`what-if-contribution-experiment-marker what-if-marker-tone-${(marker.markerNumber - 1) % 6}`}
+            style={{ left: `${(marker.amount / maximum) * 100}%` }}
+            title={`${marker.markerNumber}. ${marker.name} · ${formatCurrency(marker.amount)}/month`}
+            aria-hidden="true"
+          >
+            {marker.markerNumber}
+          </span>
+        ))}
       </div>
       <div className="what-if-slider-labels what-if-contribution-slider-labels" aria-hidden="true">
         <span>£0</span>
-        <span className="what-if-contribution-saved-label" style={{ left: `${baselinePosition}%` }}>
-          Saved · {formatCurrency(baseline)}
-        </span>
+        <span className="what-if-contribution-saved-label" style={{ left: `${baselinePosition}%` }}>Saved · {formatCurrency(baseline)}</span>
         <span>{formatCurrency(maximum)}</span>
       </div>
     </div>
   );
 }
 
-function SimpleResult({
-  value,
-  label,
-  note,
-  tone,
-}: {
-  value: string;
-  label: string;
-  note: string;
-  tone: "positive" | "negative" | "neutral";
-}) {
-  return (
-    <article className="what-if-simple-result">
-      <strong>{value}</strong>
-      <span>{label}</span>
-      <small className={`is-${tone}`}>{note}</small>
-    </article>
-  );
+function SimpleResult({ value, label, note, tone }: { value: string; label: string; note: string; tone: "positive" | "negative" | "neutral" }) {
+  return <article className="what-if-simple-result"><strong>{value}</strong><span>{label}</span><small className={`is-${tone}`}>{note}</small></article>;
 }
 
-function KeyResult({
-  label,
-  value,
-  difference,
-}: {
-  label: string;
-  value: string;
-  difference: string;
-}) {
-  return (
-    <article className="what-if-key-result">
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small className={toneClassName(difference)}>{difference}</small>
-    </article>
-  );
+function KeyResult({ label, value, difference }: { label: string; value: string; difference: string }) {
+  return <article className="what-if-key-result"><span>{label}</span><strong>{value}</strong><small className={toneClassName(difference)}>{difference}</small></article>;
 }
 
-function OutcomeCard({
-  label,
-  baseline,
-  experiment,
-  difference,
-}: {
-  label: string;
-  baseline: string;
-  experiment: string;
-  difference: string;
-}) {
+function OutcomeCard({ label, baseline, experiment, difference }: { label: string; baseline: string; experiment: string; difference: string }) {
   return (
     <article className="what-if-outcome-card what-if-outcome-card-compact">
       <span>{label}</span>
-      <div>
-        <small>Saved plan</small>
-        <strong>{baseline}</strong>
-      </div>
-      <FontAwesomeIcon
-        className="what-if-outcome-arrow"
-        icon={AppIcons.chartLine}
-        aria-hidden="true"
-      />
-      <div>
-        <small>Experiment</small>
-        <strong>{experiment}</strong>
-      </div>
+      <div><small>Saved plan</small><strong>{baseline}</strong></div>
+      <FontAwesomeIcon className="what-if-outcome-arrow" icon={AppIcons.chartLine} aria-hidden="true" />
+      <div><small>Experiment</small><strong>{experiment}</strong></div>
       <em className={`what-if-outcome-difference${toneSuffix(difference)}`}>{difference}</em>
     </article>
   );
@@ -679,113 +366,50 @@ function OutcomeCard({
 function createSimpleTitle(regularDifference: number, pensionDifference: number): string {
   if (regularDifference > 0) return "More going in each month gives your pension more to build on";
   if (regularDifference < 0) return "Less going in each month reduces what reaches retirement";
-  if (pensionDifference !== 0) return "The wider saving changes affect your pension at retirement";
+  if (pensionDifference !== 0) return "The contribution change affects your pension at retirement";
   return "Your regular monthly saving is unchanged";
 }
 
-function createSimpleExplanation(
-  regularDifference: number,
-  pensionDifference: number,
-  yearsToRetirement: number,
-): string {
-  if (regularDifference === 0 && pensionDifference === 0) {
-    return "Change either contribution to see how the combined monthly amount affects the pension you could have at retirement.";
-  }
+function createSimpleExplanation(regularDifference: number, pensionDifference: number, yearsToRetirement: number): string {
+  if (regularDifference === 0 && pensionDifference === 0) return "Change either contribution to see how the combined monthly amount affects the pension you could have at retirement.";
   return `${formatCurrency(Math.abs(regularDifference))} ${regularDifference >= 0 ? "more" : "less"} goes into your pension each month. Across the ${yearsToRetirement} years to retirement, your projected pension is ${formatCurrency(Math.abs(pensionDifference))} ${pensionDifference >= 0 ? "higher" : "lower"} than your saved plan.`;
 }
 
-function createDetailedExplanation(
-  employeeDifference: number,
-  employerDifference: number,
-  extraDifference: number,
-  extraAgeDifference: number,
-  pensionDifference: number,
-  yearsToRetirement: number,
-): string {
-  if (
-    employeeDifference === 0 &&
-    employerDifference === 0 &&
-    extraDifference === 0 &&
-    extraAgeDifference === 0
-  ) {
-    return "Change either regular contribution, or use the scheduled-saving options below, to see how the saving pattern affects your pension.";
-  }
+function createDetailedExplanation(employeeDifference: number, employerDifference: number, pensionDifference: number, yearsToRetirement: number): string {
+  if (employeeDifference === 0 && employerDifference === 0) return "Change either regular contribution to see how the amount entering your pension each month affects the pension you could have at retirement.";
   const regularDifference = employeeDifference + employerDifference;
-  const regularText =
-    regularDifference === 0
-      ? "Your combined regular monthly contributions are unchanged."
-      : `Your combined regular monthly contributions change by ${formatSignedCurrency(regularDifference)}.`;
-  const extraText =
-    extraDifference === 0 && extraAgeDifference === 0
-      ? ""
-      : " Your scheduled future contribution also changes.";
-  return `${regularText}${extraText} Across the ${yearsToRetirement} years to retirement, your projected pension changes by ${formatSignedCurrency(pensionDifference)}.`;
+  const regularText = regularDifference === 0
+    ? "Your combined regular monthly contributions are unchanged, but the split between you and your employer is different."
+    : `Your combined regular monthly contributions change by ${formatSignedCurrency(regularDifference)}.`;
+  return `${regularText} Across the ${yearsToRetirement} years to retirement, your projected pension changes by ${formatSignedCurrency(pensionDifference)}.`;
 }
 
-function createReasons({
-  employeeDifference,
-  employerDifference,
-  extraDifference,
-  extraAgeDifference,
-  extraContributionAge,
-  yearsToRetirement,
-}: {
-  employeeDifference: number;
-  employerDifference: number;
-  extraDifference: number;
-  extraAgeDifference: number;
-  extraContributionAge: number;
-  yearsToRetirement: number;
-}): string[] {
-  if (
-    employeeDifference === 0 &&
-    employerDifference === 0 &&
-    extraDifference === 0 &&
-    extraAgeDifference === 0
-  ) {
-    return [
-      "Your personal contribution is unchanged.",
-      "Your employer contribution is unchanged.",
-      "Your scheduled future contribution is unchanged.",
-    ];
+function createReasons(employeeDifference: number, employerDifference: number): string[] {
+  if (employeeDifference === 0 && employerDifference === 0) {
+    return ["Your personal contribution is unchanged.", "Your employer contribution is unchanged."];
   }
   return [
-    employeeDifference >= 0
-      ? "Higher personal payments add more money throughout the accumulation period."
-      : "Lower personal payments reduce the amount invested each month.",
-    employerDifference >= 0
-      ? "A higher employer payment increases the regular amount entering the pension."
-      : "A lower employer payment reduces the regular pension funding.",
-    extraAgeDifference < 0
-      ? `Starting the extra payment at age ${extraContributionAge} gives it more years to compound.`
-      : extraAgeDifference > 0
-        ? `Starting the extra payment at age ${extraContributionAge} shortens the period over which it is invested.`
-        : extraDifference >= 0
-          ? `The scheduled extra payment begins from age ${extraContributionAge}.`
-          : `Reducing or removing the scheduled payment lowers later contributions across the ${yearsToRetirement}-year saving period.`,
+    employeeDifference === 0
+      ? "Your personal contribution is unchanged."
+      : employeeDifference > 0
+        ? "Higher personal payments add more money throughout the accumulation period."
+        : "Lower personal payments reduce the amount invested each month.",
+    employerDifference === 0
+      ? "Your employer contribution is unchanged."
+      : employerDifference > 0
+        ? "A higher employer payment increases the regular amount entering the pension."
+        : "A lower employer payment reduces the regular pension funding.",
   ];
 }
 
-function contributionStatus(
-  employeeDifference: number,
-  employerDifference: number,
-  extraDifference: number,
-): string {
-  const difference = employeeDifference + employerDifference + extraDifference;
+function contributionStatus(difference: number): string {
   if (difference > 0) return "Saving more";
   if (difference < 0) return "Saving less";
-  return "Timing changed";
+  return "Contribution mix changed";
 }
 
-function contributionMaximum(
-  baseline: number,
-  amount: number,
-  savedExperimentAmounts: number[],
-): number {
-  return roundUp(
-    Math.max(1_000, baseline + 1_000, amount, ...savedExperimentAmounts),
-    250,
-  );
+function contributionMaximum(baseline: number, amount: number, savedExperimentAmounts: number[]): number {
+  return roundUp(Math.max(1_000, baseline + 1_000, amount, ...savedExperimentAmounts), 250);
 }
 
 function roundUp(value: number, interval: number): number {
